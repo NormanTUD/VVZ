@@ -1,5 +1,6 @@
 <?php
 	$GLOBALS['dbname'] = 'uni';
+	$GLOBALS['error_page_shown'] = 0;
 
 	$dbfile = '/etc/vvzdbpw';
 
