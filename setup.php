@@ -15,8 +15,9 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 		<h1>Setup</h1>
 
 <?php
-		$result = rquery('use '.$GLOBALS['dbname'], 0);
-		if ($result === false) {
+		try {
+			$result = rquery('use '.$GLOBALS['dbname'], 0);
+		} catch {
 			print "<h2>Erstelle die Datenbank `".$GLOBALS['dbname']."`</h2>\n";
 			rquery('CREATE DATABASE `'.$GLOBALS['dbname'].'`');
 		}
