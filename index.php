@@ -54,7 +54,7 @@
 					$this_institut = $institute[0][0];
 				}
 				if(!$this_institut) {
-					$this_institut = 1;
+					$this_institut = array_key_first($institute);
 				}
 			} else {
 				die("Es konnten keine Institute gefunden werden. Ohne eingetragene Institute kann die Software nicht benutzt werden. Bitte kontaktieren Sie die Administratoren über die Kontaktseite.");
