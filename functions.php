@@ -2081,10 +2081,10 @@
 			$headers = '';
 			$headers .= "From:" . $from."\r\n";
 
-			$fp = fsockopen("localhost", 25, $errno, $errstr, 5);
-			if($fp && mail($to, $subject, $message, $headers)) {
-				$GLOBALS['messageerror'] = 'Die Administration ist informiert worden.';
-			}
+			#$fp = fsockopen("localhost", 25, $errno, $errstr, 5);
+			#if($fp && mail($to, $subject, $message, $headers)) {
+			#	$GLOBALS['messageerror'] = 'Die Administration ist informiert worden.';
+			#}
 
 			include("error.php");
 		} else {
