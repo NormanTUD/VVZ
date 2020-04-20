@@ -3528,6 +3528,12 @@ WHERE 1
 		return get_single_row_from_query($query);
 	}
 
+	function get_institut_id_by_dozent ($id) {
+		function_debug_counter("get_institut_id");
+		$query = 'SELECT `institut_id` FROM `users` WHERE `id` = '.esc($id).' limit 1';
+		return get_single_row_from_query($query);
+	}
+
 	function get_institut_id ($name) {
 		function_debug_counter("get_institut_id");
 		$query = 'SELECT `id` FROM `institut` WHERE `name` = '.esc($name).' limit 1';

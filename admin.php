@@ -52,8 +52,9 @@
 	} else {
 		$chosen_institut = get_get('institut');
 		$institute = create_institute_array();
+		$dozenten = create_dozenten_array();
 		if(count($institute) == 0) {
-			error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen.");
+			error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen. <a href='admin.php?page=3'>Falls Sie Administrator sind, können Sie das hier machen.</a>");
 		}
 
 		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id'])) {
@@ -70,8 +71,13 @@
 		$studiengaenge = create_studiengaenge_array($chosen_institut);
 		$zeitraum = create_zeitraum_array();
 		if(!count($studiengaenge)) {
-			error("Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. Bitten Sie einen Administrator, Studiengänge hinzuzufügen.");
+			error("Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. Bitten Sie einen Administrator, Studiengänge hinzuzufügen. <a href='admin.php?page=8'>Falls Sie Administrator sind, können Sie das hier machen.</a>");
 		}
+
+		if(!count($dozenten)) {
+			error("Es existieren keine Dozenten. <a href='admin.php?page=2'>Falls Sie Administrator sind, können Sie diese hier hinzufügen</a>");
+		}
+
 		if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
 			$datestring = md5(date('Y-m-d H'));
 			if (get_get('iamsure') == $datestring) {
@@ -83,7 +89,7 @@
 		$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]));
 		if(!user_is_verwalter($GLOBALS['logged_in_user_id'])) {
 			if(!preg_match('/\w{2,}/', $dozent_name)) {
-				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! !!!</span>';
+				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! <a href="admin.php?page=1">Ändern Sie das hier</a> !!!</span>';
 			}
 		} else {
 			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]);
