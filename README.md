@@ -11,6 +11,8 @@ Damit lassen sich
 
 verwalten. Darüber lässt sich eine ganze Universität verwalten!
 
+Aktuell läuft die Software unter vvz.phil.tu-dresden.de
+
 # Requirements
 
 - Linux (tested on Debian and Suse)
