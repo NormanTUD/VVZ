@@ -15,6 +15,11 @@
 <?php
 		}
 
+		$bereiche = create_bereiche_array();
+		if(!count($bereiche)) {
+			error("Keine Bereiche gefunden. <a href='admin.php?page=22'>Fügen Sie diese hier hinzu.</a>");
+		}
+
 		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id'])) {
 			$chosen_institut = $GLOBALS['user_institut_id'];
 		}
@@ -109,7 +114,6 @@ JOIN
 						$i = 0;
 						$j = 0;
 
-						$bereiche = create_bereiche_array();
 
 						foreach ($rows as $row) {
 							if(is_null($this_studiengang) || $this_studiengang != $row[0]) {
@@ -165,7 +169,7 @@ JOIN
 <?php
 				} else {
 ?>
-					<h2 class="class_red">Für dieses Institut sind noch keine Module vorhanden. Bitten Sie einen Administrator, Module hinzuzufügen.</h2>
+					<h2 class="class_red">Für dieses Institut sind noch keine Module vorhanden. <a href='admin.php?page=5'>Fügen Sie diese hier hinzu.</a></h2>
 <?php
 				}
 			}

@@ -57,6 +57,11 @@
 			error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen. <a href='admin.php?page=3'>Falls Sie Administrator sind, können Sie das hier machen.</a>");
 		}
 
+		$bereiche = create_bereiche_array();
+		if(!count($bereiche)) {
+			error("Keine Bereiche gefunden. <a href='admin.php?page=22'>Fügen Sie diese hier hinzu.</a>");
+		}
+
 		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id'])) {
 			$chosen_institut = $GLOBALS['user_institut_id'];
 		}
