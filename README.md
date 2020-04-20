@@ -10,6 +10,8 @@ Eine freie Software zur Verwaltung von Vorlesungen (*V*orlesungs*v*er*z*eichnis)
 
 # Installation
 
+After installing MariaDB, create a database (and change to `$GLOBALS['dbname']` to this in mysql.php). Default is `uni`.
+
 > cd $VVZDIR
 
 > echo "mysqldbpw" > /etc/vvzdbpw

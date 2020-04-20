@@ -10,12 +10,7 @@
 			$username = 'root';
 			$password = $vvzdbpw;
 
-			try {
-				$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password, $GLOBALS['dbname']);
-			} 
-			catch (ParseError $err) {
-				$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password);
-			}
+			$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password, $GLOBALS['dbname']);
 			if (!$GLOBALS['dbh']) {
 				dier("Kann nicht zur Datenbank verbinden!");
 			}
