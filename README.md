@@ -1,5 +1,5 @@
 # VVZ
-Eine freie Software zur Verwaltung von Vorlesungen
+Eine freie Software zur Verwaltung von Vorlesungen (*V*orlesungs*v*er*z*eichnis)
 
 # Installation
 
