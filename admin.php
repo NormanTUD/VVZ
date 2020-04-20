@@ -83,6 +83,20 @@
 			error("Es existieren keine Dozenten. <a href='admin.php?page=2'>Falls Sie Administrator sind, können Sie diese hier hinzufügen</a>");
 		}
 
+		$module = create_modul_studiengang_array(70, null);
+		if(!count($module)) {
+			error("Es existieren keine Module. <a href='admin.php?page=5'>Fügen Sie die hier hinzu</a>");
+		}
+
+		$pns = create_pruefungsnummern_array();
+		if(!count($pns)) {
+			error("Keine Prüfungsnummern gefunden. <a href='admin.php?page=12'>Fügen Sie diese hier hinzu.</a>");
+		}
+
+		if(!$GLOBALS['user_institut_id']) {
+			error("Ihrem Account ist kein Institut zugeordnet. <a href='admin.php?page=1'>Ändern Sie das hier</a>");
+		}
+
 		if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
 			$datestring = md5(date('Y-m-d H'));
 			if (get_get('iamsure') == $datestring) {
@@ -304,14 +318,8 @@
 				Im Falle der Verweigerung der Einwilligung oder eines Widerrufes kann das online-Vorlesungsverzeichnis nicht oder nicht mehr genutzt werden.<br /></p>
 
 				<p>Datenverarbeitende Stelle<br />
-				TU Dresden<br />
-				Philosophische Fakultät<br />
-				Institut für Philosophie<br />
-				01067 Dresden<br /></p>
-
-				<p>Kontakt: Norbert Engemaier<br />
-				Mail: Norbert.Engemaier@tu-dresden.de<br />
-				Telefon: 0351 463 32890</p>
+				ÄNDERN SIE DIESE DATEN IN DER <pre>admin.php</pre>.
+				</p>
 <?php
 				if(get_get('page') || get_get('show_items')) {
 					$id = get_get('page');
