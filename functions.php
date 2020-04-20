@@ -1173,6 +1173,17 @@
 		return false;
 	}
 
+	function view_exists ($db, $table) {
+		function_debug_counter("table_exists");
+		$query = "SELECT table_name FROM information_schema.views WHERE table_schema = ".esc($db)." AND table_name = ".esc($table);
+		$result = mysqli_query($GLOBALS['dbh'], $query);
+		$table_exists = 0;
+		while ($row = mysqli_fetch_row($result)) {
+			$table_exists = 1;
+		}
+		return $table_exists;
+	}
+
 	function table_exists ($db, $table) {
 		function_debug_counter("table_exists");
 		$query = "SELECT table_name FROM information_schema.tables WHERE table_schema = ".esc($db)." AND table_name = ".esc($table);
