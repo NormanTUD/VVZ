@@ -12,7 +12,8 @@
 
 			try {
 				$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password, $GLOBALS['dbname']);
-			} catch {
+			} 
+			catch (ParseError $err) {
 				$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password);
 			}
 			if (!$GLOBALS['dbh']) {
