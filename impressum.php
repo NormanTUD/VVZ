@@ -12,19 +12,7 @@
 		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
 		<h2>Impressum</h2>
 <p>
-Es gilt das <a href="https://tu-dresden.de/impressum" target="_blank">Impressum der TU Dresden</a> 
-mit folgenden Änderungen:
-</p>
-
-<p>
-Ansprechpartner:<br> Norbert Engemaier<br>
-Betreiber:<br>
-Technische Universit&auml;t Dresden<br>
-Institut für Philosophie<br>
-Norbert Engemaier<br>
-01062 Dresden<br>
-Tel.: +49 351 463-32890<br>
-E-Mail: norbert.engemaier@tu-dresden.de<br>
+HIER MUSS EIN EIGENES IMPRESSUM REIN!
 </p>
 
 <p>

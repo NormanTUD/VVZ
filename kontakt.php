@@ -1,5 +1,6 @@
 <?php
 	$php_start = microtime(true);
+	include("data.php");
 	if(file_exists('new_setup')) {
 		include('setup.php');
 		exit(0);
@@ -48,15 +49,14 @@
 		if(get_post('frage_id') && array_key_exists(get_post('frage_id'), $sicherheitsfragen) && $sicherheitsfrage_bestanden) {
 			if(strlen(get_post('nachricht')) >= 5) {
 				$headers = '';
-				$from = "vvz.phil@tu-dresden.de";
+				$from = $GLOBALS['fromemail'];
 
-				$to_name = "Norman Koch";
-				$to = "kochnorman@rocketmail.com";
+				$to_name = $GLOBALS['contactname'];
+				$to = $GLOBALS['contactemail'];
 				if(get_post('natur') == 'inhaltlich') {
-					$to_name = "Holm Bräuer";
-					$to = "holm.braeuer@tu-dresden.de";
-					$headers .= "Cc: nengemaier@gmail.com\r\n";
-					$headers .= "Cc: kochnorman@rocketmail.com\r\n";
+					$to_name = $GLOBALS['contactnameinhalt'];
+					$to = $GLOBALS['contactemailinhalt'];
+					$headers .= "Cc: ".$GLOBALS['contactemail']."\r\n";
 				}
 				$subject = "Nachricht vom Vorlesungsverzeichnis";
 

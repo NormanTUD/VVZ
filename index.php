@@ -42,12 +42,6 @@
 	if(preg_match('/^\d+$/', get_get('institut'))) {
 		$this_institut = get_get('institut');
 	} else {
-		if($_SERVER['HTTP_HOST'] == 'vvz.phil.tu-dresden.de') {
-			$this_institut = $institute[1][0];
-		} else if ($_SERVER['HTTP_HOST'] == 'vvz.musik.tu-dresden.de') {
-			$this_institut = $institute[1][0];
-		}
-		
 		if(!$this_institut) {
 			if(count($institute)) {
 				if(array_key_exists(0, $institute) && array_key_exists(0, $institute[0])) {

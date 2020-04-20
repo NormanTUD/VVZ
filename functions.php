@@ -15,8 +15,11 @@
 	(^\s*function\s*)([a-zA-Z0-9_]+)(\s*\(.*\)\s*\{\s*)
 	\1\2\3\n\t\tfunction_debug_counter("\2");
  */
+
+	include("data.php");
+
 	header_remove("X-Powered-By"); // Serverinfos entfernen
-	header("X-Frame-Options: ALLOW-FROM https://tu-dresden.de/"); // Gegen Clickjacking
+	header("X-Frame-Options: ALLOW-FROM https://".$GLOBALS['allowed_x_frame']); // Gegen Clickjacking
 
 	$GLOBALS['nonce'] = generate_random_string(10);
 
@@ -2062,10 +2065,10 @@
 		}
 		
 		if(!isset($GLOBALS['logged_in_user_id'])) {
-			$from = "vvz.phil@tu-dresden.de";
+			$from = $GLOBALS['fromemail'];
 
-			$to_name = "Norman Koch";
-			$to = "kochnorman@rocketmail.com";
+			$to_name = $GLOBALS['contactname'];
+			$to = $GLOBALS['contactemail'];
 			$subject = "FEHLER im Vorlesungsverzeichnis";
 
 			$datum = date("d.m.Y");
@@ -2676,7 +2679,11 @@
 		$name = NULL;
 
 		while ($row = mysqli_fetch_row($result)) {
-			$name = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower($row[1])."/'>".htmlentities($row[1])."</a> ".htmlentities($row[0]);
+			if($GLOBALS['enable_navigator']) {
+				$name = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower($row[1])."/'>".htmlentities($row[1])."</a> ".htmlentities($row[0]);
+			} else {
+				$name = htmlentities($row[0]);
+			}
 		}
 		$GLOBALS['memoize'][$key] = $name;
 
@@ -2691,7 +2698,11 @@
 		$raum_gebaeude = array();
 
 		while ($row = mysqli_fetch_row($result)) {
-			$raum_gebaeude["$row[0]"] = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower(htmlentities($row[1]))."/'>".htmlentities($row[1])."</a> ".htmlentities($row[2]);
+			if($GLOBALS['enable_navigator']) {
+				$raum_gebaeude["$row[0]"] = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower(htmlentities($row[1]))."/'>".htmlentities($row[1])."</a> ".htmlentities($row[2]);
+			} else {
+				$raum_gebaeude["$row[0]"] = htmlentities($row[2]);
+			}
 		}
 
 		return $raum_gebaeude;
@@ -2714,7 +2725,11 @@
 		$name = NULL;
 
 		while ($row = mysqli_fetch_row($result)) {
-			$name = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower($row[0])."/'>$row[0]</a> $row[1]";
+			if($GLOBALS['enable_navigator']) {
+				$name = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower($row[0])."/'>$row[0]</a> $row[1]";
+			} else {
+				$name = $row[1];
+			}
 		}
 
 		$GLOBALS['memoize'][$key] = $name;
@@ -3051,6 +3066,11 @@ WHERE 1
 		if(is_null($id) || !$id) {
 			return null;
 		}
+
+		if(!$GLOBALS['enable_navigator']) {
+			$navigator = 0;
+		}
+
 		$return = '';
 		$key = "get_gebaeude_abkuerzung($id, $navigator)";
 		if(array_key_exists($key, $GLOBALS['get_gebaeude_abkuerzung_cache'])) {
@@ -9006,8 +9026,11 @@ $ret_string .= '</table>';
 		dier($query);
 	}
 
-	function send_email ($message, $to, $to_name, $subject, $from = "vvz.phil.tu-dresden.de") {
+	function send_email ($message, $to, $to_name, $subject, $from = NULL) {
 		function_debug_counter("send_email");
+		if(isnull($from)) {
+			$from = $GLOBALS['fromemail'];
+		}
 		$headers = "From:".$from."\r\n";
 
 		$fp = fsockopen("localhost", 25, $errno, $errstr, 5);
@@ -9233,7 +9256,7 @@ $ret_string .= '</table>';
 	function replace_hinweis_with_graphics ($text, $show_base_url = 0) {
 		$base_url = '';
 		if($show_base_url) {
-			$base_url = "https://vvz.phil.tu-dresden.de/";
+			$base_url = $GLOBALS['baseurl'];
 		}
 		$text = preg_replace('/LaTeX/', '<img width="45px" alt="LaTeX" src="'.$base_url.'i/LaTeX.svg">', $text);
 		$text = preg_replace('/\\\\git/', '<img width="45px" alt="git" src="'.$base_url.'i/git.svg">', $text);
