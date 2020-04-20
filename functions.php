@@ -2956,6 +2956,17 @@
 		return get_single_row_from_query($query);
 	}
 
+	function is_freigeschaltet ($veranstaltung_id) {
+		function_debug_counter("is_freigeschaltet($veranstaltung_id)");
+		$query = 'select gebaeude_id from veranstaltung where id = '.esc($veranstaltung_id);
+		$result = get_single_row_from_query($query);
+		if(!$result) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+
 	function get_auth_code_by_id ($id) {
 		function_debug_counter("get_auth_code_by_id");
 		if(is_null($id) || !$id) {
