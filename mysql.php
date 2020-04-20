@@ -1,5 +1,4 @@
 <?php
-	#$GLOBALS['dbname'] = 'info_uni';
 	$GLOBALS['dbname'] = 'uni';
 
 	$dbfile = '/etc/vvzdbpw';
@@ -11,7 +10,11 @@
 			$username = 'root';
 			$password = $vvzdbpw;
 
-			$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password, $GLOBALS['dbname']);
+			try {
+				$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password, $GLOBALS['dbname']);
+			} catch {
+				$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password);
+			}
 			if (!$GLOBALS['dbh']) {
 				dier("Kann nicht zur Datenbank verbinden!");
 			}
