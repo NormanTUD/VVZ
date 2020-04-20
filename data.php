@@ -10,5 +10,5 @@
 	$GLOBALS['allowed_x_frame'] = "tu-dresden.de";
 	$GLOBALS['baseurl'] = "https://vvz.phil.tu-dresden.de/";
 
-	$GLOBALS['enable_navigator'] = 0;
+	$GLOBALS['enable_navigator'] = 0; # Right now, only works with TU Dresden Navigator!
 ?>

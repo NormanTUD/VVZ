@@ -891,7 +891,11 @@
 							if(!$raum_gebaeude) {
 								$geb_abk = get_gebaeude_abkuerzung($row[1]);
 								if($geb_abk) {
-									$raum_gebaeude = "Raum: <a href='https://navigator.tu-dresden.de/karten/dresden/geb/".htmlentities(strtolower($geb_abk))."'>".htmlentities($geb_abk).'</a>';
+									if($GLOBALS['enable_navigator']) {
+										$raum_gebaeude = "Raum: <a href='https://navigator.tu-dresden.de/karten/dresden/geb/".htmlentities(strtolower($geb_abk))."'>".htmlentities($geb_abk).'</a>';
+									} else {
+										$raum_gebaeude = htmlentities("$geb_abk");
+									}
 								}
 
 							}
@@ -1082,8 +1086,10 @@ if($sws[1]) {
 									$gebaeude_link = '';
 
 									if($gebaeude_abkuerzung) {
-										$gebaeude_link = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".
-											strtolower($gebaeude_abkuerzung)."'>".$gebaeude_abkuerzung.'</a> '.html_map(null, null, $gebaeude_id);
+										if($GLOBALS['enable_navigator']) {
+											$gebaeude_link = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".
+												strtolower($gebaeude_abkuerzung)."'>".$gebaeude_abkuerzung.'</a> '.html_map(null, null, $gebaeude_id);
+										}
 									}
 									if(!$gebaeude_link) {
 										$gebaeude_link = "&mdash;";
