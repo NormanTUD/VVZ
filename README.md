@@ -4,11 +4,12 @@ Eine freie Software zur Verwaltung von Vorlesungen (*V*orlesungs*v*er*z*eichnis)
 Damit lassen sich
 
 - Dozenten
+- Institute
 - Veranstaltungen
 - Prüfungen
 - uvm.
 
-verwalten.
+verwalten. Darüber lässt sich eine ganze Universität verwalten!
 
 # Requirements
 
