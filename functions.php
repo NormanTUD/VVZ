@@ -2068,7 +2068,12 @@
 			if(isset($_SERVER['HTTP_USER_AGENT'])) {
 				$message .= "User-Agent: ".htmlentities($_SERVER['HTTP_USER_AGENT'])."\n";
 			}
-			$actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+			$actual_link = "";
+			try {
+				$actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+			} catch (ParseError $err) {
+				$actual_link = "Unknown";
+			}
 			$message .= "URL: ".htmlentities($actual_link)."\n";
 			$message .= "POST: ".htmlentities(print_r($_POST, true))."\n";
 			$message .= "DBname: ".print_r($GLOBALS['dbname'], true)."\n";
