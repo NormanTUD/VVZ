@@ -18,7 +18,9 @@ After installing MariaDB, create a database (and change to `$GLOBALS['dbname']` 
 
 > touch new_setup
 
-Öffne die URL vom Server im Browser.
+Open the URL in the browser after doing this and follow the instructions.
+
+After deleting `new_setup`, log in and follow the further instructions. Once done, the software is ready.
 
 # Debug
 
