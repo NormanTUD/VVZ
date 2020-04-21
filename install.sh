@@ -6,6 +6,8 @@ read -p "Where to put VVZ: " maindir
 read -p "Name of the database: " dbname
 read -p "DB Pass (user: root): " dbpass
 
+mkdir -p $maindir
+
 echo "$dbpass" > /etc/vvzdbpw
 
 sudo apt-get install -y apache2 php7.3 git php7.3-mysql mariadb-client mariadb-server
