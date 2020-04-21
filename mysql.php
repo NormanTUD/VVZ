@@ -1,5 +1,5 @@
 <?php
-	$GLOBALS['dbname'] = 'uni2';
+	$GLOBALS['dbname'] = 'PLACEHOLDERDBNAME';
 	$GLOBALS['error_page_shown'] = 0;
 
 	$dbfile = '/etc/vvzdbpw';
