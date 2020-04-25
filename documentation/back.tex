@@ -1,0 +1,586 @@
+\documentclass{scrartcl}
+\newcommand{\frontorbackendtype}{Backend}
+\input{start}
+
+%\section{Ist es nicht irgendwie gefährlich, die interne Struktur zu veröffentlichen?}
+%
+%\begin{technisches}
+%Nein, denn Sicherheit basiert nicht auf Unwissenheit (\frq Security through Obscurity\flq), sondern 
+%auf Offenheit. Es gilt Kerckhoffs' Prinzip: \frq [Ein sicheres
+%System] darf nicht der Geheimhaltung bedürfen und soll
+%ohne Schaden in Feindeshand fallen können\flq\ (Quelle: \cite{kerkhoffwiki}). Dies gilt für alle
+%sichere Software. Security-through-Obscurity bietet immer nur Scheinsicherheit.
+%\end{technisches}
+
+\section{Benutzung und Details}
+
+\subsection{Anmelden}
+
+Das Anmelden findet (noch) nicht über Shibboleth, sondern über ein eigenes Anmeldesystem statt. Accounts
+zum Anmelden können Ihnen Herr Dr. Holm Bräuer, Herr Norbert Engemaier oder ich (die Administratoren der Seiten)
+erstellen.
+
+In der Logikmaske können Sie Ihren Namen (ohne Titel) und Ihr Passwort eingeben und sehen die Startseite.
+
+\begin{technisches}
+Es gibt mehrere Arten von Accounts:
+
+\begin{itemize}
+	\item Administratoren (haben Zugriff auf alle Seiten und können alles ändern)
+	\item Dozenten (haben Zugriff auf die eigenen Daten und können eigene Veranstaltungen bearbeiten)
+	\item Superdozenten (haben, wie Dozenten, Zugriff auf eigene Veranstaltungen, aber können auch die
+		Veranstaltungen von ausgewählten anderen \frq superverwalten\flq, d.\,h. anlegen, bearbeiten
+		und löschen)
+	\item Verwalter (haben Zugriff auf Verwaltungsfunktionen, können aber keine Veranstaltungen erstellen,
+		bearbeiten oder löschen)
+	\item Raumplanungsdozenten (können ihre eigenen Veranstaltungen erstellen, bearbeiten und löschen und
+		haben Zugriff auf die Raumplanungsseite, vgl. \fullref{raumplanung})
+\end{itemize}
+
+	Jeder Account ist exakt einem dieser sogenannten \frq Rollen\flq\ zugeordnet (vgl. \fullref{rollen}).
+
+\end{technisches}
+
+\subsection{Abmelden}
+
+Nach der Anmeldung sind sowohl im Back- als auch im Frontend oben auf der Seite Links, mit denen Sie sich abmelden
+können.
+
+\subsection{Vorteile der eingeloggten Nutzer im Frontend}
+
+Wenn Sie Rechte haben, Veranstaltungen zu bearbeiten, sehen Sie im Frontend unter jeder Veranstaltung, die Sie
+bearbeiten dürfen, einen Link: \frq diese Veranstaltung bearbeiten\flq. Somit können Sie direkt von der Startseite
+zur \frq Einzelne Veranstaltung\flq-Seite Ihrer Veranstaltung.
+
+\begin{technisches}
+Wenn Sie Administrator sind, haben Sie mehr Rechte. So sehen Sie z.\,B. die Debug-Informationen am unteren Ende der
+Seite.
+\end{technisches}
+
+\subsection{Der Aufbau der Seite}
+
+Die Seite ist vier- (bzw. fünf)-geteilt. Im obersten Abschnitt finden Sie nach der Anmeldung Ihren Namen, das
+TU-Dresden-Logo und einen Link zum Abmelden Ihres Accounts.
+
+Darunter befindet sich eine Zeile mit allen Unterseiten und Seitenkategorien. Unterseiten erkennen Sie an der
+dunkleren Farbe, Seitenkategorien (thematische Sammlung einzelner Unterseiten) erkennen Sie am Pfeil runter $\downarrow$ 
+neben dem Namen und dem gräulicherem Blauton. Die aktuell ausgewählte Seite hat sowohl einen Pfeil $\longrightarrow$, als
+auch eine deutliche grüne Hintergrundfarbe.
+
+Darunter befindet sich der Hauptbereich für einzelne Unterseiten. Dort werden -- je nach ausgewählter Unterseite --
+die Inhalte der Seite angezeigt.
+
+Noch weiter runter befindet sich --- wie im Frontend --- die Leiste mit nützlichen Links auf der Seite.
+
+\begin{technisches}
+Darunter befindet sich der Query-Debugger, der nur für Administratoren sichtbar ist. In ihm sind alle Queries, die für den
+Aufbau der Seite ausgeführt worden sind, Debug-Meldungen, Stack-Traces usw.
+\end{technisches}
+
+\begin{technisches}
+Alle Daten auf der Seite sind \frq normalisiert\flq, das heißt: eine Änderung an einer Stelle wirkt sich überall aus.
+Als Beispiel sei ein Dozent genannt, der durch Heirat seinen Namen ändert. Der neue Name muss nur an einer Stelle
+einmalig eingetragen werden und ist dann überall sofort aktualisiert. Es gibt keine redundanten Daten, die an mehreren
+Stellen geändert werden müssen.
+\end{technisches}
+
+\begin{technisches}
+Vor jedem Löschen einer Information aus dem VVZ werden alle Abhängigkeiten, die durch die Normalisierung entstehen,
+gesucht und angezeigt. Beispiel:
+
+Der Datenbankzustand muss immer konsistent sein, damit immer alle nötigen Informationen vorhanden sind. Löscht man
+aber nun einen Dozenten, dann hätten Veranstaltungen ohne seine Existenz im System keine Zuordnung mehr.
+Daher müsste man alle Veranstaltungen mitlöschen. 
+
+Um klar anzuzeigen, was entfernt werden würde, wenn man Etwas löscht, wird ebendies alles angezeigt und man kann
+noch von der Entscheidung, das zu löschen, zurücktreten.
+
+Bei vielen Menüpunkten besteht daher auch die Möglichkeit, einen Eintrag zu deaktivieren statt ihn zu löschen.
+Das Deaktivieren verhindert z.\,B. bei Accounts, dass man sich mit dem Benutzeraccount anmelden kann, ohne,
+dass die Daten, die ihm zugehörig sind, gelöscht werden müssen. Solche Mechanismen existieren bei den 
+\fullref{accounts}, bei den \fullref{pruefungsnummern} und bei \fullref{dozenten}.
+\end{technisches}
+
+In den meisten Tabellen, in denen Daten stehen, steht ganz rechts der Button \frq löschen\flq. Damit lassen sich, für
+Accounts, die die jeweiligen Rechte besitzen, Daten aus dem VVZ löschen. Die letzte Spalte der meisten Tabellen 
+beinhaltet dagegen die Möglichkeit, einen neuen Eintrag hinzuzufügen. Dieser ist dann leer und hat keinen
+\frq Löschen\flq-Button.
+
+\section{Ich will doch nur\dots}
+
+\subsection{\dots\ meine Veranstaltung eintragen, ändern oder löschen}
+
+Dazu müssen Sie einen Account mit den Rechten, eine Veranstaltung zu erstellen, besitzen und angemeldet sein.
+Gehen Sie in der Navigationsleiste auf \frq Veranstaltungen\flq, scrollen runter und tragen in die letzte Zeile
+der großen Tabelle den Namen, das Semester und den Typ ein (und, wenn Sie Administrator oder Superdozent sind,
+den Namen des Dozenten; sonst wird automatisch der mit Ihrem Account verknüpfte Dozent eingetragen).
+
+Klicken Sie dann auf \frq Bearbeiten\flq. Das speichert die eingegebenen Daten und leitet Sie weiter zur
+Seite \frq Einzelne Veranstaltungen\flq\ (siehe \fullref{einzelneveranstaltung}). Dort können Sie Zeiten, Räume und
+Prüfungsleistungen eintragen. Klicken Sie dann entweder ganz oben oder ganz unten auf der Seite nochmal auf
+\frq Speichern\flq\ und die Veranstaltung ist sofort live. 
+
+Über den selben Weg können Sie die Veranstaltung auch nachträglich jederzeit bearbeiten.
+
+Der Gebäude- und Raumwunsch wird nicht automatisch veröffentlicht. Dazu muss erst der Raumplanungsdozent
+nach der Kommunikation mit dem Raumplanungsdezernat eintragen, wo die Veranstaltung stattfindet.
+
+\subsection{\dots\ mein Passwort ändern}
+
+Das können Sie auf der Seite \frq Eigene Daten ändern\flq\ in der Navigationsleiste.
+
+\subsection{\dots\ mein vergessenes Passwort erfahren}
+
+Die Passworte werden nicht im Klartext gespeichert, sondern gehasht. Das heißt, dass niemand Zugriff auf Ihr
+verlorenes Passwort hat. Aber die Administratoren können Ihr Passwort jederzeit neu setzen. Benutzen Sie einfach
+die Kontakt-Seite am unteren Bildschirmrand, um uns danach zu fragen.
+
+\begin{technisches}
+Genauer gesagt sind die Passworte mit \texttt{sha256} und einem zufällig-generiertem Salt gehasht. Es ist 
+nicht möglich, aus dieser Kombination Ihr Ursprungspasswort wiederherzustellen. \texttt{sha256} ist eine
+sogenannte Einwegfunktion. Das heißt, dass es relativ einfach ist, $y$ mit $y = f(x)$ zu berechnen, aber praktisch
+unmöglich, aus $y$ herauszufinden, welches $x$ (Ihr Passwort) in die Funktion gegeben worden ist. Das Hinzufügen
+eines Saltes erschwert das noch zusätzlich, weil die zufällig angehangene Zeichenkette sogenannte 
+\frq Rainbow-Tables\flq\ in der Praxis 
+unmöglich macht, in der eine Menge aus verschiedenen $x \leftrightarrow y$-Kombinationen gespeichert sind.
+\end{technisches}
+
+\section{Unterseiten}
+
+\subsection{Willkommen!}
+
+Auf der Startseite sehen Sie Informationen und Hinweise zur Benutzung. Darunter sehen Sie die gleichen Daten, wie sie
+oben im Menü angezeigt werden, in hierarchischer Struktur. Von hier aus können Sie alle Seiten, die Sie aufrufen dürfen,
+auf einen Blick sehen.
+
+\begin{technisches}
+Sowohl die Leiste oben als auch diese Ansicht passt sich an die Rolle des angemeldeten Benutzers an. Ein Administrator
+sieht bei Beidem andere Punkte als ein Raumplanungsdozent.
+\end{technisches}
+
+\subsection{Eigene Daten ändern}
+
+Auf \frq Eigene Daten ändern\flq\ können Sie Ihr eigenes Passwort ändern und festsetzen, ob der Raumplanungsdozent
+automatisch sehen soll, dass Sie ein barrierefreies Gebäude bevorzugen. Mit dieser Option müssen Sie das nicht immer
+manuell eintragen beim Erstellen von Veranstaltungen.
+
+\subsection{Kontakt}
+
+Unter Kontakt können Sie -- wie unten in der Navigationsleiste -- zum Kontaktformular kommen, um Fehler, Vorschläge und
+Fragen zur Software oder den Daten zu geben. Als angemeldeter Benutzer muss man keine Sicherheitsfrage eingeben.
+
+\subsection{Moduldaten}
+
+In dieser Kategorie befinden sich zwei Unterseiten, die dazu dienen, Informationen zu Modulen einzutragen oder zu ändern.
+
+\subsubsection{Modul $\longrightarrow$ Semester}
+
+Hier können Informationen eingetragen werden, die für die automatische Stundenplanerstellung genutzt werden. Dabei muss
+man als erstes einen Studiengang auswählen und bekommt dann eine Liste aller Module. Zu diesen Modulen kann man dann sagen,
+in welchem Semester sie laut Regelstudienordnung auftauchen sollten. Dies geht mit einem einfachen Komma:
+\frq\texttt{1,2}\flq\ heißt: im ersten und zweiten Semester.
+
+Sind die Semesterinformationen gespeichert, taucht eine zweite Tabelle auf, in der die Anzahl der Veranstaltungstypen, der
+Credit-Points und Prüfungsleistungen, die nötig sind, eingetragen werden können.
+
+Ist dies für einen Studiengang eingetragen ist eine automatische Stundenplanerstellung möglich.
+
+\subsubsection{Module}
+
+Auf der Unterseite zu Modulen können Sie neue Module erstellen, vorhandene bearbeiten oder löschen. Dabei braucht
+jedes Modul eine Zuordnung zu einem Studiengang, einen Namen und optionalerweise auch eine Beschreibung und eine Abkürzung.
+
+Studiengänge hierfür können unter Stammdaten $\longrightarrow$ Studiengänge hinzugefügt werden (vgl. \fullref{studiengaenge}).
+
+\subsection{Prüfungsdaten}
+
+In dieser Kategorie sind alle Unterseiten, die Etwas mit der Verwaltung von Prüfungsleistungen zu tun haben.
+
+\subsubsection{Dozent $\longrightarrow$ Prüfungsdaten}
+
+\label{dozentpruefungsdaten}
+
+Diese Seite erstellt automatisch Berichte für die Prüfungsämter, welcher Dozent welche Prüfungsleistungen angeboten hat.
+Dabei kann man sowohl Semester, Studiengang als auch das Prüfungsamt einschränken (manche Prüfungsämter wollen nicht
+die Daten aller Studiengänge, und mit der Definition von Prüfungsämtern kann man festlegen, welche was bekommen wollen, vgl. \fullref{pruefungsaemter}).
+
+Am unteren Ende der Seite besteht die Möglichkeit, die oben angezeigte Liste als Excel-Datei herunterzuladen.
+
+Alles auf dieser Seite wird vollautomatisch erstellt. Es ist nicht möglich, hier etwas zu ändern (dazu müssten 
+beispielsweise Dozenten in ihren Veranstaltungen Prüfungsleistungen abwählen, siehe \fullref{einzelneveranstaltung}).
+
+\subsubsection{Prüfung $\longrightarrow$ Zeitraum}
+
+Jeder Prüfungsleistung ist ein Zeitraum zugeordnet (\frq erster Zeitraum\flq\ und \frq zweiter Zeitraum\flq). Diese
+Zeiträume lassen sich hier erstellen, ändern oder löschen.
+
+\subsubsection{Prüfungsämter}
+
+\label{pruefungsaemter}
+Für die in \fullref{dozentpruefungsdaten} auswählbaren Prüfungsämter lässt sich hier festlegen, welche Prüfungsämter an
+Dokumenten welcher Studiengänge interessiert sind. In der oberen Tabelle lassen sich neue Prüfungsämter eintragen oder alte
+umbenennen oder löschen und in der unteren Tabelle lassen sich für jedes Prüfungsamt Checkboxen setzen für gewisse
+Studiengänge.
+
+\subsubsection{Prüfungsnummer $\longrightarrow$ Dozent}
+
+Ähnlich wie in \fullref{dozentpruefungsdaten} lässt sich hier vollautomatisch erstellt eine Liste ansehen und als Excel-Datei
+downloaden, nur ist hier Zuordnung hier genau andersherum. Jeder Prüfungsleistung wird zugeordnet, welche Dozenten sie
+in dem Semester anbieten und in welchem Studiengang.
+
+\subsubsection{Prüfungsnummern}
+
+\label{pruefungsnummern}
+
+Die Prüfungsnummernunterseite erlaubt es, Prüfungsnummern zu erstellen, zu bearbeiten oder zu löschen. Jeder 
+Prüfungsleistungen ist dabei ein Studiengang, ein Modul, ein Bereich, ein Prüfungstyp, eine Modulbezeichnung (optional),
+eine Prüfungsnummer (optional) und ein Zeitraum zugeordnet. Einzelne Prüfungsleistungen lassen sich hier auch
+deaktivieren, um die Datenkonsistenz nicht zu gefährden und trotzdem Veranstaltungen auf der Seite einzelner 
+Veranstaltungen nicht sichtbar werden zu lassen (vgl. \fullref{einzelneveranstaltung}).
+
+\subsubsection{Prüfungstypen}
+
+Diese Unterseite verwaltet die Arten von Prüfungsleistungen, die es gibt, beispielsweise Klausuren oder Essays.
+Bis auf den Namen kann man hier keine Informationen eintragen.
+
+\subsection{Raumplanung}
+
+\label{raumplanung}
+
+Auf der Raumplanungsseite ist sowohl das Institut als auch das Semester auswählbar. Hier erscheinen alle für die
+gewählten Einstellung eingetragenen Veranstaltungen mit Zusatzinformationen wie dem Gebäudewunsch und dem Raumwunsch,
+aber auch einem vom Dozenten frei eingebbaren Hinweis für die Raumplanung.
+
+Der Raumplanungsdozent kann hier -- nach Rücksprache mit dem Raumplanungsdezernat -- ein Gebäude und einen Raum für eine
+Veranstaltung festlegen. Diese erscheinen dann im Frontend des VVZs. Die Raumwünsche und Gebäudewünsche erscheinen
+dort noch nicht. Zusätzlich kann eingetragen werden, wann der Raum gemeldet worden ist.
+
+Wenn der Raumplaner einen Raum eingetragen hat, aber der Dozent noch für die Raumplanung relevante Daten geändert hat,
+erscheint neben dem Titel der Veranstaltung ein kleiner Blitz {\Huge\textcolor{yellow}{\faBolt}}. Dieser weist darauf hin, dass nachträglich
+relevante Daten geändert worden sind und man sich die Veranstaltung nochmal ansehen sollte. Durch erneutes Speichern (auch,
+wenn keine weiteren Änderungen vorgenommen worden sind) verschwindet der Blitz.
+
+Am unteren Ende der Seite ist die Möglichkeit, sich die oben gezeigte Liste als Excel-Datei zu downloaden.
+
+\subsection{Stammdaten}
+
+\subsubsection{Alte Daten löschen}
+
+Wenn Daten, die vergangene Semester betreffen, aus irgendwelchen Gründen gelöscht werden sollen, kann man das hier machen.
+Die Seite zeigt alle Semester, die die Software kennt, an, und gibt die einfache Möglichkeit zum konsistenten Löschen.
+
+\subsubsection{Bereiche}
+
+Hier können Bereichsnamen erstellt, bearbeitet oder gelöscht werden.
+
+\subsubsection{Dozenten}
+
+\label{dozenten}
+
+Hier können Dozenten mit ihren Metadaten erstellt, bearbeitet oder gelöscht werden. Auch kann hier festgelegt
+werden, ob der Dozent noch am Institut oder bereits ausgeschieden ist. In der Tabelle darunter ist eine Übersicht,
+wie viele Prüfungsleistungen ein Dozent im ausgewählten Semester anbietet.
+
+Noch etwas weiter runter ist eine Tabelle, in der eine Verknüpfung zwischen Dozent und Titel hergestellt werden kann.
+Hat Jemand z.\,B. einen Doktortitel und man trägt das hier ein, taucht der Doktortitel auf der Seite an den meisten
+Stellen auf, wo der Name des Dozenten steht (für die Festlegung der Titel, siehe \fullref{titel}).
+
+\subsubsection{Einzelne Veranstaltung}
+
+\label{einzelneveranstaltung}
+Auf der Unterseite \frq Einzelne Veranstaltung\flq\ können --- wie der Name es sagt --- einzelne Veranstaltungen
+bearbeitet werden. Geht man über das Menü auf diese Seite, erscheint eine Liste aller Veranstaltung, die Sie editieren
+dürfen. Wählen Sie dort eine aus und klicken auf \frq Veranstaltung auswählen\flq, und Sie können die Veranstaltung
+bearbeiten.
+
+In der ersten Tabelle haben Sie die Möglichkeit, Sprache, Wochentag, Stunde, Wochenrhythmus,
+den ersten Termin, die Anzahl der Hörer (für die Raumplanung), einen Link zu OPAL, einen Gebäude- und einen Raumwunsch
+einzutragen. Dabei ist alles -- bis auf Wochentag, Stunde und Wochenrhythmus -- optional. Umso mehr Informationen Sie
+aber eintragen, umso nützlicher ist die Seite.
+
+Darunter ist eine Tabelle mit zwei Hinweisfeldern. Der Hinweis für die Raumplanung taucht nur auf der Raumplanungsseite
+auf (vgl. \fullref{raumplanung}), der Hinweis für die Studenten auch im Frontend.
+
+Darunter haben Sie die Möglichkeit, eine inhaltliche Verbindung zweier Fächer herzustellen, beispielsweise einer Vorlesung
+und einer Übung. Diese Verbindung erscheint dann auf der Startseite.
+
+Dann kommt eine Tabelle, in der einzelne Termine und Orte eingetragen werden können, die nicht in das oben-angegebene
+Muster passen (ist die ganze Veranstaltung nicht ins Schema zu pressen, kann man dafür bei der Stunde \frq *\flq, oder
+\frq ganztägig\flq\ auswählen und beim Tag \frq BS\flq\, für Blockseminar, auswählen).
+
+Darunter befindet sich eine Tabelle aller Prüfungsleistungen. Diese sind geordnet nach Studiengängen (blaue Überschriften)
+und Modulen (linke Seite). Wird hier ein Haken gesetzt, dann taucht die Veranstaltung in der Unterseite des Studienganges
+des Modules auf, für das eine Prüfung ausgewählt worden ist. Tipp: mit der Tastenkombination \frq STRG f\flq\ kann man auf
+einer Internetseite z.\,B. nach Zahlen oder Text suchen. Somit finden sich die Prüfungsleistungen schneller. 
+
+Darunter ist ein großer Speichernknopf, der auch oben auf der Seite nochmal ist. Klickt man diesen, werden alle 
+eingetragenen Informationen gespeichert.
+
+Noch weiter runter ist die Möglichkeit, ausgewählte Prüfungsleistungen von einer anderen Veranstaltung zu klonen (z.\,B.
+aus einem vorherigen Semester). Dabei kann man sich Veranstaltungen alter Semester anzeigen, aber auch aktueller, auf
+die man selbst Zugriff hat. Außerdem lassen sich mit einer Checkbox die aktuell ausgewählten und die zu-klonenden 
+in einer Gesamtmenge vereinen, so, dass man beide hat.
+
+\subsubsection{FAQ}
+
+Hier ist es möglich, die Daten des FAQs zu editieren. Dazu können Fragen und Antworten eingegeben werden, und eine
+Zahl, wie häufig danach gefragt wird. Umso häufiger etwas gefragt wird, umso höher steht es automatisch im FAQ.
+
+\subsubsection{Gebäude}
+
+Hier lassen sich Gebäude einfügen, bearbeiten oder löschen. Dabei muss man den Gebäuden sowohl einen Namen als auch eine
+Abkürzung geben.
+
+\subsubsection{Institute}
+
+Auf der Seite der Institute lassen sich neue Institute erstellen, vorhandene bearbeiten oder löschen. Dazu hat jedes 
+Institut einen Namen und eine Startnummer. Diese Startnummer ist relevant für die Liste auf der Raumplanungsseite,
+denn für die Prüfungsämterlisten beginnen Veranstaltungen eines Institutes immer mit einer bestimmten, automatisch
+generierten ID. Die Startnummer wird der automatisch generierten \frq 1\flq\ für die erste Veranstaltung aufaddiert.
+Ist sie nicht gesetzt, wird das behandelt wie eine 0.
+
+\subsubsection{Merges}
+
+\begin{technisches}
+Die Merge-Seite erlaubt es, sehr ähnliche Informationen in der Datenbank zu verschmelzen. Als Beispiel sei 
+genannt, dass man ausversehen zwei Sprachen eingetragen hat, die eigentlich eine sind, und beiden Sprachen
+bereits mit Veranstaltungen verknüpft sind. Würde man eine davon löschen, wäre die Datenbank inkonsistent. 
+
+Merges erlaubt es, solche Strukturen automatisch zusammenzufügen, in dem man eine geeignete Tabelle auswählt
+(der automatische Vorgang geht nicht mit allen Tabellen!) und in der oberen Tabelle eine Liste aller Einträge hat
+mit Checkboxen und darunter mit Radio-Buttons.
+
+Wählt man in der ersten Tabelle drei Einträge aus und in der zweiten nur einen, dann werden alle Referenzen der
+auf Daten in der Tabelle geändert auf das, was in der zweiten Tabelle ausgewählt ist. Danach werden die alten,
+nicht-mehr-referenzierten Daten gelöscht.
+
+\mydbend\ \mydbend\ \mydbend\ Achtung: das ist ein sehr experimentelles Feature. Ich habe bisher bei vielen
+Versuchen noch keine Fehler entdecken können, aber ich würde dringend empfehlen, vorher ein Datenbankbackup
+zu machen, siehe dazu \fullref{backup}.
+\end{technisches}
+
+\subsubsection{Semester}
+
+Im Unterpunkt Semester sind die vom System automatisch erstellten Jahressemester (Sommersemester/Wintersemester und Jahr).
+Das System erstellt automatisch Semester für die nächsten zehn Jahre, um immer die Möglichkeit zu bieten, genügend
+Referenzpunkte für Veranstaltungen zu haben.
+
+Hier kann außerdem das Start-Datum des Semesters eingetragen werden. Einmal erstellte Semester können nicht mehr über
+die grafische Oberfläche entfernt werden, so wie neue Semester auch nicht eingetragen. Das geschieht immer automatisch.
+
+\subsubsection{Sprachen}
+
+Hier können Sprachen festgelegt werden, die im Menüpunkt \frq Einzelne Veranstaltung\flq\ ausgewählt werden können,
+     siehe dazu \fullref{einzelneveranstaltung}. Dazu muss je ein Name und eine Abkürzung (bestenfalls nach ISO 639-5) festgelegt 
+werden.
+
+\subsubsection{Studiengänge}
+
+\label{studiengaenge}
+
+Hier können neue Studiengänge eingeführt, vorhandene bearbeitet oder gelöscht werden. Dazu muss je ein Institut angeben
+werden, ein Name und optionalerweise auch ein Link zur Studienordnung. Dieser erscheint dann im Frontend.
+
+\subsubsection{Stundenpläne}
+
+Unter \frq Stundenpläne\flq\ sind Links zur automatischen Stundenplanverwaltung, die für jeden Dozenten (bei 
+Administratoren) bzw. für sich selbst den Stundenplan enthält. Dieser wird automatisch generiert aus den ausgewählten
+Veranstaltungen.
+
+\subsubsection{Superdozenten}
+\label{superdozenten}
+
+Diese Seite erlaubt das Festlegen der Superdozenten. Ein Superdozent ist ein Dozent, der Superkräfte hat. Das heißt:
+er kann Veranstaltungen ausgewählter anderer Dozenten bearbeiten. Dazu muss einem Dozenten die Rolle als Superdozent zugewiesen werden (siehe \fullref{rollen}) und Checkboxen bei den Namen der jeweiligen Dozenten gemacht werden.
+
+\subsubsection{Titel}
+\label{titel}
+
+In der \frq Titel\flq-Seite können zentral Titel festgelegt werden, die Dozenten zugewiesen werden können (vgl. auch
+\fullref{dozenten}). Dabei hat jeder Titel einen Namen und eine Abkürzung, wobei nur die Abkürzung vor den Namen
+erscheint.
+
+\subsubsection{Vorlesungstypen}
+
+Hier können Vorlesungstypen (beispielsweise Vorlesung oder Textproseminar) eingepflegt werden. Dabei müssen sowohl 
+ein Name als auch eine Abkürzung eingegeben werden.
+
+\subsection{System}
+
+\subsubsection{Accounts}
+\label{accounts}
+
+Hier können Accounts festgelegt werden, mit denen es möglich ist, sich im Backend anzumelden und beispielsweise
+Veranstaltungen zu erstellen. Dabei muss ein Name, ein Passwort, eine Rolle und optionalerweise ein zugeordneter
+Dozent eingetragen werden. Ist ein Dozent zugeordnet, kann ein Account der Dozentenklasse (Dozent oder Raumplanungsdozent)
+nur die Veranstaltungen dieses Dozenten bearbeiten. Ausnahme ist der Superdozent, der auch Veranstaltungen ausgewählter
+anderer Dozenten bearbeiten darf. Hier lässt sich auch festlegen, ob automatisch in der Raumplanung ein Hinweis auftauchen
+soll, dass barrierefreie Räume bevorzugt werden.
+
+Dahinter ist auch eine Checkbox, ob die Datenschutzfrage akzeptiert worden ist. Diese lässt sich nicht beim Erstellen
+eines Benutzers setzen, um sicherzustellen, dass jeder zugesagt hat, der die Software benutzt. Sollte je eine neue
+Datenschutzfrage nötig sein (z.\,B. wegen einer Gesetzesänderung), ist es hier jederzeit durch Wegmachen des Hakens
+möglich, den Benutzer zum erneuten Akzeptieren (oder Ablehnen) zu bringen.
+
+Außerdem lassen sich hier Accounts deaktivieren, um sie nicht löschen zu müssen und Dateninkonsistenz zu verursachen.
+
+\begin{technisches}
+Accounts sind nicht das Gleiche wie Dozenten. Es kann Accounts ohne Dozenten geben und umgekehrt. Dozenten ohne Accounts
+können beispielsweise von Superdozenten oder Superduperdozenten (umgangssprachlich Administratoren) 
+verwaltet werden. Vgl. dazu \fullref{superdozenten}.
+\end{technisches}
+
+\begin{technisches}
+Die Passworte sind nicht im Klartext in der Datenbank, sondern \texttt{sha256}-gehasht mit einem langen,
+zufällig-generiertem Salt. Daher ist es nicht möglich, vergessene Passworte auszulesen. Wenn ein Nutzer sein Passwort
+vergisst, können die Administratoren hier jedoch ein neues Passwort setzen.
+\end{technisches}
+
+\subsubsection{Aktuelles Semester setzen}
+
+Hier ist es möglich, festzulegen, welches als Semester als das Aktuelle anzusehen ist. Dieses wird überall, wo eine
+Semesterauswahl möglich ist, als Standardsemester gewählt.
+
+\subsubsection{Apache-Neustarts}
+
+\begin{technisches}
+Einmal die Minute überprüft ein Cronjob, ob der Apache noch läuft und die Seite erreichbar ist. Ist das nicht der Fall,
+wird versucht, den Webserver neuzustarten. Wenn das auftritt, wird das in die Datenbank geloggt und auf dieser Seite
+angezeigt.
+\end{technisches}
+
+\subsubsection{API}
+
+\begin{technisches}
+Die API erlaubt es, von Außen Informationen aus dem VVZ abzurufen, z.\,B., um eigene Apps zu entwickeln.
+Siehe dazu die Frontend-Dokumentation.
+
+Auf dieser Seite ist es möglich, neue Nutzer einzutragen und für sie einen Auth-Code zu erstellen, mit dem der Zugriff auf
+die API gewährt wird. Dazu kann man einen Namen, eine Kontakt-Email-Adresse und eine Begründung eintragen, wofür die API
+benutzt werden soll. Dies soll ermöglichen, wenn plötzlich sehr viele Anfragen stattfinden, nach dem Rechten zu fragen,
+um Softwarefehler o.\,Ä. in der Software Anderer zu finden, die diese API benutzen und eventuell den VVZ-Server durch
+zu viele Anfragen belasten.
+
+Die API-Zugriffe werden mitgeloggt, um potenzielle Botnetze erkennen zu können. Dafür kann man sich auf dieser Seite auch 
+die Logs anzeigen.
+\end{technisches}
+
+
+\subsubsection{DB-Backup}
+
+\label{backup}
+\begin{technisches}
+Hier ist für Administratoren es möglich, sich einen Dump der Datenbank zu holen, um sie zu sichern. Auch ist hierüber
+das komplette Wiederherstellen eines vorherigen Datenbankzustandes durch einen gespeicherten Dump möglich. Die Änderungen
+zwischen Dump und aktuellem Status lassen sich im DB-Diff nachsehen, siehe dazu \fullref{dbdiff}.
+\end{technisches}
+
+\subsubsection{DB-Diff}
+
+\label{dbdiff}
+\begin{technisches}
+Hier kann eine MySQL-Dump-Datei hochgeladen werden und es erscheint eine Liste der Änderungen zwischen Dump und aktueller
+Datenbankversion.
+\end{technisches}
+
+\subsubsection{Funktionen}
+\label{funktionen}
+
+\begin{technisches}
+Das VVZ verhindert unauthorisierte Änderungen über das Rollensystem, das jedem Account eine Rolle zuordnet. Vor jeder
+Funktion, die potenziell gefährlich sein könnte, weil damit Änderungen in der Datenbank gemacht werden könnten, wird
+überprüft, ob der aktuell-eingeloggte Account die Rechte besitzt, diese Änderungen zu machen. Dafür ist hier eine Liste
+aller Funktionen vorhanden (obere Tabelle), wo neue Funktionen angelegt werden können.
+
+In der unteren Tabelle ist eine Liste aller Funktionen und eine Liste von Rollen mit Checkboxen. Wählt man für eine Funktion
+eine Checkbox aus, darf der Benutzer sie ausführen. Sonst erhält er eine Fehlermeldung. Zur Rechteverwaltung, siehe Rollen
+unter \fullref{rollen} und Neue Seite unter \fullref{neueseite}.
+\end{technisches}
+
+\subsubsection{Neue Seite}
+
+\label{neueseite}
+
+\begin{technisches}
+Der Menüpunkt \frq Neue Seite\flq\ erlaubt es, neue Seiten in die Navigation hinzuzufügen. Dabei muss ein Name (der
+überall erscheint, wo die Seite verlinkt wird), eine \texttt{.php}-Datei, die im Ordner \texttt{./pages/} liegen muss,
+eine Checkbox, ob die Seite in der Navigation angezeigt werden soll, ein Vaterelement (was die Seite zu einer Kategorie
+in der Navigation zuordnet, Rollen, die Zugriff haben und eine Beschreibung (die in den Kategorien und auf der 
+Willkommensseite angezeigt wird) und ein Hinweis, der auf der Seite selbst angezeigt werden, festgelegt werden.
+
+Über diesen Menüpunkt lassen sich auch die bisherigen Zuordnungen verändern, wenn man z.\,B. den Punkt 
+\frq Raumplanung\flq\ in die Kategorie der Stammdaten verschieben will, dann kann man das hier ändern und speichern.
+\end{technisches}
+
+\subsubsection{Rollen}
+
+\label{rollen}
+
+\begin{technisches}
+In der Unterseite der Rollen ist es möglich, vorhandene Rollen zu bearbeiten, zu löschen oder neue anzulegen. Eine Rolle
+bestimmt, was einem Nutzer angezeigt wird und was er verändern darf (siehe auch dazu \fullref{funktionen}). Damit eine neue
+Rolle eine neue Seite vollständig benutzen darf, müssen alle auf der Seite benutzten Funktionen eingetragen und für die 
+Rolle freigeschaltet sein und die Rolle braucht auch Zugriff auf die Seite selbst. 
+
+Zusätzlich zur Seitenzuordnung kann jeder Rolle auch eine kurze Beschreibung gegeben werden.
+\end{technisches}
+
+\subsubsection{Seiteninformationen}
+
+\begin{technisches}
+Beinhaltet nur die Untermenge der Daten aus \frq Neue Seite\flq\ (\fullref{neueseite}), bestehend aus der Beschreibung und
+dem Hinweis für eine Seite. Diese Unterseite ist damit obsolet. Aber sie greift auf die gleichen Daten zu, wie die
+\frq Neue Seite\flq-Seite und daher ist es egal, auf welcher von Beiden Hinweise oder Beschreibungen geändert werden.
+\end{technisches}
+
+
+\subsubsection{User-Agents}
+
+\begin{technisches}
+Beinhaltet Listen, welche Browser, Betriebssysteme und Browser-Betriebssystem-Kombinationen auf die
+Seite zugegriffen haben und wie oft. Bietet auch die Möglichkeit, sich verschiedene Bot-Zugriffe anzeigen zu lassen,
+z.\,B. vom Googlebot.
+\end{technisches}
+
+\subsection{Veranstaltungen}
+
+\label{veranstaltungen}
+
+Zeigt alle Veranstaltungen, die der eingeloggte Benutzer bearbeiten darf und erlaubt es auch, Veranstaltungen aus
+vorherigen Semestern (bzw. bei Administratoren und Superdozenten von einzelnen Dozenten anzuzeigen, auf die man
+Zugriff hat).
+
+Dabei hat jede Veranstaltung einen Namen, ein zugeordnetes Semester, einen zugeordneten Dozenten und einen zugeordneten
+Veranstaltungstyp. Außerdem wird angezeigt, wie viele Prüfungsleistungen in der Veranstaltung ausgewählt sind. Ist die
+Anzahl 0, wird sie rot und mit drei Ausführungzeichen davor und danach markiert.
+
+Will man nur die Daten der Veranstaltung ändern, die auf dieser Seite angezeigt werden, kann man auf
+\frq Speichern\flq\ klicken. Will man die Einzelne-Veranstaltungs-Seite (vgl. \fullref{einzelneveranstaltung}) dieser
+Veranstaltung haben, um Zeit, Raum, ausgewählte Prüfungsleistungen usw. zu ändern, muss man auf
+\frq Bearbeiten\flq\ klicken; dabei wird auch die Änderung auf der aktuellen Seite gespeichert, aber an gelangt an die
+spezifische Seite der einzelnen Veranstaltung).
+
+In der letzten Zeile lassen sich neue Veranstaltungen eintragen und statt der Anzahl der Veranstaltungen, die
+ausgewählt wird, steht dort die Summe der oben ausgewählten Veranstaltungen (mit $\uparrow\Sigma = \dots$).
+
+\section{Zukünftige Ideen}
+
+\begin{itemize}
+	\item Zentrales Eingeben von Verspätungen, Verlegungen und Ausfällen mit intuitiven Auswahlmöglichkeiten
+		(\frq nächste Woche\flq, \frq die nächsten $n$ Wochen\flq,
+		\frq alle zwei Wochen bis \texttt{DATUM}\flq, \dots). Daraus resultierend:
+		\begin{itemize}
+			\item Zentraler Vertretungsplan
+			\item Automatische Statistik über Vertretungspläne im einheitlichen Format
+		\end{itemize}
+	\item Zentrale Quellen- und Literaturverwaltung. Daraus resultierend:
+		\begin{itemize}
+			\item Eine Liste aller verwendeten Bücher, Skripte und Websites (mit Titel, ISBN,
+				Veröffentlichungszeitraum, \dots)
+			\item Einfache Eingabe von Literatur (z.\,B. Vorschläge von Büchern, die bereits eingetragen 
+				worden sind)
+			\item Automatische Statistiken über Lesestoffe und Quellen
+		\end{itemize}
+\end{itemize}
+
+\input{end}

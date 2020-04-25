@@ -1,0 +1,449 @@
+Dokumentation zum Frontend des VVZs
+Norman Koch
+13. April 2019
+
+Inhaltsverzeichnis
+1 Typographische Konventionen
+
+4
+
+2 Einleitung
+
+4
+
+3 Zu den Cookies
+
+4
+
+4 Benutzung und Details
+4.1 Alle Prüfungsleistungen . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.1.1 Planung von Prüfungsleistungen . . . . . . . . . . . . . . . .
+4.2 Veranstaltungen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.2.1 Menüs in einzelnen Studiengängen/allen Veranstaltungen .
+4.2.1.1 1 — Filter anzeigen/ausblenden . . . . . . . . . . . .
+4.2.1.2 2 — Details anzeigen/ausblenden . . . . . . . . . . .
+4.2.1.3 3 — Stundenplanerstellung . . . . . . . . . . . . . . .
+4.2.2 Manuelle und Halbautomatische Stundenplanerstellung . .
+4.2.2.1 Manuelle Stundenplanerstellung . . . . . . . . . . .
+4.2.2.2 Halbautomatische Stundenplanerstellung . . . . .
+4.2.3 Alle Veranstaltungen und einzelne Studiengänge . . . . . .
+4.2.3.1 Die Veranstaltungsbox (siehe Abbildung 3) . . . . .
+4.2.4 Einzelne Studiengänge . . . . . . . . . . . . . . . . . . . . . . .
+4.3 Dokumentenersteller . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4.4 FAQ . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+5
+6
+6
+7
+8
+9
+9
+9
+9
+9
+10
+10
+11
+12
+12
+12
+
+5 API
+
+12
+
+6 Fehlerbehebung
+
+14
+
+7 Fehler oder Wünsche melden
+
+14
+
+8 Urheberrechte & Danksagungen
+
+15
+
+9 Quellen
+
+15
+
+2
+
+≫
+
+Simplicity is the soul of eﬃciency.≪
+— Austin Freeman1
+
+1 Typographische Konventionen
+Sehr technische oder abstrakte Erklärungen, die nicht gelesen werden müssen,
+
+um die Software normal zu benutzen, werden mit dem Symbol > < gekennzeichnet. Außerdem sind solche Bereiche grau hinterlegt, um sie optisch hervorzuheben.
+Die gesamte Dokumentation wurde mit XƎLATEX in der Schriftart >Noto< gesetzt.
+
+2 Einleitung
+Die Vorlesungsverzeichnissoftware >VVZ< (von Vorlesungsverzeichnis) versammelt an einem zentralen Ort alle für die Planung des Studiums notwendigen Daten. Mit ihm ist es möglich, herauszuﬁnden, wann wo welche Veranstaltung stattﬁndet, sich einen Stundenplan zu erstellen und die Termine automatisch in den
+digitalen Kalender einzutragen.
+
+3 Zu den Cookies
+
+
+Cookies sind kleine Textdateien, die auf Ihrem Rechner gespeichert und
+beim Aufrufen des VVZs an den VVZ-Server gesendet werden. In diesen sind
+dann Informationen wie ausgewählte Prüfungsleistungen, Anmeldedaten
+für den Administrationsbereich oder ausgewählte Veranstaltungen beﬁnden. Das VVZ nutzt diese Daten nicht, um Sie zu verfolgen und diese werden
+auch nirgendwo sonst preisgegeben oder von der Serverseite gespeichert.
+Lediglich beim Aufrufen der Seite sind die Cookies im Arbeitsspeicher des
+Servers, um die Anfrage bearbeiten zu können.
+Die Seite ist auch ohne Cookies weitgehend benutzbar, aber Funktionen
+wie das Anmelden im Administrationsbereich, Speichern von Veranstaltungen oder Prüfungsleistungen benötigen Cookies zum Funktionieren.
+
+4
+
+4 Benutzung und Details
+
+Abbildung 1: Startseite des VVZs
+Auf der Startseite (siehe Abbildung 1) beﬁndet sich eine Auswahlbox mit dem
+Semester, für das die Veranstaltungen angezeigt werden sollen. Sofern das VVZ
+mehrere Institute verwaltet, ist dort auch das Institut auswählbar. Darunter beﬁnden sich alle angebotenen Studiengänge, ein Menü, in dem alle Veranstaltun-
+
+5
+
+gen – unabhängig vom Studiengang – angezeigt werden und ein Menü, in dem alle
+Prüfungsleistungen angezeigt werden, die am Institut überhaupt möglich sind.
+Ganz unten beﬁnden sich Links zum Impressum, zur Administrationsseite, zur
+API (siehe 5), zu einem Dokumentenersteller (vgl. 4.3) und FAQ (vgl. 4.4).
+
+4.1 Alle Prüfungsleistungen
+
+Abbildung 2: Übersicht aller Prüfungsleistungen
+Im Menü >Alle Prüfungsleistungen anzeigen< beﬁndet sich eine große Tabelle mit
+allen Studiengängen und deren Modulen. Sofern im Backend eingetragen auch zu
+jedem Modul Informationen zur Studienordnung, wie viele Prüfungsleistungen
+welcher Art erbracht werden müssen, wie viele Credit-Points es dafür gibt und
+wie viele davon man geplant bzw. absolviert hat (siehe 4.1.1).
+Standardmäßig werden alle Studiengänge angezeigt, in der Checkbox überhalb
+der großen Tabelle lassen sich jedoch auch einzelne Studiengänge auswählen.
+Mit einem Klick auf die Prüfungsnummer wird eine Liste aller Veranstaltungen
+gezeigt, die diese Prüfungsnummer anbieten. Von dieser Seite aus ist es möglich,
+seinen Stundenplan zu planen (siehe 4.2.2).
+4.1.1 Planung von Prüfungsleistungen
+Um die Übersicht zu behalten, lassen sich im Unterpunkt >Alle Prüfungsleistungen anzeigen< zu jeder angebotenen Prüfungsleistungen zwei Informationen
+speichern (lokal in einem Cookie). Dazu gibt es neben jeder Prüfungsleistung
+zwei Checkboxen mit den Texten >Absolviert?< und >Geplant?<. Werden diese
+aktiviert, dann tauchen auf dem jeweiligen Rechner (solange Cookies persistent
+
+6
+
+bleiben) überall auf der Seite, wo eine Prüfungsnummer auftaucht, entweder ein
+grüner Haken (erledigt) oder ein Stift (geplant) auf.
+Diese können nach der Auswahl, sofern die Seite sich nicht automatisch neu
+lädt, mit dem Button >Bereits absolvierte Prüfungsleistungen speichern< am unteren Seitenrand speichern. Hier gibt es auch den Button >Cookie-URL generieren<.
+Dieser erlaubt es, eine URL zu generieren, die, wenn man sie aufruft, die gespeicherten Prüfungen auch auf anderen Rechnern zur Verfügung stellt, denen man
+die URL mitgeteilt hat (z. B. eigener Laptop und Desktop-Rechner).
+
+4.2 Veranstaltungen
+Durch die Verknüpfung von Veranstaltungen zu Prüfungsleistungen lässt sich
+jede Veranstaltung (mit ausgewählten Prüfungsleistungen) mindestens einem
+Studiengang zuordnen. Sollte keine Prüfungsleistung ausgewählt worden sein,
+taucht die Veranstaltung aber in >Alle Studiengänge< auf.
+Zu den Veranstaltungen gehören alle wichtigen Daten, die notwendig sind, sie
+in den eigenen Stundenplan einzutragen.
+
+
+Auf der Seite eines Studienganges bzw. aller Studiengänge werden Informationen mehrerer Instanzierungen abstrakter Objekte zusammengeführt
+und dargestellt. Die Objekte sind hierarchisch geordnet und erben voneinander.
+Institute bestehen aus:
+• Einem Namen
+(Es können je beliebig viele2 Studiengänge, Module, Prüfungen und Veranstaltungen hinzugefügt werden.)
+Studiengänge bestehen aus:
+• Einer Zuordnung zu einem Institut
+• Einem Namen
+• Einer Studienordnungs-URL (optional)
+Bereiche bestehen aus:
+• Einem Namen
+Module bestehen aus:
+• Einer Studiengangszuordnung (z. B. >Bachelor Kernbereich<)
+• Einem Namen
+
+7
+
+• Einer Beschreibung (optional)
+• Einer Abkürzung (optional)
+• Einer Zuordnung zu einem Studiengang
+Prüfungen bestehen aus:
+• Einer Modulzuordnung (z. B. >Geschichte der Philosophie<)
+• Einer Bereichszuordnung (z. B. >Philosophie der Antike<)
+• Einem Prüfungstyp (z. B. >Essay<)
+• Einer Modulabkürzung (z. B. >PhF-Phil-MG<), optional
+• Einer Prüfungsnummer (z. B. >76210<), optional
+Veranstaltungen bestehen aus:
+• Titel
+• Dozent
+• Gebäude, Raum und Zeit
+• Die Anzahl der Semesterwochenstunden, die diese Veranstaltung belegt
+(bei Veranstaltungen über mehrere Doppelstunden geschätzt!)
+• Einzelne, nicht regelmäßige Termine
+• Einer Verknüpfung zwischen in der Veranstaltung ablegbaren Prüfungsleistungen
+
+4.2.1 Menüs in einzelnen Studiengängen/allen Veranstaltungen
+Über der Liste Veranstaltungen sind einige Links:
+1. Filter anzeigen/ausblenden
+2. Details anzeigen/Ausblenden
+3. Stundenplanerstellung (nur bei Studiengängen, bei denen im Backend entsprechende Daten eingegeben worden sind)
+4. Studienordnung (nur bei Studiengängen, bei denen im Backend entsprechende Daten eingegeben worden sind)
+
+8
+
+4.2.1.1
+
+1 — Filter anzeigen/ausblenden
+
+Gibt die Möglichkeit, die angezeigten Veranstaltungen weiter einzuschränken.
+Hier kann nach Modulen, die eine Veranstaltung enthalten muss, Wochentagen,
+Dozenten usw. eingeschränkt werden. Hier kann auch nach Worten im Titel der
+Veranstaltung geﬁltert werden.
+4.2.1.2
+
+2 — Details anzeigen/ausblenden
+
+Klappt alle >Details<-Boxen aller Veranstaltungen auf bzw., wenn sie bereits auf
+sind, wieder zu. Zu den Details, die auch durch Klicken eines Details-Buttons an
+jeder Veranstaltung einzeln geöffnet werden kann, gehören folgende Informationen:
+• Einem Kommentar des Dozenten, sofern vorhanden
+• Den Link zu OPAL, sofern vorhanden
+• Einer Liste aus allen im ausgewählten Studiengang (bzw. in allen Studiengängen, wenn auf der Startseite >Alle Studiengängen< gewählt worden sind),
+geordnet nach Modulen, in denen die Prüfungsleistungen abgelegt werden
+können. Zusätzlich noch Prüfungen, die vorgemerkt oder bereits erledigt
+sind (vgl. 4.1)
+• Einzelne Veranstaltungen und Orte, die nicht regelmäßig stattﬁnden
+4.2.1.3
+
+3 — Stundenplanerstellung
+
+Die Stundenplanerstellung nutzt speziell dafür im Backend eingegebene Daten,
+daher ist es möglich, dass dieser Button nicht in jedem Studiengang auftaucht.
+Zum Erstellen von Stundenplänen, siehe 4.2.2
+4.2.2 Manuelle und Halbautomatische Stundenplanerstellung
+4.2.2.1
+
+Manuelle Stundenplanerstellung
+
+Links überhalb der Veranstaltungen beﬁndet sich eine kleine Checkbox. Mit diesen Checkboxen kann man auswählen, welche Veranstaltungen man besuchen
+möchte. Wählt man diese aus, kann man am unteren Seitenende >Aus markierten Veranstaltungen einen Stundenplan erstellen< oder diese Veranstaltungen als
+Cookie setzen. Hat man bereits Veranstaltungscookies gesetzt und möchte die neu
+ausgewählten Veranstaltungen der aktuellen Liste hinzufügen, kann man >Stundenplancookies updaten< auswählen.
+
+9
+
+Wird aus den markierten Veranstaltungen ein Stundenplan erstellt, gelangt
+man auf eine Seite mit einem Zeitraster und dadrinnen allen ausgewählten Veranstaltungen, sofern sie verwertbare Daten haben (d. h. Zeit und Wochenrhythmus).
+In allen Punkten erscheint auch eine symbolische Hand. Klickt man auf diese,
+kann man die Einträge des Feldes bearbeiten. Klickt man dann auf >Daten absenden< kann man die Adresse der Seite kopieren und hat >für unterwegs< immer
+einen Stundenplan, oder kann sich die Seite als Bookmark oder Lesezeichen setzen. Dabei werden die Daten nicht gespeichert und sind ohne diese URL nicht
+zugänglich.
+Darunter ist die Möglichkeit, den ausgewählten Stundenplan automatisch als
+iCal-Datei zu downloaden und somit in einen digitalen Kalender einzutragen. Außerdem beﬁndet sich darunter eine Liste von Gebäuden, die oben im Stundenplan vorkommen und die Möglichkeit, den Stundenplan als PDF-Datei zu down
+loaden (
+experimentell!).
+4.2.2.2
+
+Halbautomatische Stundenplanerstellung
+
+Klickt man auf den Button namens >Stundenplan erstellen<, kommt die Frage, für
+welches Semester ein Stundenplan erstellt werden soll. Mit einem Klick auf Weiter werden die laut Studienordnung für diesen Studiengang und dieses Semester
+empfohlenen Module angezeigt. Ein weiterer Klick auf >Veranstaltungsauswahl
+anzeigen< zeigt nun nur noch Veranstaltungen, die Module und Prüfungsarten
+beinhalten, die in diesem Semester gemacht werden sollten. Hier muss nun manuell ausgewählt werden, welche Veranstaltungen relevant sind. Ab hier läuft es
+so ab, wie bei der manuellen Stundenplanerstellung.
+4.2.3 Alle Veranstaltungen und einzelne Studiengänge
+Nach einem Klick auf >Alle Veranstaltungen< bzw. einen einzelnen Studiengang
+auf der Startseite wird eine Liste angezeigt, die alle Veranstaltungen (dieses Studienganges) anzeigt. Von hier aus ist die Stundenplanerstellung (siehe 4.2.2) möglich.
+
+10
+
+Abbildung 3: Die Veranstaltungsbox
+4.2.3.1
+
+Die Veranstaltungsbox (siehe Abbildung 3)
+
+Jede einzelne Veranstaltung ist in einer Box dargestellt, die Informationen zu ihrer Zeit, ihres Ortes, ihrer Art, ihren Namen, den Namen des Dozenten und einer Details-Box beinhaltet. Klickt man auf >Details anzeigen/ausblenden< oder auf
+eine einzelne Details-Box, sind dort weitere Informationen zu sehen, z. B. einen
+Kommentar des Dozenten, einzelne, nicht regelmäßige Veranstaltungen und die
+Prüfungsleistungen, die in dieser Veranstaltung abgelegt werden können. Bedenken Sie jedoch, dass es oft auch möglich ist, andere Prüfungsleistungen abzulegen
+
+11
+
+als die Eingetragenen. Fragen Sie dazu einfach mal nett Ihren Dozenten ,. In der
+Veranstaltungsbox beﬁnden sich, sofern der Software die Daten zur Verfügung
+stehen, etwa in der Mitte oben Buttons zum Eintragen in den Kalender, ein Link
+zu Google Earth, wo das Gebäude ist (sehr praktisch mit Google Street View zum
+Navigieren) und, rechts hinter dem Gebäudenamen, verbirgt sich ein Link auf die
+Campusnavigatorseite des Gebäudes.
+4.2.4 Einzelne Studiengänge
+Die Seiten für alle Veranstaltungen und einzelne Studiengänge unterscheiden
+sich nur insofern, als dass in der oberen Leiste für einzelne Studiengänge mehr
+Informationen auftauchen (z. B. die Studienordnung oder die halbautomatische
+Stundenplanerstellung, vgl. 4.2.2) und bei den einzelnen Veranstaltungen in der
+Details-Box nur noch Prüfungen angezeigt werden, die in diesem Studiengang
+angeboten werden können (aus Modulen aus ebendiesem Studiengang).
+
+4.3 Dokumentenersteller
+Der halbautomatische Dokumentenersteller ist ein Framework, dass es erlaubt,
+aus eingegebenen Daten Dokumente zu befüllen. Mit einem Klick auf >Dokumente< am Ende der Seite können Sie Dokumente auswählen, die ausgefüllt werden
+sollen. Aktuell ist dort nur das praktischste Dokument des Philosophiestudiums,
+>Anmeldung zu einer nicht online ausgeschriebenen Prüfung<.
+Mit einem Klick auf das gewünschte Dokument kommen Sie auf eine Seite zum
+Eingeben Ihrer Daten. Aus der Prüfungsnummer wird automatisch das Modul
+im Dokument eingetragen und Sie erhalten ein fertig ausgefülltes Dokument, das
+Sie nur noch unterschreiben und abgeben müssen. Die Daten lassen sich auch in
+einem Cookie speichern.
+
+4.4 FAQ
+Der FAQ, kurz für >frequently asked questions<, enthält einige Links zu wichtigen
+Studienunterlagen, Adressen und Informationen zum Studium.
+Wenn Sie im Studium über etwas stolpern, von dem Sie denken, dass es hilfreich wäre, wenn man dieses Wissen zur Verfügung stellen würde, kontaktieren
+Sie mich gern und ich trage es ein.
+
+5 API
+
+12
+
+
+
+Eine API erlaubt es, Daten in einem einheitlichen Format aus einer Anwendung zu bekommen. Die Daten, die im Frontend der Software VVZ sind,
+lassen sich fast allesamt über eine solche API bekommen. Damit ist es möglich, eigene Anwendungen zu entwickeln, z. B. Smartphone-Apps, die auf die
+Daten des VVZs zugreifen.
+Zur Benutzung der API, müssen Sie mir eine Email schreiben. Das geht am einfachsten über das Kontaktformular, das über das untere Ende der Seite aufrufbar
+ist. Ich teile Ihnen dann einen API-Schlüssel mit, der Sie berechtigt, auf die Daten
+des Front-Ends im >JSON<-Format zuzugreifen. Dieser Schlüssel wird, wenn er in
+den Beispielen hier genannt wird, immer AUTHKEY genannt. Sie können die API
+über einen Browser, oder über eine HTTPS-Schnittstelle (wie wget oder curl) aufrufen. Eine Beispiel-URL wäre https://vvz.phil.tu-dresden.de/api.php?
+auth_code=AUTHKEY&studiengang=1&semester=6.
+Folgende Parameter sind möglich:
+Achtung: Sie können die API nur einmal pro Sekunde aufrufen. Das ist ein
+Schutzmechanismus, um den Server nicht unnötig zu belasten. Am Besten, Sie
+cachen die Antwort auf Ihrer Seite. Änderungen im VVZ sollten sowieso nicht im
+Sekundentakt passieren.
+Parameter
+notitle=1
+
+type=Seminar
+
+gebaeude=BZW
+
+gebaeude_liste=1
+ﬁrst_name=Holm
+last_name=Bräuer
+
+Beschreibung
+Ist diese Option nicht gesetzt, sind in der ersten Spalte der JSON-Ausgabe überschriften
+für die jeweiligen Werte.
+Listet nur Veranstaltungen vom Typ Seminar. Mögliche Typen sind: Blockseminar, Exkursion, Fachseminar, Forschungskolloquium, Graduiertenseminar, Hauptseminar, Lesegruppe, Oberseminar, Proseminar, Seminar, Textproseminar, Tutorium,
+Übung, Vorlesung, Vortrag.
+Listet je nur Veranstaltungen in diesem Gebäude. Als Bezeichnung muss die Abkürzung des Gebäudes gewählt werden.
+Gibt nur eine Liste aller dem System bekannten Gebäuden der TU Dresden zurück.
+Sucht nur nach Veranstaltungen, bei dem
+der Dozent mit erstem Namen Holm heißt.
+Sucht nur nach Veranstaltungen, bei dem
+der Dozent mit letztem Namen Holm heißt.
+
+13
+
+Tabelle von vorheriger Seite1
+datetype=[discordian, unix] Stellt alle Datumsangaben, die vorkommen, auf den diskordianischen bzw. UnixKalendar um.
+studiengang=1
+Listet alle Veranstaltungen eines bestimmten Studienganges auf.
+pruefungen=1
+Listet alle Prüfungen auf, ist kombinierbar
+mit studiengang=1.
+semester=1
+Listet Veranstaltungen aus dem Semester 1
+auf.
+institut=1
+Listet Veranstaltungen aus dem Institut 1
+auf.
+institute_liste=1
+Listet alle Institute auf.
+semester_liste=1
+Listet alle Semester auf.
+studiengang_liste=1
+Listet alle Studiengänge auf.
+dozenten_liste=1
+Listet alle Dozenten auf.
+veranstaltungstypen=1
+Listet alle Veranstaltungstypen auf.
+Wenn Sie für Ihre Anwendungen weitere oder andere Daten oder andere Formate benötigen, können Sie uns jederzeit kontaktieren.
+
+6 Fehlerbehebung
+Bei gravierenden Fehlern wird automatisch eine Fehlerseite angezeigt und die
+Administration informiert.
+Kleinere Probleme lassen sich meist selbst beheben. Wenn das Aufklappen von
+Menüs nicht funktioniert, aktivieren Sie bitte Javascript. Für die Anmeldung auf
+der Administrationsseite oder das Speichern von geplanten/erledigten Prüfungsleistungen oder ausgewählten Veranstaltungen aktivieren Sie bitte Cookies.
+Die Seite sollte in allen halbwegs modernen Browsern funktionieren, inklusive
+den Konsolenbrowsern w3m und lynx.
+
+7 Fehler oder Wünsche melden
+Über den Menüpunkt >Kontakt< ganz unten auf der Seite ist es möglich, mit der
+Studienberatung oder mir in Kontakt zu treten. Dazu müssen Sie Ihre EmailAdresse, die Art des Anliegens und das Anliegen selbst formulieren (die Art des
+Anliegens bestimmt, wohin die Email geht: bei Technischen Fragen, Wünschen,
+Verbesserungsvorschlägen oder Fehlerberichten wählen Sie bitte >technischer
+Natur<, sonst >inhaltlicher<). Dazu muss gegenenfalls noch eine Sicherheits-
+
+14
+
+abfrage beantwortet werden, die aus sehr einfachen mathematischen oder
+geographischen Fragen besteht.
+Jede Email wird gelesen! Es wird um viel Feedback gebeten, da ich die Software
+so gut wie möglich an die realen Bedürfnisse von Studenten ausrichten möchte!
+Ich möchte aber darum bitten zu bedenken, dass ich die Software nur als Hobby
+neben dem Studium betreibe und daher manchmal etwas länger brauchen kann,
+um Fehler zu ﬁnden oder Wünsche einzubauen.
+
+8 Urheberrechte & Danksagungen
+Die Urheberrechte sowohl der Software als auch der Dokumentation liegen bei
+Norman Koch.
+Ich möchte mich außerdem bedanken für die freundliche Hilfe des philosophischen Institutes der Technischen Universität Dresden, Herrn Prof. Dr. Schönrich,
+Herrn Prof. Dr. Rentsch und Herrn Prof. Dr. Hiltscher. Vorallem was das Technische möchte ich mich für die Hilfe von Herrn Dr. Holm Bräuer und Herrn Norbert
+Engemaier bedanken. Auch herzlichen Dank an Frau Gilda Märcz, die mir sowohl
+im Studium als auch in der Verwaltung immer sehr freundlich und kompetent geholfen hat.
+Ohne die Hilfe, die Bugreports und die freundliche Art aller Mitarbeiter des
+Institutes wäre diese Software nie entstanden.
+
+Notes
+1
+
+Glenn Vanderburg. Quotations About Software Design. url: https://vanderburg.org/etc/
+soft-quotes.html (besucht am 12. April 2019).
+2
+Technisch gesehen ist das falsch, aber das Limit liegt bei 4 294 967 295 und ist daher praktisch
+nicht relevant.
+
+9 Quellen
+— Raffael. The School of Athens. 1509 – 1511. url: https://en.wikipedia.
+org/wiki/The_School_of_Athens.
+— Glenn Vanderburg. Quotations About Software Design. url: https : / /
+vanderburg . org / etc / soft - quotes . html (besucht am 12. April 2019)
+(siehe S. 15).
+
+15
+
+

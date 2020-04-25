@@ -1,0 +1,1706 @@
+Dokumentation zum Backend des VVZs
+Norman Koch
+13. April 2019
+
+Inhaltsverzeichnis
+1 Typographische Konventionen
+
+5
+
+2 Einleitung
+
+5
+
+3 Zu den Cookies
+
+5
+
+4 Ist es nicht irgendwie gefährlich, die interne Struktur zu veröffentlichen?
+
+5
+
+5 Benutzung und Details
+5.1 Anmelden . . . . . . . . . . . . . . . . . . . . . . .
+5.2 Abmelden . . . . . . . . . . . . . . . . . . . . . . .
+5.3 Vorteile der eingeloggten Nutzer im Frontend .
+5.4 Der Aufbau der Seite . . . . . . . . . . . . . . . .
+
+.
+.
+.
+.
+
+6
+6
+6
+7
+7
+
+6 Ich will doch nur…
+6.1 … meine Veranstaltung eintragen, ändern oder löschen . . . . . . .
+6.2 … mein Passwort ändern . . . . . . . . . . . . . . . . . . . . . . . . . . .
+6.3 … mein vergessenes Passwort erfahren . . . . . . . . . . . . . . . . . .
+
+8
+8
+9
+9
+
+7 Unterseiten
+7.1 Willkommen! . . . . . . . . . . . . . .
+7.2 Eigene Daten ändern . . . . . . . . .
+7.3 Kontakt . . . . . . . . . . . . . . . . .
+7.4 Moduldaten . . . . . . . . . . . . . . .
+7.4.1 Modul Ð→ Semester . . . . . .
+7.4.2 Module . . . . . . . . . . . . .
+7.5 Prüfungsdaten . . . . . . . . . . . . .
+7.5.1 Dozent Ð→ Prüfungsdaten . .
+7.5.2 Prüfung Ð→ Zeitraum . . . .
+7.5.3 Prüfungsämter . . . . . . . . .
+7.5.4 Prüfungsnummer Ð→ Dozent
+7.5.5 Prüfungsnummern . . . . . .
+7.5.6 Prüfungstypen . . . . . . . . .
+7.6 Raumplanung . . . . . . . . . . . . .
+7.7 Stammdaten . . . . . . . . . . . . . .
+7.7.1 Alte Daten löschen . . . . . .
+7.7.2 Bereiche . . . . . . . . . . . . .
+7.7.3 Dozenten . . . . . . . . . . . .
+7.7.4 Einzelne Veranstaltung . . .
+
+2
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+9
+9
+9
+10
+10
+10
+10
+10
+11
+11
+11
+11
+11
+12
+12
+12
+12
+12
+12
+13
+
+7.7.5 FAQ . . . . . . . . . . . . . .
+7.7.6 Gebäude . . . . . . . . . . .
+7.7.7 Institute . . . . . . . . . . .
+7.7.8 Merges . . . . . . . . . . . .
+7.7.9 Semester . . . . . . . . . .
+7.7.10 Sprachen . . . . . . . . . .
+7.7.11 Studiengänge . . . . . . . .
+7.7.12 Stundenpläne . . . . . . .
+7.7.13 Superdozenten . . . . . . .
+7.7.14 Titel . . . . . . . . . . . . .
+7.7.15 Vorlesungstypen . . . . . .
+7.8 System . . . . . . . . . . . . . . . .
+7.8.1 Accounts . . . . . . . . . .
+7.8.2 Aktuelles Semester setzen
+7.8.3 Apache-Neustarts . . . . .
+7.8.4 API . . . . . . . . . . . . . .
+7.8.5 DB-Backup . . . . . . . . .
+7.8.6 DB-Diff . . . . . . . . . . . .
+7.8.7 Funktionen . . . . . . . . .
+7.8.8 Neue Seite . . . . . . . . .
+7.8.9 Rollen . . . . . . . . . . . .
+7.8.10 Seiteninformationen . . .
+7.8.11 User-Agentes . . . . . . . .
+7.9 Veranstaltungen . . . . . . . . . .
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+14
+14
+14
+14
+15
+15
+15
+15
+15
+16
+16
+16
+16
+17
+17
+17
+18
+18
+18
+18
+19
+19
+19
+20
+
+8 Fehlerbehebung
+
+20
+
+9 Fehler oder Wünsche melden
+
+21
+
+10 Urheberrechte & Danksagungen
+
+21
+
+11 Quellen
+
+21
+
+3
+
+≫
+
+Simplicity is the soul of eﬃciency.≪
+— Austin Freeman1
+
+1 Typographische Konventionen
+Sehr technische oder abstrakte Erklärungen, die nicht gelesen werden müssen,
+
+um die Software normal zu benutzen, werden mit dem Symbol > < gekennzeichnet. Außerdem sind solche Bereiche grau hinterlegt, um sie optisch hervorzuheben.
+Die gesamte Dokumentation wurde mit XƎLATEX in der Schriftart >Noto< gesetzt.
+
+2 Einleitung
+Die Vorlesungsverzeichnissoftware >VVZ< (von Vorlesungsverzeichnis) versammelt an einem zentralen Ort alle für die Planung des Studiums notwendigen Daten. Mit ihm ist es möglich, herauszuﬁnden, wann wo welche Veranstaltung stattﬁndet, sich einen Stundenplan zu erstellen und die Termine automatisch in den
+digitalen Kalender einzutragen.
+
+3 Zu den Cookies
+
+
+Cookies sind kleine Textdateien, die auf Ihrem Rechner gespeichert und
+beim Aufrufen des VVZs an den VVZ-Server gesendet werden. In diesen sind
+dann Informationen wie ausgewählte Prüfungsleistungen, Anmeldedaten
+für den Administrationsbereich oder ausgewählte Veranstaltungen beﬁnden. Das VVZ nutzt diese Daten nicht, um Sie zu verfolgen und diese werden
+auch nirgendwo sonst preisgegeben oder von der Serverseite gespeichert.
+Lediglich beim Aufrufen der Seite sind die Cookies im Arbeitsspeicher des
+Servers, um die Anfrage bearbeiten zu können.
+Die Seite ist auch ohne Cookies weitgehend benutzbar, aber Funktionen
+wie das Anmelden im Administrationsbereich, Speichern von Veranstaltungen oder Prüfungsleistungen benötigen Cookies zum Funktionieren.
+
+4 Ist es nicht irgendwie gefährlich, die interne Struktur zu
+veröffentlichen?
+
+
+Nein, denn Sicherheit basiert nicht auf Unwissenheit (>Security through
+Obscurity<), sondern auf Offenheit. Es gilt Kerckhoffs’ Prinzip: >[Ein sicheres
+
+5
+
+System] darf nicht der Geheimhaltung bedürfen und soll ohne Schaden in
+Feindeshand fallen können< (Quelle: Kerckhoffs’ Prinzip — Wikipedia). Dies
+gilt für alle sichere Software. Security-through-Obscurity bietet immer nur
+Scheinsicherheit.
+
+5 Benutzung und Details
+5.1 Anmelden
+Das Anmelden ﬁndet (noch) nicht über Shibboleth, sondern über ein eigenes Anmeldesystem statt. Accounts zum Anmelden können Ihnen Herr Dr. Holm Bräuer,
+Herr Norbert Engemaier oder ich (die Administratoren der Seiten) erstellen.
+In der Logikmaske können Sie Ihren Namen (ohne Titel) und Ihr Passwort eingeben und sehen die Startseite.
+
+
+Es gibt mehrere Arten von Accounts:
+• Administratoren (haben Zugriff auf alle Seiten und können alles ändern)
+• Dozenten (haben Zugriff auf die eigenen Daten und können eigene Veranstaltungen bearbeiten)
+• Superdozenten (haben, wie Dozenten, Zugriff auf eigene Veranstaltungen, aber können auch die Veranstaltungen von ausgewählten anderen
+>superverwalten<, d. h. anlegen, bearbeiten und löschen)
+• Verwalter (haben Zugriff auf Verwaltungsfunktionen, können aber keine Veranstaltungen erstellen, bearbeiten oder löschen)
+• Raumplanungsdozenten (können ihre eigenen Veranstaltungen erstellen, bearbeiten und löschen und haben Zugriff auf die Raumplanungsseite, vgl. 7.6)
+
+Jeder Account ist exakt einem dieser sogenannten >Rollen< zugeordnet.
+
+5.2 Abmelden
+Nach der Anmeldung sind sowohl im Back- als auch im Frontend oben auf der
+Seite Links, mit denen Sie sich abmelden können.
+
+6
+
+5.3 Vorteile der eingeloggten Nutzer im Frontend
+Wenn Sie Rechte haben, Veranstaltungen zu bearbeiten, sehen Sie im Frontend
+unter jeder Veranstaltung, die Sie bearbeiten dürfen, einen Link: >diese Veranstaltung bearbeiten<. Somit können Sie direkt von der Startseite zur >Einzelne Veranstaltung<-Seite Ihrer Veranstaltung.
+
+
+Wenn Sie Administrator sind, haben Sie mehr Rechte. So sehen Sie z. B.
+die Debug-Informationen am unteren Ende der Seite.
+
+5.4 Der Aufbau der Seite
+Die Seite ist vier- (bzw. fünf)-geteilt. Im obersten Abschnitt ﬁnden Sie nach der
+Anmeldung Ihren Namen, das TU-Dresden-Logo und einen Link zum Abmelden
+Ihres Accounts.
+Darunter beﬁndet sich eine Zeile mit allen Unterseiten und Seitenkategorien.
+Unterseiten erkennen Sie an der dunkleren Farbe, Seitenkategorien (thematische
+Sammlung einzelner Unterseiten) erkennen Sie am Pfeil runter ↓ neben dem Namen und dem gräulicherem Blauton. Die aktuell ausgewählte Seite hat sowohl
+einen Pfeil Ð→, als auch eine deutliche grüne Hintergrundfarbe.
+Darunter beﬁndet sich der Hauptbereich für einzelne Unterseiten. Dort werden
+– je nach ausgewählter Unterseite – die Inhalte der Seite angezeigt.
+Noch weiter runter beﬁndet sich — wie im Frontend — die Leiste mit nützlichen
+Links auf der Seite.
+
+
+Darunter beﬁndet sich der Query-Debugger, der nur für Administratoren
+sichtbar ist. In ihm sind alle Queries, die für den Aufbau der Seite ausgeführt
+worden sind, Debug-Meldungen, Stack-Traces usw.
+
+
+
+Alle Daten auf der Seite sind >normalisiert<, das heißt: eine Änderung an
+einer Stelle wirkt sich überall aus. Als Beispiel sei ein Dozent genannt, der
+durch Heirat seinen Namen ändert. Der neue Name muss nur an einer Stelle
+einmalig eingetragen werden und ist dann überall sofort aktualisiert. Es gibt
+keine redundanten Daten, die an mehreren Stellen geändert werden müssen.
+
+7
+
+
+
+Vor jedem Löschen einer Information aus dem VVZ werden alle Abhängigkeiten, die durch die Normalisierung entstehen, gesucht und angezeigt.
+Beispiel:
+Der Datenbankzustand muss immer konsistent sein, damit immer alle nötigen Informationen vorhanden sind. Löscht man aber nun einen Dozenten,
+dann hätten Veranstaltungen ohne seinen Account keine Zuordnung mehr.
+Daher müsste man alle Veranstaltungen mitlöschen.
+Um klar anzuzeigen, was entfernt werden würde, wenn man Etwas löscht,
+wird ebendies alles angezeigt und man kann noch von der Entscheidung, das
+zu löschen, zurücktreten.
+In den meisten Tabellen, in denen Daten stehen, steht ganz rechts der Button
+löschen<. Damit lassen sich, für Accounts, die die jeweiligen Rechte besitzen, Daten aus dem VVZ löschen. Die letzte Spalte der meisten Tabellen beinhaltet dagegen die Möglichkeit, einen neuen Eintrag hinzuzufügen. Dieser ist dann leer und
+hat keinen >Löschen<-Button.
+
+>
+
+6 Ich will doch nur…
+6.1 … meine Veranstaltung eintragen, ändern oder löschen
+Dazu müssen Sie einen Account mit den Rechten, eine Veranstaltung zu erstellen, besitzen und angemeldet sein. Gehen Sie in der Navigationsleiste auf >Veranstaltungen<, scrollen runter und tragen in die letzte Zeile der großen Tabelle den
+Namen, das Semester und den Typ ein (und, wenn Sie Administrator oder Superdozent sind, den Namen des Dozenten; sonst wird automatisch der mit Ihrem
+Account verknüpfte Dozent eingetragen).
+Klicken Sie dann auf >Bearbeiten<. Das speichert die eingegebenen Daten und
+leitet Sie weiter zur Seite >Einzelne Veranstaltungen< (siehe 7.7.4). Dort können
+Sie Zeiten, Räume und Prüfungsleistungen eintragen. Klicken Sie dann entweder
+ganz oben oder ganz unten auf der Seite nochmal auf >Speichern< und die Veranstaltung ist sofort live.
+Über den selben Weg können Sie die Veranstaltung auch nachträglich jederzeit
+bearbeiten.
+Der Gebäude- und Raumwunsch wird nicht automatisch veröffentlicht. Dazu
+muss erst der Raumplanungsdozent nach der Kommunikation mit dem Raumplanungsdezernat eintragen, wo die Veranstaltung stattﬁndet.
+
+8
+
+6.2 … mein Passwort ändern
+Das können Sie auf der Seite >Eigene Daten ändern< in der Navigationsleiste.
+
+6.3 … mein vergessenes Passwort erfahren
+Die Passworte werden nicht im Klartext gespeichert, sondern gehasht. Das heißt,
+dass niemand Zugriff auf Ihr verlorenes Passwort hat. Aber die Administratoren
+können Ihr Passwort jederzeit neu setzen. Benutzen Sie einfach die Kontakt-Seite
+am unteren Bildschirmrand, um uns danach zu fragen.
+
+
+Genauer gesagt sind die Passworte mit sha256 und einem zufälliggeneriertem Salt gehasht. Es ist nicht möglich, aus dieser Kombination Ihr
+Ursprungspasswort wiederherzustellen. sha256 ist eine sogenannte Einwegfunktion. Das heißt, dass es relativ einfach ist, y mit y = f(x) zu berechnen,
+aber praktisch unmöglich, aus y herauszuﬁnden, welches x (Ihr Passwort)
+in die Funktion gegeben worden ist. Das Hinzufügen eines Saltes erschwert
+das noch zusätzlich, weil die zufällig angehangene Zeichenkette sogenannte
+>Rainbow-Tables< in der Praxis unmöglich macht, in der eine Menge aus
+verschiedenen x ↔ y-Kombinationen gespeichert sind.
+
+7 Unterseiten
+7.1 Willkommen!
+Auf der Startseite sehen Sie Informationen und Hinweise zur Benutzung. Darunter sehen Sie die gleichen Daten, wie sie oben im Menü angezeigt werden, in hierarchischer Struktur. Von hier aus können Sie alle Seiten, die Sie aufrufen dürfen,
+auf einen Blick sehen.
+
+
+Sowohl die Leiste oben als auch diese Ansicht passt sich an die Rolle
+des angemeldeten Benutzers an. Ein Administrator sieht bei Beidem andere
+Punkte als ein Raumplanungsdozent.
+
+7.2 Eigene Daten ändern
+Auf >Eigene Daten ändern< können Sie Ihr eigenes Passwort ändern und festsetzen, ob der Raumplanungsdozent automatisch sehen soll, dass Sie ein barriere-
+
+9
+
+freies Gebäude bevorzugen. Mit dieser Option müssen Sie das nicht immer manuell eintragen beim Erstellen von Veranstaltungen.
+
+7.3 Kontakt
+Unter Kontakt können Sie – wie unten in der Navigationsleiste – zum Kontaktformular kommen, um Fehler, Vorschläge und Fragen zur Software oder den Daten
+zu geben. Als angemeldeter Benutzer muss man keine Sicherheitsfrage eingeben.
+
+7.4 Moduldaten
+In dieser Kategorie beﬁnden sich zwei Unterseiten, die dazu dienen, Informationen zu Modulen einzutragen oder zu ändern.
+7.4.1 Modul Ð→ Semester
+Hier können Informationen eingetragen werden, die für die automatische Stundenplanerstellung genutzt werden. Dabei muss man als erstes einen Studiengang
+auswählen und bekommt dann eine Liste aller Module. Zu diesen Modulen kann
+man dann sagen, in welchem Semester sie laut Regelstudienordnung auftauchen
+sollten. Dies geht mit einem einfachen Komma: >1,2< heißt: im ersten und zweiten Semester.
+Sind die Semesterinformationen gespeichert, taucht eine zweite Tabelle auf, in
+der die Anzahl der Veranstaltungstypen, der Credit-Points und Prüfungsleistungen, die nötig sind, eingetragen werden können.
+Ist dies für einen Studiengang eingetragen ist eine automatische Stundenplanerstellung möglich.
+7.4.2 Module
+Auf der Unterseite zu Modulen können Sie neue Module erstellen, vorhandene
+bearbeiten oder löschen. Dabei braucht jedes Modul eine Zuordnung zu einem
+Studiengang, einen Namen und optionalerweise auch eine Beschreibung und eine Abkürzung.
+Studiengänge hierfür können unter Stammdaten Ð→ Studiengänge hinzugefügt
+werden (vgl. 7.7.11).
+
+7.5 Prüfungsdaten
+In dieser Kategorie sind alle Unterseiten, die Etwas mit der Verwaltung von Prüfungsleistungen zu tun haben.
+
+10
+
+7.5.1 Dozent Ð→ Prüfungsdaten
+Diese Seite erstellt automatisch Berichte für die Prüfungsämter, welcher Dozent
+welche Prüfungsleistungen angeboten hat. Dabei kann man sowohl Semester,
+Studiengang als auch das Prüfungsamt einschränken (manche Prüfungsämter
+wollen nicht die Daten aller Studiengänge, und mit der Deﬁnition von Prüfungsämtern kann man festlegen, welche was bekommen wollen, vgl. 7.5.3).
+Am unteren Ende der Seite besteht die Möglichkeit, die oben angezeigte Liste
+als Excel-Datei herunterzuladen.
+Alles auf dieser Seite wird vollautomatisch erstellt. Es ist nicht möglich, hier etwas zu ändern (dazu müssten beispielsweise Dozenten in ihren Veranstaltungen
+Prüfungsleistungen abwählen, siehe 7.7.4).
+7.5.2 Prüfung Ð→ Zeitraum
+Jeder Prüfungsleistung ist ein Zeitraum zugeordnet (>erster Zeitraum< und >zweiter Zeitraum<). Diese Zeiträume lassen sich hier erstellen, ändern oder löschen.
+7.5.3 Prüfungsämter
+Für die in 7.5.1 auswählbaren Prüfungsämter lässt sich hier festlegen, welche
+Prüfungsämter an Dokumenten welcher Studiengänge interessiert sind. In der
+oberen Tabelle lassen sich neue Prüfungsämter eintragen oder alte umbenennen
+oder löschen und in der unteren Tabelle lassen sich für jedes Prüfungsamt Checkboxen setzen für gewisse Studiengänge.
+7.5.4 Prüfungsnummer Ð→ Dozent
+Ähnlich wie in 7.5.1 lässt sich hier vollautomatisch erstellt eine Liste ansehen und
+als Excel-Datei downloaden, nur ist hier Zuordnung hier genau andersherum. Jeder Prüfungsleistung wird zugeordnet, welche Dozenten sie in dem Semester anbieten und in welchem Studiengang.
+7.5.5 Prüfungsnummern
+Die Prüfungsnummernunterseite erlaubt es, Prüfungsnummern zu erstellen, zu
+bearbeiten oder zu löschen. Jeder Prüfungsleistungen ist dabei ein Studiengang,
+ein Modul, ein Bereich, ein Prüfungstyp, eine Modulbezeichnung (optional), eine
+Prüfungsnummer (optional) und ein Zeitraum zugeordnet. Einzelne Prüfungsleistungen lassen sich hier auch deaktivieren, um die Datenkonsistenz nicht zu
+gefährden und trotzdem Veranstaltungen auf der Seite einzelner Veranstaltungen nicht sichtbar werden zu lassen (vgl. 7.7.4).
+
+11
+
+7.5.6 Prüfungstypen
+Diese Unterseite verwaltet die Arten von Prüfungsleistungen, die es gibt, beispielsweise Klausuren oder Essays. Bis auf den Namen kann man hier keine
+Informationen eintragen.
+
+7.6 Raumplanung
+Auf der Raumplanungsseite ist sowohl das Institut als auch das Semester auswählbar. Hier erscheinen alle für die gewählten Einstellung eingetragenen Veranstaltungen mit Zusatzinformationen wie dem Gebäudewunsch und dem Raumwunsch, aber auch einem vom Dozenten frei eingebbaren Hinweis für die Raumplanung.
+Der Raumplanungsdozent kann hier – nach Rücksprache mit dem Raumplanungsdezernat – ein Gebäude und einen Raum für eine Veranstaltung festlegen.
+Diese erscheinen dann im Frontend des VVZs. Die Raumwünsche und Gebäudewünsche erscheinen dort noch nicht. Zusätzlich kann eingetragen werden, wann
+der Raum gemeldet worden ist.
+Wenn der Raumplaner einen Raum eingetragen hat, aber der Dozent noch für
+die Raumplanung relevante Daten geändert hat, erscheint neben dem Titel der
+Veranstaltung ein kleiner Blitz . Dieser weist darauf hin, dass nachträglich relevante Daten geändert worden sind und man sich die Veranstaltung nochmal
+ansehen sollte. Durch erneutes Speichern (auch, wenn keine weiteren Änderungen vorgenommen worden sind) verschwindet der Blitz.
+Am unteren Ende der Seite ist die Möglichkeit, sich die oben gezeigte Liste als
+Excel-Datei zu downloaden.
+
+7.7 Stammdaten
+7.7.1 Alte Daten löschen
+Wenn Daten, die vergangene Semester betreffen, aus irgendwelchen Gründen gelöscht werden sollen, kann man das hier machen. Die Seite zeigt alle Semester,
+die die Software kennt, an, und gibt die einfache Möglichkeit zum konsistenten
+Löschen.
+7.7.2 Bereiche
+Hier können Bereichsnamen erstellt, bearbeitet oder gelöscht werden.
+7.7.3 Dozenten
+Hier können Dozenten mit ihren Metadaten erstellt, bearbeitet oder gelöscht werden. Auch kann hier festgelegt werden, ob der Dozent noch am Institut oder be-
+
+12
+
+reits ausgeschieden ist. In der Tabelle darunter ist eine Übersicht, wie viele Prüfungsleistungen ein Dozent im ausgewählten Semester anbietet.
+Noch etwas weiter runter ist eine Tabelle, in der eine Verknüpfung zwischen
+Dozent und Titel hergestellt werden kann. Hat Jemand z. B. einen Doktortitel und
+man trägt das hier ein, taucht der Doktortitel auf der Seite an den meisten Stellen
+auf, wo der Name des Dozenten steht (für die Festlegung der Titel, siehe 7.7.14).
+7.7.4 Einzelne Veranstaltung
+Auf der Unterseite >Einzelne Veranstaltung< können — wie der Name es sagt —
+einzelne Veranstaltungen bearbeitet werden. Geht man über das Menü auf diese
+Seite, erscheint eine Liste aller Veranstaltung, die Sie editieren dürfen. Wählen
+Sie dort eine aus und klicken auf >Veranstaltung auswählen<, und Sie können die
+Veranstaltung bearbeiten.
+In der ersten Tabelle haben Sie die Möglichkeit, Sprache, Wochentag, Stunde,
+Wochenrhythmus, den ersten Termin, die Anzahl der Hörer (für die Raumplanung), einen Link zu OPAL, einen Gebäude- und einen Raumwunsch einzutragen. Dabei ist alles – bis auf Wochentag, Stunde und Wochenrhythmus – optional.
+Umso mehr Informationen Sie aber eintragen, umso nützlicher ist die Seite.
+Darunter ist eine Tabelle mit zwei Hinweisfeldern. Der Hinweis für die Raumplanung taucht nur auf der Raumplanungsseite auf (vgl. 7.6), der Hinweis für die
+Studenten auch im Frontend.
+Darunter haben Sie die Möglichkeit, eine inhaltliche Verbindung zweier Fächer
+herzustellen, beispielsweise einer Vorlesung und einer Übung. Diese Verbindung
+erscheint dann auf der Startseite.
+Dann kommt eine Tabelle, in der einzelne Termine und Orte eingetragen werden können, die nicht in das oben-angegebene Muster passen (ist die ganze Veranstaltung nicht ins Schema zu pressen, kann man dafür bei der Stunde >*<, oder
+>ganztägig< auswählen und beim Tag >BS< für Blockseminar, auswählen).
+Darunter beﬁndet sich eine Tabelle aller Prüfungsleistungen. Diese sind geordnet nach Studiengängen (blaue Überschriften) und Modulen (linke Seite). Wird
+hier ein Haken gesetzt, dann taucht die Veranstaltung in der Unterseite des Studienganges des Modules auf, für das eine Prüfung ausgewählt worden ist. Tipp:
+mit der Tastenkombination >STRG f< kann man auf einer Internetseite z. B. nach
+Zahlen oder Text suchen. Somit ﬁnden sich die Prüfungsleistungen schneller.
+Darunter ist ein großer Speichernknopf, der auch oben auf der Seite nochmal
+ist. Klickt man diesen, werden alle eingetragenen Informationen gespeichert.
+Noch weiter runter ist die Möglichkeit, ausgewählte Prüfungsleistungen von einer anderen Veranstaltung zu klonen (z. B. aus einem vorherigen Semester). Dabei kann man sich Veranstaltungen alter Semester anzeigen, aber auch aktueller,
+auf die man selbst Zugriff hat. Außerdem lassen sich mit einer Checkbox die aktu-
+
+13
+
+ell ausgewählten und die zu-klonenden in einer Gesamtmenge vereinen, so, dass
+man beide hat.
+7.7.5 FAQ
+Hier ist es möglich, die Daten des FAQs zu editieren. Dazu können Fragen und
+Antworten eingegeben werden, und eine Zahl, wie häuﬁg danach gefragt wird.
+Umso häuﬁger etwas gefragt wird, umso höher steht es automatisch im FAQ.
+7.7.6 Gebäude
+Hier lassen sich Gebäude einfügen, bearbeiten oder löschen. Dabei muss man den
+Gebäuden sowohl einen Namen als auch eine Abkürzung geben.
+7.7.7 Institute
+Auf der Seite der Institute lassen sich neue Institute erstellen, vorhandene bearbeiten oder löschen. Dazu hat jedes Institut einen Namen und eine Startnummer.
+Diese Startnummer ist relevant für die Liste auf der Raumplanungsseite, denn für
+die Prüfungsämterlisten beginnen Veranstaltungen eines Institutes immer mit einer bestimmten, automatisch generierten ID. Die Startnummer wird der automatisch generierten >1< für die erste Veranstaltung aufaddiert. Ist sie nicht gesetzt,
+wird das behandelt wie eine 0.
+7.7.8 Merges
+
+
+
+Die Merge-Seite erlaubt es, sehr ähnliche Informationen in der Datenbank zu verschmelzen. Als Beispiel sei genannt, dass man ausversehen zwei
+Sprachen eingetragen hat, die eigentlich eine sind, und beiden Sprachen bereits mit Veranstaltungen verknüpft sind. Würde man eine davon löschen,
+wäre die Datenbank inkonsistent.
+Merges erlaubt es, solche Strukturen automatisch zusammenzufügen, in
+dem man eine geeignete Tabelle auswählt (der automatische Vorgang geht
+nicht mit allen Tabellen!) und in der oberen Tabelle eine Liste aller Einträge
+hat mit Checkboxen und darunter mit Radio-Buttons.
+Wählt man in der ersten Tabelle drei Einträge aus und in der zweiten nur
+einen, dann werden alle Referenzen der auf Daten in der Tabelle geändert
+auf das, was in der zweiten Tabelle ausgewählt ist. Danach werden die alten,
+nicht-mehr-referenzierten Daten gelöscht.
+
+14
+
+
+
+Achtung: das ist ein sehr experimentelles Feature. Ich habe bisher
+bei vielen Versuchen noch keine Fehler entdecken können, aber ich würde
+dringend empfehlen, vorher ein Datenbankbackup zu machen, siehe dazu
+7.8.5.
+7.7.9 Semester
+Im Unterpunkt Semester sind die vom System automatisch erstellten Jahressemester (Sommersemester/Wintersemester und Jahr). Das System erstellt automatisch Semester für die nächsten zehn Jahre, um immer die Möglichkeit zu bieten,
+genügend Referenzpunkte für Veranstaltungen zu haben.
+Hier kann außerdem das Start-Datum des Semesters eingetragen werden. Einmal erstellte Semester können nicht mehr über die graﬁsche Oberﬂäche entfernt
+werden, so wie neue Semester auch nicht eingetragen. Das geschieht immer automatisch.
+7.7.10 Sprachen
+Hier können Sprachen festgelegt werden, die im Menüpunkt >Einzelne Veranstaltung< ausgewählt werden können, siehe dazu 7.7.4. Dazu muss je ein Name und
+eine Abkürzung (bestenfalls nach ISO 639-5) festgelegt werden.
+7.7.11 Studiengänge
+Hier können neue Studiengänge eingeführt, vorhandene bearbeitet oder gelöscht
+werden. Dazu muss je ein Institut angeben werden, ein Name und optionalerweise auch ein Link zur Studienordnung. Dieser erscheint dann im Frontend.
+7.7.12 Stundenpläne
+Unter >Stundenpläne< sind Links zur automatischen Stundenplanverwaltung, die
+für jeden Dozenten (bei Administratoren) bzw. für sich selbst den Stundenplan
+enthält. Dieser wird automatisch generiert aus den ausgewählten Veranstaltungen.
+7.7.13 Superdozenten
+Diese Seite erlaubt das Festlegen der Superdozenten. Ein Superdozent ist ein Dozent, der Superkräfte hat. Das heißt: er kann Veranstaltungen ausgewählter anderer Dozenten bearbeiten. Dazu muss einem Dozenten die Rolle als Superdozent
+zugewiesen werden (siehe 7.8.9) und Checkboxen bei den Namen der jeweiligen
+Dozenten gemacht werden.
+
+15
+
+7.7.14 Titel
+In der >Titel<-Seite können zentral Titel festgelegt werden, die Dozenten zugewiesen werden können (vgl. auch 7.7.3). Dabei hat jeder Titel einen Namen und eine
+Abkürzung, wobei nur die Abkürzung vor den Namen erscheint.
+7.7.15 Vorlesungstypen
+Hier können Vorlesungstypen (beispielsweise Vorlesung oder Textproseminar)
+eingepﬂegt werden. Dabei müssen sowohl ein Name als auch eine Abkürzung
+eingegeben werden.
+
+7.8 System
+7.8.1 Accounts
+Hier können Accounts festgelegt werden, mit denen es möglich ist, sich im Backend anzumelden und beispielsweise Veranstaltungen zu erstellen. Dabei muss
+ein Name, ein Passwort, eine Rolle und optionalerweise ein zugeordneter Dozent eingetragen werden. Ist ein Dozent zugeordnet, kann ein Account der Dozentenklasse (Dozent oder Raumplanungsdozent) nur die Veranstaltungen dieses
+Dozenten bearbeiten. Ausnahme ist der Superdozent, der auch Veranstaltungen
+ausgewählter anderer Dozenten bearbeiten darf. Hier lässt sich auch festlegen,
+ob automatisch in der Raumplanung ein Hinweis auftauchen soll, dass barrierefreie Räume bevorzugt werden.
+Dahinter ist auch eine Checkbox, ob die Datenschutzfrage akzeptiert worden
+ist. Diese lässt sich nicht beim Erstellen eines Benutzers setzen, um sicherzustellen, dass jeder zugesagt hat, der die Software benutzt. Sollte je eine neue Datenschutzfrage nötig sein (z. B. wegen einer Gesetzesänderung), ist es hier jederzeit
+durch Wegmachen des Hakens möglich, den Benutzer zum erneuten Akzeptieren
+(oder Ablehnen) zu bringen.
+Außerdem lassen sich hier Accounts deaktivieren, um sie nicht löschen zu müssen und Dateninkonsistenz zu verursachen.
+
+
+Accounts sind nicht das Gleiche wie Dozenten. Es kann Accounts ohne Dozenten geben und umgekehrt. Dozenten ohne Accounts können beispielsweise von Superdozenten oder Superduperdozenten (umgangssprachlich Administratoren) verwaltet werden. Vgl. dazu 7.7.13.
+
+16
+
+
+
+Die Passworte sind nicht im Klartext in der Datenbank, sondern sha256gehasht mit einem langen, zufällig-generiertem Salt. Daher ist es nicht möglich, vergessene Passworte auszulesen. Wenn ein Nutzer sein Passwort vergisst, können die Administratoren hier jedoch ein neues Passwort setzen.
+
+7.8.2 Aktuelles Semester setzen
+Hier ist es möglich, festzulegen, welches als Semester als das Aktuelle anzusehen
+ist. Dieses wird überall, wo eine Semesterauswahl möglich ist, als Standardsemester gewählt.
+7.8.3 Apache-Neustarts
+
+
+
+Einmal die Minute überprüft ein Cronjob, ob der Apache noch läuft und
+die Seite erreichbar ist. Ist das nicht der Fall, wird versucht, den Webserver
+neuzustarten. Wenn das auftritt, wird das in die Datenbank geloggt und auf
+dieser Seite angezeigt.
+7.8.4 API
+
+
+
+Die API erlaubt es, von Außen Informationen aus dem VVZ abzurufen,
+z. B., um eigene Apps zu entwickeln. Siehe dazu die Frontend-Dokumentation.
+Auf dieser Seite ist es möglich, neue Nutzer einzutragen und für sie einen
+Auth-Code zu erstellen, mit dem der Zugriff auf die API gewährt wird. Dazu
+kann man einen Namen, eine Kontakt-Email-Adresse und eine Begründung
+eintragen, wofür die API benutzt werden soll. Dies soll ermöglichen, wenn
+plötzlich sehr viele Anfragen stattﬁnden, nach dem Rechten zu fragen, um
+Softwarefehler o. Ä. in der Software Anderer zu ﬁnden, die diese API benutzen und eventuell den VVZ-Server durch zu viele Anfragen belasten.
+Die API-Zugriffe werden mitgeloggt, um potenzielle Botnetze erkennen zu
+können. Dafür kann man sich auf dieser Seite auch die Logs anzeigen.
+
+17
+
+7.8.5 DB-Backup
+
+
+Hier ist für Administratoren es möglich, sich einen Dump der Datenbank
+zu holen, um sie zu sichern. Auch ist hierüber das komplette Wiederherstellen eines vorherigen Datenbankzustandes durch einen gespeicherten Dump
+möglich. Die Änderungen zwischen Dump und aktuellem Status lassen sich
+im DB-Diff nachsehen, siehe dazu 7.8.6.
+7.8.6 DB-Diff
+
+
+Hier kann eine MySQL-Dump-Datei hochgeladen werden und es erscheint eine Liste der Änderungen zwischen Dump und aktueller Datenbankversion.
+7.8.7 Funktionen
+
+
+Das VVZ verhindert unauthorisierte Änderungen über das Rollensystem,
+das jedem Account eine Rolle zuordnet. Vor jeder Funktion, die potenziell gefährlich sein könnte, weil damit Änderungen in der Datenbank gemacht werden könnten, wird überprüft, ob der aktuell-eingeloggte Account die Rechte
+besitzt, diese Änderungen zu machen. Dafür ist hier eine Liste aller Funktionen vorhanden (obere Tabelle), wo neue Funktionen angelegt werden können.
+In der unteren Tabelle ist eine Liste aller Funktionen und eine Liste von
+Rollen mit Checkboxen. Wählt man für eine Funktion eine Checkbox aus, darf
+der Benutzer sie ausführen. Sonst erhält er eine Fehlermeldung. Zur Rechteverwaltung, siehe Rollen unter 7.8.9 und Neue Seite unter ??.
+7.8.8 Neue Seite
+
+
+Der Menüpunkt >Neue Seite< erlaubt es, neue Seiten in die Navigation hinzuzufügen. Dabei muss ein Name (der überall erscheint, wo die Seite verlinkt
+
+18
+
+wird), eine .php-Datei, die im Ordner ./pages/ liegen muss, eine Checkbox,
+ob die Seite in der Navigation angezeigt werden soll, ein Vaterelement (was
+die Seite zu einer Kategorie in der Navigation zuordnet, Rollen, die Zugriff
+haben und eine Beschreibung (die in den Kategorien und auf der Willkommensseite angezeigt wird) und ein Hinweis, der auf der Seite selbst angezeigt
+werden, festgelegt werden.
+Über diesen Menüpunkt lassen sich auch die bisherigen Zuordnungen
+verändern, wenn man z. B. den Punkt >Raumplanung< in die Kategorie
+der Stammdaten verschieben will, dann kann man das hier ändern und
+speichern.
+7.8.9 Rollen
+
+
+
+In der Unterseite der Rollen ist es möglich, vorhandene Rollen zu bearbeiten, zu löschen oder neue anzulegen. Eine Rolle bestimmt, was einem Nutzer
+angezeigt wird und was er verändern darf (siehe auch dazu 7.8.7). Damit eine neue Rolle eine neue Seite vollständig benutzen darf, müssen alle auf der
+Seite benutzten Funktionen eingetragen und für die Rolle freigeschaltet sein
+und die Rolle braucht auch Zugriff auf die Seite selbst.
+Zusätzlich zur Seitenzuordnung kann jeder Rolle auch eine kurze Beschreibung gegeben werden.
+7.8.10 Seiteninformationen
+
+
+
+Beinhaltet nur die Untermenge der Daten aus >Neue Seite< (??), bestehend
+aus der Beschreibung und dem Hinweis für eine Seite. Diese Unterseite ist
+damit obsolet. Aber sie greift auf die gleichen Daten zu, wie die >Neue Seite<Seite und daher ist es egal, auf welcher von Beiden Hinweise oder Beschreibungen geändert werden.
+7.8.11 User-Agentes
+
+19
+
+
+
+Beinhaltet Graphen und eine Liste, welche Browser, Betriebssysteme und
+Browser-Betriebssystem-Kombinationen auf die Seite zugegriffen haben und
+wie oft. Bietet auch die Möglichkeit, sich verschiedene Bot-Zugriffe anzeigen
+zu lassen, z. B. vom Googlebot.
+
+Aktuell wird diese Unterseite nicht gewartet. Die Erstellung der
+Graphen geschah durch Google Charts, aber durch die Einführung der XSSSicherheitsfunktionen funktioniert diese Seite aktuell nicht mehr.
+
+7.9 Veranstaltungen
+Zeigt alle Veranstaltungen, die der eingeloggte Benutzer bearbeiten darf und erlaubt es auch, Veranstaltungen aus vorherigen Semestern (bzw. bei Administratoren und Superdozenten von einzelnen Dozenten anzuzeigen, auf die man Zugriff
+hat).
+Dabei hat jede Veranstaltung einen Namen, ein zugeordnetes Semester, einen
+zugeordneten Dozenten und einen zugeordneten Veranstaltungstyp. Außerdem
+wird angezeigt, wie viele Prüfungsleistungen in der Veranstaltung ausgewählt
+sind. Ist die Anzahl 0, wird sie rot und mit drei Ausführungzeichen davor und
+danach markiert.
+Will man nur die Daten der Veranstaltung ändern, die auf dieser Seite angezeigt werden, kann man auf >Speichern< klicken. Will man die EinzelneVeranstaltungs-Seite (vgl. 7.7.4) dieser Veranstaltung haben, um Zeit, Raum,
+ausgewählte Prüfungsleistungen usw. zu ändern, muss man auf >Bearbeiten< klicken; dabei wird auch die Änderung auf der aktuellen Seite gespeichert, aber an
+gelangt an die speziﬁsche Seite der einzelnen Veranstaltung).
+In der letzten Zeile lassen sich neue Veranstaltungen eintragen und statt der
+Anzahl der Veranstaltungen, die ausgewählt wird, steht dort die Summe der oben
+ausgewählten Veranstaltungen (mit ↑ Σ = . . . ).
+
+8 Fehlerbehebung
+Bei gravierenden Fehlern wird automatisch eine Fehlerseite angezeigt und die
+Administration informiert.
+Kleinere Probleme lassen sich meist selbst beheben. Wenn das Aufklappen von
+Menüs nicht funktioniert, aktivieren Sie bitte Javascript. Für die Anmeldung auf
+der Administrationsseite oder das Speichern von geplanten/erledigten Prüfungsleistungen oder ausgewählten Veranstaltungen aktivieren Sie bitte Cookies.
+Die Seite sollte in allen halbwegs modernen Browsern funktionieren, inklusive
+den Konsolenbrowsern w3m und lynx.
+
+20
+
+9 Fehler oder Wünsche melden
+Über den Menüpunkt >Kontakt< ganz unten auf der Seite ist es möglich, mit der
+Studienberatung oder mir in Kontakt zu treten. Dazu müssen Sie Ihre EmailAdresse, die Art des Anliegens und das Anliegen selbst formulieren (die Art des
+Anliegens bestimmt, wohin die Email geht: bei Technischen Fragen, Wünschen,
+Verbesserungsvorschlägen oder Fehlerberichten wählen Sie bitte >technischer
+Natur<, sonst >inhaltlicher<). Dazu muss gegenenfalls noch eine Sicherheitsabfrage beantwortet werden, die aus sehr einfachen mathematischen oder
+geographischen Fragen besteht.
+Jede Email wird gelesen! Es wird um viel Feedback gebeten, da ich die Software
+so gut wie möglich an die realen Bedürfnisse von Studenten ausrichten möchte!
+Ich möchte aber darum bitten zu bedenken, dass ich die Software nur als Hobby
+neben dem Studium betreibe und daher manchmal etwas länger brauchen kann,
+um Fehler zu ﬁnden oder Wünsche einzubauen.
+
+10 Urheberrechte & Danksagungen
+Die Urheberrechte sowohl der Software als auch der Dokumentation liegen bei
+Norman Koch.
+Ich möchte mich außerdem bedanken für die freundliche Hilfe des philosophischen Institutes der Technischen Universität Dresden, Herrn Prof. Dr. Schönrich,
+Herrn Prof. Dr. Rentsch und Herrn Prof. Dr. Hiltscher. Vorallem was das Technische möchte ich mich für die Hilfe von Herrn Dr. Holm Bräuer und Herrn Norbert
+Engemaier bedanken. Auch herzlichen Dank an Frau Gilda Märcz, die mir sowohl
+im Studium als auch in der Verwaltung immer sehr freundlich und kompetent geholfen hat.
+Ohne die Hilfe, die Bugreports und die freundliche Art aller Mitarbeiter des
+Institutes wäre diese Software nie entstanden.
+
+Notes
+1
+
+Glenn Vanderburg. Quotations About Software Design. url: https://vanderburg.org/etc/
+soft-quotes.html (besucht am 12. April 2019).
+
+11 Quellen
+— Kerckhoffs’ Prinzip — Wikipedia. url: https://de.wikipedia.org/wiki/
+Kerckhoffs%E2%80%99_Prinzip (besucht am 12. April 2019) (siehe S. 6).
+— Raffael. The School of Athens. 1509 – 1511. url: https://en.wikipedia.
+org/wiki/The_School_of_Athens.
+
+21
+
+— Glenn Vanderburg. Quotations About Software Design. url: https : / /
+vanderburg . org / etc / soft - quotes . html (besucht am 12. April 2019)
+(siehe S. 21).
+
+22
+
+

@@ -1,0 +1,61 @@
+\BOOKMARK [1][-]{section.1}{Typographische\040Konventionen}{}% 1
+\BOOKMARK [1][-]{section.2}{Einleitung}{}% 2
+\BOOKMARK [1][-]{section.3}{Zu\040den\040Cookies}{}% 3
+\BOOKMARK [1][-]{section.4}{Benutzung\040und\040Details}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Anmelden}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{Abmelden}{section.4}% 6
+\BOOKMARK [2][-]{subsection.4.3}{Vorteile\040der\040eingeloggten\040Nutzer\040im\040Frontend}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.4}{Der\040Aufbau\040der\040Seite}{section.4}% 8
+\BOOKMARK [1][-]{section.5}{Ich will doch nur…}{}% 9
+\BOOKMARK [2][-]{subsection.5.1}{… meine Veranstaltung eintragen, ändern oder löschen}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.2}{… mein Passwort ändern}{section.5}% 11
+\BOOKMARK [2][-]{subsection.5.3}{… mein vergessenes Passwort erfahren}{section.5}% 12
+\BOOKMARK [1][-]{section.6}{Unterseiten}{}% 13
+\BOOKMARK [2][-]{subsection.6.1}{Willkommen!}{section.6}% 14
+\BOOKMARK [2][-]{subsection.6.2}{Eigene Daten ändern}{section.6}% 15
+\BOOKMARK [2][-]{subsection.6.3}{Kontakt}{section.6}% 16
+\BOOKMARK [2][-]{subsection.6.4}{Moduldaten}{section.6}% 17
+\BOOKMARK [3][-]{subsubsection.6.4.1}{Modul\040-3.1mu\040Semester}{subsection.6.4}% 18
+\BOOKMARK [3][-]{subsubsection.6.4.2}{Module}{subsection.6.4}% 19
+\BOOKMARK [2][-]{subsection.6.5}{Prüfungsdaten}{section.6}% 20
+\BOOKMARK [3][-]{subsubsection.6.5.1}{Dozent -3.1mu Prüfungsdaten}{subsection.6.5}% 21
+\BOOKMARK [3][-]{subsubsection.6.5.2}{Prüfung -3.1mu Zeitraum}{subsection.6.5}% 22
+\BOOKMARK [3][-]{subsubsection.6.5.3}{Prüfungsämter}{subsection.6.5}% 23
+\BOOKMARK [3][-]{subsubsection.6.5.4}{Prüfungsnummer -3.1mu Dozent}{subsection.6.5}% 24
+\BOOKMARK [3][-]{subsubsection.6.5.5}{Prüfungsnummern}{subsection.6.5}% 25
+\BOOKMARK [3][-]{subsubsection.6.5.6}{Prüfungstypen}{subsection.6.5}% 26
+\BOOKMARK [2][-]{subsection.6.6}{Raumplanung}{section.6}% 27
+\BOOKMARK [2][-]{subsection.6.7}{Stammdaten}{section.6}% 28
+\BOOKMARK [3][-]{subsubsection.6.7.1}{Alte Daten löschen}{subsection.6.7}% 29
+\BOOKMARK [3][-]{subsubsection.6.7.2}{Bereiche}{subsection.6.7}% 30
+\BOOKMARK [3][-]{subsubsection.6.7.3}{Dozenten}{subsection.6.7}% 31
+\BOOKMARK [3][-]{subsubsection.6.7.4}{Einzelne\040Veranstaltung}{subsection.6.7}% 32
+\BOOKMARK [3][-]{subsubsection.6.7.5}{FAQ}{subsection.6.7}% 33
+\BOOKMARK [3][-]{subsubsection.6.7.6}{Gebäude}{subsection.6.7}% 34
+\BOOKMARK [3][-]{subsubsection.6.7.7}{Institute}{subsection.6.7}% 35
+\BOOKMARK [3][-]{subsubsection.6.7.8}{Merges}{subsection.6.7}% 36
+\BOOKMARK [3][-]{subsubsection.6.7.9}{Semester}{subsection.6.7}% 37
+\BOOKMARK [3][-]{subsubsection.6.7.10}{Sprachen}{subsection.6.7}% 38
+\BOOKMARK [3][-]{subsubsection.6.7.11}{Studiengänge}{subsection.6.7}% 39
+\BOOKMARK [3][-]{subsubsection.6.7.12}{Stundenpläne}{subsection.6.7}% 40
+\BOOKMARK [3][-]{subsubsection.6.7.13}{Superdozenten}{subsection.6.7}% 41
+\BOOKMARK [3][-]{subsubsection.6.7.14}{Titel}{subsection.6.7}% 42
+\BOOKMARK [3][-]{subsubsection.6.7.15}{Vorlesungstypen}{subsection.6.7}% 43
+\BOOKMARK [2][-]{subsection.6.8}{System}{section.6}% 44
+\BOOKMARK [3][-]{subsubsection.6.8.1}{Accounts}{subsection.6.8}% 45
+\BOOKMARK [3][-]{subsubsection.6.8.2}{Aktuelles\040Semester\040setzen}{subsection.6.8}% 46
+\BOOKMARK [3][-]{subsubsection.6.8.3}{Apache-Neustarts}{subsection.6.8}% 47
+\BOOKMARK [3][-]{subsubsection.6.8.4}{API}{subsection.6.8}% 48
+\BOOKMARK [3][-]{subsubsection.6.8.5}{DB-Backup}{subsection.6.8}% 49
+\BOOKMARK [3][-]{subsubsection.6.8.6}{DB-Diff}{subsection.6.8}% 50
+\BOOKMARK [3][-]{subsubsection.6.8.7}{Funktionen}{subsection.6.8}% 51
+\BOOKMARK [3][-]{subsubsection.6.8.8}{Neue\040Seite}{subsection.6.8}% 52
+\BOOKMARK [3][-]{subsubsection.6.8.9}{Rollen}{subsection.6.8}% 53
+\BOOKMARK [3][-]{subsubsection.6.8.10}{Seiteninformationen}{subsection.6.8}% 54
+\BOOKMARK [3][-]{subsubsection.6.8.11}{User-Agents}{subsection.6.8}% 55
+\BOOKMARK [2][-]{subsection.6.9}{Veranstaltungen}{section.6}% 56
+\BOOKMARK [1][-]{section.7}{Zukünftige Ideen}{}% 57
+\BOOKMARK [1][-]{section.8}{Fehlerbehebung}{}% 58
+\BOOKMARK [1][-]{section.9}{Fehler oder Wünsche melden}{}% 59
+\BOOKMARK [1][-]{section.10}{Urheberrechte\040&\040Danksagungen}{}% 60
+\BOOKMARK [1][-]{section.11}{Quellen}{}% 61

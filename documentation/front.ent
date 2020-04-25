@@ -1,0 +1,25 @@
+\@doanenote {1}
+macro:->\protecting
+{\blxmkbibnote
+{foot}{\blxciteicmd
+{footfullcite}{}{}{kathedralewiki}{}}}
+\@endanenote 
+\@doanenote {2}
+macro:->Technisch
+gesehen
+ist
+das
+falsch,
+aber
+das
+Limit
+liegt
+bei
+$4\,294\,967\,295$
+und
+ist
+daher
+praktisch
+nicht
+relevant.
+\@endanenote 
