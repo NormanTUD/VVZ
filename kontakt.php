@@ -77,7 +77,7 @@
 				$message .= "========================== Nachricht Ende\n";
 
 				$headers .= "From:" . $from."\r\n";
-				if(preg_match('/.+@.+\.\+/', get_post('email'))) {
+				if(preg_match('/@/', get_post('email'))) {
 					$headers .= 'Reply-To: '.get_post('email')."\r\n";
 				}
 
