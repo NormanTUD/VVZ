@@ -13,18 +13,8 @@
 <?php
 		include_once('hinweise.php');
 ?>
-		<?php simple_edit(
-			array('first_name', 'last_name', 'ausgeschieden'), 
-			'dozent', 
-			array('Vorname', 'Nachname', 'Ausgeschieden?', 'Speichern', 'Löschen'),
-			$GLOBALS['this_page_number'], 
-			array('id', 'dozent_first_name', 'dozent_last_name', 'ausgeschieden'), 
-			0, 
-			1, 
-			null, 
-			array('last_name', 'first_name', 'ausgeschieden')
-		);
-
+		<?php simple_edit(array('first_name', 'last_name', 'ausgeschieden'), 'dozent', array('Vorname', 'Nachname', 'Ausgeschieden?', 'Speichern', 'Löschen'), $GLOBALS['this_page_number'], array('id', 'dozent_first_name', 'dozent_last_name', 'ausgeschieden'), 0, 1, null, array('last_name', 'first_name', 'ausgeschieden')) ?>
+<?php
 		$semester = get_get('semester');
 		if(!$semester) {
 			$semester = $GLOBALS['this_semester_id'][0];
