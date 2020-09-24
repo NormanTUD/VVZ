@@ -64,11 +64,7 @@
 					$last_update = $row[0];
 				}
 				if($last_update) {
-					$metainfos .= ", letztes Update: $last_update";
-				}
-
-				if(!is_freigeschaltet(get_get('id'))) {
-					$metainfos .= ', noch nicht freigeschaltet (das können nur Admins und Raumverwalter)';
+					$metainfos .= ", letztes Update: $last_update\n";
 				}
 
 				if($metainfos) {
