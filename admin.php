@@ -52,14 +52,8 @@
 	} else {
 		$chosen_institut = get_get('institut');
 		$institute = create_institute_array();
-		$dozenten = create_dozenten_array();
 		if(count($institute) == 0) {
-			error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen. <a href='admin.php?page=3'>Falls Sie Administrator sind, können Sie das hier machen.</a>");
-		}
-
-		$bereiche = create_bereiche_array();
-		if(!count($bereiche)) {
-			error("Keine Bereiche gefunden. <a href='admin.php?page=22'>Fügen Sie diese hier hinzu.</a>");
+			error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen.");
 		}
 
 		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id'])) {
@@ -76,27 +70,8 @@
 		$studiengaenge = create_studiengaenge_array($chosen_institut);
 		$zeitraum = create_zeitraum_array();
 		if(!count($studiengaenge)) {
-			error("Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. Bitten Sie einen Administrator, Studiengänge hinzuzufügen. <a href='admin.php?page=8'>Falls Sie Administrator sind, können Sie das hier machen.</a>");
+			error("Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. Bitten Sie einen Administrator, Studiengänge hinzuzufügen.");
 		}
-
-		if(!count($dozenten)) {
-			error("Es existieren keine Dozenten. <a href='admin.php?page=2'>Falls Sie Administrator sind, können Sie diese hier hinzufügen</a>");
-		}
-
-		$module = create_modul_studiengang_array(70, null);
-		if(!count($module)) {
-			error("Es existieren keine Module. <a href='admin.php?page=5'>Fügen Sie die hier hinzu</a>");
-		}
-
-		$pns = create_pruefungsnummern_array();
-		if(!count($pns)) {
-			error("Keine Prüfungsnummern gefunden. <a href='admin.php?page=12'>Fügen Sie diese hier hinzu.</a>");
-		}
-
-		if(!$GLOBALS['user_institut_id']) {
-			error("Ihrem Account ist kein Institut zugeordnet. <a href='admin.php?page=1'>Ändern Sie das hier</a>");
-		}
-
 		if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
 			$datestring = md5(date('Y-m-d H'));
 			if (get_get('iamsure') == $datestring) {
@@ -108,7 +83,7 @@
 		$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]));
 		if(!user_is_verwalter($GLOBALS['logged_in_user_id'])) {
 			if(!preg_match('/\w{2,}/', $dozent_name)) {
-				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! <a href="admin.php?page=1">Ändern Sie das hier</a> !!!</span>';
+				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! !!!</span>';
 			}
 		} else {
 			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]);
@@ -308,18 +283,7 @@
 ?>
 				<h3>Datenschutz-/Einwilligungserklärung </h3>
 
-				<p>Hiermit bestätige ich, dass ich <b>freiwillig</b> in die Verarbeitung meiner personenbezogenen Daten:<br />
-				1. Titel<br />
-				2. Name<br />
-				3. Angaben zu Lehrveranstaltungen<br />
-				ausschließlich zum Zweck der weltweiten Veröffentlichung in einem Vorlesungsverzeichnis im Internet <b>einwillige</b>.<br />
-				Eine darüberhinausgehende Übermittlung von Daten erfolgt nicht, soweit dies nicht anders gesetzlich bestimmt ist.<br />
-				Mir ist bekannt, dass ich diese Einwilligung ohne Angabe von Gründen und ohne Rechtsfolgen verweigern oder mit Wirkung für die Zukunft bei unten genannter datenverarbeitenden Stelle widerrufen kann.<br />
-				Im Falle der Verweigerung der Einwilligung oder eines Widerrufes kann das online-Vorlesungsverzeichnis nicht oder nicht mehr genutzt werden.<br /></p>
-
-				<p>Datenverarbeitende Stelle<br />
-				ÄNDERN SIE DIESE DATEN IN DER <pre>admin.php</pre>.
-				</p>
+				<p>DATENSCHUTZEINSTELLUNGEN!!!</p>
 <?php
 				if(get_get('page') || get_get('show_items')) {
 					$id = get_get('page');

@@ -35,7 +35,8 @@ Open the URL in the browser after doing this and follow the instructions.
 
 After deleting `new_setup`, log in and follow the further instructions. Then, edit the `data.php` appropriately.
 
-Then, change the `tudlogo.svg` to the logo of your university.
+Then, change the `tudlogo.svg` to the logo of your university. Then, go to the `admin.php` and change the line
+`DATENSCHUTZEINSTELLUNGEN!!!` to the Datenschutzbedingungen of your university.
 
 Once done, the software is ready.
 
