@@ -25,11 +25,17 @@ Aktuell läuft die Software unter vvz.phil.tu-dresden.de
 
 After installing MariaDB, create a database (and change to `$GLOBALS['dbname']` to this in mysql.php). Default is `uni`.
 
-> cd $VVZDIR
+```console
+cd $VVZDIR
+```
 
-> echo "mysqldbpw" > /etc/vvzdbpw
+```console
+echo "mysqldbpw" > /etc/vvzdbpw
+```
 
-> touch new_setup
+```console
+touch new_setup
+```
 
 Open the URL in the browser after doing this and follow the instructions.
 
@@ -44,6 +50,8 @@ Once done, the software is ready.
 
 Wenn du 
 
-> touch /etc/vvz_debug_query_all
+```console
+touch /etc/vvz_debug_query_all
+```
 
 ausführst, solltest du am Ende der Seite eine Liste aller Queries, die ausgeführt worden sind, sehen.
