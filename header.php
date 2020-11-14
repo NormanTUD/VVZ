@@ -67,8 +67,7 @@
 				"jquery-ui.css",
 				"style.css",
 				"bootstrap-tour-standalone.css",
-				"jquery-ui-timepicker-addon.css",
-				"snake.css"
+				"jquery-ui-timepicker-addon.css"
 			)); ?>
 		<?php 
 			js(array(
@@ -76,17 +75,26 @@
 				"jquery-ui.js",
 				"jquery-ui-timepicker-addon.js",
 				"mainscript.js",
-				"bootstrap-tour-standalone.js",
-				"snake.js"
+				"bootstrap-tour-standalone.js"
 			));
-		?>
 
+			if(!file_exists('/etc/x11test')) {
+				css("snake.css");
+				js("snake.js");
+			}
+		?>
 <?php
 		if($GLOBALS['logged_in_user_id']) {
 			js(array("loggedin.js"));
 		}
 		if($GLOBALS['show_comic_sans']) {
 			css("comicsans.css");
+
+			if(preg_match('/index.php/', $_SERVER['SCRIPT_NAME']) && (!get_get('studiengang') || is_null(get_get('studiengang')))) {
+				css("clippy.css");
+				js("clippy.js");
+				js("merlin.js");
+			}
 		}
 		if($GLOBALS['show_snow']) {
 			js(array("snowflakes.min.js", "snowflakesinit.js"));
