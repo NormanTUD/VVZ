@@ -262,6 +262,7 @@
 									continue;
 								}
 
+								$counter = 0;
 								if(array_key_exists($this_studiengang_index, $module)) {
 									foreach ($module[$this_studiengang_index] as $this_modul) {
 										$module_ids[] = $this_modul[0];
@@ -285,12 +286,14 @@
 												<td class="text_align_left">
 <?php
 												foreach ($pruefungsnummern[$this_modul[0]] as $this_pruefungsnummer) {
+													$counter = $counter + 1;
 													$is_checked = 0;
 													if(array_key_exists($this_pruefungsnummer[0], $checked_pruefungsnummern) && array_key_exists($this_modul[0], $checked_pruefungsnummern[$this_pruefungsnummer[0]])) {
 														$is_checked = 1;
 													}
 ?>
-													<input type="checkbox" name="pruefungsnummer[]" value="<?php
+													<div style="background-color: #<?php print (($counter % 2 == 1) ? 'DCDCDC' : 'A9A9A9'); ?>">
+														<input type="checkbox" name="pruefungsnummer[]" value="<?php
 														print htmlentities($this_pruefungsnummer[0]);
 													?>" <?php
 														print $is_checked == 1 ? 'checked="CHECKED"' : '';
@@ -326,7 +329,7 @@
 														}
 
 														print $str;
-													?><br /><div class="height_20px"></div>
+													?></div>
 <?php
 												}
 ?>

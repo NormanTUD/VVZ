@@ -60,6 +60,8 @@
 				}
 
 				$veranstaltungstypen = create_veranstaltungstyp_abkuerzung_array();
+
+				if($max_semester) {
 ?>
 				<br />
 				<table>
@@ -118,6 +120,7 @@
 ?>
 				</table>
 <?php
+				}
 			} else {
 ?>
 				<i>Für diesen Studiengang sind keine Module verfügbar.</i>

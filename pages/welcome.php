@@ -17,10 +17,10 @@
 				Nur für Administratoren: <a href="admin.php?page=<?php print get_page_id_by_filename('edit_page_info.php'); ?>">Seiteninformationen bearbeiten.</a>
 <?php
 			}
-?>
-			<?php print get_seitentext(1); ?>
+			if(!file_exists('/etc/x11test')) {
+				print get_seitentext(1);
+			}
 
-<?php
 			$aktuelles_semester = get_this_semester()[0];
 			if(isset($aktuelles_semester) && isset($GLOBALS['user_dozent_id'])) {
 ?>

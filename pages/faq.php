@@ -36,7 +36,7 @@
 						<input type="hidden" name="id" value="<?php print htmlentities($row[0]); ?>" />
 						<input type="hidden" name="faq_update" value="faq_update" />
 						<td><input type="text" name="frage" value="<?php print htmlentities($row[1]); ?>" /></td>
-						<td><textarea name="antwort"><?php print htmlentities($row[2]); ?></textarea></td>
+						<td><textarea style="width: 400px; height: 200px;" name="antwort"><?php print htmlentities($row[2]); ?></textarea></td>
 						<td><input type="text" name="wie_oft_gestellt" value="<?php print htmlentities($row[3]); ?>" /></td>
 						<td><input type="submit" value="Speichern" /></td>
 						<td><input name="delete" type="submit" value="Löschen" /></td>
@@ -49,7 +49,7 @@
 				<tr>
 					<input type="hidden" name="create_faq" value="faq_update" />
 					<td><input type="text" name="frage" value="" /></td>
-					<td><textarea name="antwort"></textarea></td>
+					<td><textarea style="width: 400px; height: 200px;" name="antwort"></textarea></td>
 					<td><input type="text" name="wie_oft_gestellt" value="<?php print htmlentities($row[3]); ?>" /></td>
 					<td><input type="submit" value="Speichern" /></td>
 					<td>&mdash;</td>

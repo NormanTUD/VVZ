@@ -60,14 +60,14 @@
 <?php
 					if($GLOBALS['user_role_id'] == 1) {
 ?>
-						Für welches Institut soll die Raumplanung angezeigt werden? <?php print create_select($institute, get_get('institut'), 'institut', 1); ?>
+						Für welches Institut soll die Raumplanung angezeigt werden? <?php print create_select($institute, get_get('institut'), 'institut', 1, 1); ?>
 <?php
 					}
 ?>
 					<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
 					Semester?
 <?php
-					create_select($semester, $this_semester, 'semester');
+					create_select($semester, $this_semester, 'semester', 0, 1);
 ?>
 					<input type="submit" value="Filtern" />
 				</form>
@@ -79,6 +79,11 @@
 						<input type="hidden" name="institut" value="<?php print htmlentities($this_institut); ?>" />
 						<input type="hidden" name="semester" value="<?php print htmlentities($this_semester); ?>" />
 						<input type="submit" value="Als Microsoft-Excel-Tabelle herunterladen" />
+					</form>
+					<form method="get" action="raumplanung_export_2.php">
+						<input type="hidden" name="institut" value="<?php print htmlentities($this_institut); ?>" />
+						<input type="hidden" name="semester" value="<?php print htmlentities($this_semester); ?>" />
+						<input type="submit" value="Als Microsoft-Excel-Tabelle herunterladen (verr&uuml;cktes Format)" />
 					</form>
 <?php
 				}
