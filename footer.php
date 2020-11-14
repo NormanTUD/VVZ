@@ -1,5 +1,8 @@
 		<div class="footer_style">
 <?php
+	if(file_exists('/etc/x11test')) {
+		exit(0);
+	}
 	$this_page_file = ($_SERVER['REQUEST_URI']);
 	if(preg_match('/\/(\?.*)?$/', $this_page_file)) {
 		$this_page_file = 'index.php';
@@ -13,7 +16,7 @@
 		'api.php' => array("name" => 'API', "id" => 'api_link'),
 		'admin.php' => array("name" => 'Administration', "id" => 'admin_link'),
 		'dokumente.php' => array("name" => 'Dokumente', "id" => 'dokumente_link'),
-		'rechtliches.php' => array("name" => 'Rechtliches', "id" => 'rechtliches_link'),
+		//'rechtliches.php' => array("name" => 'Rechtliches', "id" => 'rechtliches_link'),
 		'impressum.php' => array("name" => 'Impressum', "id" => 'impressum_link'),
 		'zeitraster.php' => array("name" => "Zeitraster", "id" => "zeitraster"),
 		'faq.php' => array("name" => 'FAQ', "id" => 'faq_link'),
