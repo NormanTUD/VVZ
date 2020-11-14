@@ -93,7 +93,13 @@
 		}
 ?>
 		<div id="main">
-			<a href="admin.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+<?php
+			if(!file_exists('/etc/x11test')) {
+?>
+				<a href="admin.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+<?php
+			}
+?>
 			Willkommen, <?php print $dozent_name; ?>!
 <?php
 			if(get_post('password') == 'test' && get_post('try_login')) {
@@ -101,9 +107,11 @@
 				<script type="text/javascript">alert("Bitte ändern Sie Ihr Passwort! Dies können Sie unter dem Menüpunkt 'Eigene Daten ändern' machen. Diese Meldung wird bei jedem Anmelden kommen, solange Sie Ihr Passwort nicht geändert haben.");</script>
 <?php
 			}
+			if(!file_exists('/etc/x11test')) {
 ?>
-			<img src="empty.gif" width="200" height=1 /><div class="tooltip"><a class="red_large" href="logout.php">Abmelden</a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+				<img src="empty.gif" width="200" height=1 /><div class="tooltip"><a class="red_large" href="logout.php">Abmelden</a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
 <?php
+			}
 			if($GLOBALS['user_role_id'] == 1) {
 				$df = sprintf("%0.2f", disk_free_space($_SERVER['DOCUMENT_ROOT']) / 1024 / 1024 / 1024);
 				if($df <= 1) {
@@ -283,7 +291,18 @@
 ?>
 				<h3>Datenschutz-/Einwilligungserklärung </h3>
 
-				<p>DATENSCHUTZEINSTELLUNGEN!!!</p>
+				<p>Hiermit bestätige ich, dass ich <b>freiwillig</b> in die Verarbeitung meiner personenbezogenen Daten:<br />
+				1. Titel<br />
+				2. Name<br />
+				3. Angaben zu Lehrveranstaltungen<br />
+				ausschließlich zum Zweck der weltweiten Veröffentlichung in einem Vorlesungsverzeichnis im Internet <b>einwillige</b>.<br />
+				Eine darüberhinausgehende Übermittlung von Daten erfolgt nicht, soweit dies nicht anders gesetzlich bestimmt ist.<br />
+				Mir ist bekannt, dass ich diese Einwilligung ohne Angabe von Gründen und ohne Rechtsfolgen verweigern oder mit Wirkung für die Zukunft bei unten genannter datenverarbeitenden Stelle widerrufen kann.<br />
+				Im Falle der Verweigerung der Einwilligung oder eines Widerrufes kann das online-Vorlesungsverzeichnis nicht oder nicht mehr genutzt werden.<br /></p>
+
+				<p>Datenverarbeitende Stelle<br />
+IHRE DATEN HIER REIN
+				</p>
 <?php
 				if(get_get('page') || get_get('show_items')) {
 					$id = get_get('page');
