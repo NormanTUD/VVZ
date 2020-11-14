@@ -27,13 +27,7 @@ After installing MariaDB, create a database (and change to `$GLOBALS['dbname']` 
 
 ```console
 cd $VVZDIR
-```
-
-```console
 echo "mysqldbpw" > /etc/vvzdbpw
-```
-
-```console
 touch new_setup
 ```
 
