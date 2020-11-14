@@ -47,17 +47,17 @@ function update_selection_cookies () {
 	unique_ids = unique_ids.filter(
 		function(n){
 			if(
-				n != undefined && 
-				n != "" && 
-				n != 'null' && 
-				n !== null && 
-				n != '=null' 
+				n != undefined &&
+				n != "" &&
+				n != 'null' &&
+				n !== null &&
+				n != '=null'
 				&& !removed_ids.includes(n)
 			) {
 				return n;
 			}
 		}
-	); 
+	);
 	unique_ids = filter_array(unique_ids);
 	console.log(unique_ids);
 
@@ -111,7 +111,7 @@ function edit_veranstaltung (id) {
 
 	//$("#hidden_alternative_text_veranstaltung_" + id).remove();
 
-	edit_text.attr('name', 'alternative_text_veranstaltung_' + id); 
+	edit_text.attr('name', 'alternative_text_veranstaltung_' + id);
 
 	console.log(edit_text_name);
 
@@ -145,7 +145,7 @@ function getCookie(name) {
 		}
 	}
 	return "";
-} 
+}
 
 function get_modul_via_pruefungs_id (pn) {
 	var elem = $("#pn_modul_" + pn);
@@ -206,7 +206,7 @@ function update_pruefungsleistung_cookies (reload) {
 	});
 
 	if(reload) {
-		location.reload(); 
+		location.reload();
 	}
 }
 
@@ -219,7 +219,7 @@ function get_absolvierte_pruefungsleistungen () {
 		if($(this).is(':checked')) {
 			pruefungsnummern.push(this.value);
 		}
-	}); 
+	});
 
 	var json_str = JSON.stringify(pruefungsnummern);
 	setCookie(cname, json_str, 99999999);
@@ -234,7 +234,7 @@ function get_geplante_pruefungsleistungen () {
 		if($(this).is(':checked')) {
 			pruefungsnummern.push(this.value);
 		}
-	}); 
+	});
 
 	var json_str = JSON.stringify(pruefungsnummern);
 	setCookie(cname, json_str, 99999999);
@@ -500,4 +500,10 @@ function safariIFrameWarning () {
 }
 
 
-
+$(document).ready(function() {
+    $('.accordion-title').on('keydown', function(e) {
+        if(e.keyCode === 13){
+            $(this).click();
+        }
+    });
+});

@@ -12,6 +12,15 @@ table {
 	background-position: top;
 }
 
+#mainindexnocenter {
+	padding: 5px;
+	background-color: white;
+	border-radius: 5px;
+	margin-left: auto;
+	margin-right: auto;
+	min-width: 600px;
+}
+
 #mainindex {
 	padding: 5px;
 	background-color: white;
@@ -33,9 +42,12 @@ table {
 }
 
 #main {
+	min-width: 99%;
 	padding: 5px;
+	padding-top: 0px;
+	display: inline-block;
 	background-color: white;
-	border-radius: 5px;
+	border-radius: 0px;
 	height: auto;
 }
 
@@ -73,8 +85,6 @@ table {
 }
 
 .ui-datepicker-trigger { display: none; }
-
-a:focus { outline: none; } 
 
 .small_text {
 	font-size: 8pt;
@@ -959,4 +969,8 @@ a, a:visited, a:hover, a:active {
 	background-color: white;
 	color: black;
 	opacity: 1;
+}
+
+*:focus {
+	outline: 2px dashed red;
 }
