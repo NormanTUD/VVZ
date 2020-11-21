@@ -1,4 +1,6 @@
 <?php
+	include_once("config.php");
+
 	function einzelne_termine ($id) {
 		$einzelne_termine = get_einzelne_termine_by_veranstaltung_id($id);
 
@@ -33,7 +35,7 @@
 				$gebaeude_link = '';
 
 				if($gebaeude_abkuerzung) {
-					$gebaeude_link = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".
+					$gebaeude_link = "<a href='".$GLOBALS['navigator_base_url'].
 						strtolower($gebaeude_abkuerzung)."'>".$gebaeude_abkuerzung.'</a> '.html_map(null, null, $gebaeude_id);
 				}
 				if(!$gebaeude_link) {
@@ -559,7 +561,7 @@
 		if(!$raum_gebaeude) {
 			$geb_abk = get_gebaeude_abkuerzung($row[1]);
 			if($geb_abk) {
-				$raum_gebaeude = "Raum: <a href='https://navigator.tu-dresden.de/karten/dresden/geb/".htmlentities(strtolower($geb_abk))."'>".htmlentities($geb_abk).'</a>';
+				$raum_gebaeude = "Raum: <a href='".$GLOBALS['navigator_base_url'].htmlentities(strtolower($geb_abk))."'>".htmlentities($geb_abk).'</a>';
 			}
 
 		}
@@ -701,28 +703,7 @@
 		}
 	}
 
-	function show_stunde_header ($id, $stunde, $woche) {
-		if(preg_match('/^\d+(-\d+)?$/', $stunde)) {
-?>
-			<?php print htmle($stunde); ?>. DS (<?php print get_zeiten($stunde); ?><?php 
-				$sws = get_sws($stunde, $woche);
-				if($sws[0]) {
-					print ", Etwa* ";
-					$GLOBALS['shown_etwa'] = 1;
-				}
-				if($sws[1]) {
-					if(!$GLOBALS['shown_etwa']) {
-						print ", ";
-					};
-					print htmlentities(" ".$sws[1]." SWS");
-				}
-			?>)
-			<a href="event_file.php?veranstaltung[]=<?php print $id; ?>"><?php print html_calendar(); ?></a>
-<?php
-		} else {
-?>
-			<?php print htmle($stunde); ?> (<?php
-				print get_zeiten($stunde); 
+	function show_sws ($stunde, $woche) {
 				$sws = get_sws($stunde, $woche);
 				if($sws[0]) { 
 					print ", Etwa* ";
@@ -734,6 +715,21 @@
 					};
 					print htmlentities($sws[1]." SWS"); 
 				}
+	}
+
+	function show_stunde_header ($id, $stunde, $woche) {
+		if(preg_match('/^\d+(-\d+)?$/', $stunde)) {
+?>
+			<?php print htmle($stunde); ?>. DS (<?php print get_zeiten($stunde); ?><?php 
+				show_sws($stunde, $woche);
+			?>)
+			<a href="event_file.php?veranstaltung[]=<?php print $id; ?>"><?php print html_calendar(); ?></a>
+<?php
+		} else {
+?>
+			<?php print htmle($stunde); ?> (<?php
+				print get_zeiten($stunde); 
+				show_sws($stunde, $woche);
 			?>)
 <?php
 		}
@@ -848,7 +844,7 @@
 	function show_veranstaltung_box ($id, $name, $abgabe_pruefungsleistungen, $related_veranstaltung, $stunde, $woche, $row, $hinweis, $veranstaltungstyp, $raum_gebaeude, $dozent, $relevante_module_string, $master_niveau, $erster_termin, $opal, $pruefungen) {
 ?>
 		<div class="row">
-			<div class="medium-4 columns">
+			<div class="medium-4">
 				<div class="callout">
 <?php
 					show_veranstaltungsbox_full_header($id, $stunde, $woche, $row, $hinweis, $veranstaltungstyp, $raum_gebaeude);
@@ -1320,12 +1316,13 @@
 ?>
 			<tr>
 				<td>Credit-Points per Semester</td>
-				<td><?php
-				foreach (range(0, $max - 1) as $index) {
-					$tstr = "Semester ".$modul_infos[$this_modul[0]][4][$index].': '.$modul_infos[$this_modul[0]][2][$index]." Credit Points<br />\n";
-					print $tstr;
+				<td>
+<?php
+					foreach (range(0, $max - 1) as $index) {
+						$tstr = "Semester ".$modul_infos[$this_modul[0]][4][$index].': '.$modul_infos[$this_modul[0]][2][$index]." Credit Points<br />\n";
+						print $tstr;
 
-				}
+					}
 ?>
 				</td>
 			</tr>
@@ -1340,11 +1337,11 @@
 				<td>Prüfungen pro Semester</td>
 				<td>
 <?php
-			foreach (range(0, $max - 1) as $index) {
-				$tstr = "Semester ".$modul_infos[$this_modul[0]][4][$index].': '.$modul_infos[$this_modul[0]][5][$index]." Prüfungen<br />\n";
-				print $tstr;
+				foreach (range(0, $max - 1) as $index) {
+					$tstr = "Semester ".$modul_infos[$this_modul[0]][4][$index].': '.$modul_infos[$this_modul[0]][5][$index]." Prüfungen<br />\n";
+					print $tstr;
 
-			}
+				}
 ?>
 				</td>
 			</tr>
@@ -1598,18 +1595,19 @@
 	}
 
 	function show_studiengaenge_uebersicht () {
+		$width_determining_class = "medium-6";
 		$rows = create_studiengaenge_mit_veranstaltungen_array($GLOBALS['this_semester'][0], isset($GLOBALS['this_institut']) ? $GLOBALS['this_institut'] : null);
 		if(count($rows)) {
 ?>
 			<div class="row">
-				<div class="medium-4 medium-centered columns">
+				<div class="<?php print $width_determining_class; ?> medium-centered columns">
 				<a href="index.php?studiengang=alle&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
 						<div id="alle_lehrveranstaltungen" class="callout alert text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Lehrveranstaltungen</h4></div>
 					</a>
 				</div>
 			</div>
 			<div class="row">
-				<div class="medium-4 medium-centered columns">
+				<div class="<?php print $width_determining_class; ?> medium-centered columns">
 				<a href="index.php?alle_pruefungsnummern=1&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
 						<div id="alle_pruefungsleistungen_anzeigen" class="callout allepls text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Prüfungsleistungen anzeigen</h4></div>
 					</a>
@@ -1631,15 +1629,14 @@
 			}
 ?>
 			<div class="row">
-				<div <?php print $divid ? "id='$divid'" : ''; ?> class="medium-4 medium-centered columns text-center">
+				<div <?php print $divid ? "id='$divid'" : ''; ?> class="<?php print $width_determining_class; ?> medium-centered columns text-center">
 					<a href="index.php?studiengang=<?php print $this_studiengang_id; ?>&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
 						<div class="callout primary"><?php print $GLOBALS['linkicon']; ?><h4><?php
 							if($this_studiengang_name[1] == "Werkstatt Philosophie") {
 								print "&#128295; ";
 							}
 							print htmlentities($this_studiengang_name[1]);
-?>
-							</h4>
+?></h4>
 <?php
 							if(array_key_exists(2, $this_studiengang_name)) {
 ?>

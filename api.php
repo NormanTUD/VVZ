@@ -120,14 +120,14 @@
 		}
 
 	} else {
-		$page_title = 'Vorlesungsverzeichnis TU Dresden — API';
+		$page_title = 'Vorlesungsverzeichnis '.$GLOBALS['university_name'].' | API';
 		include("header.php");
 ?>
 	<div id="main">
 		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
-		<h1>Vorlesungsverzeichnis TU Dresden</h1>
+		<h1>Vorlesungsverzeichnis <?php print $GLOBALS['university_name']; ?></h1>
 		<h2>Was ist das hier?</h2>
-		Diese API erlaubt automatisierte Zugriffe auf die öffentlichen Daten des Vorlesungsverzeichnis der TU Dresden. Über diese Schnittstelle
+		Diese API erlaubt automatisierte Zugriffe auf die öffentlichen Daten des Vorlesungsverzeichnis der <?php print $GLOBALS['university_name']; ?>. Über diese Schnittstelle
 		lassen sich einfach automatisierte Zugriffe erstellen, die z. B. für selbstentwickelte Software zur Verfügung stehen.
 
 

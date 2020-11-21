@@ -78,7 +78,7 @@
 				//print " <a href='$url' title='Geburtstagsgruß senden'>&#x1F382; frohen $alter. Geburtstag, </a>";
 				print " &#127878; Happy New Year! ";
 			}
-		?> Norman Koch, TU Dresden
+		?> Norman Koch, <?php print $GLOBALS['university_name']; ?>
 	</div>
 
 <?php

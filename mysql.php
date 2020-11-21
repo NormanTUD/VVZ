@@ -1,6 +1,5 @@
 <?php
-	$GLOBALS['dbname'] = 'PLACEHOLDERDBNAME';
-	$GLOBALS['error_page_shown'] = 0;
+	include_once("config.php");
 
 	$dbfile = '/etc/vvzdbpw';
 
@@ -8,10 +7,9 @@
 		$vvzdbpw = explode("\n", file_get_contents($dbfile))[0];
 
 		if($vvzdbpw) {
-			$username = 'root';
 			$password = $vvzdbpw;
 
-			$GLOBALS['dbh'] = mysqli_connect('localhost', $username, $password, $GLOBALS['dbname']);
+			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $password, $GLOBALS['dbname']);
 			if (!$GLOBALS['dbh']) {
 				dier("Kann nicht zur Datenbank verbinden!");
 			}

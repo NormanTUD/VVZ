@@ -39,8 +39,11 @@ declare(ticks=1);
 	(^\s*function\s*)([a-zA-Z0-9_]+)(\s*\(.*\)\s*\{\s*)
 	\1\2\3\n\t\tfunction_debug_counter("\2");
  */
+
+	include_once("config.php");
+
 	header_remove("X-Powered-By"); // Serverinfos entfernen
-	header("X-Frame-Options: ALLOW-FROM https://tu-dresden.de/"); // Gegen Clickjacking
+	header("X-Frame-Options: ALLOW-FROM ".$GLOBALS['university_page_url']); // Gegen Clickjacking
 
 	$GLOBALS['nonce'] = generate_random_string(10);
 
@@ -2072,10 +2075,8 @@ declare(ticks=1);
 		}
 		
 		if(!isset($GLOBALS['logged_in_user_id'])) {
-			$from = $GLOBALS['fromemail'];
+			$from = $GLOBALS['from_email'];
 
-			$to_name = $GLOBALS['contactname'];
-			$to = $GLOBALS['contactemail'];
 			$subject = "FEHLER im Vorlesungsverzeichnis";
 
 			$datum = date("d.m.Y");
@@ -2103,7 +2104,7 @@ declare(ticks=1);
 			$headers .= "From:" . $from."\r\n";
 
 			$fp = fsockopen("localhost", 25, $errno, $errstr, 5);
-			if($fp && mail($to, $subject, $message, $headers)) {
+			if($fp && mail($GLOBALS['admin_email'], $subject, $message, $headers)) {
 				$GLOBALS['messageerror'] = 'Die Administration ist informiert worden.';
 			}
 
@@ -2681,7 +2682,7 @@ declare(ticks=1);
 		$name = NULL;
 
 		while ($row = mysqli_fetch_row($result)) {
-			$name = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower($row[1])."/'>".htmlentities($row[1])."</a> ".htmlentities($row[0]);
+			$name = "<a href='".$GLOBALS['navigator_base_url'].strtolower($row[1])."/'>".htmlentities($row[1])."</a> ".htmlentities($row[0]);
 		}
 		$GLOBALS['memoize'][$key] = $name;
 
@@ -2696,7 +2697,7 @@ declare(ticks=1);
 		$raum_gebaeude = array();
 
 		while ($row = mysqli_fetch_row($result)) {
-			$raum_gebaeude["$row[0]"] = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower(htmlentities($row[1]))."/'>".htmlentities($row[1])."</a> ".htmlentities($row[2]);
+			$raum_gebaeude["$row[0]"] = "<a href='".$GLOBALS['navigator_base_url'].strtolower(htmlentities($row[1]))."/'>".htmlentities($row[1])."</a> ".htmlentities($row[2]);
 		}
 
 		return $raum_gebaeude;
@@ -2719,7 +2720,7 @@ declare(ticks=1);
 		$name = NULL;
 
 		while ($row = mysqli_fetch_row($result)) {
-			$name = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower($row[0])."/'>$row[0]</a> $row[1]";
+			$name = "<a href='".$GLOBALS['navigator_base_url'].strtolower($row[0])."/'>$row[0]</a> $row[1]";
 		}
 
 		$GLOBALS['memoize'][$key] = $name;
@@ -3066,7 +3067,7 @@ WHERE 1
 
 			while ($row = mysqli_fetch_row($result)) {
 				if($navigator) {
-					$return = "<a href='https://navigator.tu-dresden.de/karten/dresden/geb/".strtolower($row[0])."/'>".htmlentities($row[0])."</a>";
+					$return = "<a href='".$GLOBALS['navigator_base_url'].strtolower($row[0])."/'>".htmlentities($row[0])."</a>";
 				} else {
 					$return = $row[0];
 				}
@@ -7650,9 +7651,7 @@ $ret_string .= '</table>';
 			if(preg_match('/^\d+$/', get_get('institut'))) {
 				$this_institut = get_get('institut');
 			} else {
-				if($_SERVER['HTTP_HOST'] == 'vvz.phil.tu-dresden.de') {
-					$this_institut = $institute[1][0];
-				} else if ($_SERVER['HTTP_HOST'] == 'vvz.musik.tu-dresden.de') {
+				if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
 					$this_institut = $institute[1][0];
 				}
 				
@@ -8901,13 +8900,7 @@ SE 1/2 oder BZW
 	function create_event_file ($veranstaltungen) {
 		function_debug_counter("create_event_file");
 		$str = "BEGIN:VCALENDAR\n";
-		#$str .= "METHOD:PUBLISH\n";
-		#$str .= "VERSION:2.0\n";
-		#$str .= "PRODID:-TU Dresden//Vorlesungsverzeichnis//DE\n";
-		#$str .= "CHARSET:utf8\n";
-
-		#neu von nico
-		$str .= "PRODID:-TU Dresden//Vorlesungsverzeichnis//DE\n";
+		$str .= "PRODID:-".$GLOBALS['university_name']."//Vorlesungsverzeichnis//DE\n";
 		$str .= "VERSION:2.0\n";
 		$str .= "CALSCALE:GREGORIAN\n";
 		$str .= "METHOD:PUBLISH\n";
@@ -9432,20 +9425,6 @@ SE 1/2 oder BZW
 		dier($query);
 	}
 
-	function send_email ($message, $to, $to_name, $subject, $from = "vvz.phil.tu-dresden.de") {
-		function_debug_counter("send_email");
-		$headers = "From:".$from."\r\n";
-
-		$fp = fsockopen("localhost", 25, $errno, $errstr, 5);
-		if($fp && mail($to, $subject, $message, $headers)) {
-			success("OK. Mail gesendet!");
-			return 1;
-		} else {
-			error("Mail nicht gesendet. Fehler: $errno: $errstr");
-			return 0;
-		}
-	}
-
 	function escapeJsonString($value) { 
 		function_debug_counter("escapeJsonString");# list from www.json.org: (\b backspace, \f formfeed)
 		$escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
@@ -9661,7 +9640,7 @@ SE 1/2 oder BZW
 	function replace_hinweis_with_graphics ($text, $show_base_url = 0) {
 		$base_url = '';
 		if($show_base_url) {
-			$base_url = "https://vvz.phil.tu-dresden.de/";
+			$base_url = $GLOBALS['vvz_base_url'];
 		}
 		$text = preg_replace('/LaTeX/', '<img width="45px" alt="LaTeX" src="'.$base_url.'i/LaTeX.svg">', $text);
 		$text = preg_replace('/\\\\git/', '<img width="45px" alt="git" src="'.$base_url.'i/git.svg">', $text);

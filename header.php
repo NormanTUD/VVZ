@@ -9,7 +9,15 @@
 	}
 
 	if(!$page_title) {
-		$page_title = 'Vorlesungsverzeichnis TU Dresden';
+		$page_title = 'Vorlesungsverzeichnis '.$GLOBALS['university_name'];
+	}
+
+	if(get_get("studiengang")) {
+		$page_title = "$page_title | ".get_studiengang_name(get_get('studiengang'));
+	}
+
+	if(get_get("alle_pruefungsnummern")) {
+		$page_title = "$page_title | Alle Prüfungsnummern";
 	}
 ?>
 <!DOCTYPE html>
@@ -23,8 +31,9 @@
 		<meta http-equiv="X-WebKit-CSP" content="<?php print $GLOBALS['csp_string']; ?>">
 
 		<meta name="description" content="Vorlesungsverzeichnis">
-		<meta name="keywords" content="Vorlesungsverzeichnis, TU Dresden">
+		<meta name="keywords" content="Vorlesungsverzeichnis, <?php print $GLOBALS['university_name']; ?>">
 		<meta name="author" content="Norman Koch">
+		<meta name="viewport" content="width=device-width, user-scalable=yes">
 <?php
 		if(preg_match('/admin/', basename($_SERVER['SCRIPT_NAME']))) {
 ?>
@@ -74,7 +83,7 @@
 				"jquery-1.12.4.js",
 				"jquery-ui.js",
 				"jquery-ui-timepicker-addon.js",
-				"mainscript.js",
+				"mainscript.php",
 				"bootstrap-tour-standalone.js"
 			));
 

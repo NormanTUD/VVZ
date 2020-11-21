@@ -1,11 +1,11 @@
 <?php
 	$php_start = microtime(true);
-	include("data.php");
 	if(file_exists('new_setup')) {
 		include('setup.php');
 		exit(0);
 	}
-	$page_title = "Vorlesungsverzeichnis TU Dresden";
+	include_once("config.php");
+	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | Kontakt";
 	$filename = 'index.php';
 	if(!isset($GLOBALS['adminpage'])) {
 		include("header.php");
@@ -19,9 +19,9 @@
 		4 => array("question" => "Was ist höher: Hochhaus oder Ameise?", "answer" => "Hochhaus"),
 		5 => array("question" => "Was ist heller: schwarz oder weiß?", "answer" => "weiß"),
 		6 => array("question" => "Mit welchem Gerät, das mit &raquo;K&laquo; anfängt, kann man nur Photos machen?", "answer" => "Kamera"),
-		7 => array("question" => "Wie heißt die Hauptstadt Sachsens?", "answer" => "Dresden"),
-		8 => array("question" => "Was ist schneller: Auto oder Schnecke?", "answer" => "Auto"),
-		9 => array("question" => "Was ist teurer: Gold oder Schlamm?", "answer" => "Gold")
+		7 => array("question" => "Was ist schneller: Auto oder Schnecke?", "answer" => "Auto"),
+		8 => array("question" => "Was ist teurer: Gold oder Schlamm?", "answer" => "Gold"),
+		9 => array("question" => "Welches Tier macht Miau?", "answer" => "Katze")
 	);
 
 	$frage = rand(0, count($sicherheitsfragen) - 1);
@@ -41,22 +41,33 @@
 
 		Wir sind bemüht, alle Unannehmlichkeiten aufzuspüren und zu beseitigen.
 <?php
-	if (function_exists('mail')) {
-		$sicherheitsfrage_bestanden = get_post('sicherheitsfrage') == $sicherheitsfragen[get_post('frage_id')]['answer'] ? 1 : 0;
+	if (!file_exists('/etc/x11test')  && function_exists('mail')) {
+		$got_frage_id = get_post('frage_id');
+		//$sicherheitsfrage_bestanden = get_post('sicherheitsfrage') == $sicherheitsfragen[$got_frage_id]['answer'] ? 1 : 0;
+		$sicherheitsfrage_bestanden = 0;
+		if(get_post('sicherheitsfrage') && isset($got_frage_id)) {
+			$sicherheitsfrage_bestanden = get_post('sicherheitsfrage') == $sicherheitsfragen[$got_frage_id]['answer'] ? 1 : 0;
+		}
 		if(isset($GLOBALS['logged_in']) && $GLOBALS['logged_in'] == 1) {
 			$sicherheitsfrage_bestanden = 1;
 		}
 		if(get_post('frage_id') && array_key_exists(get_post('frage_id'), $sicherheitsfragen) && $sicherheitsfrage_bestanden) {
 			if(strlen(get_post('nachricht')) >= 5) {
 				$headers = '';
-				$from = $GLOBALS['fromemail'];
 
-				$to_name = $GLOBALS['contactname'];
-				$to = $GLOBALS['contactemail'];
+				$to_name = $GLOBALS['admin_name'];
+				$to = $GLOBALS['admin_email'];
+
 				if(get_post('natur') == 'inhaltlich') {
-					$to_name = $GLOBALS['contactnameinhalt'];
-					$to = $GLOBALS['contactemailinhalt'];
-					$headers .= "Cc: ".$GLOBALS['contactemail']."\r\n";
+					$to_name = $GLOBALS['name_non_technical'];
+					$to = $GLOBALS['to_non_technical'];
+					if(is_array($GLOBALS['cc_non_technical'])) {
+						foreach ($GLOBALS['cc_non_technical'] as $cc_email) {
+							$headers .= "Cc: ".$cc_email."r\n";
+						}
+					} else if($GLOBALS['cc_non_technical']) {
+						$headers .= "Cc: ".$GLOBALS['cc_non_technical']."r\n";
+					}
 				}
 				$subject = "Nachricht vom Vorlesungsverzeichnis";
 
@@ -76,7 +87,7 @@
 				$message .= htmlentities(get_post('nachricht'))."\n";
 				$message .= "========================== Nachricht Ende\n";
 
-				$headers .= "From:" . $from."\r\n";
+				$headers .= "From:" . $GLOBALS['from_email']."\r\n";
 				if(preg_match('/@/', get_post('email'))) {
 					$headers .= 'Reply-To: '.get_post('email')."\r\n";
 				}
@@ -124,16 +135,16 @@
 						} else {
 ?>
 							<tr>
-								<td>Ihr Name:</td><td><input type="text" name="name" /></td>
+								<td><label for="name">Ihr Name:</label></td><td><input type="text" name="name" /></td>
 							</tr>
 <?php
 						}
 ?>
 						<tr>
-							<td>Ihre Email-Adresse:</td><td><input type="text" name="email" /></td>
+							<td><label for="email">Ihre Email-Adresse:</label></td><td><input type="text" name="email" /></td>
 						</tr>
 						<tr>
-							<td>Das Anliegen ist...</td>
+							<td><label for="natur">Das Anliegen ist...</label></td>
 							<td>
 								<select name="natur">
 									<option value="inhaltlich">... inhaltlicher Natur (Fragen zu Vorlesungen, Prüfungen, Modulen, Studienablauf usw.)</option>
@@ -142,13 +153,13 @@
 							</td>
 						</tr>
 						<tr>
-							<td>Ihre Nachricht an uns:</td><td><textarea name="nachricht" class="contactfield"></textarea></td>
+							<td><label for="nachricht">Ihre Nachricht an uns:</label></td><td><textarea name="nachricht" class="contactfield"></textarea></td>
 						</tr>
 <?php
 						if(!isset($GLOBALS['logged_in']) || $GLOBALS['logged_in'] == 0) {
 ?>
 							<tr>
-								<td>Sicherheitsfrage: <i><?php print $sicherheitsfragen[$frage]['question']; ?></i></td><td><input type="text" name="sicherheitsfrage" /></td>
+								<td><label for="sicherheitsfrage">Sicherheitsfrage:<i><?php print $sicherheitsfragen[$frage]['question']; ?></i></label></td><td><input type="text" name="sicherheitsfrage" /></td>
 							</tr>
 <?php
 						}
@@ -161,27 +172,13 @@
 <?php
 			}
 		}
-	} else {
+	} else if (!file_exists('/etc/x11test')) {
 ?>
-		<p>Kontaktieren Sie bei Fragen, gefundenen Fehlern oder Ergänzungsvorschlägen <script type="text/javascript">
-			//<![CDATA[
-			<!--
-			var x="function f(x){var i,o=\"\",ol=x.length,l=ol;while(x.charCodeAt(l/13)!" +
-			"=92){try{x+=x;l+=l;}catch(e){}}for(i=l-1;i>=0;i--){o+=x.charAt(i);}return o" +
-			".substr(0,ol);}f(\")86,\\\"ZPdw771\\\\b:ue049630\\\\t=3<\\\"\\\\ 000\\\\sn7" +
-			"20\\\\$,,+#(d+!2.Ji530\\\\N^^V030\\\\ESY\\\\\\\\Vt320\\\\l220\\\\KAXB^t\\\\" +
-			"n\\\\{ULJKAHEelxjh}wmdsyf|D,dlkgn~y6mc(kagqdr230\\\\Pt\\\\710\\\\T100\\\\72" +
-			"0\\\\520\\\\230\\\\430\\\\520\\\\630\\\\2130\\\\320\\\\000\\\\500\\\\C200\\" +
-			"\\n\\\\700\\\\330\\\\700\\\\t\\\\\\\\\\\\n\\\\020\\\\710\\\\310\\\\000\\\\r" +
-			"\\\\}200\\\\`:>(1x6jw|=>4$&<:b?$,%2%* \\\"(f};o nruter};))++y(^)i(tAedoCrah" +
-			"c.x(edoCrahCmorf.gnirtS=+o;721=%y{)++i;l<i;0=i(rof;htgnel.x=l,\\\"\\\"=o,i " +
-			"rav{)y,x(f noitcnuf\")"                                                      ;
-			while(x=eval(x));
-			//-->
-			//]]>
-		</script>. Ich werde mich schnellstmöglich um Antwort bemühen.</p>
+		<p>Kontaktieren Sie bei Fragen, gefundenen Fehlern oder Ergänzungsvorschlägen <a href="mailto:<?php print $GLOBALS['admin_email']; ?>><?php print $GLOBALS['admin_email']; ?></a>. 
+		Ich werde mich schnellstmöglich um Antwort bemühen.</p>
 <?php
 	}
+
 	if(!isset($GLOBALS['adminpage'])) {
 		include("footer.php");
 	}

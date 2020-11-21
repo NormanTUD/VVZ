@@ -8,7 +8,8 @@
 
 	$GLOBALS['metadata_shown'] = 0;
 
-	$page_title = "Vorlesungsverzeichnis TU Dresden";
+	include_once("config.php");
+	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
 	$filename = 'index.php';
 	include("header.php");
 	include("startseite_functions.php");
@@ -45,7 +46,7 @@
 	if(preg_match('/^\d+$/', get_get('institut'))) {
 		$GLOBALS['this_institut'] = get_get('institut');
 	} else {
-		if($_SERVER['HTTP_HOST'] == 'vvz.phil.tu-dresden.de') {
+		if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
 			$GLOBALS['this_institut'] = $GLOBALS['institute'][1][0];
 		}
 		

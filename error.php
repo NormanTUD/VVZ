@@ -9,7 +9,9 @@
 		include('setup.php');
 		exit(0);
 	}
-	$page_title = "Vorlesungsverzeichnis TU Dresden";
+	include_once("config.php");
+	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
+
 	$filename = 'index.php';
 	include_once("header.php");
 ?>

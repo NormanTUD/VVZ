@@ -1,6 +1,0 @@
-\@doanenote {1}
-macro:->\protecting
-{\blxmkbibnote
-{foot}{\blxciteicmd
-{footfullcite}{}{}{kathedralewiki}{}}}
-\@endanenote 

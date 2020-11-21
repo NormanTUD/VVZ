@@ -4,7 +4,8 @@
 		include('setup.php');
 		exit(0);
 	}
-	$page_title = "Administration des Vorlesungsverzeichnisses der TU Dresden";
+	include_once("config.php");
+	$page_title = $GLOBALS['university_name']." | Administration";
 	$filename = 'admin.php';
 	$GLOBALS['adminpage'] = 1;
 	include("header.php");
@@ -301,8 +302,14 @@
 				Im Falle der Verweigerung der Einwilligung oder eines Widerrufes kann das online-Vorlesungsverzeichnis nicht oder nicht mehr genutzt werden.<br /></p>
 
 				<p>Datenverarbeitende Stelle<br />
-IHRE DATEN HIER REIN
-				</p>
+				<?php $GLOBALS['university_name']; ?><br />
+				<?php $GLOBALS['faculty']; ?><br />
+				<?php $GLOBALS['institut']; ?><br />
+				<?php print $GLOBALS['university_plz_city']; ?><br /></p>
+
+				<p>Kontakt: <?php print $GLOBALS['ansprechpartner']; ?><br />
+				Mail: <?php print $GLOBALS['ansprechpartner_email'] ?><br />
+				Telefon: <?php print $GLOBALS['ansprechpartner_tel_nr'] ?><br />
 <?php
 				if(get_get('page') || get_get('show_items')) {
 					$id = get_get('page');

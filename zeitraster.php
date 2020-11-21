@@ -4,7 +4,8 @@
 		include('setup.php');
 		exit(0);
 	}
-	$page_title = "Vorlesungsverzeichnis TU Dresden";
+	include_once("config.php");
+	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | Zeitraster";
 	$filename = 'index.php';
 	if(!isset($GLOBALS['adminpage'])) {
 		include("header.php");
@@ -25,7 +26,7 @@
 ?>
 	<div id="mainindex">
 		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
-		<h2>Zeitraster der TU Dresden</h2>
+		<h2>Zeitraster der <?php print $GLOBALS['university_name']; ?></h2>
 		<table>
 			<tr>
 				<th>Doppelstunde</th>
