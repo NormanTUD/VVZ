@@ -55,8 +55,6 @@ declare(ticks=1);
 	header("X-Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("WebKit-CSP: \"default-src 'self'\"");
 
-	$GLOBALS["calname"] = "Philosophie";
-
 	// Definition globaler Variablen
 	$GLOBALS['backtraces'] = array();
 	$GLOBALS['function_debugger'] = array();
@@ -8906,8 +8904,8 @@ SE 1/2 oder BZW
 		$str .= "METHOD:PUBLISH\n";
 		$str .= "CHARSET:utf8\n";
 		$str .= "X-WR-CALNAME: ".$GLOBALS["calname"]."\n";
-		$str .= "TZID:Europe/Berlin\n";
-		$str .= "X-LIC-LOCATION:Europe/Berlin\n";
+		$str .= "TZID:".$GLOBALS['timezone_name']."\n";
+		$str .= "X-LIC-LOCATION:".$GLOBALS['timezone_name']."\n";
 
 		foreach ($veranstaltungen as $this_veranstaltung) {
 			$veranstaltung_name = get_veranstaltungsname_by_id($this_veranstaltung);

@@ -12,6 +12,8 @@
 	$GLOBALS['ansprechpartner_email'] = "norbert.engemaier@tu-dresden.de";
 	$GLOBALS['vvz_base_url'] = "vvz.phil.tu-dresden.de";
 	$GLOBALS['university_page_url'] = "https://tu-dresden.de/";
+	$GLOBALS["calname"] = "Philosophie";
+	$GLOBALS['timezone_name'] = "Europe/Berlin";
 
 /*
 	Navigator
