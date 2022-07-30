@@ -9,7 +9,25 @@
 		if($vvzdbpw) {
 			$password = $vvzdbpw;
 
-			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $password, $GLOBALS['dbname']);
+			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $password);
+			// Check connection
+			if ($GLOBALS["dbh"]->connect_error) {
+				die("Connection failed: ".$GLOBALS["dbh"]->connect_error);
+			}
+
+
+			try {
+				mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
+			} catch (\Throwable $e) {
+				error_log($e);
+				error_log("Trying to create database...");
+				$sql = "CREATE DATABASE ".$GLOBALS["dbname"];
+				if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+					die("Error creating database: ".$GLOBALS["dbh"]->error);
+				}
+
+
+			}
 			if (!$GLOBALS['dbh']) {
 				dier("Kann nicht zur Datenbank verbinden!");
 			}

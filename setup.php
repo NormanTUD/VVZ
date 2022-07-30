@@ -176,7 +176,7 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 				//include_once('fill_database.php');
 			}
 
-			print "<br /><span style='color: red; font-size: 25px;'>Bitte l&ouml;sche nun die `new_setup`-Datei!</span><br>";
+			print "<br /><span style='color: red; font-size: 25px;'>Bitte l&ouml;sche nun die `".dirname(__FILE__)."/new_setup`-Datei!</span><br>";
 		} else {
 			if($show_importer) {
 ?>
