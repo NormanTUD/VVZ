@@ -54,6 +54,8 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			rquery('use `'.$GLOBALS['dbname'].'`');
 			$query = 'insert ignore into users (`username`, `password_sha256`) values ('.esc(get_post('username')).', '.esc(hash('sha256', get_post('password'))).')';
 			rquery($query);
+
+			print("Ok. Bitte lösche nun die <pre>new_setup</pre>-Datei.");
 		}
 
 		if(table_exists($GLOBALS['dbname'], 'users')) {
