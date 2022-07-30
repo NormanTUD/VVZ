@@ -237,7 +237,7 @@
   CONSTRAINT `superdozent_ibfk_2` FOREIGN KEY (`dozent_id`) REFERENCES `dozent` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
-'CREATE TABLE `titel` (
+'titel' => 'CREATE TABLE `titel` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `abkuerzung` varchar(100) NOT NULL,
