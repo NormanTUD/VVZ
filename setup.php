@@ -56,7 +56,8 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 
 
 			rquery('use `'.$GLOBALS['dbname'].'`');
-			$query = 'insert ignore into users (`username`, `password_sha256`) values ('.esc(get_post('username')).', '.esc(hash('sha256', get_post('password'))).')';
+			$salt = generate_random_string(100);
+			$query = 'insert ignore into users (`username`, `password_sha256`, `salt`) values ('.esc(get_post('username')).', '.esc(hash('sha256', get_post('password').$salt)).', '.esc($salt).')';
 			rquery($query);
 
 			$show_importer = 0;
