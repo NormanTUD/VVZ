@@ -24,6 +24,7 @@ Aktuell läuft die Software unter vvz.phil.tu-dresden.de.
 # Installation
 
 ```console
+git clone --depth 1 https://github.com/NormanTUD/VVZ.git
 cd VVZ
 bash install.sh
 ```
