@@ -22,13 +22,11 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			rquery('CREATE DATABASE `'.$GLOBALS['dbname'].'`');
 		}
 
-
 		$admin_accounts = array();
 
 		if(array_key_exists('username', $_POST) && array_key_exists('password', $_POST)) {
 			include("sql_datenbanken.php");
 
-			rquery('SET @@global.innodb_large_prefix = 1');
 			rquery('select @@FOREIGN_KEY_CHECKS');
 			rquery('set FOREIGN_KEY_CHECKS=0');
 
