@@ -222,12 +222,15 @@
 	FOREIGN KEY (page_id) REFERENCES page(id) ON DELETE CASCADE
 );',
 
-'semester' => 'create table if not exists semester (
-	id int unsigned auto_increment primary key,
-	jahr int,
-	typ enum("Sommersemester", "Wintersemester"),
-	UNIQUE KEY jahr_typ (jahr, typ)
-);',
+'semester' => "CREATE TABLE `semester` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `jahr` int(11) DEFAULT NULL,
+  `typ` enum('Sommersemester','Wintersemester') DEFAULT NULL,
+  `default` enum('0','1') NOT NULL DEFAULT '0',
+  `erste_veranstaltung_default` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `jahr_typ` (`jahr`,`typ`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;",
 
 'function_rights' => 'create table if not exists function_rights (
 	id int unsigned auto_increment primary key,
