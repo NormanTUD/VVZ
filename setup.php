@@ -63,6 +63,21 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			print("<h2>Ok. Bitte lösche nun die <tt>new_setup</tt>-Datei.</h2>");
 		}
 
+		if(!$show_importer) {
+			rquery("insert into role values ('1', 'Administrator', 'darf alles');");
+			rquery("insert into role values ('2', 'Dozent', 'darf eigene sachen bearbeiten');");
+			rquery("insert into role values ('3', 'Dozent, Raumplanung', 'darf eigene sachen bearbeiten und auf raumplanung zugreifen');");
+			rquery("insert into role values ('4', 'Superdozent', 'darf eigene sachen bearbeiten und auf veranstaltungen anderer zugreifen ,');");
+			rquery("insert into role values ('5', 'Verwalter', 'darf auf statistiken und veranstaltungen zugreifen');");
+			rquery("insert into role values ('6', 'Studienverwalter', 'darf studiengange und pns editieren');");
+			rquery("insert into role values ('7', 'Raumplanungsverwalter', 'darf alles was der verwalter darf + raumplanung');");
+
+			if(file_exists("/etc/default_institut_name")) {
+				$default_institut_name = file_get_contents("/etc/default_institut_name");
+				rquery("INSERT INTO uni.institut VALUES (1, ".esc($default_institut_name).", 1);");
+			}
+		}
+
 		if(table_exists($GLOBALS['dbname'], 'users')) {
 			$query = 'SELECT username FROM `'.$GLOBALS['dbname'].'`.`users` `u` JOIN `role_to_user` `ur` ON `ur`.`user_id` = `u`.`id` WHERE `role_id` = 1';
 			$result = rquery($query);

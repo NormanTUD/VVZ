@@ -131,11 +131,13 @@
 	FOREIGN KEY page(parent) REFERENCES page(id) ON DELETE SET NULL
 );',
 
-'role' => 'create table if not exists role (
-	id int unsigned auto_increment primary key,
-	name varchar(100),
-	UNIQUE KEY name (name)
-);',
+'role' => 'CREATE TABLE `role` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `beschreibung` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;',
 
 'role_to_page' => 'create table if not exists role_to_page (
 	role_id int unsigned not null,

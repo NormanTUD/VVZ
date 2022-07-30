@@ -48,8 +48,11 @@ function new_setup {
 
 function create_institut {
 	INSTITUT_NAME=$(whiptail --inputbox "Initial Institut?" 8 39 "$INSTITUT_NAME" --title "Name of the Default Institut" 3>&1 1>&2 2>&3)
-	mysql -uroot -p$PASSWORD -e "INSERT INTO uni.institut VALUES (1, \"$INSTITUT_NAME\", 1);"
+	echo "$INSTITUT_NAME" > /etc/default_institut_name
 }
+
+PASSWORD=$(whiptail --passwordbox "What is your DB password" 8 78 --title "DB-password" 3>&1 1>&2 2>&3)
+echo "$PASSWORD" > /etc/vvzdbpw
 
 eval `resize`
 WHAT_TO_DO=$(
@@ -75,8 +78,6 @@ done
 exit
 
 
-PASSWORD=$(whiptail --passwordbox "What is your DB password (specified earlier when you installed mysql)" 8 78 --title "DB-password" 3>&1 1>&2 2>&3)
-echo "$PASSWORD" > /etc/vvzdbpw
 
 set +x
 mysql -uroot -p$PASSWORD -e "create database uni"
