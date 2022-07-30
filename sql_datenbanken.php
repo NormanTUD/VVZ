@@ -262,7 +262,7 @@
   KEY `institut_id` (`institut_id`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`dozent_id`) REFERENCES `dozent` (`id`) ON DELETE CASCADE,
   CONSTRAINT `users_ibfk_2` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;",
 
 'page' => "CREATE TABLE `page` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
