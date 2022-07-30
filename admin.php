@@ -71,14 +71,49 @@
 		$studiengaenge = create_studiengaenge_array($chosen_institut);
 		$zeitraum = create_zeitraum_array();
 		if(!count($studiengaenge)) {
-			$keine_studiengaenge_fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. ";
+			$fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$keine_studiengaenge_fehler .= "<a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
+				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
-				$keine_studiengaenge_fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
+				$fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
 			}
-			error($keine_studiengaenge_fehler);
+			error($fehler);
 		}
+
+
+		$bereiche = create_bereiche_array();
+		if(!count($bereiche)) {
+			$fehler = "Es sind keine Bereiche vorhanden. ";
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("bereiche.php")."'>Hier können Sie welche hinzufügen.</a>";
+			} else {
+				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+			}
+			error($fehler);
+		}
+
+		$module = create_modul_array();
+		if(!count($module)) {
+			$fehler = "Es sind keine Module vorhanden. ";
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("modul.php")."'>Hier können Sie welche hinzufügen.</a>";
+			} else {
+				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+			}
+			error($fehler);
+		}
+
+		$pruefungsnummern = create_pruefungsnummern_array();
+		if(!count($pruefungsnummern)) {
+			$fehler = "Es sind keine Prüfungsnummern vorhanden. ";
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("pruefungsnummern.php")."'>Hier können Sie welche hinzufügen.</a>";
+			} else {
+				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+			}
+			error($fehler);
+		}
+
 		if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
 			$datestring = md5(date('Y-m-d H'));
 			if (get_get('iamsure') == $datestring) {
