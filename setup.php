@@ -108,8 +108,7 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			rquery("INSERT INTO `seitentext` VALUES (18,'<h2>Willkommen auf der Administrationsseite des VVZ</h2>');");
 
 
-			rquery("INSERT INTO `titel` VALUES (1,'Doktor der Philosophie','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor','Prof. Dr.');
-")
+			rquery("INSERT INTO `titel` VALUES (1,'Doktor der Philosophie','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor','Prof. Dr.');");
 		}
 
 		if(table_exists($GLOBALS['dbname'], 'users')) {
