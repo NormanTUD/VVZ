@@ -4,14 +4,14 @@
 	}
 
 	$GLOBALS['databases'] = array(
-'apache_restarts' => 'CREATE TABLE `apache_restarts` (
+'apache_restarts' => "CREATE TABLE `apache_restarts` (
   `t` datetime DEFAULT NULL,
   `reason` varchar(200) DEFAULT NULL,
   `stdout` text DEFAULT NULL,
   `stderr` text DEFAULT NULL,
   `exit_code` int(11) DEFAULT NULL,
   `success` enum('0','1') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'veranstaltungstyp' => 'CREATE TABLE `veranstaltungstyp` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -22,7 +22,7 @@
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;',
 
-'dozent' => 'CREATE TABLE `dozent` (
+'dozent' => "CREATE TABLE `dozent` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `first_name` varchar(100) NOT NULL,
   `last_name` varchar(100) NOT NULL,
@@ -32,7 +32,7 @@
   UNIQUE KEY `first_last_name` (`first_name`,`last_name`),
   KEY `titel_id_fk` (`titel_id`),
   CONSTRAINT `titel_id_fk` FOREIGN KEY (`titel_id`) REFERENCES `titel` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;",
 
 'faq' => 'CREATE TABLE `faq` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -42,7 +42,7 @@
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;',
 
-'einzelne_termine' => 'CREATE TABLE `einzelne_termine` (
+'einzelne_termine' => "CREATE TABLE `einzelne_termine` (
   `veranstaltung_id` int(10) unsigned NOT NULL DEFAULT 0,
   `start` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `end` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -51,7 +51,7 @@
   KEY `raum_id` (`raum_id`),
   CONSTRAINT `einzelne_termine_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
   CONSTRAINT `einzelne_termine_ibfk_2` FOREIGN KEY (`raum_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'gebaeude' => 'CREATE TABLE `gebaeude` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -99,7 +99,7 @@
   CONSTRAINT `raumplanung_relevante_daten_geaendert_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
 
-'veranstaltung' => 'CREATE TABLE `veranstaltung` (
+'veranstaltung' => "CREATE TABLE `veranstaltung` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `veranstaltungstyp_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(500) NOT NULL,
@@ -130,7 +130,7 @@
   CONSTRAINT `veranstaltung_ibfk_6` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE,
   CONSTRAINT `veranstaltung_ibfk_7` FOREIGN KEY (`veranstaltungstyp_id`) REFERENCES `veranstaltungstyp` (`id`) ON DELETE CASCADE,
   CONSTRAINT `veranstaltung_ibfk_8` FOREIGN KEY (`raum_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=499 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB AUTO_INCREMENT=499 DEFAULT CHARSET=utf8;",
 
 'veranstaltung_metadaten' => "CREATE TABLE `veranstaltung_metadaten` (
   `veranstaltung_id` int(10) unsigned NOT NULL,
@@ -246,7 +246,7 @@
   UNIQUE KEY `abkuerzung` (`abkuerzung`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;', 
 
-'users' => 'CREATE TABLE `users` (
+'users' => "CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `username` varchar(100) DEFAULT NULL,
   `dozent_id` int(10) unsigned DEFAULT NULL,
@@ -262,9 +262,9 @@
   KEY `institut_id` (`institut_id`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`dozent_id`) REFERENCES `dozent` (`id`) ON DELETE CASCADE,
   CONSTRAINT `users_ibfk_2` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;",
 
-'page' => 'CREATE TABLE `page` (
+'page' => "CREATE TABLE `page` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `file` varchar(50) DEFAULT NULL,
@@ -275,7 +275,7 @@
   UNIQUE KEY `file` (`file`),
   KEY `page` (`parent`),
   CONSTRAINT `page_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `page` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;",
 
 'role' => 'CREATE TABLE `role` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -440,7 +440,7 @@
 	UNIQUE KEY name_role_id (name, role_id)
 );',
 
-'right_issues_pages' => 'CREATE TABLE `right_issues_pages` (
+'right_issues_pages' => "CREATE TABLE `right_issues_pages` (
   `user_id` int(10) unsigned NOT NULL,
   `page_id` int(10) unsigned NOT NULL,
   `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -448,16 +448,16 @@
   KEY `page_id` (`page_id`),
   CONSTRAINT `right_issues_pages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `right_issues_pages_ibfk_2` FOREIGN KEY (`page_id`) REFERENCES `page` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
-'right_issues' => 'CREATE TABLE `right_issues` (
+'right_issues' => "CREATE TABLE `right_issues` (
   `function` varchar(100) NOT NULL DEFAULT '',
   `user_id` int(10) unsigned NOT NULL,
   `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`function`,`user_id`,`date`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `right_issues_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'api_auth_codes' => 'CREATE TABLE `api_auth_codes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
