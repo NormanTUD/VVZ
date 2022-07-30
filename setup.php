@@ -108,9 +108,46 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			rquery("insert into `titel` VALUES (1,'Doktor der Philosophie','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor','Prof. Dr.');");
 
 			rquery("INSERT INTO `role_to_user` VALUES (1,1);");
-			print("<h2>Ok. Bitte lösche nun die <tt>new_setup</tt>-Datei.</h2>");
-
 			$show_importer = 0;
+
+			$veranstaltungstypen = array(
+				array('Vorlesung' => 'VL'),
+				array('Fachseminar' => 'FS'),
+				array('Blockseminar' => 'BS'),
+				array('Proseminar' => 'PS'),
+				array('Textproseminar' => 'TPS'),
+				array('Tutorium' => 'TUT'),
+				array('Übung' => 'Ü'),
+				array('Seminar' => 'S'),
+				array('Hauptseminar' => 'HS'),
+				array('Oberseminar' => 'OS'),
+				array('Exkursion' => 'EX'),
+				array('Graduiertenseminar' => 'GS')
+			);
+
+			$pruefungstypen = array(
+				"Klausur",
+				"Essay",
+				"Bibliographie",
+				"Vortrag",
+				"Mündliche Prüfung",
+				"Protokoll",
+				"Thesenpapier",
+				"Referat",
+				"Seminararbeit",
+				"Exposé",
+				"Rezension",
+				"Portfolio 1",
+				"Portfolio 2",
+				"Bericht",
+				"Nachweis SPS",
+				"Nachweis 2h begl. Unterricht",
+				"Nachweis Schulprakt. Studien"
+			);
+
+
+			insert_values('pruefungstyp', array('name'), $pruefungstypen);
+			insert_values('veranstaltungstyp', array('name', 'abkuerzung'), $veranstaltungstypen);
 		}
 
 		if(table_exists($GLOBALS['dbname'], 'users')) {
@@ -135,8 +172,8 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			print "</ul>\n";
 
 			if($GLOBALS['slurped_sql_file'] == 0) {
-				print "<h2>Initialdatensatzfüllung</h2>\n";
-				include_once('fill_database.php');
+				//print "<h2>Initialdatensatzfüllung</h2>\n";
+				//include_once('fill_database.php');
 			}
 
 			print "<br /><span style='color: red; font-size: 25px;'>Bitte l&ouml;sche nun die `new_setup`-Datei!</span><br>";
