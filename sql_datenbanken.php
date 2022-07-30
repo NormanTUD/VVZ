@@ -13,13 +13,14 @@
   `success` enum('0','1') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
-'veranstaltungstyp' => 'create table if not exists veranstaltungstyp (
-	id int unsigned auto_increment primary key,
-	abkuerzung varchar(5) not null,
-	name varchar(20) not null,
-	UNIQUE KEY abkuerzung (abkuerzung),
-	UNIQUE KEY name (name)
-);',
+'veranstaltungstyp' => 'CREATE TABLE `veranstaltungstyp` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `abkuerzung` varchar(5) NOT NULL,
+  `name` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `abkuerzung` (`abkuerzung`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;',
 
 'dozent' => 'CREATE TABLE `dozent` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -98,43 +99,93 @@
   CONSTRAINT `raumplanung_relevante_daten_geaendert_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
 
-'veranstaltung' => 'create table if not exists veranstaltung (
-	id int unsigned auto_increment primary key,
-	veranstaltungstyp_id int unsigned null,
-	name varchar(500) not null,
-	dozent_id int unsigned not null,
-	gebaeudewunsch_id int unsigned,
-	gebaeude_id int unsigned,
-	raummeldung date,
-	raumwunsch_id int unsigned,
-	institut_id int unsigned,
-	raum_id int unsigned,
-	semester_id int unsigned not null,
-	last_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY (dozent_id) REFERENCES dozent(id) ON DELETE CASCADE,
-	FOREIGN KEY (semester_id) REFERENCES semester(id) ON DELETE CASCADE,
-	FOREIGN KEY (gebaeudewunsch_id) REFERENCES gebaeude(id) ON DELETE CASCADE,
-	FOREIGN KEY (gebaeude_id) REFERENCES gebaeude(id) ON DELETE CASCADE,
-	FOREIGN KEY (raumwunsch_id) REFERENCES raum(id) ON DELETE CASCADE,
-	FOREIGN KEY (institut_id) REFERENCES institut(id) ON DELETE CASCADE,
-	FOREIGN KEY (veranstaltungstyp_id) REFERENCES veranstaltungstyp(id) ON DELETE CASCADE,
-	FOREIGN KEY (raum_id) REFERENCES raum(id) ON DELETE CASCADE
-);',
+'veranstaltung' => 'CREATE TABLE `veranstaltung` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `veranstaltungstyp_id` int(10) unsigned DEFAULT NULL,
+  `name` varchar(500) NOT NULL,
+  `dozent_id` int(10) unsigned NOT NULL,
+  `gebaeudewunsch_id` int(10) unsigned DEFAULT NULL,
+  `gebaeude_id` int(10) unsigned DEFAULT NULL,
+  `raummeldung` date DEFAULT NULL,
+  `raumwunsch_id` int(10) unsigned DEFAULT NULL,
+  `institut_id` int(10) unsigned DEFAULT NULL,
+  `raum_id` int(10) unsigned DEFAULT NULL,
+  `semester_id` int(10) unsigned NOT NULL,
+  `last_change` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `master_niveau` enum('0','1') DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `dozent_id` (`dozent_id`),
+  KEY `semester_id` (`semester_id`),
+  KEY `gebaeudewunsch_id` (`gebaeudewunsch_id`),
+  KEY `gebaeude_id` (`gebaeude_id`),
+  KEY `raumwunsch_id` (`raumwunsch_id`),
+  KEY `institut_id` (`institut_id`),
+  KEY `veranstaltungstyp_id` (`veranstaltungstyp_id`),
+  KEY `raum_id` (`raum_id`),
+  CONSTRAINT `veranstaltung_ibfk_1` FOREIGN KEY (`dozent_id`) REFERENCES `dozent` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_ibfk_2` FOREIGN KEY (`semester_id`) REFERENCES `semester` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_ibfk_3` FOREIGN KEY (`gebaeudewunsch_id`) REFERENCES `gebaeude` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_ibfk_4` FOREIGN KEY (`gebaeude_id`) REFERENCES `gebaeude` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_ibfk_5` FOREIGN KEY (`raumwunsch_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_ibfk_6` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_ibfk_7` FOREIGN KEY (`veranstaltungstyp_id`) REFERENCES `veranstaltungstyp` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_ibfk_8` FOREIGN KEY (`raum_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=499 DEFAULT CHARSET=utf8;',
 
-'veranstaltung_metadaten' => 'create table if not exists veranstaltung_metadaten (
-	veranstaltung_id int unsigned not null,
-	wunsch varchar(500),
-	hinweis varchar(500),
-	opal_link varchar(500),
-	anzahl_hoerer int unsigned,
-	erster_termin date,
-	wochentag enum ("Mo", "Di", "Mi", "Do", "Fr", "Sa", "So") DEFAULT "Mo",
-	stunde enum ("1", "2", "3", "4", "5", "6", "7", "8") DEFAULT "1",
-	woche enum("gerade Woche", "ungerade Woche", "jede Woche") default "jede Woche",
-	abgabe_pruefungsleistungen date,
-	FOREIGN KEY (veranstaltung_id) REFERENCES veranstaltung(id) ON DELETE CASCADE,
-	UNIQUE KEY veranstaltung_id (veranstaltung_id)
-);',
+'veranstaltung_metadaten' => "CREATE TABLE `veranstaltung_metadaten` (
+  `veranstaltung_id` int(10) unsigned NOT NULL,
+  `wunsch` varchar(5000) DEFAULT NULL,
+  `hinweis` varchar(5000) DEFAULT NULL,
+  `opal_link` varchar(500) DEFAULT NULL,
+  `anzahl_hoerer` varchar(100) DEFAULT NULL,
+  `erster_termin` date DEFAULT NULL,
+  `wochentag` enum('Mo','Di','Mi','Do','Fr','Sa','So','BS') DEFAULT 'Mo',
+  `stunde` enum('1','1-2','1-3','1-4','1-5','1-6','1-7','1-8','2','2-3','2-4','2-5','2-6','2-7','2-8','3','3-4','3-5','3-6','3-7','3-8','4','4-5','4-6','4-7','4-8','5','5-6','5-7','5-8','6','6-7','6-8','7','7-8','8','*','Ganztägig') DEFAULT '1',
+  `woche` enum('gerade Woche','ungerade Woche','jede Woche','keine Angabe') DEFAULT 'jede Woche',
+  `abgabe_pruefungsleistungen` date DEFAULT NULL,
+  `language_id` int(11) DEFAULT 1,
+  `related_veranstaltung` int(10) unsigned DEFAULT NULL,
+  `fester_bbb_raum` int(11) DEFAULT 0,
+  `videolink` varchar(1000) DEFAULT NULL,
+  UNIQUE KEY `veranstaltung_id` (`veranstaltung_id`),
+  KEY `fk_related_veranstaltung` (`related_veranstaltung`),
+  KEY `veranstaltung_metadaten_ibfk_2` (`language_id`),
+  CONSTRAINT `fk_related_veranstaltung` FOREIGN KEY (`related_veranstaltung`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `related_veranstaltung_fk` FOREIGN KEY (`related_veranstaltung`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_metadaten_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_metadaten_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+
+'veranstaltung_nach_lv_nr' => 'CREATE TABLE `veranstaltung_nach_lv_nr` (
+  `veranstaltung_id` int(11) NOT NULL,
+  `lv_nr` int(11) NOT NULL,
+  PRIMARY KEY (`veranstaltung_id`,`lv_nr`),
+  UNIQUE KEY `veranstaltung_id` (`veranstaltung_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
+
+'veranstaltung_to_praesenztyp' => 'CREATE TABLE `veranstaltung_to_praesenztyp` (
+  `veranstaltung_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `praesenztyp_id` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`veranstaltung_id`,`praesenztyp_id`),
+  KEY `veranstaltung_id` (`veranstaltung_id`),
+  KEY `praesenztyp_id` (`praesenztyp_id`),
+  CONSTRAINT `veranstaltung_to_praesenztyp_ibfk_1` FOREIGN KEY (`praesenztyp_id`) REFERENCES `praesenztyp` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_to_praesenztyp_ibfk_2` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_to_praesenztyp_ibfk_3` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_to_praesenztyp_ibfk_4` FOREIGN KEY (`praesenztyp_id`) REFERENCES `praesenztyp` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
+
+'veranstaltung_to_language' => 'CREATE TABLE `veranstaltung_to_language` (
+  `veranstaltung_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `language_id` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`veranstaltung_id`,`language_id`),
+  KEY `veranstaltung_id` (`veranstaltung_id`),
+  KEY `language_id` (`language_id`),
+  CONSTRAINT `language_id_fk` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_id_fk` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_to_language_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `veranstaltung_to_language_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
 
 'institut' => 'CREATE TABLE `institut` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -195,21 +246,23 @@
   UNIQUE KEY `abkuerzung` (`abkuerzung`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;', 
 
-'users' => 'create table if not exists users (
-	id int unsigned auto_increment primary key,
-	username varchar(100),
-	dozent_id int unsigned,
-	institut_id int unsigned,
-	password_sha256 varchar(256),
-	salt varchar(100) not null,
-	enabled enum ("0", "1") not null default "1",
-	barrierefrei enum ("0", "1") not null default "0",
-	accepted_public_data enum ("0", "1") not null default "0",
-	UNIQUE KEY name (username),
-	UNIQUE KEY dozent_id (dozent_id),
-	FOREIGN KEY (dozent_id) REFERENCES dozent(id) ON DELETE CASCADE,
-	FOREIGN KEY (institut_id) REFERENCES institut(id) ON DELETE CASCADE
-);',
+'users' => 'CREATE TABLE `users` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(100) DEFAULT NULL,
+  `dozent_id` int(10) unsigned DEFAULT NULL,
+  `institut_id` int(10) unsigned DEFAULT NULL,
+  `password_sha256` varchar(256) DEFAULT NULL,
+  `salt` varchar(100) NOT NULL,
+  `enabled` enum('0','1') NOT NULL DEFAULT '1',
+  `barrierefrei` enum('0','1') NOT NULL DEFAULT '0',
+  `accepted_public_data` enum('0','1') NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`username`),
+  UNIQUE KEY `dozent_id` (`dozent_id`),
+  KEY `institut_id` (`institut_id`),
+  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`dozent_id`) REFERENCES `dozent` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `users_ibfk_2` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;',
 
 'page' => 'CREATE TABLE `page` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
