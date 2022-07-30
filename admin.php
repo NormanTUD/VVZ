@@ -73,7 +73,7 @@
 		if(!count($studiengaenge)) {
 			$keine_studiengaenge_fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$keine_studiengaenge_fehler .= "<a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.";
+				$keine_studiengaenge_fehler .= "<a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
 				$keine_studiengaenge_fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
 			}
