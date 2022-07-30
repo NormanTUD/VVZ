@@ -20,7 +20,7 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `abkuerzung` (`abkuerzung`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'dozent' => "CREATE TABLE `dozent` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -32,7 +32,7 @@
   UNIQUE KEY `first_last_name` (`first_name`,`last_name`),
   KEY `titel_id_fk` (`titel_id`),
   CONSTRAINT `titel_id_fk` FOREIGN KEY (`titel_id`) REFERENCES `titel` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;",
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'faq' => 'CREATE TABLE `faq` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -40,7 +40,7 @@
   `antwort` text NOT NULL,
   `wie_oft_gestellt` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'einzelne_termine' => "CREATE TABLE `einzelne_termine` (
   `veranstaltung_id` int(10) unsigned NOT NULL DEFAULT 0,
@@ -62,7 +62,7 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `abkuerzung` (`abkuerzung`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=143 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'function_right_to_page' => 'CREATE TABLE `function_right_to_page` (
   `function_right_id` int(10) unsigned NOT NULL,
@@ -89,7 +89,7 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `gebaeude_raum` (`gebaeude_id`,`raumnummer`),
   CONSTRAINT `raum_ibfk_1` FOREIGN KEY (`gebaeude_id`) REFERENCES `gebaeude` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=245 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'raumplanung_relevante_daten_geaendert' => 'CREATE TABLE `raumplanung_relevante_daten_geaendert` (
   `veranstaltung_id` int(10) unsigned NOT NULL,
@@ -130,7 +130,7 @@
   CONSTRAINT `veranstaltung_ibfk_6` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE,
   CONSTRAINT `veranstaltung_ibfk_7` FOREIGN KEY (`veranstaltungstyp_id`) REFERENCES `veranstaltungstyp` (`id`) ON DELETE CASCADE,
   CONSTRAINT `veranstaltung_ibfk_8` FOREIGN KEY (`raum_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=499 DEFAULT CHARSET=utf8;",
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'veranstaltung_metadaten' => "CREATE TABLE `veranstaltung_metadaten` (
   `veranstaltung_id` int(10) unsigned NOT NULL,
@@ -194,21 +194,21 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `start_nr` (`start_nr`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'language' => 'CREATE TABLE `language` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `abkuerzung` varchar(3) DEFAULT NULL,
   `name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'bereich' => 'CREATE TABLE `bereich` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=175 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'pruefungsnummer_fach' => 'CREATE TABLE `pruefungsnummer_fach` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -226,7 +226,7 @@
   UNIQUE KEY `name` (`name`),
   KEY `institut_id` (`institut_id`),
   CONSTRAINT `studiengang_ibfk_1` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'superdozent' => 'CREATE TABLE `superdozent` (
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,
@@ -244,7 +244,7 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `abkuerzung` (`abkuerzung`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;', 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;', 
 
 'users' => "CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -262,7 +262,7 @@
   KEY `institut_id` (`institut_id`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`dozent_id`) REFERENCES `dozent` (`id`) ON DELETE CASCADE,
   CONSTRAINT `users_ibfk_2` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;",
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'page' => "CREATE TABLE `page` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -275,7 +275,7 @@
   UNIQUE KEY `file` (`file`),
   KEY `page` (`parent`),
   CONSTRAINT `page_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `page` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;",
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'role' => 'CREATE TABLE `role` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -283,7 +283,7 @@
   `beschreibung` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'role_to_page' => 'CREATE TABLE `role_to_page` (
   `role_id` int(10) unsigned NOT NULL,
@@ -312,7 +312,7 @@
   PRIMARY KEY (`id`),
   KEY `studiengang_id` (`studiengang_id`),
   CONSTRAINT `modul_ibfk_1` FOREIGN KEY (`studiengang_id`) REFERENCES `studiengang` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=139 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'session_ids' => 'CREATE TABLE `session_ids` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -322,14 +322,14 @@
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `session_ids_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'pruefungstyp' => 'CREATE TABLE `pruefungstyp` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
   'pruefungsnummer' => "CREATE TABLE `pruefungsnummer` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -352,7 +352,7 @@
   CONSTRAINT `pruefungsnummer_ibfk_3` FOREIGN KEY (`modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE,
   CONSTRAINT `pruefungsnummer_ibfk_4` FOREIGN KEY (`pruefungsnummer_fach_id`) REFERENCES `pruefungsnummer_fach` (`id`) ON DELETE CASCADE,
   CONSTRAINT `pruefunsnummer` FOREIGN KEY (`zeitraum_id`) REFERENCES `pruefung_zeitraum` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=590 DEFAULT CHARSET=utf8;",
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'pruefung' => 'CREATE TABLE `pruefung` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -368,7 +368,7 @@
   CONSTRAINT `pruefung_ibfk_1` FOREIGN KEY (`pruefungsnummer_id`) REFERENCES `pruefungsnummer` (`id`) ON DELETE CASCADE,
   CONSTRAINT `pruefung_ibfk_2` FOREIGN KEY (`raum_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE,
   CONSTRAINT `pruefung_ibfk_3` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=39586 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'hinweise' => 'CREATE TABLE `hinweise` (
   `page_id` int(10) unsigned NOT NULL,
@@ -392,14 +392,14 @@
   `erste_veranstaltung_default` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `jahr_typ` (`jahr`,`typ`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;",
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'pruefungsamt' => 'CREATE TABLE `pruefungsamt` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'pruefungsamt_nach_studiengang' => 'CREATE TABLE `pruefungsamt_nach_studiengang` (
   `pruefungsamt_id` int(10) unsigned NOT NULL,
@@ -415,7 +415,7 @@
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'start_message' => 'CREATE TABLE `start_message` (
   `institut_id` int(10) unsigned NOT NULL,
@@ -430,7 +430,7 @@
   `description` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `function_name` (`function_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=295 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'function_rights' => 'create table if not exists function_rights (
 	id int unsigned auto_increment primary key,
@@ -471,14 +471,14 @@
   UNIQUE KEY `email` (`email`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `api_auth_codes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'api_error_code' => 'CREATE TABLE `api_error_code` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'api_log' => 'CREATE TABLE `api_log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -492,7 +492,7 @@
   KEY `auth_code_id` (`auth_code_id`),
   CONSTRAINT `api_log_ibfk_1` FOREIGN KEY (`api_error_code_id`) REFERENCES `api_error_code` (`id`) ON DELETE CASCADE,
   CONSTRAINT `api_log_ibfk_2` FOREIGN KEY (`auth_code_id`) REFERENCES `api_auth_codes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3784 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'page_info' => 'CREATE TABLE `page_info` (
   `page_id` int(10) unsigned NOT NULL,
@@ -507,7 +507,7 @@
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
 
 'modul_nach_semester' => 'CREATE TABLE `modul_nach_semester` (
   `modul_id` int(10) unsigned NOT NULL,
@@ -547,7 +547,7 @@
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'ua_specific_os' => 'CREATE TABLE `ua_specific_os` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -556,7 +556,7 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_version` (`name_id`,`version`),
   CONSTRAINT `ua_specific_os_ibfk_1` FOREIGN KEY (`name_id`) REFERENCES `ua_os` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=222 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'ua_call' => 'CREATE TABLE `ua_call` (
   `specific_os_id` int(10) unsigned NOT NULL DEFAULT 0,
@@ -576,7 +576,7 @@
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=311 DEFAULT CHARSET=utf8;',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'ua_specific_browser' => 'CREATE TABLE `ua_specific_browser` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -585,7 +585,7 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_version` (`name_id`,`version`),
   CONSTRAINT `ua_specific_browser_ibfk_1` FOREIGN KEY (`name_id`) REFERENCES `ua_browser` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1797 DEFAULT CHARSET=utf8;'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 
 		);
 
