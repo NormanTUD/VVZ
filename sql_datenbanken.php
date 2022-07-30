@@ -175,17 +175,28 @@
 	UNIQUE KEY name (name)
 );',
 
-'pruefungsnummer' => 'create table if not exists pruefungsnummer (
-	id int unsigned auto_increment primary key,
-	pruefungsnummer varchar(100),
-	modul_id int unsigned null,
-	pruefungstyp_id int unsigned null,
-	pruefungsnummer_fach_id int unsigned,
-	modulbezeichnung varchar(500) null,
-	FOREIGN KEY (pruefungstyp_id) REFERENCES pruefungstyp(id) ON DELETE CASCADE,
-	FOREIGN KEY (pruefungsnummer_fach_id) REFERENCES pruefungsnummer_fach(id) ON DELETE CASCADE,
-	FOREIGN KEY (modul_id) REFERENCES modul(id) ON DELETE CASCADE
-);',
+'pruefungsnummer' => "CREATE TABLE `pruefungsnummer` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pruefungsnummer` varchar(100) DEFAULT NULL,
+  `modul_id` int(10) unsigned DEFAULT NULL,
+  `pruefungstyp_id` int(10) unsigned DEFAULT NULL,
+  `bereich_id` int(10) unsigned DEFAULT NULL,
+  `pruefungsnummer_fach_id` int(10) unsigned DEFAULT NULL,
+  `modulbezeichnung` varchar(500) DEFAULT NULL,
+  `zeitraum_id` int(11) NOT NULL DEFAULT 1,
+  `disabled` enum('0','1') DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `pruefungstyp_id` (`pruefungstyp_id`),
+  KEY `bereich_id` (`bereich_id`),
+  KEY `modul_id` (`modul_id`),
+  KEY `pruefungsnummer_fach_id` (`pruefungsnummer_fach_id`),
+  KEY `pruefunsnummer` (`zeitraum_id`),
+  CONSTRAINT `pruefungsnummer_ibfk_1` FOREIGN KEY (`pruefungstyp_id`) REFERENCES `pruefungstyp` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `pruefungsnummer_ibfk_2` FOREIGN KEY (`bereich_id`) REFERENCES `bereich` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `pruefungsnummer_ibfk_3` FOREIGN KEY (`modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `pruefungsnummer_ibfk_4` FOREIGN KEY (`pruefungsnummer_fach_id`) REFERENCES `pruefungsnummer_fach` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `pruefunsnummer` FOREIGN KEY (`zeitraum_id`) REFERENCES `pruefung_zeitraum` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=590 DEFAULT CHARSET=utf8",
 
 'pruefung' => 'create table if not exists pruefung (
 	id int unsigned auto_increment primary key,
@@ -287,24 +298,47 @@
 		);
 
 	$GLOBALS['views'] = array(
-		'view_user_session_id' => 'create view view_user_session_id as select `s`.`id` AS `session_id_id`,`u`.`id` AS `user_id`,`s`.`session_id` AS `session_id`,`s`.`creation_time` AS `creation_time`,`u`.`username` AS `username`,`u`.`dozent_id` AS `dozent_id`, `u`.`institut_id`, `u`.`enabled`, `u`.`accepted_public_data` as `accepted_public_data` from (`users` `u` left join `session_ids` `s` on((`s`.`user_id` = `u`.`id`)));',
-		'view_account_to_role_pages' => 'create or replace view view_account_to_role_pages AS select `p`.`id` AS `page_id`,`p`.`name` AS `name`,`p`.`file` AS `file`,`ru`.`user_id` AS `user_id`, `p`.`show_in_navigation`, `parent` from ((`role_to_user` `ru` join `role_to_page` `rp` on((`rp`.`role_id` = `ru`.`role_id`))) join `page` `p` on((`p`.`id` = `rp`.`page_id`)))',
-		'view_user_to_role' => 'CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_user_to_role` AS select `u`.`id` AS `user_id`,`u`.`username` AS `username`,`ru`.`role_id` AS `role_id`,`r`.`name` AS `name`,`u`.`dozent_id` AS `dozent_id`,`u`.`institut_id` AS `institut_id`,`u`.`enabled` AS `enabled`, `barrierefrei` from ((`users` `u` left join `role_to_user` `ru` on((`u`.`id` = `ru`.`user_id`))) join `role` `r` on((`r`.`id` = `ru`.`role_id`)));',
-		'view_veranstaltung_autor' => 'create or replace view view_veranstaltung_autor as select v.id veranstaltung_id, v.name veranstaltung_name, v.gebaeudewunsch_id gebaeudewunsch_id, v.gebaeude_id gebaeude_id, v.raummeldung raummeldung, v.raumwunsch_id raumwunsch_id, v.raum_id raum_id, d.id dozent_id, d.first_name, d.last_name from veranstaltung v left join dozent d on v.dozent_id = d.id;',
-		'view_veranstaltung_komplett' => 'create view view_veranstaltung_komplett as select `v`.`id` AS `veranstaltung_id`,`vt`.`name` AS `veranstaltung_typ`,`v`.`name` AS `veranstaltung_name`,`v`.`gebaeudewunsch_id` AS `gebaeudewunsch_id`,`v`.`gebaeude_id` AS `gebaeude_id`,`v`.`raummeldung` AS `raummeldung`,`v`.`raumwunsch_id` AS `raumwunsch_id`,`v`.`raum_id` AS `raum_id`,`d`.`id` AS `dozent_id`,`d`.`first_name` AS `first_name`,`d`.`last_name` AS `last_name`,`vt`.`name` AS `name`,`vm`.`wochentag` AS `wochentag`,`vm`.`stunde` AS `stunde`,`vm`.`woche` AS `woche`,`v`.`semester_id` AS `semester_id`, `erster_termin` from (((`veranstaltung` `v` left join `dozent` `d` on((`v`.`dozent_id` = `d`.`id`))) left join `veranstaltungstyp` `vt` on((`vt`.`id` = `v`.`veranstaltungstyp_id`))) left join `veranstaltung_metadaten` `vm` on((`vm`.`veranstaltung_id` = `v`.`id`)))',
-		'view_page_and_hinweis' => 'create or replace view `view_page_and_hinweis` AS SELECT `p`.`id`, `p`.`name`, `p`.`show_in_navigation`, `h`.`hinweis` FROM page `p` LEFT JOIN `hinweise` `h` ON `h`.`page_id` = `p`.`id`;',
-		'view_modul_studiengang' => 'create or replace view view_modul_studiengang AS SELECT `m`.`id` AS `modul_id`, `m`.`name` AS `modul_name`, `s`.`name` `studiengang_name`, `s`.`id` AS `studiengang_id` FROM `modul` `m` LEFT JOIN `studiengang` `s` ON `m`.`studiengang_id` = `s`.`id`',
-		'view_pruefungsnummern_in_modulen' => 'create or replace view view_pruefungsnummern_in_modulen as select `m`.`id` AS `modul_id`,`m`.`name` AS `modul_name`,`m`.`studiengang_id` AS `studiengang_id`,`p`.`pruefungsnummer` AS `pruefungsnummer`,`pt`.`name` AS `pruefungstyp_name`,`s`.`name` AS `studiengang_name`, `pt`.`id` as pruefungstyp_id, `p`.`id` as pruefungsnummer_id, b.name, modulbezeichnung from (((`modul` `m` left join `pruefungsnummer` `p` on((`p`.`modul_id` = `m`.`id`))) left join `pruefungstyp` `pt` on((`pt`.`id` = `p`.`pruefungstyp_id`))) left join `studiengang` `s` on((`m`.`studiengang_id` = `s`.`id`))) left join bereich b on b.id = p.bereich_id',
-		'view_pruefungsnummern_in_modulen_not_null' => 'create or replace view view_pruefungsnummern_in_modulen_not_null as select `m`.`id` AS `modul_id`,`m`.`name` AS `modul_name`,`m`.`studiengang_id` AS `studiengang_id`,`p`.`pruefungsnummer` AS `pruefungsnummer`,`pt`.`name` AS `pruefungstyp_name`,`s`.`name` AS `studiengang_name`,`pt`.`id` AS `pruefungstyp_id`,`p`.`id` AS `pruefungsnummer_id`,`b`.`name` AS `bereich_name`,`b`.`id` AS `bereich_id`, `pruefungsnummer_fach_id`, `modulbezeichnung` from ((((`modul` `m` join `pruefungsnummer` `p` on((`p`.`modul_id` = `m`.`id`))) left join `pruefungstyp` `pt` on((`pt`.`id` = `p`.`pruefungstyp_id`))) left join `studiengang` `s` on((`m`.`studiengang_id` = `s`.`id`))) left join `bereich` `b` on((`b`.`id` = `p`.`bereich_id`)));',
-		'view_veranstaltung_raumplanung' => 'create or replace view view_veranstaltung_raumplanung as SELECT `v`.`id`, `v`.`name`, `vm`.`wunsch`, `vm`.`anzahl_hoerer`, `vm`.`erster_termin`, `vm`.`wochentag`, `vm`.`stunde`, `vm`.`woche`, `vm`.`abgabe_pruefungsleistungen`, `v`.`gebaeudewunsch_id`, `v`.`raumwunsch_id`, `v`.`gebaeude_id`, `v`.`raum_id`, concat(`d`.`last_name`, ", ", `d`.`first_name`) as `dozent_name`, `vt`.`name` as `veranstaltungstyp_name`, `vt`.`abkuerzung` AS `veranstaltungstyp_abkuerzung`, `v`.`institut_id`, `v`.`raummeldung`, `f`.`name` `institut_name`, `v`.`semester_id` as `semester_id`, `dozent_id` FROM `veranstaltung_metadaten` `vm` RIGHT JOIN `veranstaltung` `v` ON `vm`.`veranstaltung_id` = `v`.`id` JOIN `dozent` `d` ON `d`.`id` = `v`.`dozent_id` JOIN `veranstaltungstyp` `vt` ON `vt`.`id` = `v`.`veranstaltungstyp_id` JOIN `institut` `f` ON `f`.`id` = `v`.`institut_id`',
-		'view_api_access_log' => 'create view view_api_access_log as select al.auth_code_id, al.time, al.parameter, al.ip, ae.name from api_log al join api_error_code ae on ae.id = al.api_error_code_id',
-		'view_anzahl_pruefungen_pro_dozent' => 'create view view_anzahl_pruefungen_pro_dozent as select count(*) as anzahl_pruefungen, d.first_name, d.last_name, d.id, semester_id from pruefung p join veranstaltung v on v.id = p.veranstaltung_id join dozent d on v.dozent_id = d.id group by d.id, v.semester_id',
-		'view_modul_semester' => 'CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_modul_semester` AS select `m`.`name` AS `name`,`m`.`studiengang_id` AS `studiengang_id`,`ms`.`semester` AS `semester`, `m`.`id` AS `modul_id` from (`modul` `m` left join `modul_nach_semester` `ms` on((`m`.`id` = `ms`.`modul_id`)));',
-		'view_veranstaltung_nach_modul' => 'create view view_veranstaltung_nach_modul as select m.name as modulname, m.id as modul_id, v.id as veranstaltung_id, v.name, m.studiengang_id as veranstaltung_name from veranstaltung v join pruefung p on v.id = p.veranstaltung_id right join pruefungsnummer pn on pn.id = p.pruefungsnummer_id join modul m on pn.modul_id = m.id where v.name is not null',
-		'view_veranstaltung_nach_studiengang' => 'create view view_veranstaltung_nach_studiengang as select veranstaltung_id, modul_id, studiengang_id, s.name as studiengang_name from view_veranstaltung_nach_modul vm left join modul m on m.id = vm.modul_id join studiengang s on m.studiengang_id = s.id',
-		'view_pruefungsdaten' => 'create view view_pruefungsdaten as select p.id, p.veranstaltung_id, pn.pruefungsnummer, p.date, p.raum_id, pt.name, modul_id, m.name as modul_name, abgabe_pruefungsleistungen, b.name as bereich, b.id as bereich_id, v.semester_id as semester_id from pruefung p join pruefungsnummer pn on pn.id = p.pruefungsnummer_id join pruefungstyp pt on pt.id = pn.pruefungstyp_id join modul m on pn.modul_id = m.id join veranstaltung_metadaten vm on vm.veranstaltung_id = p.veranstaltung_id left join bereich b on b.id = p.bereich_id left join veranstaltung v on v.id = vm.veranstaltung_id',
-		'view_page_and_text' => 'create or replace view `view_page_and_text` AS SELECT `p`.`id`, `p`.`name`, `p`.`show_in_navigation`, `h`.`text` FROM page `p` LEFT JOIN `seitentext` `h` ON `h`.`page_id` = `p`.`id`;',
-		'view_log_to_graph' => "create or replace view view_log_to_graph as select unix_timestamp(DATE_FORMAT(time, '%Y-%m-%d %H:59:59')) as t, count(*) as c from api_log group by DATE_FORMAT(time, '%Y-%m-%d %H');"
+		"view_page_and_text" => "create view `view_page_and_text` AS select `p`.`id` AS `id`,`p`.`name` AS `name`,`p`.`show_in_navigation` AS `show_in_navigation`,`h`.`text` AS `text` from (`page` `p` left join `seitentext` `h` on(`h`.`page_id` = `p`.`id`));",
+
+		"view_veranstaltung_nach_modul" => "create view `view_veranstaltung_nach_modul` AS select `m`.`name` AS `modulname`,`m`.`id` AS `modul_id`,`v`.`id` AS `veranstaltung_id`,`v`.`name` AS `name`,`m`.`studiengang_id` AS `veranstaltung_name` from ((`pruefungsnummer` `pn` left join (`veranstaltung` `v` join `pruefung` `p` on(`v`.`id` = `p`.`veranstaltung_id`)) on(`pn`.`id` = `p`.`pruefungsnummer_id`)) join `modul` `m` on(`pn`.`modul_id` = `m`.`id`)) where `v`.`name` is not null;",
+
+		"view_veranstaltung_nach_studiengang" => "create view `view_veranstaltung_nach_studiengang` AS select `vm`.`veranstaltung_id` AS `veranstaltung_id`,`vm`.`modul_id` AS `modul_id`,`m`.`studiengang_id` AS `studiengang_id`,`s`.`name` AS `studiengang_name` from ((`view_veranstaltung_nach_modul` `vm` left join `modul` `m` on(`m`.`id` = `vm`.`modul_id`)) join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`));",
+
+		#"ua_overview" => "create view `ua_overview` AS select `o`.`name` AS `os_name`,`so`.`version` AS `os_version`,`b`.`name` AS `browser_name`,`sb`.`version` AS `browser_version`,`c`.`c` AS `c`,`c`.`year` AS `year`,`c`.`month` AS `month`,`c`.`day` AS `day` from ((((`ua_call` `c` left join `ua_specific_browser` `sb` on(`sb`.`id` = `c`.`specific_browser_id`)) left join `ua_browser` `b` on(`b`.`id` = `sb`.`name_id`)) left join `ua_specific_os` `so` on(`so`.`id` = `c`.`specific_os_id`)) left join `ua_os` `o` on(`o`.`id` = `so`.`name_id`));",
+
+		"view_account_to_role_pages" => "create view `view_account_to_role_pages` AS select `p`.`id` AS `page_id`,`p`.`name` AS `name`,`p`.`file` AS `file`,`ru`.`user_id` AS `user_id`,`p`.`show_in_navigation` AS `show_in_navigation`,`p`.`parent` AS `parent` from ((`role_to_user` `ru` join `role_to_page` `rp` on(`rp`.`role_id` = `ru`.`role_id`)) join `page` `p` on(`p`.`id` = `rp`.`page_id`));",
+
+		"view_log_to_graph" => "create view `view_log_to_graph` AS select unix_timestamp(date_format(`api_log`.`time`,'%Y-%m-%d %H:59:59')) AS `t`,count(0) AS `c` from `api_log` group by date_format(`api_log`.`time`,'%Y-%m-%d %H');",
+
+		"view_pruefungsnummern_in_modulen_not_null" => "create view `view_pruefungsnummern_in_modulen_not_null` AS select `m`.`id` AS `modul_id`,`m`.`name` AS `modul_name`,`m`.`studiengang_id` AS `studiengang_id`,`p`.`pruefungsnummer` AS `pruefungsnummer`,`pt`.`name` AS `pruefungstyp_name`,`s`.`name` AS `studiengang_name`,`pt`.`id` AS `pruefungstyp_id`,`p`.`id` AS `pruefungsnummer_id`,`b`.`name` AS `bereich_name`,`b`.`id` AS `bereich_id`,`p`.`pruefungsnummer_fach_id` AS `pruefungsnummer_fach_id`,`p`.`modulbezeichnung` AS `modulbezeichnung`,`p`.`zeitraum_id` AS `zeitraum_id`,`p`.`disabled` AS `disabled` from ((((`modul` `m` join `pruefungsnummer` `p` on(`p`.`modul_id` = `m`.`id`)) left join `pruefungstyp` `pt` on(`pt`.`id` = `p`.`pruefungstyp_id`)) left join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`)) left join `bereich` `b` on(`b`.`id` = `p`.`bereich_id`));",
+
+		"view_pruefungsdaten" => "create view `view_pruefungsdaten` AS select `p`.`id` AS `id`,`p`.`veranstaltung_id` AS `veranstaltung_id`,`pn`.`pruefungsnummer` AS `pruefungsnummer`,`p`.`date` AS `date`,`p`.`raum_id` AS `raum_id`,`pt`.`name` AS `name`,`pn`.`modul_id` AS `modul_id`,`m`.`name` AS `modul_name`,`vm`.`abgabe_pruefungsleistungen` AS `abgabe_pruefungsleistungen`,`b`.`name` AS `bereich`,`b`.`id` AS `bereich_id`,`m`.`studiengang_id` AS `studiengang_id`,`d`.`first_name` AS `dozent_first_name`,`d`.`last_name` AS `dozent_last_name`,`d`.`id` AS `dozent_id` from (((((((`pruefung` `p` join `pruefungsnummer` `pn` on(`pn`.`id` = `p`.`pruefungsnummer_id`)) join `pruefungstyp` `pt` on(`pt`.`id` = `pn`.`pruefungstyp_id`)) join `modul` `m` on(`pn`.`modul_id` = `m`.`id`)) join `veranstaltung_metadaten` `vm` on(`vm`.`veranstaltung_id` = `p`.`veranstaltung_id`)) join `bereich` `b` on(`b`.`id` = `pn`.`bereich_id`)) join `veranstaltung` `v` on(`v`.`id` = `vm`.`veranstaltung_id`)) join `dozent` `d` on(`d`.`id` = `v`.`dozent_id`));",
+
+		"view_veranstaltung_autor" => "create view `view_veranstaltung_autor` AS select `v`.`id` AS `veranstaltung_id`,`v`.`name` AS `veranstaltung_name`,`v`.`gebaeudewunsch_id` AS `gebaeudewunsch_id`,`v`.`gebaeude_id` AS `gebaeude_id`,`v`.`raummeldung` AS `raummeldung`,`v`.`raumwunsch_id` AS `raumwunsch_id`,`v`.`raum_id` AS `raum_id`,`d`.`id` AS `dozent_id`,`d`.`first_name` AS `first_name`,`d`.`last_name` AS `last_name` from (`veranstaltung` `v` left join `dozent` `d` on(`v`.`dozent_id` = `d`.`id`));",
+
+		"view_page_and_hinweis" => "create view `view_page_and_hinweis` AS select `p`.`id` AS `id`,`p`.`name` AS `name`,`p`.`show_in_navigation` AS `show_in_navigation`,`h`.`hinweis` AS `hinweis` from (`page` `p` left join `hinweise` `h` on(`h`.`page_id` = `p`.`id`));",
+
+
+		"view_api_access_log" => "create view `view_api_access_log` AS select `al`.`auth_code_id` AS `auth_code_id`,`al`.`time` AS `time`,`al`.`parameter` AS `parameter`,`al`.`ip` AS `ip`,`ae`.`name` AS `name` from (`api_log` `al` join `api_error_code` `ae` on(`ae`.`id` = `al`.`api_error_code_id`));",
+
+		"view_veranstaltung_raumplanung" => "create view `view_veranstaltung_raumplanung` AS select `v`.`id` AS `id`,`v`.`name` AS `name`,`vm`.`wunsch` AS `wunsch`,`vm`.`anzahl_hoerer` AS `anzahl_hoerer`,`vm`.`erster_termin` AS `erster_termin`,`vm`.`wochentag` AS `wochentag`,`vm`.`stunde` AS `stunde`,`vm`.`woche` AS `woche`,`vm`.`abgabe_pruefungsleistungen` AS `abgabe_pruefungsleistungen`,`v`.`gebaeudewunsch_id` AS `gebaeudewunsch_id`,`v`.`raumwunsch_id` AS `raumwunsch_id`,`v`.`gebaeude_id` AS `gebaeude_id`,`v`.`raum_id` AS `raum_id`,concat(`d`.`last_name`,', ',`d`.`first_name`) AS `dozent_name`,`vt`.`name` AS `veranstaltungstyp_name`,`vt`.`abkuerzung` AS `veranstaltungstyp_abkuerzung`,`v`.`institut_id` AS `institut_id`,`v`.`raummeldung` AS `raummeldung`,`f`.`name` AS `institut_name`,`v`.`semester_id` AS `semester_id`,`v`.`dozent_id` AS `dozent_id` from ((((`veranstaltung` `v` left join `veranstaltung_metadaten` `vm` on(`vm`.`veranstaltung_id` = `v`.`id`)) join `dozent` `d` on(`d`.`id` = `v`.`dozent_id`)) join `veranstaltungstyp` `vt` on(`vt`.`id` = `v`.`veranstaltungstyp_id`)) join `institut` `f` on(`f`.`id` = `v`.`institut_id`));",
+
+		"view_user_to_role" => "create view `view_user_to_role` AS select `u`.`id` AS `user_id`,`u`.`username` AS `username`,`ru`.`role_id` AS `role_id`,`r`.`name` AS `name`,`u`.`dozent_id` AS `dozent_id`,`u`.`institut_id` AS `institut_id`,`u`.`enabled` AS `enabled`,`u`.`barrierefrei` AS `barrierefrei` from ((`users` `u` left join `role_to_user` `ru` on(`u`.`id` = `ru`.`user_id`)) join `role` `r` on(`r`.`id` = `ru`.`role_id`));",
+
+		"view_modul_semester" => "create view `view_modul_semester` AS select `m`.`name` AS `name`,`m`.`studiengang_id` AS `studiengang_id`,`ms`.`semester` AS `semester`,`m`.`id` AS `modul_id` from (`modul` `m` left join `modul_nach_semester` `ms` on(`m`.`id` = `ms`.`modul_id`));",
+
+		"view_user_session_id" => "create view `view_user_session_id` AS select `s`.`id` AS `session_id_id`,`u`.`id` AS `user_id`,`s`.`session_id` AS `session_id`,`s`.`creation_time` AS `creation_time`,`u`.`username` AS `username`,`u`.`dozent_id` AS `dozent_id`,`u`.`institut_id` AS `institut_id`,`u`.`enabled` AS `enabled`,`u`.`accepted_public_data` AS `accepted_public_data` from (`users` `u` left join `session_ids` `s` on(`s`.`user_id` = `u`.`id`));",
+
+		"view_pruefungsnummern_in_modulen" => "create view `view_pruefungsnummern_in_modulen` AS select `m`.`id` AS `modul_id`,`m`.`name` AS `modul_name`,`m`.`studiengang_id` AS `studiengang_id`,`p`.`pruefungsnummer` AS `pruefungsnummer`,`pt`.`name` AS `pruefungstyp_name`,`s`.`name` AS `studiengang_name`,`pt`.`id` AS `pruefungstyp_id`,`p`.`id` AS `pruefungsnummer_id`,`b`.`name` AS `name`,`p`.`modulbezeichnung` AS `modulbezeichnung` from ((((`modul` `m` left join `pruefungsnummer` `p` on(`p`.`modul_id` = `m`.`id`)) left join `pruefungstyp` `pt` on(`pt`.`id` = `p`.`pruefungstyp_id`)) left join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`)) left join `bereich` `b` on(`b`.`id` = `p`.`bereich_id`));",
+
+
+		"view_modul_studiengang" => "create view `view_modul_studiengang` AS select `m`.`id` AS `modul_id`,`m`.`name` AS `modul_name`,`s`.`name` AS `studiengang_name`,`s`.`id` AS `studiengang_id` from (`modul` `m` left join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`));",
+
+		"view_anzahl_pruefungen_pro_dozent" => "create view `view_anzahl_pruefungen_pro_dozent` AS select count(0) AS `anzahl_pruefungen`,`d`.`first_name` AS `first_name`,`d`.`last_name` AS `last_name`,`d`.`id` AS `id`,`v`.`semester_id` AS `semester_id` from ((`pruefung` `p` join `veranstaltung` `v` on(`v`.`id` = `p`.`veranstaltung_id`)) join `dozent` `d` on(`v`.`dozent_id` = `d`.`id`)) group by `d`.`id`,`v`.`semester_id`;",
+
+		"view_veranstaltung_komplett" => "create view `view_veranstaltung_komplett` AS select `v`.`id` AS `veranstaltung_id`,`vt`.`name` AS `veranstaltung_typ`,`v`.`name` AS `veranstaltung_name`,`v`.`gebaeudewunsch_id` AS `gebaeudewunsch_id`,`v`.`gebaeude_id` AS `gebaeude_id`,`v`.`raummeldung` AS `raummeldung`,`v`.`raumwunsch_id` AS `raumwunsch_id`,`v`.`raum_id` AS `raum_id`,`d`.`id` AS `dozent_id`,`d`.`first_name` AS `first_name`,`d`.`last_name` AS `last_name`,`vt`.`name` AS `name`,`vm`.`wochentag` AS `wochentag`,`vm`.`stunde` AS `stunde`,`vm`.`woche` AS `woche`,`v`.`semester_id` AS `semester_id`,`vm`.`erster_termin` AS `erster_termin`,`vm`.`hinweis` AS `hinweis` from (((`veranstaltung` `v` left join `dozent` `d` on(`v`.`dozent_id` = `d`.`id`)) left join `veranstaltungstyp` `vt` on(`vt`.`id` = `v`.`veranstaltungstyp_id`)) left join `veranstaltung_metadaten` `vm` on(`vm`.`veranstaltung_id` = `v`.`id`));",
+
+		"view_pruefungsnummern_in_modulen_not_null___OLD" => "create view `view_pruefungsnummern_in_modulen_not_null___OLD` AS select `m`.`id` AS `modul_id`,`m`.`name` AS `modul_name`,`m`.`studiengang_id` AS `studiengang_id`,`p`.`pruefungsnummer` AS `pruefungsnummer`,`pt`.`name` AS `pruefungstyp_name`,`s`.`name` AS `studiengang_name`,`pt`.`id` AS `pruefungstyp_id`,`p`.`id` AS `pruefungsnummer_id`,`b`.`name` AS `bereich_name`,`b`.`id` AS `bereich_id`,`p`.`pruefungsnummer_fach_id` AS `pruefungsnummer_fach_id`,`p`.`modulbezeichnung` AS `modulbezeichnung`,`p`.`zeitraum_id` AS `zeitraum_id` from ((((`modul` `m` join `pruefungsnummer` `p` on(`p`.`modul_id` = `m`.`id`)) left join `pruefungstyp` `pt` on(`pt`.`id` = `p`.`pruefungstyp_id`)) left join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`)) left join `bereich` `b` on(`b`.`id` = `p`.`bereich_id`));"
 	);
 
 	if(isset($argv) && array_key_exists(1, $argv) && $argv[1] == 'print') {

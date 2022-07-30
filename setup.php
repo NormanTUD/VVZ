@@ -4,6 +4,7 @@ Diese Datei soll helfen, ein neues System aufzusetzen, in dem es die nötigen
 Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
  */
 	$GLOBALS['setup_mode'] = 1;
+	$show_importer = 1;
 	$php_start = microtime(true);
 	if(file_exists('new_setup')) {
 		include_once("config.php");
@@ -55,7 +56,8 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			$query = 'insert ignore into users (`username`, `password_sha256`) values ('.esc(get_post('username')).', '.esc(hash('sha256', get_post('password'))).')';
 			rquery($query);
 
-			print("Ok. Bitte lösche nun die <pre>new_setup</pre>-Datei.");
+			$show_importer = 0;
+			print("<h2>Ok. Bitte lösche nun die <tt>new_setup</tt>-Datei.</h2>");
 		}
 
 		if(table_exists($GLOBALS['dbname'], 'users')) {
@@ -86,22 +88,24 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 
 			print "<br /><span style='color: red; font-size: 25px;'>Bitte l&ouml;sche nun die `new_setup`-Datei!</span><br>";
 		} else {
+			if($show_importer) {
 ?>
-			<form method="post" enctype="multipart/form-data">
-				Die Datei muss im SQL-Format sein und die Initialdatensatzfüllungsbefehle enthalten.
-				<input type="file" name="sql_file">
-				<input type="submit" name="import_datenbank" value="Importieren" />
-			</form>
+				<form method="post" enctype="multipart/form-data">
+					Die Datei muss im SQL-Format sein und die Initialdatensatzfüllungsbefehle enthalten.
+					<input type="file" name="sql_file">
+					<input type="submit" name="import_datenbank" value="Importieren" />
+				</form>
 
 
-			<h2>&mdash; oder &mdash;</h2>
+				<h2>&mdash; oder &mdash;</h2>
 
-			<form method="post">
-				Benutzername: <input type="text" name="username" />
-				Passwort: <input type="password" name="password" />
-				<input type="submit" value="Adminkonto speichern" />
-			</form>
+				<form method="post">
+					Benutzername: <input type="text" name="username" />
+					Passwort: <input type="password" name="password" />
+					<input type="submit" value="Adminkonto speichern" />
+				</form>
 <?php
+			}
 		}
 	} else {
 		exit(0);
