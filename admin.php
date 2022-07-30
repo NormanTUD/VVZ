@@ -71,7 +71,13 @@
 		$studiengaenge = create_studiengaenge_array($chosen_institut);
 		$zeitraum = create_zeitraum_array();
 		if(!count($studiengaenge)) {
-			error("Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. Bitten Sie einen Administrator, Studiengänge hinzuzufügen.");
+			$keine_studiengaenge_fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. ";
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				$keine_studiengaenge_fehler .= "<a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.";
+			} else {
+				$keine_studiengaenge_fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
+			}
+			error($keine_studiengaenge_fehler);
 		}
 		if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
 			$datestring = md5(date('Y-m-d H'));
