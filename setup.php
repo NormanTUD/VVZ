@@ -47,6 +47,9 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 				} else {
 					print "Die View `$name` existiert noch nicht. <i><b>Daher erstelle ich sie gerade neu...</b></i><br>\n";
 					rquery($create);
+					if(mysqli_error($GLOBALS['dbh'])) {
+						dier(mysqli_error($GLOBALS['dbh']));
+					}
 				}
 			}
 

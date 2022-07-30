@@ -294,7 +294,53 @@
 	semester int unsigned,
 	primary key (modul_id, semester),
 	FOREIGN KEY (modul_id) REFERENCES modul(id) ON DELETE CASCADE
-);'
+);',
+
+'ua_os' => 'CREATE TABLE `ua_os` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;',
+
+'ua_specific_os' => 'CREATE TABLE `ua_specific_os` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name_id` int(10) unsigned DEFAULT NULL,
+  `version` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_version` (`name_id`,`version`),
+  CONSTRAINT `ua_specific_os_ibfk_1` FOREIGN KEY (`name_id`) REFERENCES `ua_os` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=222 DEFAULT CHARSET=utf8;',
+
+'ua_call' => 'CREATE TABLE `ua_call` (
+  `specific_os_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `specific_browser_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `c` int(10) unsigned DEFAULT NULL,
+  `month` int(10) unsigned NOT NULL,
+  `year` int(10) unsigned NOT NULL,
+  `day` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`specific_os_id`,`specific_browser_id`,`month`,`year`),
+  KEY `specific_browser_id` (`specific_browser_id`),
+  CONSTRAINT `ua_call_ibfk_1` FOREIGN KEY (`specific_os_id`) REFERENCES `ua_specific_os` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ua_call_ibfk_2` FOREIGN KEY (`specific_browser_id`) REFERENCES `ua_specific_browser` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+
+'ua_browser' => 'CREATE TABLE `ua_browser` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=311 DEFAULT CHARSET=utf8;',
+
+'ua_specific_browser' => 'CREATE TABLE `ua_specific_browser` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name_id` int(10) unsigned DEFAULT NULL,
+  `version` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name_version` (`name_id`,`version`),
+  CONSTRAINT `ua_specific_browser_ibfk_1` FOREIGN KEY (`name_id`) REFERENCES `ua_browser` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1797 DEFAULT CHARSET=utf8;'
+
 		);
 
 	$GLOBALS['views'] = array(
@@ -304,7 +350,7 @@
 
 		"view_veranstaltung_nach_studiengang" => "create view `view_veranstaltung_nach_studiengang` AS select `vm`.`veranstaltung_id` AS `veranstaltung_id`,`vm`.`modul_id` AS `modul_id`,`m`.`studiengang_id` AS `studiengang_id`,`s`.`name` AS `studiengang_name` from ((`view_veranstaltung_nach_modul` `vm` left join `modul` `m` on(`m`.`id` = `vm`.`modul_id`)) join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`));",
 
-		#"ua_overview" => "create view `ua_overview` AS select `o`.`name` AS `os_name`,`so`.`version` AS `os_version`,`b`.`name` AS `browser_name`,`sb`.`version` AS `browser_version`,`c`.`c` AS `c`,`c`.`year` AS `year`,`c`.`month` AS `month`,`c`.`day` AS `day` from ((((`ua_call` `c` left join `ua_specific_browser` `sb` on(`sb`.`id` = `c`.`specific_browser_id`)) left join `ua_browser` `b` on(`b`.`id` = `sb`.`name_id`)) left join `ua_specific_os` `so` on(`so`.`id` = `c`.`specific_os_id`)) left join `ua_os` `o` on(`o`.`id` = `so`.`name_id`));",
+		"ua_overview" => "create view `ua_overview` AS select `o`.`name` AS `os_name`,`so`.`version` AS `os_version`,`b`.`name` AS `browser_name`,`sb`.`version` AS `browser_version`,`c`.`c` AS `c`,`c`.`year` AS `year`,`c`.`month` AS `month`,`c`.`day` AS `day` from ((((`ua_call` `c` left join `ua_specific_browser` `sb` on(`sb`.`id` = `c`.`specific_browser_id`)) left join `ua_browser` `b` on(`b`.`id` = `sb`.`name_id`)) left join `ua_specific_os` `so` on(`so`.`id` = `c`.`specific_os_id`)) left join `ua_os` `o` on(`o`.`id` = `so`.`name_id`));",
 
 		"view_account_to_role_pages" => "create view `view_account_to_role_pages` AS select `p`.`id` AS `page_id`,`p`.`name` AS `name`,`p`.`file` AS `file`,`ru`.`user_id` AS `user_id`,`p`.`show_in_navigation` AS `show_in_navigation`,`p`.`parent` AS `parent` from ((`role_to_user` `ru` join `role_to_page` `rp` on(`rp`.`role_id` = `ru`.`role_id`)) join `page` `p` on(`p`.`id` = `rp`.`page_id`));",
 
@@ -337,8 +383,6 @@
 		"view_anzahl_pruefungen_pro_dozent" => "create view `view_anzahl_pruefungen_pro_dozent` AS select count(0) AS `anzahl_pruefungen`,`d`.`first_name` AS `first_name`,`d`.`last_name` AS `last_name`,`d`.`id` AS `id`,`v`.`semester_id` AS `semester_id` from ((`pruefung` `p` join `veranstaltung` `v` on(`v`.`id` = `p`.`veranstaltung_id`)) join `dozent` `d` on(`v`.`dozent_id` = `d`.`id`)) group by `d`.`id`,`v`.`semester_id`;",
 
 		"view_veranstaltung_komplett" => "create view `view_veranstaltung_komplett` AS select `v`.`id` AS `veranstaltung_id`,`vt`.`name` AS `veranstaltung_typ`,`v`.`name` AS `veranstaltung_name`,`v`.`gebaeudewunsch_id` AS `gebaeudewunsch_id`,`v`.`gebaeude_id` AS `gebaeude_id`,`v`.`raummeldung` AS `raummeldung`,`v`.`raumwunsch_id` AS `raumwunsch_id`,`v`.`raum_id` AS `raum_id`,`d`.`id` AS `dozent_id`,`d`.`first_name` AS `first_name`,`d`.`last_name` AS `last_name`,`vt`.`name` AS `name`,`vm`.`wochentag` AS `wochentag`,`vm`.`stunde` AS `stunde`,`vm`.`woche` AS `woche`,`v`.`semester_id` AS `semester_id`,`vm`.`erster_termin` AS `erster_termin`,`vm`.`hinweis` AS `hinweis` from (((`veranstaltung` `v` left join `dozent` `d` on(`v`.`dozent_id` = `d`.`id`)) left join `veranstaltungstyp` `vt` on(`vt`.`id` = `v`.`veranstaltungstyp_id`)) left join `veranstaltung_metadaten` `vm` on(`vm`.`veranstaltung_id` = `v`.`id`));",
-
-		"view_pruefungsnummern_in_modulen_not_null___OLD" => "create view `view_pruefungsnummern_in_modulen_not_null___OLD` AS select `m`.`id` AS `modul_id`,`m`.`name` AS `modul_name`,`m`.`studiengang_id` AS `studiengang_id`,`p`.`pruefungsnummer` AS `pruefungsnummer`,`pt`.`name` AS `pruefungstyp_name`,`s`.`name` AS `studiengang_name`,`pt`.`id` AS `pruefungstyp_id`,`p`.`id` AS `pruefungsnummer_id`,`b`.`name` AS `bereich_name`,`b`.`id` AS `bereich_id`,`p`.`pruefungsnummer_fach_id` AS `pruefungsnummer_fach_id`,`p`.`modulbezeichnung` AS `modulbezeichnung`,`p`.`zeitraum_id` AS `zeitraum_id` from ((((`modul` `m` join `pruefungsnummer` `p` on(`p`.`modul_id` = `m`.`id`)) left join `pruefungstyp` `pt` on(`pt`.`id` = `p`.`pruefungstyp_id`)) left join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`)) left join `bereich` `b` on(`b`.`id` = `p`.`bereich_id`));"
 	);
 
 	if(isset($argv) && array_key_exists(1, $argv) && $argv[1] == 'print') {
