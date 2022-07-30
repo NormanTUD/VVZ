@@ -6095,7 +6095,7 @@ INSERT INTO
 	function create_pruefungsnummern_array () {
 		$pruefungsnummern = array();
 		$query = 'SELECT `p`.`id`, `p`.`pruefungsnummer`, `p`.`pruefungstyp_id`, `pt`.`name` AS `pruefungstyp_name` FROM `pruefungsnummer` `p` LEFT JOIN `pruefungstyp` `pt` ON `pt`.`id` = `p`.`pruefungstyp_id`';
-		if(strlen($modul_id)) {
+		if(isset($modul_id) && strlen($modul_id)) {
 			$query .= ' WHERE `modul_id` = '.esc($modul_id);
 		}
 		$result = rquery($query);
