@@ -1,10 +1,15 @@
 #!/bin/bash
 
+if [ "$EUID" -ne 0 ]; then
+	echo "Please run as root"
+	exit
+fi
+
 INSTALL_PATH=/var/www/html
 INSTITUT_NAME="Institut für Philosophie"
 
 sudo apt-get update
-sudo apt-get install whiptail sudo -y
+sudo apt-get install xterm whiptail sudo -y
 
 set -x
 
