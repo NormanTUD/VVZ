@@ -103,6 +103,17 @@
 			error($fehler);
 		}
 
+		$gebaeude = create_gebaeude_array();
+		if(!count($gebaeude)) {
+			$fehler = "Es sind keine Gebäude vorhanden. ";
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("gebaeude.php")."'>Hier können Sie welche hinzufügen.</a>";
+			} else {
+				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+			}
+			error($fehler);
+		}
+
 		$pruefungsnummern = create_pruefungsnummern_array();
 		if(!count($pruefungsnummern)) {
 			$fehler = "Es sind keine Prüfungsnummern vorhanden. ";
