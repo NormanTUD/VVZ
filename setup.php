@@ -104,6 +104,4 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 	} else {
 		exit(0);
 	}
-
-	include("footer.php");
 ?>
