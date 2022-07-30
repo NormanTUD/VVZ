@@ -24,9 +24,8 @@ Aktuell läuft die Software unter vvz.phil.tu-dresden.de.
 # Installation
 
 ```console
-cd $VVZDIR
-echo "mysqldbpw" > /etc/vvzdbpw
-touch new_setup
+cd VVZ
+bash install.sh
 ```
 
 Open the URL in the browser after doing this and follow the instructions.
