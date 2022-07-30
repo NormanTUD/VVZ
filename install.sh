@@ -1,6 +1,8 @@
 #!/bin/bash
 
 INSTALL_PATH=/var/www/html
+INSTITUT_NAME="Institut für Philosophie"
+
 
 sudo apt-get update
 sudo apt-get install whiptail sudo -y
@@ -44,6 +46,11 @@ function new_setup {
 	touch $INSTALL_PATH/new_setup
 }
 
+function create_institut {
+	INSTITUT_NAME=$(whiptail --inputbox "Initial Institut?" 8 39 "$INSTITUT_NAME" --title "Name of the Default Institut" 3>&1 1>&2 2>&3)
+	mysql -uroot -p$PASSWORD -e "INSERT INTO uni.institut VALUES (1, \"$INSTITUT_NAME\", 1);"
+}
+
 eval `resize`
 WHAT_TO_DO=$(
 	whiptail --title "What to do?" --checklist \
@@ -56,6 +63,7 @@ WHAT_TO_DO=$(
 	"custompath" "Set custom install path?" OFF \
 	"copy_to_path" "Copy files to the apache path" ON \
 	"new_setup" "Create new_setup file" ON \
+	"create_institut" "Create a default Institut" ON \
 	3>&1 1>&2 2>&3
 )
 
