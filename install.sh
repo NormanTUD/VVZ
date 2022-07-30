@@ -55,7 +55,6 @@ WHAT_TO_DO=$(
 	"setup_mariadb" "Setup MariaDB" ON \
 	"custompath" "Set custom install path?" OFF \
 	"copy_to_path" "Copy files to the apache path" ON \
-	"setup_vvzbpw" "Setup VVZ-DB-password file" ON \
 	"new_setup" "Create new_setup file" ON \
 	3>&1 1>&2 2>&3
 )
