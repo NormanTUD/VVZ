@@ -56,15 +56,13 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 
 
 			rquery('use `'.$GLOBALS['dbname'].'`');
+
+			rquery("INSERT INTO `dozent` VALUES (1,'Admin','Istrator', null, '0')");
+
 			$salt = generate_random_string(100);
-			$query = 'insert ignore into users (`username`, `password_sha256`, `salt`) values ('.esc(get_post('username')).', '.esc(hash('sha256', get_post('password').$salt)).', '.esc($salt).')';
+			$query = 'insert ignore into users (`username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values ('.esc(get_post('username')).', '.esc(hash('sha256', get_post('password').$salt)).', '.esc($salt).', 1, 1)';
 			rquery($query);
 
-			$show_importer = 0;
-			print("<h2>Ok. Bitte lösche nun die <tt>new_setup</tt>-Datei.</h2>");
-		}
-
-		if(!$show_importer) {
 			rquery("insert into role values ('1', 'Administrator', 'darf alles');");
 			rquery("insert into role values ('2', 'Dozent', 'darf eigene sachen bearbeiten');");
 			rquery("insert into role values ('3', 'Dozent, Raumplanung', 'darf eigene sachen bearbeiten und auf raumplanung zugreifen');");
@@ -109,6 +107,9 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 
 
 			rquery("INSERT INTO `titel` VALUES (1,'Doktor der Philosophie','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor','Prof. Dr.');");
+			print("<h2>Ok. Bitte lösche nun die <tt>new_setup</tt>-Datei.</h2>");
+
+			$show_importer = 0;
 		}
 
 		if(table_exists($GLOBALS['dbname'], 'users')) {
