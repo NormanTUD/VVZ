@@ -3,7 +3,6 @@
 INSTALL_PATH=/var/www/html
 INSTITUT_NAME="Institut für Philosophie"
 
-
 sudo apt-get update
 sudo apt-get install whiptail sudo -y
 
@@ -74,11 +73,3 @@ WHAT_TO_DO=$(
 for task in $WHAT_TO_DO; do
 	eval $task
 done
-
-exit
-
-
-
-set +x
-mysql -uroot -p$PASSWORD -e "create database uni"
-set -x
