@@ -16,6 +16,7 @@
 
 	$GLOBALS['linkicon'] = '<i class="fa float-right"><img alt="Link zum Studiengang" src="icon.svg" /></i>';
 
+
 	$GLOBALS['this_semester'] = null;
 
 	if(preg_match('/^\d+$/', get_get('semester'))) {
@@ -85,6 +86,24 @@
 				show_pruefungen_fuer_studiengang();
 			} else {
 				if(!get_get('create_stundenplan')) {
+?>
+					<script nonce=<?php print($GLOBALS['nonce']); ?> >
+						document.onkeypress = function (e) {
+							e = e || window.event;
+
+							if(document.activeElement == $("body")[0]) {
+								var keycode =  e.keyCode;
+								if(keycode >= 97 && keycode <= 122) {
+									if($("#filter").css("display") == "none") {
+										$("#filter").show();
+									}
+									$("[name=vltitel]").val($("[name=vltitel]").val() + String.fromCharCode(e.keyCode));
+									$("[name=vltitel]").focus();
+								}
+							}
+						};
+					</script>
+<?php
 					show_veranstaltungsuebersicht_header();
 				}
 

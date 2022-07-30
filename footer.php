@@ -52,33 +52,6 @@
 ?>
 	</i>
 	<br />
-	<br />
-	&copy; <?php
-			$thisyear = date('Y');
-			if($thisyear == 2017) {
-				print date('Y');
-			} else if($thisyear <= date('Y')) {
-				print "2017&nbsp;&mdash;&nbsp;$thisyear";
-			} else {
-				print "2017 &mdash;<span class='class_red'>An die Administratoren: Falsch eingestellte Server-Zeit. Bitte überprüfen.</span> &mdash; ";
-			}
-
-			if(date('j') == 10 && date('m') == 8 || get_get('geburtstag')) {
-				$alter = $thisyear - 1993;
-				//$params = array_merge($_GET, array("sende_geburtstagsgruss" => "1"));
-				//$url = $_SERVER['REQUEST_URI'].http_build_query($params);
-				//print " <a href='$url' title='Geburtstagsgruß senden'>&#x1F382; frohen $alter. Geburtstag, </a>";
-				print " &#x1f408;&#x1F382;&#127878; frohen $alter. Geburtstag, ";
-			}
-
-			if((date('j') == 31 || date('j') == 1) && (date('m') == 1 || date('m') == 12)|| get_get('silvester')) {
-				$alter = $thisyear - 1993;
-				//$params = array_merge($_GET, array("sende_geburtstagsgruss" => "1"));
-				//$url = $_SERVER['REQUEST_URI'].http_build_query($params);
-				//print " <a href='$url' title='Geburtstagsgruß senden'>&#x1F382; frohen $alter. Geburtstag, </a>";
-				print " &#127878; Happy New Year! ";
-			}
-		?> Norman Koch, <?php print $GLOBALS['university_name']; ?>
 	</div>
 
 <?php
@@ -88,6 +61,15 @@
 	
 		js("footer.js");
 ?>
+                <script type="text/x-mathjax-config">
+                        MathJax.Hub.Config({
+                                tex2jax: {
+                                        inlineMath: [['$','$']]
+                                },
+                                "showMathMenu": true
+                        });
+                </script>
+
 	</body>
 </html>
 <?php

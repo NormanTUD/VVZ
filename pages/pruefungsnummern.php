@@ -156,7 +156,7 @@ JOIN
 							<td><?php create_select($bereiche, '', 'bereich', 0, 1); ?></td>
 							<td><?php create_select($pruefungstypen, '', 'pruefungstyp', 0, 1); ?></td>
 							<td><input type="text" name="modulbezeichnung" class="width_auto" noautosubmit="1" value="" /></td>
-							<td><input type="text" name="pruefungsnummer" class="width_auto" noautosubmit=1" placeholder="pruefungsnummer" /></td>
+							<td><input type="text" name="pruefungsnummer" class="width_auto" noautosubmit="1" placeholder="pruefungsnummer" /></td>
 							<td><?php create_select($zeitraum, '', 'zeitraum', 0, 1); ?></td>
 							<td>&mdash;</td>
 							<td><input type="submit" value="Speichern" /></td>

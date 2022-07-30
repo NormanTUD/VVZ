@@ -112,10 +112,7 @@
 			}
 			print "</table>\n";
 		}
-		if(get_get('plotcallgraph')) {
-			print "<h4>Callgraph</h4>\n";
-			print plot_all_backtraces();
-		}
+
 		print "</div>\n";
 		print "</div>\n";
 

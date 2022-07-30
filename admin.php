@@ -204,7 +204,7 @@
 						print "<ul>\n";
 						foreach ($subpage_data as $row) {
 							if($row[1]) {
-								print "<li class='margin_5px_0'><a href='admin.php?page=$row[0]'>$row[1]</a> &mdash; ".htmlentities($subpage_texts[$row[0]])."</li>\n";
+								print "<li class='margin_5px_0'><a href='admin.php?page=$row[0]'>$row[1]</a> ".($subpage_texts[$row[0]] ? "&mdash; ".htmlentities($subpage_texts[$row[0]]) : "")."</li>\n";
 							}
 						}
 						print "</ul>\n";

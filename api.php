@@ -56,9 +56,13 @@
 							$where[] = '`v`.`dozent_id` = '.esc($id);
 						}
 					}
+					$semester = get_get('semester');
+					if($semester == "current") {
+						$semester = get_current_semester_id();
+					}
 
-					if(get_get('semester')) {
-						$where[] = '`ve`.`semester_id` = '.esc(get_get('semester'));
+					if($semester) {
+						$where[] = '`ve`.`semester_id` = '.esc($semester);
 					}
 
 					if(get_get('institut')) {
@@ -186,7 +190,7 @@
 			</tr>
 			<tr>
 				<td><pre>semester=1</pre></td>
-				<td>Listet Veranstaltungen aus dem Semester mit der ID 1 auf.</td>
+				<td>Listet Veranstaltungen aus dem Semester mit der ID 1 auf (semester=current holt das aktuelle Semester).</td>
 			</tr>
 			<tr>
 				<td><pre>institut=1</pre></td>

@@ -33,8 +33,6 @@ declare(ticks=1);
 	NO_ID
 	
 	
-	
-	
 	REGEX ZUM DEBUGGEN VON FUNKTIONEN:
 	(^\s*function\s*)([a-zA-Z0-9_]+)(\s*\(.*\)\s*\{\s*)
 	\1\2\3\n\t\tfunction_debug_counter("\2");
@@ -131,8 +129,11 @@ declare(ticks=1);
 	$GLOBALS['get_gebaeude_abkuerzung_cache'] = array();
 	$GLOBALS['get_page_name_by_id_cache'] = array();
 	$GLOBALS['create_language_array_cache'] = array();
+	$GLOBALS['create_praesenztypen_array'] = array();
 	$GLOBALS['get_gebaeude_geo_coords_by_id_cache'] = array();
 	$GLOBALS['get_language_name_cache'] = array();
+	$GLOBALS['get_role_name_cache'] = array();
+	$GLOBALS['get_praesenztyp_id_from_name_cache'] = array();
 
 	$GLOBALS['memoize'] = array();
 
@@ -178,7 +179,6 @@ declare(ticks=1);
 
 	if(!function_exists('set_login_data')) {
 		function set_login_data ($row) {
-			function_debug_counter("set_login_data");
 			$GLOBALS['logged_in'] = 1;
 			$GLOBALS['logged_in_data'] = $row;
 			$GLOBALS['logged_in_user_id'] = $row[0];
@@ -191,7 +191,6 @@ declare(ticks=1);
 	}
 
 	function set_session_id ($user_id) {
-		function_debug_counter("set_session_id");
 		delete_old_session_ids($GLOBALS['logged_in_user_id']);
 		$session_id = generate_random_string(1024);
 		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
@@ -528,7 +527,7 @@ declare(ticks=1);
 						delete_veranstaltung($this_id);
 					} else {
 						if(get_post('name') && get_post('dozent') && get_post('veranstaltungstyp') && get_post('institut') && get_post('semester')) {
-							update_veranstaltung(get_post('id'), get_post('name'), get_post('dozent'), get_post('veranstaltungstyp'), get_post('institut'), get_post('semester'), get_get('master_niveau'));
+							update_veranstaltung(get_post('id'), get_post('name'), get_post('dozent'), get_post('veranstaltungstyp'), get_post('institut'), get_post('semester'), get_post('master_niveau'), get_post("fester_bbb_raum"));
 							if(get_post('speichern_metainfos')) {
 								if(preg_match('/^\d+$/', $this_id)) {
 									header('Location: admin.php?page='.get_page_id_by_filename('veranstaltung.php').'&id='.$this_id);
@@ -569,7 +568,7 @@ declare(ticks=1);
 						delete_role($this_id);
 					} else {
 						update_role($this_id, get_post('neue_rolle'), get_post("beschreibung"));
-						$query = 'DELETE FROM `role_to_page` WHERE `role_id` = '.esc(get_role_id(get_post('neue_rolle')));;
+						$query = 'DELETE FROM `role_to_page` WHERE `role_id` = '.esc(get_role_id(get_post('neue_rolle')));
 						rquery($query);
 						foreach (get_post('page') as $key => $this_page_id) {
 							if(preg_match('/^\d+$/', $this_page_id)) {
@@ -634,6 +633,7 @@ declare(ticks=1);
 						$master_niveau = 0;
 					}
 					$language = get_post('language');
+					$praesenztyp = get_post('praesenztyp');
 					if($gebaeudewunsch && get_post('raumwunsch')) {
 						$raumwunsch = get_and_create_raum_id($gebaeudewunsch, get_post('raumwunsch'));
 					}
@@ -642,9 +642,12 @@ declare(ticks=1);
 
 					$einzelne_termine = get_einzelne_termine_from_post();
 
+					$fester_bbb_raum = get_post("fester_bbb_raum");
+					$videolink = get_post("videolink");
+
 
 								#	1	2	3	4	5		6		7	8		9	10				11		12		13				14
-					update_veranstaltung_metadata($this_id, $tag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, get_post('pruefungsnummer'), $master_niveau, $language, $related_veranstaltung, $einzelne_termine);
+					update_veranstaltung_metadata($this_id, $tag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, get_post('pruefungsnummer'), $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink);
 				}
 
 			// ist keine Id gegeben, sind es neue Daten. Aufgrund der Parameternamen wird dann entschieden, was wo einzutragen ist.
@@ -657,14 +660,60 @@ declare(ticks=1);
 				$institut = get_post('institut');
 				$semester = get_post('semester');
 				$language = get_post('language');
+				$praesenztyp = get_post('praesenztyp');
 				$related_veranstaltung = get_post('related_veranstaltung');
 
-				create_veranstaltung($name, $dozent, $veranstaltungstyp, $institut, $semester, $language, $related_veranstaltung);
+				create_veranstaltung($name, $dozent, $veranstaltungstyp, $institut, $semester, $language, $related_veranstaltung, $praesenztyp);
 			} else if (get_post('neue_veranstaltung')) {
 				error('Für eine Veranstaltung muss ein Name, ein Dozent, der Typ der Institut und ein Veranstaltungstyp definiert sein. Sofern Sie kein Administrator sind, muss Ihrem Account zum Erstellen von Veranstaltungen ein Dozent zugewiesen sein. Bitte kontaktieren Sie die <a href="kontakt.php">Administratoren</a>, damit Ihr Account diese Zuordnung bekommt.');
 			}
 		} else {
+			#dier($_POST);
 			# NO_ID
+
+			if(get_post("delete_current_semester_start_ids")) {
+				$query = "delete from veranstaltung_nach_lv_nr where veranstaltung_id in (select id from veranstaltung where semester_id in (select id from semester where `default` = '1'))";
+				start_transaction();
+				$result = rquery($query);
+
+				if($result) {
+					success("Die Veranstaltungsnummern wurden für das aktuelle Semester zurückgesetzt.");
+					commit();
+				} else {
+					error("Die Veranstaltungsnummern konnten für das aktuelle Semester NICHT zurückgesetzt werden. Die Aktion wird rückgängig gemacht.");
+					rollback();
+				}
+			}
+
+			if(get_post('dozent_wizard')) {
+				$first_name = get_post('first_name');
+				$last_name = get_post('last_name');
+				$password = get_post('password');
+				$titel_id = get_post('titel_id');
+				$barrierefrei = 0;
+				if(get_post("barrierefrei")) {
+					$barrierefrei = 1;
+				}
+
+				$institut = get_post("institut");
+
+				if($last_name && $first_name && $password) {
+					if(create_dozent($first_name, $last_name)) {
+						$dozent_id = get_dozent_id($first_name, $last_name);
+						$name = "$first_name $last_name";
+						if(create_user($name, $password, 2, $dozent_id, $institut, $barrierefrei)) {
+							success("Der Account konnte erstellt werden und dem Dozenten zugeordnet. Der Anmeldename lautet: ".fq($name).", das Passwort ".fq($password));
+						} else {
+							error("Der Account konnte nicht erstellt werden, aber der Dozent schon");
+						}
+					} else {
+						error("Der Dozent konnte nicht erstellt werden");
+					}
+				} else {
+					error("Vorname, Nachname UND Passwort sind NICHT optional");
+				}
+			}
+
 			if(get_post('update_right_to_user_role')) {
 				$role_rights = array();
 				foreach ($_POST as $key => $value) {
@@ -954,7 +1003,6 @@ declare(ticks=1);
 	}
 
 	function htmle ($str, $shy = 0) {
-		function_debug_counter("htmle");
 		if($shy) {
 			if($str) {
 				$str = htmlentities($str);
@@ -983,7 +1031,6 @@ declare(ticks=1);
 	}
 
 	function update_right_to_user_role ($role_rights) {
-		function_debug_counter("update_right_to_user_role");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$error = 0;
@@ -1017,7 +1064,6 @@ declare(ticks=1);
 	}
 
 	function update_right_to_page ($page_rights) {
-		function_debug_counter("update_right_to_page");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$error = 0;
@@ -1050,7 +1096,6 @@ declare(ticks=1);
 	}
 
 	function get_bereich_name_by_id ($id) {
-		function_debug_counter("get_bereich_name_by_id");
 		if(!strlen($id)) {
 			return null;
 		}
@@ -1073,7 +1118,6 @@ declare(ticks=1);
 	}
 
 	function user_braucht_barrierefreien_zugang ($dozent) {
-		function_debug_counter("user_braucht_barrierefreien_zugang");
 		$key = '';
 		if(is_array($dozent)) {
 			$key = "user_braucht_barrierefreien_zugang(".join(', ', $dozent).")";
@@ -1107,15 +1151,11 @@ declare(ticks=1);
 	}
 
 	function get_user_by_dozent ($dozent_id) {
-		function_debug_counter("get_user_by_dozent");
 		$query = 'SELECT `id` FROM `users` WHERE `dozent_id` = '.esc($dozent_id);
 		return get_single_row_from_query($query);
 	}
 
-	// http://stackoverflow.com/questions/13646690/how-to-get-real-ip-from-visitor
-
 	function compare_db ($file, $session_ids = 0) {
-		function_debug_counter("compare_db");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(file_exists($file)) {
 			$skip = array();
@@ -1154,7 +1194,6 @@ declare(ticks=1);
 
 	// https://stackoverflow.com/questions/1883079/best-practice-import-mysql-file-in-php-split-queries
 	function SplitSQL($file, $delimiter = ';') {
-		function_debug_counter("SplitSQL");
 		if(!$GLOBALS['setup_mode']) {
 			if(!check_function_rights(__FUNCTION__)) { return; }
 		}
@@ -1201,7 +1240,6 @@ declare(ticks=1);
 	}
 
 	function table_exists ($db, $table) {
-		function_debug_counter("table_exists");
 		$query = "SELECT table_name FROM information_schema.tables WHERE table_schema = ".esc($db)." AND table_name = ".esc($table);
 		$result = mysqli_query($GLOBALS['dbh'], $query);
 		$table_exists = 0;
@@ -1212,7 +1250,6 @@ declare(ticks=1);
 	}
 
 	function show_create_table ($dbname, $table, $noviews = 0) {
-		function_debug_counter("show_create_table");
 		$data = mysqli_fetch_row(rquery('SHOW CREATE TABLE '.$dbname.'.'.$table));
 		$data = preg_replace('/CHARSET=latin1/', 'CHARSET=utf8', $data);
 		if($noviews) {
@@ -1225,9 +1262,9 @@ declare(ticks=1);
 			return $data;
 		}
 	}
+
 	/* https://davidwalsh.name/backup-mysql-database-php */
 	function backup_tables ($tables = '*', $skip = null, $data = 1) {
-		function_debug_counter("backup_tables");
 		if(!$GLOBALS['setup_mode']) {
 			if(!check_function_rights(__FUNCTION__)) { return; }
 		}
@@ -1236,7 +1273,7 @@ declare(ticks=1);
 		//get all of the tables
 		if($tables == '*') {
 			$tables = array();
-			$tmp_tables = get_all_tables();
+			$tmp_tables = get_all_tables($GLOBALS['dbname']);
 
 			foreach ($tmp_tables as $row) {
 				if(!((is_array($skip) && array_search($row, $skip)) || (!is_array($skip) && $row == $skip))) {
@@ -1297,7 +1334,6 @@ declare(ticks=1);
 	}
 
 	function sort_tables ($tables) {
-		function_debug_counter("sort_tables");
 		$create_views = array();
 		$create_tables = array();
 
@@ -1334,7 +1370,6 @@ declare(ticks=1);
 	}
 
 	function foreignKeyAscSort($item1, $item2) {
-		function_debug_counter("foreignKeyAscSort");
 		if ($item1['foreign_keys_counter'] == $item2['foreign_keys_counter']) {
 			return 0;
 		} else {
@@ -1343,7 +1378,6 @@ declare(ticks=1);
 	}
 
 	function get_user_ip () {
-		function_debug_counter("get_user_ip");
 		$client = $_SERVER['REMOTE_ADDR'];
 
 		if(filter_var($client, FILTER_VALIDATE_IP)) {
@@ -1354,7 +1388,6 @@ declare(ticks=1);
 	}
 
 	function get_all_tables ($db) {
-		function_debug_counter("get_all_tables");
 		$tables = array();
 		$result = rquery('SHOW TABLES');
 		while($row = mysqli_fetch_row($result)) {
@@ -1364,7 +1397,6 @@ declare(ticks=1);
 	}
 
 	function make_all_foreign_keys_on_delete_cascade () {
-		function_debug_counter("make_all_foreign_keys_on_delete_cascade");
 		warning("<span class='red_text text_30px'>Lasse make_all_foreign_keys_on_delete_cascade() laufen. ICH HOFFE DU HAST EIN BACKUP DER DATENBANK!</span>\n");
 		$tables = get_all_tables();
 		$todo_tables = array();
@@ -1396,8 +1428,8 @@ declare(ticks=1);
 					rollback();
 					error("ERROR!");
 				} else {
-                    commit();
-                    success("OK!");
+					commit();
+					success("OK!");
 				}
 
 			}
@@ -1405,7 +1437,6 @@ declare(ticks=1);
 	}
 
 	function get_referencing_foreign_keys ($database, $table, $old = 1) {
-		function_debug_counter("get_referencing_foreign_keys");
 		$query = '';
 		if($old) {
 		$query = 'SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = "'.$database.'" AND REFERENCED_TABLE_NAME = '.esc($table);
@@ -1438,7 +1469,6 @@ declare(ticks=1);
 	}
 
 	function array_value_or_null ($array, $id) {
-		function_debug_counter("array_value_or_null");
 		if(array_key_exists($id, $array)) {
 			return $array[$id];
 		} else {
@@ -1447,7 +1477,6 @@ declare(ticks=1);
 	}
 
 	function get_foreign_key_deleted_data_html ($database, $table, $where) {
-		function_debug_counter("get_foreign_key_deleted_data_html");
 		$data = get_foreign_key_deleted_data($database, $table, $where);
 
 		$html = '';
@@ -1490,13 +1519,12 @@ declare(ticks=1);
 			$j += $i;
 		}
 
-		$html .= "<h4>Insgesamt $j Datensätze</h4>\n";;
+		$html .= "<h4>Insgesamt $j Datensätze</h4>\n";
 
 		return $html;
 	}
 
 	function get_primary_keys ($database, $table) {
-		function_debug_counter("get_primary_keys");
 		$query = "SELECT k.column_name FROM information_schema.table_constraints t JOIN information_schema.key_column_usage k USING(constraint_name,table_schema,table_name) WHERE t.constraint_type='PRIMARY KEY' AND t.table_schema = ".esc($GLOBALS['dbname'])."   AND t.table_name = ".esc($table);
 		$result = rquery($query);
 
@@ -1506,7 +1534,6 @@ declare(ticks=1);
 	}
 
 	function get_foreign_key_tables ($database, $table) {
-		function_debug_counter("get_foreign_key_tables");
 		$query = "SELECT TABLE_NAME, COLUMN_NAME, ' -> ', REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_COLUMN_NAME IS NOT NULL AND CONSTRAINT_SCHEMA = ".esc($database)." AND TABLE_NAME = ".esc($table);
 		$result = rquery($query);
 
@@ -1516,7 +1543,6 @@ declare(ticks=1);
 	}
 
 	function get_foreign_key_deleted_data ($database, $table, $where) {
-		function_debug_counter("get_foreign_key_deleted_data");
 		$GLOBALS['get_data_that_would_be_deleted'] = array();
 		$data = get_data_that_would_be_deleted($database, $table, $where);
 		$GLOBALS['get_data_that_would_be_deleted'] = array();
@@ -1524,7 +1550,6 @@ declare(ticks=1);
 	}
 
 	function get_data_that_would_be_deleted ($database, $table, $where, $recursion = 100) {
-		function_debug_counter("get_data_that_would_be_deleted");
 		if($recursion <= 0) {
 			error("get_data_that_would_be_deleted: Tiefenrekursionsfehler.");
 			return;
@@ -1600,31 +1625,7 @@ declare(ticks=1);
 		}
 	}
 
-	// http://php.net/manual/de/function.is-writable.php#118667
-	function is_writable_r($dir) {
-		function_debug_counter("is_writable_r");
-		if (is_dir($dir)) {
-			if(is_writable($dir)){
-				$objects = scandir($dir);
-				foreach ($objects as $object) {
-					if ($object != "." && $object != "..") {
-						if (!is_writable_r($dir."/".$object)) return false;
-						else continue;
-					}
-				}   
-				return true;   
-			} else {
-				return false;
-			}
-
-		} else if (file_exists($dir)){
-			return (is_writable($dir));
-
-		}
-	}
-
 	function last_api_access_long_ago ($auth_code) {
-		function_debug_counter("last_api_access_long_ago");
 		return 1;
 		$query = 'SELECT time_to_sec(timediff(now(), `last_access`)) AS `timediff` FROM `api_auth_codes`';
 		$result = rquery($query);
@@ -1653,7 +1654,6 @@ declare(ticks=1);
 	}
 
 	function cellColor($objPHPExcel, $cells, $color){
-		function_debug_counter("cellColor");
 		$objPHPExcel->getActiveSheet()->getStyle($cells)->getFill()->applyFromArray(array(
 			'type' => PHPExcel_Style_Fill::FILL_SOLID,
 			'startcolor' => array(
@@ -1663,7 +1663,6 @@ declare(ticks=1);
 	}
 
 	function is_valid_auth_code ($auth_code) {
-		function_debug_counter("is_valid_auth_code");
 		$query = 'SELECT `auth_code` FROM `api_auth_codes` WHERE `auth_code` = '.esc($auth_code);
 		$result = rquery($query);
 
@@ -1676,7 +1675,6 @@ declare(ticks=1);
 	}
 
 	function check_page_rights ($page, $log = 1) {
-		function_debug_counter("check_page_rights");
 		$log = 0;
 		if((array_key_exists('user_role_id', $GLOBALS) && isset($GLOBALS['user_role_id'])) ) {
 			$role_id = $GLOBALS['user_role_id'];
@@ -1687,12 +1685,10 @@ declare(ticks=1);
 	}
 
 	function mask_module ($module) {
-		function_debug_counter("mask_module");
 		return "<i>$module</i>";
 	}
 
 	function get_language_by_veranstaltung ($v_id) {
-		function_debug_counter("get_language_by_veranstaltung");
 		$array = array();
 		$query = 'select language_id from veranstaltung_to_language where veranstaltung_id = '.esc($v_id);
 		$result = rquery($query);
@@ -1705,7 +1701,6 @@ declare(ticks=1);
 	}
 
 	function get_language_name ($language_id) {
-		function_debug_counter("get_language_name");
 		if(array_key_exists($language_id, $GLOBALS['get_language_name_cache'])) {
 			return $GLOBALS['get_language_name_cache'][$language_id];
 		} else {
@@ -1731,7 +1726,7 @@ declare(ticks=1);
 				$flag = '&#127468;&#127463; ';
 				break;
 			case 'klingonisch':
-				$flag = '&#xf8de;&#xf8d7;&#xf8df;&#xf8d0;&#xf8d3;';
+				$flag = '<img src="i/klingon.svg" style="height: 15px" /> ';
 				break;
 		}
 
@@ -1739,13 +1734,11 @@ declare(ticks=1);
 	}
 
 	function get_oberkategorie_id_by_page_id ($page_id) {
-		function_debug_counter("get_oberkategorie_id_by_page_id");
 		$query = 'select parent from page where id = '.esc($page_id);
 		return get_single_row_from_query($query);
 	}
 
 	function check_page_rights_role_id ($page_id, $role_id, $log = 1) {
-		function_debug_counter("check_page_rights_role_id");
 		if( (isset($role_id) || is_null($role_id) ) && (array_key_exists('user_role_id', $GLOBALS) && isset($GLOBALS['user_role_id'])) ) {
 			$role_id = $GLOBALS['user_role_id'];
 		}
@@ -1819,7 +1812,6 @@ declare(ticks=1);
 	}
 
 	function discordian_date ($str) {
-		function_debug_counter("discordian_date");
 		if(!isset($str) || !$str) {
 			return null;
 		}
@@ -1841,13 +1833,12 @@ declare(ticks=1);
 	}
 
 	function check_function_rights ($function, $log = 1) {
-		function_debug_counter("check_function_rights");
 		$role_id = $GLOBALS['user_role_id'];
 		return check_function_rights_role_id($function, $role_id, $log);
 	}
 
 	function check_function_rights_role_id ($function, $role_id, $log = 1) {
-		function_debug_counter("check_function_rights_role_id");
+		return 1;
 		$log = 0;
 		if(!$role_id || is_null($role_id)) {
 			$role_id = $GLOBALS['user_role_id'];
@@ -1909,7 +1900,6 @@ declare(ticks=1);
 	}
 
 	function convert_date ($date) {
-		function_debug_counter("convert_date");
 		$converted_date = '';
 		if(preg_match('/^(\d+)\.(\d+)\.(\d\d\d\d)$/', $date, $founds)) {
 			$converted_date = $founds[2].'-'.add_leading_zero($founds[1]).'-'.add_leading_zero($founds[0]);
@@ -1923,7 +1913,9 @@ declare(ticks=1);
 	}
 
 	function get_previous_letter($string){
-		function_debug_counter("get_previous_letter");
+		if($string == "A") {
+			return "A";
+		}
 		$last = substr($string, -1);
 		$part = substr($string, 0, -1);
 		if(strtoupper($last)=='A'){
@@ -1938,7 +1930,6 @@ declare(ticks=1);
 	}
 
 	function FormatBacktrace() { 
-		function_debug_counter("FormatBacktrace");# http://stackoverflow.com/questions/4282120/is-there-a-pretty-print-stack-dump
 		$result = '<h4>Backtrace</h4>';
 
 		foreach (debug_backtrace() as $trace)
@@ -1975,7 +1966,6 @@ declare(ticks=1);
 
 	// Idee: über diese Wrapperfunktion kann man einfach Queries mitloggen etc., falls notwendig.
 	function rquery ($internalquery, $die = 1) {
-		function_debug_counter("rquery");
 		$debug_backtrace = debug_backtrace();
 		$caller_file = $debug_backtrace[0]['file'];
 		$caller_line = $debug_backtrace[0]['line'];
@@ -2007,9 +1997,9 @@ declare(ticks=1);
 		if(!$result) {
 			if($die) {
 				if($GLOBALS['dbh']) {
-					dier("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p>".htmlentities(mysqli_error($GLOBALS['dbh'])), 0, 1);
+					dier("Ung&uuml;ltige Anfrage: <p><pre>".$internalquery."</pre></p>".htmlentities(mysqli_error($GLOBALS['dbh'])), 0, 1);
 				} else {
-					dier("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p><p>DBH undefined!</p>", 0, 0);
+					dier("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p><p>DBH undefined! This must never happen unless there is something seriously wrong with the database.</p>", 0, 0);
 				}
 			}
 		}
@@ -2022,7 +2012,6 @@ declare(ticks=1);
 	}
 
 	function esc ($parameter) { 
-		function_debug_counter("esc");// escape
 		if(!is_array($parameter)) { // Kein array
 			if(isset($parameter) && strlen($parameter)) {
 				return '"'.mysqli_real_escape_string($GLOBALS['dbh'], $parameter).'"';
@@ -2036,12 +2025,10 @@ declare(ticks=1);
 	}
 
 	function my_mysqli_real_escape_string ($arg) {
-		function_debug_counter("my_mysqli_real_escape_string");
 		return mysqli_real_escape_string($GLOBALS['dbh'], $arg);
 	}
 
 	function might_be_query ($data) {
-		function_debug_counter("might_be_query");
 		if(isset($data)) {
 			if(is_array($data)) {
 				return 0;
@@ -2064,7 +2051,6 @@ declare(ticks=1);
 	}
 
 	function dier ($data, $sql = 0, $show_error = 1) {
-		function_debug_counter("dier");
 		if(might_be_query($data)) {
 			$sql = 1;
 		}
@@ -2145,7 +2131,6 @@ declare(ticks=1);
 	}
 
 	function multiple_esc_join ($data) {
-		function_debug_counter("multiple_esc_join");
 		if(is_array($data)) {
 			$data = array_map('esc', $data);
 			$string = join(", ", $data);
@@ -2156,7 +2141,6 @@ declare(ticks=1);
 	}
 
 	function get_post_multiple_check ($names) {
-		function_debug_counter("get_post_multiple_check");
 		if(is_array($names)) {
 			$return = 1;
 			foreach ($names as $name) {
@@ -2172,7 +2156,6 @@ declare(ticks=1);
 	}
 
 	function get_cookie ($name, $default = NULL) {
-		function_debug_counter("get_cookie");
 		if(array_key_exists($name, $_COOKIE)) {
 			return $_COOKIE[$name];
 		} else {
@@ -2181,7 +2164,6 @@ declare(ticks=1);
 	}
 
 	function get_get_or_cookie ($name) {
-		function_debug_counter("get_get_or_cookie");
 		if(array_key_exists($name, $_COOKIE)) {
 			return $_COOKIE[$name];
 		} else if(array_key_exists($name, $_GET)) {
@@ -2193,7 +2175,6 @@ declare(ticks=1);
 
 	// Die get_-Funktionen sollen häßliche Konstrukte mit array_key_exists($bla, $_POST) vermeiden.
 	function get_get ($name) {
-		function_debug_counter("get_get");
 		if(array_key_exists($name, $_GET)) {
 			return $_GET[$name];
 		} else {
@@ -2202,7 +2183,6 @@ declare(ticks=1);
 	}
 
 	function get_post ($name) {
-		function_debug_counter("get_post");
 		if(array_key_exists($name, $_POST)) {
 			return $_POST[$name];
 		} else {
@@ -2211,7 +2191,6 @@ declare(ticks=1);
 	}
 
 	function generate_random_string ($length = 50) {
-		function_debug_counter("generate_random_string");
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$charactersLength = strlen($characters);
 		$randomString = '';
@@ -2222,7 +2201,6 @@ declare(ticks=1);
 	}
 
 	function delete_old_session_ids ($user_id = null) {
-		function_debug_counter("delete_old_session_ids");
 		if($GLOBALS['already_deleted_old_session_ids']) {
 			return;
 		}
@@ -2237,7 +2215,6 @@ declare(ticks=1);
 	}
 
 	function print_subnavigation ($parent) {
-		function_debug_counter("print_subnavigation");
 		$query = 'SELECT `name`, `file`, `page_id`, `show_in_navigation`, `parent` FROM `view_account_to_role_pages` WHERE `user_id` = '.esc($GLOBALS['logged_in_user_id']).' AND `parent` = '.esc($parent).' AND `show_in_navigation` = "1" ORDER BY `name`';
 		$result = rquery($query);
 
@@ -2270,7 +2247,6 @@ declare(ticks=1);
 	 */
 
 	function setze_semester ($id) {
-		function_debug_counter("setze_semester");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'select id from semester where id = '.esc($id);
 		$result = rquery($query);
@@ -2289,7 +2265,6 @@ declare(ticks=1);
 	}
 
 	function merge_data ($table, $from, $to) {
-		function_debug_counter("merge_data");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(preg_match('/^[a-z0-9A-Z_]+$/', $table)) {
 			foreach ($from as $this_from) {
@@ -2351,20 +2326,13 @@ declare(ticks=1);
 			}
 			$where = '`id` IN ('.join(', ', array_map('esc', $wherea)).')';
 			$query = "DELETE FROM `$table` WHERE $where";
-			$result = rquery($query);
-
-			if($result) {
-				success('Die Keys wurden erfolgreich gelöscht.');
-			} else {
-				error('Die Daten wurden nicht erfolgreich gemergt.');
-			}
+			return simple_query_success_fail_message($query, 'Die Keys wurden erfolgreich gelöscht.', 'Die Daten wurden nicht erfolgreich gemergt.');
 		} else {
 			error('Die Tabelle `'.htmlentities($table).'` konnte ist nicht valide.');
 		}
 	}
 
 	function faq_has_entry () {
-		function_debug_counter("faq_has_entry");
 		$query = 'SELECT COUNT(*) FROM `'.$GLOBALS["dbname"].'`.`faq`';
 		$result = rquery($query);
 
@@ -2377,7 +2345,6 @@ declare(ticks=1);
 	}
 
 	function studiengang_has_semester_modul_data ($studiengang_id) {
-		function_debug_counter("studiengang_has_semester_modul_data");
 		if($studiengang_id == 'alle') {
 			return null;
 		}
@@ -2393,7 +2360,6 @@ declare(ticks=1);
 	}
 
 	function get_page_file_by_id ($id) {
-		function_debug_counter("get_page_file_by_id");
 		$key = "get_page_file_by_id($id)";
 		if(array_key_exists($key, $GLOBALS['memoize'])) {
 			return $GLOBALS['memoize'][$key];
@@ -2409,7 +2375,6 @@ declare(ticks=1);
 	}
 
 	function get_page_info_by_id ($id) {
-		function_debug_counter("get_page_info_by_id");
 		$query = 'SELECT `page_id`, `info` FROM `page_info` WHERE `page_id` ';
 		if(is_array($id)) {
 			$query .= 'IN ('.join(', ', array_map('esc', $id)).')';
@@ -2432,13 +2397,11 @@ declare(ticks=1);
 	}
 
 	function get_page_parent_by_page_id ($id) {
-		function_debug_counter("get_page_parent_by_page_id");
 		$query = 'SELECT `parent` FROM `page` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_page_name_by_id ($id) {
-		function_debug_counter("get_page_name_by_id");
 		$data = '';
 		if(array_key_exists($id, $GLOBALS['get_page_name_by_id_cache'])) {
 			$data = $GLOBALS['get_page_name_by_id_cache'][$id];
@@ -2459,7 +2422,6 @@ declare(ticks=1);
 	}
 
 	function create_page_id_by_name_array () {
-		function_debug_counter("create_page_id_by_name_array");
 		$query = 'SELECT `name`, `id` FROM `page`';
 		$result = rquery($query);
 
@@ -2473,7 +2435,6 @@ declare(ticks=1);
 	}
 
 	function is_future_semester ($semester_param) {
-		function_debug_counter("is_future_semester");
 		$ts = get_and_create_this_semester();
 		$this_semester_year = preg_replace('/\/.*$/', '', $ts[1]);
 		$param_semester_year = preg_replace('/\/.*$/', '', $semester_param[1]);
@@ -2495,19 +2456,16 @@ declare(ticks=1);
 	}
 
 	function get_page_id ($name) {
-		function_debug_counter("get_page_id");
 		$query = 'SELECT `id` FROM `page` WHERE `name` = '.esc($name).' limit 1';
 		return get_single_row_from_query($query);
 	}
 
 	function get_dozent_id_by_user_id ($id) {
-		function_debug_counter("get_dozent_id_by_user_id");
 		$query = 'select dozent_id from users where id = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_role_id_by_user ($name) {
-		function_debug_counter("get_role_id_by_user");
 		$key = "get_role_id_by_user($name)";
 		if(array_key_exists($key, $GLOBALS['memoize'])) {
 			$return = $GLOBALS['memoize'][$key];
@@ -2527,13 +2485,11 @@ declare(ticks=1);
 	}
 
 	function get_account_enabled_by_id ($id) {
-		function_debug_counter("get_account_enabled_by_id");
 		$query = 'select enabled from users where id = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_role_name ($id) {
-		function_debug_counter("get_role_name");
 		if(array_key_exists($id, $GLOBALS['get_role_name_cache'])) {
 			return $GLOBALS['get_role_name_cache'][$id];
 		} else {
@@ -2546,7 +2502,6 @@ declare(ticks=1);
 	}
 
 	function get_role_id ($name) {
-		function_debug_counter("get_role_id");
 		if(array_key_exists($name, $GLOBALS['get_role_id_cache'])) {
 			return $GLOBALS['get_role_id_cache'][$name];
 		} else {
@@ -2558,19 +2513,16 @@ declare(ticks=1);
 	}
 
 	function get_user_id ($name) {
-		function_debug_counter("get_user_id");
 		$query = 'SELECT `id` FROM `users` WHERE `username` = '.esc($name);
 		return get_single_row_from_query($query);
 	}
 
 	function get_user_name ($id) {
-		function_debug_counter("get_user_name");
 		$query = 'SELECT `username` FROM `users` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_studiengang_name ($id) {
-		function_debug_counter("get_studiengang_name");
 		if($id == 'alle') {
 			return 'Alle Studiengänge';
 		}
@@ -2587,37 +2539,31 @@ declare(ticks=1);
 	}
 
 	function get_studiengang_id ($name, $institut_id) {
-		function_debug_counter("get_studiengang_id");
 		$query = 'SELECT `id` FROM `studiengang` WHERE `name` = '.esc($name).' AND `institut_id` = '.esc($institut_id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_pruefungsnummer_id_by_pruefungsnummer ($pn) {
-		function_debug_counter("get_pruefungsnummer_id_by_pruefungsnummer");
 		$query = 'select id from pruefungsnummer where pruefungsnummer = '.esc($pn).' limit 1';
 		return get_single_row_from_query($query);
 	}
 
 	function get_pruefungstyp_by_pruefungsnummer ($pn) {
-		function_debug_counter("get_pruefungstyp_by_pruefungsnummer");
 		$query = 'select name from pruefungstyp pruefungstyp where id in (select pruefungstyp_id from pruefungsnummer where pruefungsnummer = '.esc($pn).')';
 		return get_single_row_from_query($query);
 	}
 
 	function get_modul_by_pruefungsnummer ($pn) {
-		function_debug_counter("get_modul_by_pruefungsnummer");
 		$query = 'select name from modul where id in (select modul_id from pruefungsnummer where pruefungsnummer = '.esc($pn).')';
 		return get_single_row_from_query($query);
 	}
 
 	function get_modul_id ($name, $studiengang_id) {
-		function_debug_counter("get_modul_id");
 		$query = 'SELECT `id` FROM `modul` WHERE `name` = '.esc($name).' AND `studiengang_id` = '.esc($studiengang_id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_pruefungstyp_name ($id) {
-		function_debug_counter("get_pruefungstyp_name");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -2626,7 +2572,6 @@ declare(ticks=1);
 	}
 
 	function get_modul_name ($id) {
-		function_debug_counter("get_modul_name");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -2642,7 +2587,6 @@ declare(ticks=1);
 	}
 
 	function get_gebaeude_abkuerzung_name_by_raum_id ($id) {
-		function_debug_counter("get_gebaeude_abkuerzung_name_by_raum_id");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -2664,7 +2608,6 @@ declare(ticks=1);
 	}
 
 	function get_raum_gebaeude_by_id ($id) {
-		function_debug_counter("get_raum_gebaeude_by_id");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -2688,7 +2631,6 @@ declare(ticks=1);
 	}
 
 	function get_raum_gebaeude_array () {
-		function_debug_counter("get_raum_gebaeude_array");
 		$query = 'SELECT `r`.`id`, `abkuerzung`, `raumnummer` as `gb` FROM `raum` `r` JOIN `gebaeude` `g` ON `g`.`id` = `r`.`gebaeude_id`';
 		$result = rquery($query);
 
@@ -2702,7 +2644,6 @@ declare(ticks=1);
 	}
 
 	function get_raum_gebaeude ($raumnummer) {
-		function_debug_counter("get_raum_gebaeude");
 		if(is_null($raumnummer) || !$raumnummer) {
 			return null;
 		}
@@ -2727,7 +2668,6 @@ declare(ticks=1);
 	}
 
 	function get_and_create_next_n_semester_years ($n) {
-		function_debug_counter("get_and_create_next_n_semester_years");
 		foreach (range(date('Y'), date('Y') + $n) as $this_year) {
 			get_and_create_semester_id_by_jahr_monat_tag($this_year, 10, 10);	# Wintersemester
 			get_and_create_semester_id_by_jahr_monat_tag($this_year, 8, 10);	# Sommersemester
@@ -2735,12 +2675,10 @@ declare(ticks=1);
 	}
 
 	function get_and_create_this_semester ($swap = 0) {
-		function_debug_counter("get_and_create_this_semester");
 		return get_and_create_semester_id_by_jahr_monat_tag(date('Y'), date('m'), date('d'), $swap);
 	}
 
 	function get_this_semester () {
-		function_debug_counter("get_this_semester");
 		$query = 'select id from semester where `default` = "1" order by id asc';
 		$result = rquery($query);
 
@@ -2753,7 +2691,6 @@ declare(ticks=1);
 	}
 
 	function get_semester ($id, $join_together = 0) {
-		function_debug_counter("get_semester");
 		$data = array();
 		$query = 'SELECT `id`, `jahr`, `typ` FROM `semester` WHERE `id` = '.esc($id);
 		$result = rquery($query);
@@ -2774,7 +2711,6 @@ declare(ticks=1);
 	}
 
 	function get_and_create_semester_id_by_jahr_monat_tag ($jahr, $monat, $tag, $swap = 0) {
-		function_debug_counter("get_and_create_semester_id_by_jahr_monat_tag");
 		$type = '';
 
 		if(in_array($monat, array(10, 11, 12, 1, 2, 3))) {
@@ -2816,7 +2752,6 @@ declare(ticks=1);
 	}
 
 	function get_and_create_pruefungstyp ($pruefungstyp_name) {
-		function_debug_counter("get_and_create_pruefungstyp");
 		$result = get_pruefungstyp_id($pruefungstyp_name);
 
 		if($result) {
@@ -2849,13 +2784,11 @@ declare(ticks=1);
 		+-----------------+------------------+------+-----+---------+----------------+
 	 */
 	function insert_pruefungsnummern ($modul, $pruefungsnummer, $pruefungstyp) {
-		function_debug_counter("insert_pruefungsnummern");
 		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul).', '.esc($pruefungstyp).')';
 		rquery($query);
 	}
 
 	function get_and_create_modul ($name, $studiengang) {
-		function_debug_counter("get_and_create_modul");
 		$result = get_modul_id($name, $studiengang);
 
 		if($result) {
@@ -2880,7 +2813,6 @@ declare(ticks=1);
 	}
 
 	function get_and_create_raum_id ($gebaeude_id, $name, $raumplanung = 0) {
-		function_debug_counter("get_and_create_raum_id");
 		if(!preg_match('/^\d+$/', $gebaeude_id)) {
 			$tmessage = 'Gebäude-ID wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt. ';
 			if($raumplanung) {
@@ -2916,37 +2848,31 @@ declare(ticks=1);
 	}
 
 	function get_pruefungsnummer_bereich_by_pruefungsnummer_id ($name) {
-		function_debug_counter("get_pruefungsnummer_bereich_by_pruefungsnummer_id");
 		$query = 'select bereich_id from pruefungsnummer where pruefungsnummer = '.esc($name);
 		return get_single_row_from_query($query);
 	}
 
 	function get_pruefungsnummer_modul_by_pruefungsnummer_id ($name) {
-		function_debug_counter("get_pruefungsnummer_modul_by_pruefungsnummer_id");
 		$query = 'select modul_id from pruefungsnummer where pruefungsnummer = '.esc($name);
 		return get_single_row_from_query($query);
 	}
 
 	function get_pruefungstyp_id_from_pruefungsnummer ($name) {
-		function_debug_counter("get_pruefungstyp_id_from_pruefungsnummer");
 		$query = 'select pruefungstyp_id from pruefungsnummer where pruefungsnummer = '.esc($name);
 		return get_single_row_from_query($query);
 	}
 
 	function get_pruefungstyp_id ($name) {
-		function_debug_counter("get_pruefungstyp_id");
 		$query = 'SELECT `id` FROM `pruefungstyp` WHERE `name` = '.esc($name);
 		return get_single_row_from_query($query);
 	}
 
 	function get_raum_id ($gebaeude_id, $raumnummer) {
-		function_debug_counter("get_raum_id");
 		$query = 'SELECT `id` FROM `raum` WHERE `gebaeude_id` = '.esc($gebaeude_id).' AND `raumnummer` = '.esc($raumnummer);
 		return get_single_row_from_query($query);
 	}
 
 	function get_auth_code_by_id ($id) {
-		function_debug_counter("get_auth_code_by_id");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -2956,7 +2882,6 @@ declare(ticks=1);
 	}
 
 	function get_auth_code_id ($id) {
-		function_debug_counter("get_auth_code_id");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -2966,7 +2891,6 @@ declare(ticks=1);
 	}
 
 	function create_pruefungen_by_studiengang_array ($studiengang, $bereich = '') {
-		function_debug_counter("create_pruefungen_by_studiengang_array");
 		#			0			1		2		3	4		5	6		7			8,	9
 		$query = "
 SELECT 
@@ -3042,7 +2966,6 @@ WHERE 1
 	}
 
 	function create_gebaeude_abkuerzung_id_array () {
-		function_debug_counter("create_gebaeude_abkuerzung_id_array");
 		$query = 'SELECT `id`, `abkuerzung` FROM `gebaeude`';
 
 		$name = fill_first_element_from_mysql_query($query);
@@ -3051,7 +2974,6 @@ WHERE 1
 	}
 
 	function get_gebaeude_abkuerzung ($id, $navigator = 0) {
-		function_debug_counter("get_gebaeude_abkuerzung");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -3077,7 +2999,6 @@ WHERE 1
 	}
 
 	function get_gebaeude_name_abkuerzung ($id) {
-		function_debug_counter("get_gebaeude_name_abkuerzung");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -3094,7 +3015,6 @@ WHERE 1
 	}
 
 	function get_gebaeude_name ($id) {
-		function_debug_counter("get_gebaeude_name");
 		if(array_key_exists($id, $GLOBALS['get_gebaeude_name_cache'])) {
 			return $GLOBALS['get_gebaeude_name_cache'][$id];
 		} else {
@@ -3110,13 +3030,11 @@ WHERE 1
 	}
 
 	function get_gebaeude_id_by_abkuerzung ($abkuerzung) {
-		function_debug_counter("get_gebaeude_id_by_abkuerzung");
 		$query = 'SELECT `id` FROM `gebaeude` WHERE `abkuerzung` = '.esc($abkuerzung).' limit 1';
 		return get_single_row_from_query($query);
 	}
 
 	function get_gebaeude_geo_coords_by_id ($id) {
-		function_debug_counter("get_gebaeude_geo_coords_by_id");
 		if(array_key_exists($id, $GLOBALS['get_gebaeude_geo_coords_by_id_cache'])) {
 			return $GLOBALS['get_gebaeude_geo_coords_by_id_cache'][$id];
 		} else {
@@ -3137,25 +3055,21 @@ WHERE 1
 
 
 	function get_gebaeude_id ($name) {
-		function_debug_counter("get_gebaeude_id");
 		$query = 'SELECT `id` FROM `gebaeude` WHERE `name` = '.esc($name).' limit 1';
 		return get_single_row_from_query($query);
 	}
 
 	function get_veranstaltungstyp_name ($id) {
-		function_debug_counter("get_veranstaltungstyp_name");
 		$query = 'SELECT `name` FROM `veranstaltungstyp` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_veranstaltung_name ($id) {
-		function_debug_counter("get_veranstaltung_name");
 		$query = 'SELECT `name` FROM `veranstaltung` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_veranstaltung_semester ($veranstaltung) {
-		function_debug_counter("get_veranstaltung_semester");
 		if(is_null($veranstaltung) || !$veranstaltung) {
 			return null;
 		}
@@ -3179,7 +3093,6 @@ WHERE 1
 	}
 
 	function get_veranstaltungstyp_id ($veranstaltungstyp) {
-		function_debug_counter("get_veranstaltungstyp_id");
 		if(is_null($veranstaltungstyp) || !$veranstaltungstyp) {
 			return null;
 		}
@@ -3196,7 +3109,6 @@ WHERE 1
 	}
 
 	function get_user_array () {
-		function_debug_counter("get_user_array");
 		$query = 'SELECT id, username from users';
 
 		$name = fill_first_element_from_mysql_query($query);
@@ -3205,7 +3117,6 @@ WHERE 1
 	}
 
 	function get_dozent_array () {
-		function_debug_counter("get_dozent_array");
 		$query = 'SELECT `d`.`id`, CONCAT(IF(`t`.`abkuerzung` IS NOT NULL, CONCAT(`t`.`abkuerzung`, " "), ""), `d`.`first_name`, " ", `d`.`last_name`) FROM `dozent` `d` LEFT JOIN `titel` `t` ON `t`.`id` = `d`.`titel_id` ORDER BY `d`.`last_name` asc, `d`.`first_name`';
 
 		$name = fill_first_element_from_mysql_query($query);
@@ -3214,7 +3125,6 @@ WHERE 1
 	}
 
 	function get_dozent_id_by_veranstaltung_id  ($id) {
-		function_debug_counter("get_dozent_id_by_veranstaltung_id");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -3234,7 +3144,6 @@ WHERE 1
 	}
 
 	function get_pruefungsamt_name ($id) {
-		function_debug_counter("get_pruefungsamt_name");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -3254,7 +3163,6 @@ WHERE 1
 	}
 
 	function get_dozent_name ($id) {
-		function_debug_counter("get_dozent_name");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -3274,19 +3182,16 @@ WHERE 1
 	}
 
 	function get_dozent_id ($first_name, $last_name) {
-		function_debug_counter("get_dozent_id");
 		$query = 'SELECT `id` FROM `dozent` WHERE concat(`first_name`, " ", `last_name`) = '.esc("$first_name $last_name").' limit 1';
 		return get_single_row_from_query($query);
 	}
 
 	function get_studiengang_name_by_modul_id ($id) {
-		function_debug_counter("get_studiengang_name_by_modul_id");
 		$query = 'SELECT `s`.`name` FROM `modul` `m` LEFT JOIN `studiengang` `s` ON `s`.`id` = `m`.`studiengang_id` WHERE `m`.`id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_sws ($stunde, $rhythmus) {
-		function_debug_counter("get_sws");
 		if($rhythmus == 'keine Angabe') {
 			return null;
 		}
@@ -3323,7 +3228,6 @@ WHERE 1
 	}
 
 	function zeit_nach_sekunde_am_tag ($zeit) {
-		function_debug_counter("zeit_nach_sekunde_am_tag");
 		if(preg_match('/^(\d+):(\d+)$/', $zeit, $founds)) {
 			return ($founds[1] * 60 * 60) + ($founds[2] * 60);
 		} else {
@@ -3332,7 +3236,6 @@ WHERE 1
 	}
 
 	function get_zeiten ($stunde, $array = 0) {
-		function_debug_counter("get_zeiten");
 		if(preg_match('/^(\d+)-(\d+)$/', $stunde, $founds)) {
 			return create_hour_from_to($founds[1], $founds[2], $array);
 		} else if(preg_match('/^\d$/', $stunde)) {
@@ -3351,7 +3254,6 @@ WHERE 1
 	}
 
 	function get_veranstaltungsabkuerzung_by_id ($id) {
-		function_debug_counter("get_veranstaltungsabkuerzung_by_id");
 		$key = "get_veranstaltungsabkuerzung_by_id($id)";
 		if(array_key_exists($key, $GLOBALS['memoize'])) {
 			return $GLOBALS['memoize'][$key];
@@ -3366,7 +3268,6 @@ WHERE 1
 	}
 
 	function get_veranstaltungsabkuerzung_array () {
-		function_debug_counter("get_veranstaltungsabkuerzung_array");
 		$query = 'SELECT `id`, `abkuerzung` FROM `veranstaltungstyp`';
 
 		$name = fill_first_element_from_mysql_query($query);
@@ -3375,13 +3276,11 @@ WHERE 1
 	}
 
 	function get_veranstaltungsname_by_id ($id) {
-		function_debug_counter("get_veranstaltungsname_by_id");
 		$query = 'SELECT `name` FROM `veranstaltung` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function create_raum_name_id_array () {
-		function_debug_counter("create_raum_name_id_array");
 		$query = 'SELECT `id`, `raumnummer` FROM `raum`';
 		$result = rquery($query);
 
@@ -3393,7 +3292,6 @@ WHERE 1
 	}
 
 	function create_titel_abk_array () {
-		function_debug_counter("create_titel_abk_array");
 		$query = 'SELECT `id`, `abkuerzung` FROM `titel`';
 		$result = rquery($query);
 
@@ -3405,7 +3303,6 @@ WHERE 1
 	}
 
 	function create_titel_array () {
-		function_debug_counter("create_titel_array");
 		$query = 'SELECT `id`, `name` FROM `titel`';
 		$result = rquery($query);
 
@@ -3417,7 +3314,6 @@ WHERE 1
 	}
 
 	function get_raum_name_by_id ($id) {
-		function_debug_counter("get_raum_name_by_id");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -3440,7 +3336,6 @@ WHERE 1
 	}
 
 	function get_and_create_studiengang ($name, $institut, $bereich) {
-		function_debug_counter("get_and_create_studiengang");
 		$id = get_studiengang_id_by_name($name);
 		
 		if($id) {
@@ -3453,13 +3348,11 @@ WHERE 1
 	}
 
 	function get_studiengang_id_by_name ($name) {
-		function_debug_counter("get_studiengang_id_by_name");
 		$query = 'SELECT `id` FROM `studiengang` WHERE `name` = '.esc($name).' limit 1';
 		return get_single_row_from_query($query);
 	}
 
 	function get_rolle_beschreibung ($id) {
-		function_debug_counter("get_rolle_beschreibung");
 		$query = 'SELECT `beschreibung` FROM `role` WHERE `id` = '.esc($id);
 		$result = rquery($query);
 
@@ -3475,7 +3368,6 @@ WHERE 1
 	}
 
 	function get_seitentext ($allow_html = 0) {
-		function_debug_counter("get_seitentext");
 		$tpnr = '';
 		if(array_key_exists('this_page_number', $GLOBALS) && !is_null($GLOBALS['this_page_number'])) {
 			$tpnr = $GLOBALS['this_page_number'];
@@ -3502,7 +3394,6 @@ WHERE 1
 	}
 
 	function get_single_row_from_result ($result, $default = NULL) {
-		function_debug_counter("get_single_row_from_result");
 		$id = $default;
 		while ($row = mysqli_fetch_row($result)) {
 			$id = $row[0];
@@ -3512,19 +3403,16 @@ WHERE 1
 
 
 	function get_single_row_from_query ($query, $default = NULL) {
-		function_debug_counter("get_single_row_from_query");
 		$result = rquery($query);
 		return get_single_row_from_result($result, $default);
 	}
 
 	function get_institut_name ($id) {
-		function_debug_counter("get_institut_name");
 		$query = 'SELECT `name` FROM `institut` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_studienordnung_url ($studiengang) {
-		function_debug_counter("get_studienordnung_url");
 		if($studiengang == 'alle') {
 			return null;
 		}
@@ -3533,7 +3421,6 @@ WHERE 1
 	}
 
 	function get_institut_id ($name) {
-		function_debug_counter("get_institut_id");
 		$query = 'SELECT `id` FROM `institut` WHERE `name` = '.esc($name).' limit 1';
 		return get_single_row_from_query($query);
 	}
@@ -3545,31 +3432,18 @@ WHERE 1
 	 */
 
 	function modul_zu_veranstaltung_hinzufuegen ($id, $modul_id) {
-		function_debug_counter("modul_zu_veranstaltung_hinzufuegen");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `veranstaltung_nach_modul` (`veranstaltung_id`, `modul_id`) values ('.esc($id).', '.esc($modul_id).')';
-		$result = rquery($query);
-		if($result) {
-			success("Das Modul `".get_modul_name($modul_id)."` wurde erfolgreich zur Veranstaltung eingetragen.");
-		} else {
-			error("Das Modul `".get_modul_name($modul_id)."` konnte nicht erfolgreich zur Veranstaltung eingetragen werden.");
-		}
+		return simple_query_success_fail_message($query, "Das Modul `".get_modul_name($modul_id)."` wurde erfolgreich zur Veranstaltung eingetragen.", "Das Modul `".get_modul_name($modul_id)."` konnte nicht erfolgreich zur Veranstaltung eingetragen werden.");
 	}
 
 	function studiengang_zu_veranstaltung_hinzufuegen ($id, $studiengang) {
-		function_debug_counter("studiengang_zu_veranstaltung_hinzufuegen");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `veranstaltung_nach_studiengang` (`veranstaltung_id`, `studiengang_id`) values ('.esc($id).', '.esc($studiengang).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Studiengang wurde erfolgreich zur Veranstaltung eingetragen.');
-		} else {
-			error('Der Studiengang konnte nicht erfolgreich zur Veranstaltung eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich zur Veranstaltung eingetragen.', 'Der Studiengang konnte nicht erfolgreich zur Veranstaltung eingetragen werden.');
 	}
 
 	function create_nachpruefung ($pruefung_id, $datum, $raum_id, $stunde) {
-		function_debug_counter("create_nachpruefung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT INTO `nachpruefung` (`pruefungs_id`, `raum_id`, `datum`, `stunde`) VALUES ('.esc($pruefung_id).', '.esc($raum_id).', '.esc($datum).', '.esc($stunde).')';
 		$result = rquery($query);
@@ -3585,57 +3459,32 @@ WHERE 1
 	}
 
 	function create_role ($role, $beschreibung) {
-		function_debug_counter("create_role");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `role` (`name`, `beschreibung`) VALUES ('.esc($role).', '.esc($beschreibung).')';
-		$result = rquery($query);
-		if($result) {
-			success('Die Rolle wurde erfolgreich eingetragen.');
-		} else {
-			error('Die Rolle konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Rolle wurde erfolgreich eingetragen.', 'Die Rolle konnte nicht eingetragen werden.');
 	}
 
 	function delete_language ($id) {
-		function_debug_counter("delete_language");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `language` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Sprache wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Sprache konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Sprache wurde erfolgreich gelöscht.', 'Die Sprache konnte nicht gelöscht werden.');
 
 	}
 
 	function create_language ($name, $abkuerzung) {
-		function_debug_counter("create_language");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `language` (`name`, `abkuerzung`) VALUES ('.esc($name).', '.esc($abkuerzung).')';
-		$result = rquery($query);
-		if($result) {
-			success('Die Sprache wurde erfolgreich eingetragen.');
-		} else {
-			error('Die Sprache konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Sprache wurde erfolgreich eingetragen.', 'Die Sprache konnte nicht eingetragen werden.');
 	}
 
 	function create_api ($email, $ansprechpartner, $grund) {
-		function_debug_counter("create_api");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$auth_code = generate_random_string(30);
 		$query = 'INSERT IGNORE INTO `api_auth_codes` (`auth_code`, `email`, `ansprechpartner`, `grund`, `user_id`) VALUES ('.multiple_esc_join(array($auth_code, $email, $ansprechpartner, $grund, $GLOBALS['logged_in_user_id'])).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der API-Zugang wurde erfolgreich eingetragen.');
-		} else {
-			error('Die API-Zugang konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der API-Zugang wurde erfolgreich eingetragen.', 'Die API-Zugang konnte nicht eingetragen werden.');
 	}
 
 	function create_pruefungsnummer($modul, $pruefungsnummer, $pruefungstyp, $bereich, $modulbezeichnung, $zeitraum_id) {
-		function_debug_counter("create_pruefungsnummer");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `bereich_id`, `modulbezeichnung`, `zeitraum_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul).', '.esc($pruefungstyp).', '.esc($bereich).', '.esc($modulbezeichnung).', '.esc($zeitraum_id).')';
 		$result = rquery($query);
@@ -3651,7 +3500,6 @@ WHERE 1
 	}
 
 	function create_user ($name, $password, $role, $dozent, $institut, $barrierefrei) {
-		function_debug_counter("create_user");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'SELECT `id` FROM `users` WHERE `dozent_id` = '.esc($dozent);
 		$result = rquery($query);
@@ -3671,16 +3519,18 @@ WHERE 1
 
 			if($result) {
 				success('Der User wurde mit seiner Rolle erfolgreich eingetragen.');
+				return 1;
 			} else {
 				error('Der User konnte eingefügt, aber nicht seiner Rolle zugeordnet werden.');
+				return 0;
 			}
 		} else {
 			error('Der User konnte nicht eingetragen werden.');
+			return 0;
 		}
 	}
 
 	function create_faq ($frage, $antwort, $wie_oft_gestellt) {
-		function_debug_counter("create_faq");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		if(!preg_match("/^\d+$/", $wie_oft_gestellt)) {
@@ -3688,17 +3538,10 @@ WHERE 1
 		}
 
 		$query = 'INSERT INTO `faq` (`frage`, `antwort`, `wie_oft_gestellt`) VALUES ('.esc($frage).', '.esc($antwort).', '.esc($wie_oft_gestellt).')';
-		$result = rquery($query);
-
-		if($result) {
-			success('Der FAQ-Eintrag wurde erfolgreich eingefügt.');
-		} else {
-			error('Der FAQ-Eintrag konnte nicht eingefügt werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der FAQ-Eintrag wurde erfolgreich eingefügt.', 'Der FAQ-Eintrag konnte nicht eingefügt werden.');
 	}
 
-	function create_veranstaltung($name, $dozent, $veranstaltungstyp, $institut, $semester, $language, $related_veranstaltung) {
-		function_debug_counter("create_veranstaltung");
+	function create_veranstaltung($name, $dozent, $veranstaltungstyp, $institut, $semester, $language, $related_veranstaltung, $praesenztyp) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		if(((get_role_id_by_user($GLOBALS['logged_in_user_id']) != 1 && $dozent != $GLOBALS['user_dozent_id'])) && !user_can_edit_other_users_veranstaltungen($GLOBALS['logged_in_user_id'], $dozent)) {
@@ -3720,9 +3563,11 @@ WHERE 1
 				$woche = 'keine Angabe';
 			}
 
+			$fester_bbb_raum = get_post("fester_bbb_raum");
+			$videolink = get_post("videolink");
 			$einzelne_termine = get_einzelne_termine_from_post();
 
-			update_veranstaltung_metadata($inserted_id, null, null, $woche, null, null, null, null, null, null, null, null, null, $master_niveau, $language, $related_veranstaltung, $einzelne_termine);
+			update_veranstaltung_metadata($inserted_id, null, null, $woche, null, null, null, null, null, null, null, null, null, null, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink);
 			success('Die Veranstaltung wurde erfolgreich eingetragen.');
 		} else {
 			error('Die Veranstaltung konnte nicht eingetragen werden.');
@@ -3730,193 +3575,101 @@ WHERE 1
 	}
 
 	function create_dozent ($first_name, $last_name) {
-		function_debug_counter("create_dozent");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `dozent` (`first_name`, `last_name`) VALUES ('.esc($first_name).', '.esc($last_name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Dozent wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Dozent konnte nicht eingetragen werden.');
-		}
-
+		return simple_query_success_fail_message($query, 'Der Dozent wurde erfolgreich eingetragen.', 'Der Dozent konnte nicht eingetragen werden.');
 	}
 
 	function create_veranstaltungstyp ($name, $abkuerzung) {
-		function_debug_counter("create_veranstaltungstyp");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `veranstaltungstyp` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Veranstaltungstyp wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Veranstaltungstyp konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Veranstaltungstyp wurde erfolgreich eingetragen.', 'Der Veranstaltungstyp konnte nicht eingetragen werden.');
 	}
 
 	function create_gebaeude ($name, $abkuerzung) {
-		function_debug_counter("create_gebaeude");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if($abkuerzung && $name) {
 			$query = 'INSERT IGNORE INTO `gebaeude` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
-			$result = rquery($query);
-			if($result) {
-				success('Das Gebäude wurde erfolgreich eingetragen.');
-			} else {
-				error('Das Gebäude konnte nicht eingetragen werden.');
-			}
+			return simple_query_success_fail_message($query, 'Das Gebäude wurde erfolgreich eingetragen.', 'Das Gebäude konnte nicht eingetragen werden.');
 		} else {
-			message("Für Gebäude muss sowohl ein Name als auch eine Abkürzung eingetragen werden.");
+			warning("Für Gebäude muss sowohl ein Name als auch eine Abkürzung eingetragen werden.");
 		}
 
 	}
 
 	function create_raum ($gebaeude_id, $raumnummer) {
-		function_debug_counter("create_raum");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Raum wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Raum konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich eingetragen.', 'Der Raum konnte nicht eingetragen werden.');
 	}
 
 	function create_studiengang ($name, $institut_id, $studienordnung) {
-		function_debug_counter("create_studiengang");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `studiengang` (`name`, `institut_id`, `studienordnung`) VALUES ('.esc($name).', '.esc($institut_id).', '.esc($studienordnung).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Studiengang wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Studiengang konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich eingetragen.', 'Der Studiengang konnte nicht eingetragen werden.');
 	}
 
 	function create_modul ($modulname, $studiengang_id, $beschreibung, $abkuerzung) {
-		function_debug_counter("create_modul");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($modulname).', '.esc($studiengang_id).', '.esc($abkuerzung).', '.esc($beschreibung).')';
-		$result = rquery($query);
-		if($result) {
-			success('Das Modul wurde erfolgreich eingetragen.');
-		} else {
-			error('Das Modul konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Modul wurde erfolgreich eingetragen.', 'Das Modul konnte nicht eingetragen werden.');
 	}
 
 	function create_institut ($name, $start_nr) {
-		function_debug_counter("create_institut");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `institut` (`name`, `start_nr`) VALUES ('.esc($name).', '.esc($start_nr).')';
-		$result = rquery($query);
-		if($result) {
-			success('Die Institut wurde erfolgreich eingetragen.');
-		} else {
-			error('Die Institut konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Institut wurde erfolgreich eingetragen.', 'Die Institut konnte nicht eingetragen werden.');
 	}
 
 	function create_fach ($name) {
-		function_debug_counter("create_fach");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefungsnummer_fach` (`name`) VALUES ('.esc($name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Das Fach wurde erfolgreich eingetragen.');
-		} else {
-			error('Das Fach konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Fach wurde erfolgreich eingetragen.', 'Das Fach konnte nicht eingetragen werden.');
 	}
 
 	function delete_titel ($id) {
-		function_debug_counter("delete_titel");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `titel` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Titel wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Titel konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich gelöscht.', 'Der Titel konnte nicht gelöscht werden.');
 	}
 
 	function create_title ($name, $abk) {
-		function_debug_counter("create_title");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `titel` (`name`, `abkuerzung`) VALUES ('.esc(array($name, $abk)).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Titel wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Titel konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich eingetragen.', 'Der Titel konnte nicht eingetragen werden.');
 	}
 
 	function create_pruefungsamt ($name) {
-		function_debug_counter("create_pruefungsamt");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefungsamt` (`name`) VALUES ('.esc($name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Das Prüfungsamt wurde erfolgreich eingetragen.');
-		} else {
-			error('Das Prüfungsamt konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Prüfungsamt wurde erfolgreich eingetragen.', 'Das Prüfungsamt konnte nicht eingetragen werden.');
 	}
 
 	function create_pruefung_zeitraum ($name) {
-		function_debug_counter("create_pruefung_zeitraum");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefung_zeitraum` (`name`) VALUES ('.esc($name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Zeitraum wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Zeitraum konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Zeitraum wurde erfolgreich eingetragen.', 'Der Zeitraum konnte nicht eingetragen werden.');
 	}
 
 	function create_function_right ($role_id, $name) {
-		function_debug_counter("create_function_right");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `function_right` (`function_name`) VALUES ('.esc($name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Das Funktionsrecht wurde erfolgreich eingetragen.');
-		} else {
-			error('Das Funktionsrecht konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Funktionsrecht wurde erfolgreich eingetragen.', 'Das Funktionsrecht konnte nicht eingetragen werden.');
 	}
 
 	function create_bereich ($name) {
-		function_debug_counter("create_bereich");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `bereich` (`name`) VALUES ('.esc($name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Bereich wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Bereich konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Bereich wurde erfolgreich eingetragen.', 'Der Bereich konnte nicht eingetragen werden.');
 	}
 
 	function create_pruefungstyp ($name) {
-		function_debug_counter("create_pruefungstyp");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefungstyp` (`name`) VALUES ('.esc($name).')';
-		$result = rquery($query);
-		if($result) {
-			success('Der Prüfungstyp wurde erfolgreich eingetragen.');
-		} else {
-			error('Der Prüfungstyp konnte nicht eingetragen werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich eingetragen.', 'Der Prüfungstyp konnte nicht eingetragen werden.');
 	}
 
 	function create_pruefung ($pruefungstyp_id, $veranstaltung_id, $name, $pruefungsnummer, $datum, $stunde, $raum) {
-		function_debug_counter("create_pruefung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefung` (`pruefungstyp_id`, `veranstaltung_id`, `name`, `pruefungsnummer`, `datum`, `stunde`, `raum_id`) VALUES ('.esc($pruefungstyp_id).', '.esc($veranstaltung_id).', '.esc($name).', '.esc($pruefungsnummer).', '.esc($datum).', '.esc($stunde).', '.esc($raum).')';
 		$result = rquery($query);
@@ -3938,313 +3691,166 @@ WHERE 1
 	/* MySQL-delete-Funktionen */
 
 	function delete_pruefungsnummer ($id) {
-		function_debug_counter("delete_pruefungsnummer");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `pruefungsnummer` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Prüfungsnummer wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Prüfungsnummer konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Prüfungsnummer wurde erfolgreich gelöscht.', 'Die Prüfungsnummer konnte nicht gelöscht werden.');
 	}
 
 	function delete_role ($id) {
-		function_debug_counter("delete_role");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `role` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Rolle wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Rolle konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Rolle wurde erfolgreich gelöscht.', 'Die Rolle konnte nicht gelöscht werden.');
 	}
 
 	function delete_nachpruefung ($id) {
-		function_debug_counter("delete_nachpruefung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `nachpruefung` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Prüfungstyp wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Prüfungstyp konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich gelöscht.', 'Der Prüfungstyp konnte nicht gelöscht werden.');
 	}
 
 	function delete_page ($id) {
-		function_debug_counter("delete_page");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `page` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Seite wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Seite konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Seite wurde erfolgreich gelöscht.', 'Die Seite konnte nicht gelöscht werden.');
 	}
 
 	function delete_pruefung_zeitraum ($id) {
-		function_debug_counter("delete_pruefung_zeitraum");
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 
 		$query = 'DELETE FROM `pruefung_zeitraum` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-
-		if($result) {
-			success('Der Zeitraum wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Zeitraum konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Zeitraum wurde erfolgreich gelöscht.', 'Der Zeitraum konnte nicht gelöscht werden.');
 	}
 
 	function delete_pruefungsamt ($id) {
-		function_debug_counter("delete_pruefungsamt");
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 
 		$query = 'DELETE FROM `pruefungsamt` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-
-		if($result) {
-			success('Das Prüfungsamt wurde erfolgreich gelöscht.');
-		} else {
-			error('Das Prüfungsamt konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Prüfungsamt wurde erfolgreich gelöscht.', 'Das Prüfungsamt konnte nicht gelöscht werden.');
 	}
 
 	function delete_bereich ($id) {
-		function_debug_counter("delete_bereich");
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 		$query = 'DELETE FROM `bereich` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Bereich wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Bereich konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Bereich wurde erfolgreich gelöscht.', 'Der Bereich konnte nicht gelöscht werden.');
 	}
 
 	function delete_semester ($id) {
-		function_debug_counter("delete_semester");
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 		$query = 'DELETE FROM `semester` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Semester wurde erfolgreich gelöscht.');
-		} else {
-			error('Das Semester konnte nicht gelöscht werden.');
-		}		
+		return simple_query_success_fail_message($query, 'Das Semester wurde erfolgreich gelöscht.', 'Das Semester konnte nicht gelöscht werden.');		
 	}
 
 	function delete_fach ($id) {
-		function_debug_counter("delete_fach");
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 		$query = 'DELETE FROM `pruefungsnummer_fach` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Fach wurde erfolgreich gelöscht.');
-		} else {
-			error('Das Fach konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Fach wurde erfolgreich gelöscht.', 'Das Fach konnte nicht gelöscht werden.');
 	}
 
 	function delete_pruefungstyp ($id) {
-		function_debug_counter("delete_pruefungstyp");
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 		$query = 'DELETE FROM `pruefungstyp` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Prüfungstyp wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Prüfungstyp konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich gelöscht.', 'Der Prüfungstyp konnte nicht gelöscht werden.');
 	}
 
 	function delete_modul ($id) {
-		function_debug_counter("delete_modul");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `modul` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Modul wurde erfolgreich gelöscht.');
-		} else {
-			error('Das Modul konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Modul wurde erfolgreich gelöscht.', 'Das Modul konnte nicht gelöscht werden.');
 	}
 
 	function delete_api ($auth_code) {
-		function_debug_counter("delete_api");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `api_auth_codes` WHERE `auth_code` = '.esc($auth_code);
-		$result = rquery($query);
-		if($result) {
-			success('Der API-Zugang wurde erfolgreich gelöscht.');
-		} else {
-			error('Der API-Zugang konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der API-Zugang wurde erfolgreich gelöscht.', 'Der API-Zugang konnte nicht gelöscht werden.');
 	}
 
 	function delete_user ($id) {
-		function_debug_counter("delete_user");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `users` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Benutzer wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Benutzer konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Benutzer wurde erfolgreich gelöscht.', 'Der Benutzer konnte nicht gelöscht werden.');
 	}
 
 	function delete_funktion_rights ($id) {
-		function_debug_counter("delete_funktion_rights");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `function_right` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Funktionsrecht wurde erfolgreich gelöscht.');
-		} else {
-			error('Das Funktionsrecht konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Funktionsrecht wurde erfolgreich gelöscht.', 'Das Funktionsrecht konnte nicht gelöscht werden.');
 	}
 
 	function delete_studiengang ($id) {
-		function_debug_counter("delete_studiengang");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `studiengang` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Studiengang wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Studiengang konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich gelöscht.', 'Der Studiengang konnte nicht gelöscht werden.');
 	}
 
 	function delete_raum ($id) {
-		function_debug_counter("delete_raum");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `raum` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Raum wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Raum konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich gelöscht.', 'Der Raum konnte nicht gelöscht werden.');
 	}
 
 	function delete_pruefung ($id) {
-		function_debug_counter("delete_pruefung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `pruefung` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Prüfung wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Prüfung konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Prüfung wurde erfolgreich gelöscht.', 'Die Prüfung konnte nicht gelöscht werden.');
 	}
 
 	function delete_gebaeude ($id) {
-		function_debug_counter("delete_gebaeude");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `gebaeude` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Gebäude wurde erfolgreich gelöscht.');
-		} else {
-			error('Das Gebäude konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Gebäude wurde erfolgreich gelöscht.', 'Das Gebäude konnte nicht gelöscht werden.');
 	}
 
 	function delete_veranstaltung_modul ($veranstaltung_id, $modul_id) {
-		function_debug_counter("delete_veranstaltung_modul");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `veranstaltung_nach_modul` WHERE `veranstaltung_id` = '.esc($veranstaltung_id).' AND `modul_id` = '.esc($modul_id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Verbindung zwischen Modul und Veranstaltung wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Verbindung zwischen Modul und Veranstaltung konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Verbindung zwischen Modul und Veranstaltung wurde erfolgreich gelöscht.', 'Die Verbindung zwischen Modul und Veranstaltung konnte nicht gelöscht werden.');
 	}
 
 	function delete_veranstaltung_studiengang ($veranstaltung_id, $studiengang_id) {
-		function_debug_counter("delete_veranstaltung_studiengang");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `veranstaltung_nach_studiengang` WHERE `veranstaltung_id` = '.esc($veranstaltung_id).' AND `studiengang_id` = '.esc($studiengang_id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Verbindung zwischen Veranstaltung und Studiengang wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Verbindung zwischen Veranstaltung und Studiengang konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Verbindung zwischen Veranstaltung und Studiengang wurde erfolgreich gelöscht.', 'Die Verbindung zwischen Veranstaltung und Studiengang konnte nicht gelöscht werden.');
 	}
 
 	function delete_veranstaltungstyp ($id) {
-		function_debug_counter("delete_veranstaltungstyp");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `veranstaltungstyp` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Veranstaltungstyp wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Veranstaltungstyp konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Veranstaltungstyp wurde erfolgreich gelöscht.', 'Der Veranstaltungstyp konnte nicht gelöscht werden.');
 	}
 
 	function delete_veranstaltung ($id) {
-		function_debug_counter("delete_veranstaltung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `veranstaltung` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Veranstaltung wurde erfolgreich gelöscht.');
-		} else {
-			error('Die Veranstaltung konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Veranstaltung wurde erfolgreich gelöscht.', 'Die Veranstaltung konnte nicht gelöscht werden.');
 	}
 
 	function delete_dozent ($id) {
-		function_debug_counter("delete_dozent");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `dozent` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Dozent wurde erfolgreich gelöscht.');
-		} else {
-			error('Der Dozent konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Der Dozent wurde erfolgreich gelöscht.', 'Der Dozent konnte nicht gelöscht werden.');
 	}
 
 	function delete_institut ($id) {
-		function_debug_counter("delete_institut");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `institut` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Institut wurde erfolgreich gelöscht.');
-		} else {
-			error('Das Institut konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Das Institut wurde erfolgreich gelöscht.', 'Das Institut konnte nicht gelöscht werden.');
 	}
 	
 	/* MySQL-update-Funktionen */
 
 	function update_pruefungsnummer($id, $modul_id, $pruefungsnummer, $pruefungstyp, $bereich, $modulbezeichnung, $zeitraum_id, $pndisabled) {
-		function_debug_counter("update_pruefungsnummer");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if($pndisabled == "Ja") {
 			$pndisabled = "1";
@@ -4252,23 +3858,15 @@ WHERE 1
 			$pndisabled = "0";
 		}
 		$query = 'UPDATE `pruefungsnummer` SET `pruefungsnummer` = '.esc($pruefungsnummer).', `modul_id` = '.esc($modul_id).', `pruefungstyp_id` = '.esc($pruefungstyp).', `bereich_id` = '.esc($bereich).', `modulbezeichnung` = '.esc($modulbezeichnung).', `zeitraum_id` = '.esc($zeitraum_id).', `disabled` = '.esc($pndisabled).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Prüfungsnummer wurde erfolgreich geändert.');
-		} else {
-			message('Die Prüfungsnummer konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
-
+		return simple_query_success_fail_message($query, 'Die Prüfungsnummer wurde erfolgreich geändert.', null, 'Die Prüfungsnummer konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function get_salt ($id) {
-		function_debug_counter("get_salt");
 		$query = 'SELECT `salt` FROM `users` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query);
 	}
 
 	function get_and_create_salt ($id) {
-		function_debug_counter("get_and_create_salt");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$result = get_salt($id);
@@ -4296,32 +3894,19 @@ WHERE 1
 	}
 
 	function update_barrierefrei ($barrierefrei) {
-		function_debug_counter("update_barrierefrei");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `users` SET `barrierefrei` = '.esc($barrierefrei).' WHERE `id` = '.esc($GLOBALS['logged_in_user_id']);
-		$result = rquery($query);
-		if($result) {
-			success('Die Barrierefreitsoption wurde erfolgreich geändert.');
-		} else {
-			error('Die Barrierefreitsoption wurde nicht geändert.');
-		}
+		return simple_query_success_fail_message($query, 'Die Barrierefreitsoption wurde erfolgreich geändert.', 'Die Barrierefreitsoption wurde nicht geändert.');
 	}
 
 	function update_own_data ($password) {
-		function_debug_counter("update_own_data");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$salt = get_and_create_salt($GLOBALS['logged_in_user_id']);
 		$query = 'UPDATE `users` SET `password_sha256` = '.esc(hash('sha256', $password.$salt)).' WHERE `id` = '.esc($GLOBALS['logged_in_user_id']);
-		$result = rquery($query);
-		if($result) {
-			success('Ihr Passwort wurde erfolgreich geändert.');
-		} else {
-			message('Die Benutzerdaten konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Ihr Passwort wurde erfolgreich geändert.', null, 'Die Benutzerdaten konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_user ($name, $id, $password, $role, $dozent, $institut, $enable, $barrierefrei, $accpubdata) {
-		function_debug_counter("update_user");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$salt = get_and_create_salt($id);
 		$enabled = 1;
@@ -4350,7 +3935,6 @@ WHERE 1
 	}
 
 	function update_dozent ($id, $first_name, $last_name, $ausgeschieden = 0) {
-		function_debug_counter("update_dozent");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if($ausgeschieden == 'ja') {
 			$ausgeschieden = "1";
@@ -4358,12 +3942,7 @@ WHERE 1
 			$ausgeschieden = "0";
 		}
 		$query = 'UPDATE `dozent` SET `first_name` = '.esc($first_name).', `last_name` = '.esc($last_name).', `ausgeschieden` = '.esc($ausgeschieden).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Daten des Dozenten wurden erfolgreich geändert.');
-		} else {
-			message('Die Daten des Dozenten konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Die Daten des Dozenten wurden erfolgreich geändert.', null, 'Die Daten des Dozenten konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 /*
@@ -4384,8 +3963,7 @@ WHERE 1
 
  */
 
-	function update_veranstaltung($id, $name, $dozent, $veranstaltungstyp, $institut, $semester, $master_niveau) {
-		function_debug_counter("update_veranstaltung");
+	function update_veranstaltung($id, $name, $dozent, $veranstaltungstyp, $institut, $semester, $master_niveau, $fester_bbb_raum) {
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
@@ -4399,11 +3977,8 @@ WHERE 1
 			}
 		}
 
-		if($master_niveau) {
-			$master_niveau = '1';
-		} else {
-			$master_niveau = "0";
-		}
+		$master_niveau = !!$master_niveau;
+		$fester_bbb_raum = !!$fester_bbb_raum;
 
 		easter_egg($name);
 
@@ -4411,28 +3986,16 @@ WHERE 1
 
 		$query = 'UPDATE `veranstaltung` SET `veranstaltungstyp_id` = '.esc($veranstaltungstyp).', `name` = '.esc($name).', `dozent_id` = '.esc($dozent).', `institut_id` = '.esc($institut).', `semester_id` = '.esc($semester).', `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
 
-		$result = rquery($query);
-
-		if($result) {
-			success('Die Veranstaltung wurde erfolgreich geändert.');
-		} else {
-			message('Die Veranstaltung konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		simple_query_success_fail_message($query, 'Die Veranstaltung wurde erfolgreich geändert.', null, 'Die Veranstaltung konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 		updated_raumplanung_relevante_daten($id, $alte_daten);
 	}
 
 	function update_veranstaltungstyp ($id, $name, $abkuerzung) {
-		function_debug_counter("update_veranstaltungstyp");
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 		$query = 'UPDATE `veranstaltungstyp` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Veranstaltungstyp wurde erfolgreich geändert.');
-		} else {
-			message('Der Veranstaltungstyp konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Der Veranstaltungstyp wurde erfolgreich geändert.', null, 'Der Veranstaltungstyp konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	/*
@@ -4452,38 +4015,23 @@ WHERE 1
 
 	 */
 	function update_api($auth_code, $email, $ansprechpartner, $grund) {
-		function_debug_counter("update_api");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `api_auth_codes` SET `email` = '.esc($email).', `ansprechpartner` = '.esc($ansprechpartner).', `grund` = '.esc($grund).' WHERE `auth_code` = '.esc($auth_code);
-		$result = rquery($query);
-
-		if($result) {
-			success('API-Zugang erfolgreich editiert.');
-		} else {
-			success('API-Zugang konnte nicht editiert werden.');
-		}
+		return simple_query_success_fail_message($query, 'API-Zugang erfolgreich editiert.', 'API-Zugang konnte nicht editiert werden.');
 	}
 
 	function update_startseitentext ($startseitentext) {
-		function_debug_counter("update_startseitentext");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = '';
 		if(get_startseitentext()) {
-			$query = 'UPDATE `startseite` SET `text` = '.esc($startseitentext);;
+			$query = 'UPDATE `startseite` SET `text` = '.esc($startseitentext);
 		} else {
 			$query = 'INSERT INTO `startseite` (`text`) VALUES ('.esc($startseitentext).');';
 		}
-		$result = rquery($query);
-
-		if($result) {
-			success('Startseitentext erfolgreich editiert.');
-		} else {
-			success('Startseitentext konnte nicht editiert werden.');
-		}
+		return simple_query_success_fail_message($query, 'Startseitentext erfolgreich editiert.', 'Startseitentext konnte nicht editiert werden.');
 	}
 
 	function kopiere_pruefungen_von_nach ($von, $nach, $delete_old_data = 0) {
-		function_debug_counter("kopiere_pruefungen_von_nach");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		start_transaction();
@@ -4522,7 +4070,6 @@ WHERE 1
 	}
 
 	function update_raumplanung($id, $gebaeude, $raum, $meldungsdatum) {
-		function_debug_counter("update_raumplanung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = '
 UPDATE `veranstaltung` SET
@@ -4542,7 +4089,6 @@ WHERE `id` = '.esc($id);
 	}
 
 	function add_missing_seconds_to_datetime ($dt) {
-		function_debug_counter("add_missing_seconds_to_datetime");
 		# 2018-09-07 00:00
 		if(preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $dt)) {
 			return $dt;
@@ -4595,7 +4141,6 @@ WHERE `id` = '.esc($id);
 	}
 
 	function get_einzelne_termine_by_veranstaltung_id ($id) {
-		function_debug_counter("get_einzelne_termine_by_veranstaltung_id");
 		$query = 'select year(e.start) as start_year, month(e.start) as start_month, day(e.start) as start_day, hour(e.start) as start_hour, minute(e.start) as start_minute, year(e.end) as end_year, month(e.end) as end_month, day(e.end) as end_day, hour(e.end) as end_hour, minute(e.end) as end_minute, g.id as gebaeude_id, g.name as gebaeude_name, r.raumnummer, r.id as raum_id, g.abkuerzung as gebaeude_abkuerzung, dayname(e.start) as day_start, dayname(e.end) as day_end from einzelne_termine e left join raum r on e.raum_id = r.id left join gebaeude g on g.id = r.gebaeude_id  where veranstaltung_id = '.esc($id);
 		$result = rquery($query);
 
@@ -4610,8 +4155,7 @@ WHERE `id` = '.esc($id);
 
 	# 					1	2	   3	   4		5		6	    7		8	9		10			11
 # 12		    13
-	function update_veranstaltung_metadata ($id, $wochentag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, $pruefungsnummern, $master_niveau, $language, $related_veranstaltung, $einzelne_termine) {
-		function_debug_counter("update_veranstaltung_metadata");
+	function update_veranstaltung_metadata ($id, $wochentag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, $pruefungsnummern, $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
@@ -4629,7 +4173,9 @@ INSERT INTO
 		`stunde`,
 		`woche`,
 		`abgabe_pruefungsleistungen`,
-		`related_veranstaltung`
+		`related_veranstaltung`,
+		`fester_bbb_raum`,
+		`videolink`
 	) VALUES (
 		'.esc($id).',
 		'.esc($wunsch).',
@@ -4641,7 +4187,9 @@ INSERT INTO
 		'.esc($stunde).',
 		'.esc($woche).',
 		'.esc($abgabe_pruefungsleistungen).',
-		'.esc($related_veranstaltung).'
+		'.esc($related_veranstaltung).',
+		'.esc($fester_bbb_raum).',
+		'.esc($videolink).'
 	) ON DUPLICATE KEY UPDATE
 		`wunsch` = '.esc($wunsch).',
 		`hinweis` = '.esc($hinweis).',
@@ -4650,9 +4198,11 @@ INSERT INTO
 		`erster_termin` = '.esc($erster_termin).',
 		`wochentag` = '.esc($wochentag).',
 		`stunde` = '.esc($stunde).',
-		`abgabe_pruefungsleistungen` = '.esc($abgabe_pruefungsleistungen).',
 		`woche` = '.esc($woche).',
-		`related_veranstaltung` = '.esc($related_veranstaltung);
+		`abgabe_pruefungsleistungen` = '.esc($abgabe_pruefungsleistungen).',
+		`related_veranstaltung` = '.esc($related_veranstaltung).',
+		`fester_bbb_raum` = '.esc($fester_bbb_raum).',
+		`videolink` = '.esc($videolink);
 
 		$result = rquery($query);
 
@@ -4713,6 +4263,33 @@ INSERT INTO
 				}
 			}
 
+			if(is_array($praesenztyp)) {
+				start_transaction();
+				$failed = 0;
+				$delete = 'delete from veranstaltung_to_praesenztyp where veranstaltung_id = '.esc($id);
+				if(!rquery($delete)) {
+					$failed = 1;
+				}
+				if(!$failed) {
+					foreach ($praesenztyp as $this_praesenztyp) {
+						if(!$failed) {
+							$query = 'insert ignore into veranstaltung_to_praesenztyp (veranstaltung_id, praesenztyp_id) values ('.esc($id).', '.esc($this_praesenztyp).')';
+							if(!rquery($query)) {
+								$failed = 1;
+							}
+						}
+					}
+				}
+
+				if($failed) {
+					rollback();
+					error("Die gewählten Präsenztypen konnten nicht hinzugefügt werden.");
+				} else {
+					commit();
+					success("Die gewählten Präsenztypen wurden erfolgreich hinzugefügt.");
+				}
+			}
+
 			if(is_array($language) && count($language)) {
 				start_transaction();
 				$failed = 0;
@@ -4755,7 +4332,6 @@ INSERT INTO
 	}
 
 	function assign_pruefungsnummer_to_veranstaltung ($pruefungsnummer, $id) {
-		function_debug_counter("assign_pruefungsnummer_to_veranstaltung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		if(is_array($pruefungsnummer)) {
@@ -4785,95 +4361,53 @@ INSERT INTO
 	}
 
 	function update_gebaeude ($id, $name, $abkuerzung) {
-		function_debug_counter("update_gebaeude");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `gebaeude` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Gebäude wurde erfolgreich geändert.');
-		} else {
-			message('Das Gebäude konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Das Gebäude wurde erfolgreich geändert.', null, 'Das Gebäude konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_raum ($id, $raum_name, $gebaeude_id) {
-		function_debug_counter("update_raum");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `raum` SET `raumnummer` = '.esc($raum_name).', `gebaeude_id` = '.esc($gebaeude_id).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Raum wurde erfolgreich geändert.');
-		} else {
-			message('Der Raum konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich geändert.', null, 'Der Raum konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_funktion_rights ($id, $name) {
-		function_debug_counter("update_funktion_rights");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `function_right` SET `function_name` = '.esc($name).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Funktionsrecht wurde erfolgreich geändert.');
-		} else {
-			message('Das Funktionsrecht konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Das Funktionsrecht wurde erfolgreich geändert.', null, 'Das Funktionsrecht konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_studiengang ($id, $name, $institut_id, $studienordnung) {
-		function_debug_counter("update_studiengang");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if ($studienordnung && filter_var($studienordnung, FILTER_VALIDATE_URL) === FALSE) {
 			error('`'.htmlentities($studienordnung).'` ist keine valide URL für die Studienordnung.');
 			$studienordnung = '';
 		}
 		$query = 'UPDATE `studiengang` SET `name` = '.esc($name).', `institut_id` = '.esc($institut_id).', `studienordnung` = '.esc($studienordnung).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Studiengang wurde erfolgreich geändert.');
-		} else {
-			message('Der Studiengang konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich geändert.', null, 'Der Studiengang konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_modul ($id, $name, $studiengang_id, $beschreibung, $abkuerzung) {
-		function_debug_counter("update_modul");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `modul` SET `studiengang_id` = '.esc($studiengang_id).', `name` = '.esc($name).', `beschreibung` = '.esc($beschreibung).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Modul wurde erfolgreich geändert.');
-		} else {
-			message('Das Modul konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Das Modul wurde erfolgreich geändert.', null, 'Das Modul konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_institut ($id, $name, $start_nr) {
-		function_debug_counter("update_institut");
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		if(preg_match('/^\d+$', $start_nr)) {
+		if(preg_match('/^\d+$/', $start_nr)) {
 			$query = 'UPDATE `institut` SET `name` = '.esc($name).', `start_nr` = '.esc($start_nr).' WHERE `id` = '.esc($id);
-			$result = rquery($query);
-			if($result) {
-				success('Das Institut wurde erfolgreich geändert.');
-			} else {
-				message('Das Institut konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-			}
+			return simple_query_success_fail_message($query, 'Das Institut wurde erfolgreich geändert.', null, 'Das Institut konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 		} else {
 			error("Die Startnummer muss eine natürliche Zahl sein");
 		}
 	}
 
 	function update_page ($id, $name, $file) {
-		function_debug_counter("update_page");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `page` SET `name` = '.esc($name).', `file` = '.esc($file).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Seite wurde erfolgreich geändert.');
-		} else {
-			message('Die Seite konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Die Seite wurde erfolgreich geändert.', null, 'Die Seite konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	/*
@@ -4882,7 +4416,6 @@ INSERT INTO
 		zugeordnet werden sollen
 	 */
 	function update_or_create_role_to_page ($id, $role_to_page) {
-		function_debug_counter("update_or_create_role_to_page");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		if(isset($role_to_page) && !is_array($role_to_page)) {
@@ -4916,12 +4449,7 @@ INSERT INTO
 					$rname = get_role_name($trole);
 					if($rname) {
 						$query = 'INSERT IGNORE INTO `'.$GLOBALS['dbname'].'`.`role_to_page` (`role_id`, `page_id`) VALUES ('.esc($trole).', '.esc($id).')';
-						$result = rquery($query);
-						if($result) {
-							success("Die Rolle $rname wurde erfolgreich hinzugefügt.");
-						} else {
-							error("Die Rolle $rname konnte nicht eingefügt werden.");
-						}
+						return simple_query_success_fail_message($query, "Die Rolle $rname wurde erfolgreich hinzugefügt.", "Die Rolle $rname konnte nicht eingefügt werden.");
 					} else {
 						error("Die Rolle mit der ID $trole existiert nicht.");
 					}
@@ -4931,7 +4459,6 @@ INSERT INTO
 	}
 
 	function create_new_page ($name, $file, $show_in_navigation, $parent, $role_to_page, $beschreibung, $hinweis) {
-		function_debug_counter("create_new_page");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if($parent == "") {
 			$parent = null;
@@ -4956,7 +4483,6 @@ INSERT INTO
 	}
 
 	function update_role_to_page_page_info_hinweis ($id, $role_to_page, $beschreibung, $hinweis) {
-		function_debug_counter("update_role_to_page_page_info_hinweis");
 		if(isset($role_to_page)) {
 			update_or_create_role_to_page($id, $role_to_page);
 		}
@@ -4971,7 +4497,6 @@ INSERT INTO
 	}
 
 	function update_page_full($id, $name, $file, $show_in_navigation, $parent, $role_to_page, $beschreibung, $hinweis) {
-		function_debug_counter("update_page_full");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if($parent == "") {
 			$parent = null;
@@ -4981,92 +4506,49 @@ INSERT INTO
 		if($result) {
 			update_role_to_page_page_info_hinweis ($id, $role_to_page, $beschreibung, $hinweis);
 
-			update_function_to_page($id, $role_to_page);
 			success('Die Seite wurde erfolgreich geändert.');
 		} else {
 			message('Die Seite konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 		}
 	}
 
-	function update_function_to_page ($id, $role_to_page) {
-		function_debug_counter("update_function_to_page");
-		 #$query = 'select function_right_id, page_id from function_right_to_page where page_id = '.;
-	}
-
 	function update_pruefungstyp ($id, $name) {
-		function_debug_counter("update_pruefungstyp");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `pruefungstyp` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Prüfungstyp wurde erfolgreich geändert.');
-		} else {
-			message('Der Prüfungstyp konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich geändert.', null, 'Der Prüfungstyp konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_fach ($id, $name) {
-		function_debug_counter("update_fach");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `pruefungsnummer_fach` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Fach wurde erfolgreich geändert.');
-		} else {
-			message('Das Fach konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Das Fach wurde erfolgreich geändert.', null, 'Das Fach konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_pruefungsamt ($id, $name) {
-		function_debug_counter("update_pruefungsamt");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `pruefungsamt` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Das Prüfungsamt wurde erfolgreich geändert.');
-		} else {
-			message('Das Prüfungsamt konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Das Prüfungsamt wurde erfolgreich geändert.', null, 'Das Prüfungsamt konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_pruefung_zeitraum ($id, $name) {
-		function_debug_counter("update_pruefung_zeitraum");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `pruefung_zeitraum` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Zeitraum wurde erfolgreich geändert.');
-		} else {
-			message('Der Zeitraum konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Der Zeitraum wurde erfolgreich geändert.', null, 'Der Zeitraum konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_bereich ($id, $name) {
-		function_debug_counter("update_bereich");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `bereich` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Der Bereich wurde erfolgreich geändert.');
-		} else {
-			message('Der Bereich konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Der Bereich wurde erfolgreich geändert.', null, 'Der Bereich konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_role ($id, $name, $beschreibung) {
-		function_debug_counter("update_role");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `role` SET `name` = '.esc($name).', `beschreibung` = '.esc($beschreibung).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Rolle wurde erfolgreich geändert.');
-		} else {
-			message('Die Rolle konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Die Rolle wurde erfolgreich geändert.', null, 'Die Rolle konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_pruefung ($id, $pruefungstyp_id, $veranstaltung_id, $pruefungsnummer, $pruefungsname, $datum, $stunde, $raum) {
-		function_debug_counter("update_pruefung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `pruefung` SET `pruefungsnummer` = '.esc($pruefungsnummer).', `veranstaltung_id` = '.esc($veranstaltung_id).', `pruefungstyp_id` = '.esc($pruefungstyp_id).', `name` = '.esc($pruefungsname).', `datum` = '.esc($datum).', `stunde` = '.esc($stunde).', `raum_id` = '.esc($raum).' WHERE `id` = '.esc($id);
 		$result = rquery($query);
@@ -5081,47 +4563,28 @@ INSERT INTO
 	}
 
 	function update_text ($page_id, $text) {
-		function_debug_counter("update_text");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT INTO `seitentext` (`page_id`, `text`) VALUES ('.esc($page_id).', '.esc($text).') ON DUPLICATE KEY UPDATE `text` = '.esc($text);
-		$result = rquery($query);
-		if($result) {
-			success('Der Seitentext wurde erfolgreich geändert.');
-		} else {
-			message('Der Seitentext konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Der Seitentext wurde erfolgreich geändert.', null, 'Der Seitentext konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function delete_faq ($id) {
-		function_debug_counter("delete_faq");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `faq` WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Frage wurde erfolgreich gelöscht.');
-		} else {
-			message('Die Frage konnte nicht gelöscht werden.');
-		}
+		return simple_query_success_fail_message($query, 'Die Frage wurde erfolgreich gelöscht.', null, 'Die Frage konnte nicht gelöscht werden.');
 	}
 
 	function update_faq ($id, $frage, $antwort, $wie_oft_gestellt) {
-		function_debug_counter("update_faq");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(!preg_match('/^\d+$/', $wie_oft_gestellt)) {
 			error("Wie oft gestellt muss eine natürliche Zahl sein. Sie wird auf 1 gesetzt statt auf ".htmle($wie_oft_gestellt));
 			$wie_oft_gestellt = 1;
 		}
 		$query = 'UPDATE `faq` SET `frage` = '.esc($frage).', `antwort` = '.esc($antwort).', `wie_oft_gestellt` = '.esc($wie_oft_gestellt).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success('Die Frage wurde erfolgreich geändert.');
-		} else {
-			message('Die Frage konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-		}
+		return simple_query_success_fail_message($query, 'Die Frage wurde erfolgreich geändert.', null, 'Die Frage konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function get_credit_points_and_anzahl_pruefungsleistungen_by_modul_id_and_semester ($modul, $semester) {
-		function_debug_counter("get_credit_points_and_anzahl_pruefungsleistungen_by_modul_id_and_semester");
 		$query = 'SELECT `credit_points`, `anzahl_pruefungsleistungen` FROM `modul_nach_semester_metadata` WHERE `modul_id` = '.esc($modul).' AND `semester` = '.esc($semester);
 		$result = rquery($query);
 		
@@ -5131,7 +4594,6 @@ INSERT INTO
 	}
 
 	function get_veranstaltungstypen_modul_semester ($modul, $semester) {
-		function_debug_counter("get_veranstaltungstypen_modul_semester");
 		$data = array();
 		$query = 'SELECT `v`.`name` as `veranstaltungstyp_name`, `ms`.`anzahl`, `v`.`id` AS `veranstaltungstyp_id` FROM `modul_nach_semester_veranstaltungstypen_anzahl` AS `ms` JOIN `veranstaltungstyp` `v` ON `v`.`id` = `ms`.`veranstaltungstyp_id` WHERE `ms`.`modul_id` = '.esc($modul).' AND `ms`.`semester` = '.esc($semester).' AND `ms`.`anzahl` ORDER BY `ms`.`anzahl` DESC';
 		$result = rquery($query);
@@ -5144,7 +4606,6 @@ INSERT INTO
 	}
 
 	function create_array_veranstaltungstyp_anzahl_by_modul_id_semester($modul, $semester) {
-		function_debug_counter("create_array_veranstaltungstyp_anzahl_by_modul_id_semester");
 		$array = array();
 		foreach (create_veranstaltungstyp_array() as $this_veranstaltungstyp) {
 			$array[$this_veranstaltungstyp[0]] = 0;
@@ -5161,7 +4622,6 @@ INSERT INTO
 	}
 
 	function update_modul_semester_data($semester, $studiengang, $credit_points, $pruefungsleistung_anzahl, $veranstaltungstypen_anzahl, $modul_id) {
-		function_debug_counter("update_modul_semester_data");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$error = 0;
@@ -5230,18 +4690,12 @@ INSERT INTO
 	}
 
 	function update_titel ($id, $name, $abk) {
-		function_debug_counter("update_titel");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(isset($id)) {
 			if(isset($name)) {
 				if(isset($abk)){
 					$query = 'UPDATE `titel` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abk).' WHERE `id` = '.esc($id);
-					$result = rquery($query);
-					if($result) {
-						success('Der Titel wurde erfolgreich geändert.');
-					} else {
-						message('Der Titel konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-					}
+					return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich geändert.', null, 'Der Titel konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 				} else {
 					error("Leere Abkürzung.");
 				}
@@ -5254,17 +4708,11 @@ INSERT INTO
 	}
 
 	function update_hinweis ($page_id, $hinweis) {
-		function_debug_counter("update_hinweis");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(get_page_name_by_id($page_id)) {
 			if($hinweis) {
 				$query = 'INSERT INTO `hinweise` (`page_id`, `hinweis`) VALUES ('.esc($page_id).', '.esc($hinweis).') ON DUPLICATE KEY UPDATE `hinweis` = '.esc($hinweis);
-				$result = rquery($query);
-				if($result) {
-					success('Der neue Hinweis wurde erfolgreich geändert.');
-				} else {
-					message('Der Hinweis konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
-				}
+				return simple_query_success_fail_message($query, 'Der neue Hinweis wurde erfolgreich geändert.', null, 'Der Hinweis konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 			} else {
 				message("Leerer Hinweis.");
 			}
@@ -5274,7 +4722,6 @@ INSERT INTO
 	}
 
 	function update_superdozent ($user, $dozenten) {
-		function_debug_counter("update_superdozent");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		start_transaction();
@@ -5307,7 +4754,6 @@ INSERT INTO
 	}
 
 	function user_is_logged_in () {
-		function_debug_counter("user_is_logged_in");
 		if(preg_match('/^\d+$/', $GLOBALS["logged_in_user_id"])) {
 			return 1;
 		} else {
@@ -5316,7 +4762,6 @@ INSERT INTO
 	}
 
 	function user_has_role ($user, $rolename) {
-		function_debug_counter("user_has_role");
 		$admin_role_id = get_role_id($rolename);
 
 		$this_user_role_id = get_role_id_by_user($user);
@@ -5329,19 +4774,16 @@ INSERT INTO
 	}
 
 	function user_is_admin ($user) {
-		function_debug_counter("user_is_admin");
 		// CACHEN!!!
 		return user_has_role($user, 'Administrator');
 	}
 
 	function user_is_verwalter ($user) {
-		function_debug_counter("user_is_verwalter");
 		// CACHEN!!!
 		return user_has_role($user, "Verwalter");
 	}
 
 	function user_is_superdozent ($user) {
-		function_debug_counter("user_is_superdozent");
 		$superdozent_role_id = get_role_id('Superdozent');
 		$verwalter_role_id = get_role_id('Verwalter');
 
@@ -5355,7 +4797,6 @@ INSERT INTO
 	}
 
 	function get_user_per_superdozent ($user) {
-		function_debug_counter("get_user_per_superdozent");
 		$dozenten_liste = array();
 
 		$query = 'SELECT `dozent_id` FROM `superdozent` WHERE `user_id` = '.esc($user);
@@ -5369,7 +4810,6 @@ INSERT INTO
 	}
 
 	function user_can_edit_other_users_veranstaltungen ($user, $dozent) {
-		function_debug_counter("user_can_edit_other_users_veranstaltungen");
 		$can = 0;
 
 		$query = 'SELECT COUNT(*) FROM `superdozent` WHERE `user_id` = '.esc($user).' AND `dozent_id` = '.esc($dozent);
@@ -5389,7 +4829,6 @@ INSERT INTO
 	}
 
 	function update_pruefungsamt_studiengang ($id, $studiengang) {
-		function_debug_counter("update_pruefungsamt_studiengang");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		start_transaction();
@@ -5421,20 +4860,28 @@ INSERT INTO
 		}
 	}
 
-	function update_page_info ($id, $info) {
-		function_debug_counter("update_page_info");
-		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT INTO `page_info` (`page_id`, `info`) VALUES ('.esc($id).', '.esc($info).') ON DUPLICATE KEY UPDATE `info` = '.esc($info);
+	function simple_query_success_fail_message ($query, $success, $fail = null, $message = null) {
 		$result = rquery($query);
 		if($result) {
-			success('Die Seiteninfo wurde erfolgreich geändert.');
+			success($success);
+			return 1;
 		} else {
-			message('Die Seiteninfo konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
+			if(is_null($fail) && !is_null($message)) {
+				message($message);
+			} else {
+				error($fail);
+			}
+			return 0;
 		}
 	}
 
+	function update_page_info ($id, $info) {
+		if(!check_function_rights(__FUNCTION__)) { return; }
+		$query = 'INSERT INTO `page_info` (`page_id`, `info`) VALUES ('.esc($id).', '.esc($info).') ON DUPLICATE KEY UPDATE `info` = '.esc($info);
+		return simple_query_success_fail_message($query, 'Die Seiteninfo wurde erfolgreich geändert.', null, 'Die Seiteninfo konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
+	}
+
 	function update_modul_semester ($modul, $semester) {
-		function_debug_counter("update_modul_semester");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$success_counter = 0;
@@ -5472,7 +4919,6 @@ INSERT INTO
 	}
 
 	function update_nachpruefung ($id, $pruefung, $datum, $raum, $stunde) {
-		function_debug_counter("update_nachpruefung");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'UPDATE `nachpruefung` SET `pruefungs_id` = '.esc($pruefung).', `raum_id` = '.esc($raum).', `datum` = '.esc($datum).', `stunde` = '.esc($stunde).' WHERE `id` = '.esc($id);
 		$result = rquery($query);
@@ -5487,7 +4933,6 @@ INSERT INTO
 	}
 
 	function create_semester_type_array () {
-		function_debug_counter("create_semester_type_array");
 		return array('Wintersemester', 'Sommersemester');
 	}
 
@@ -5496,7 +4941,6 @@ INSERT INTO
 	#			1		2	3	4	5		6		7		8			9
 	# 10
 	function simple_edit ($columnnames, $table, $columns, $page, $datanames, $block_user_id, $htmlentities = 1, $special_input = array(), $order_by = null, $disable_new = 0, $disable_delete = 0, $width = null) {
-		function_debug_counter("simple_edit");
 		$query = 'SELECT `id`, `'.join('`, `', $columnnames).'` FROM `'.$table.'`';
 		if($order_by) {
 			$query .= ' ORDER BY `'.join('`, `', $order_by).'`';
@@ -5624,7 +5068,6 @@ INSERT INTO
 	}
 
 	function create_select ($data, $chosen, $name, $allow_empty = 0, $noautosubmit = 0, $aria_labelledby = null) {
-		function_debug_counter("create_select");
 		if(!is_null($aria_labelledby)) {
 			$aria_labelledby = 'aria-labelledby="'.htmle($aria_labelledby).'"';
 		} else {
@@ -5655,7 +5098,6 @@ INSERT INTO
 	}
 
 	function create_table_one_dependency ($data, $columnnames, $headlines, $table, $page, $select_name, $dataname, $where = null) {
-		function_debug_counter("create_table_one_dependency");
 ?>
 		<table>
 			<tr>
@@ -5765,7 +5207,6 @@ INSERT INTO
 	}
 
 	function create_modul_html ($veranstaltung_id, $modul, $chosen) {
-		function_debug_counter("create_modul_html");
 		$query = 'SELECT `modul_id` FROM `veranstaltung_nach_modul` WHERE `veranstaltung_id` = '.esc($veranstaltung_id);
 		$result = rquery($query);
 ?>
@@ -5783,7 +5224,6 @@ INSERT INTO
 	}
 
 	function create_studiengang_html ($veranstaltung_id, $studiengaenge) {
-		function_debug_counter("create_studiengang_html");
 ?>
 		<div class="input_fields_wrap_studiengang_<?php print $veranstaltung_id; ?>">
 			<button class="add_field_button_studiengang"><img src="plus.png" /></button>
@@ -5793,7 +5233,6 @@ INSERT INTO
 	}
 
 	function create_modul_html_vvz ($id) {
-		function_debug_counter("create_modul_html_vvz");
 		if(is_null($id) || !$id) {
 			return null;
 		}
@@ -5804,7 +5243,6 @@ INSERT INTO
 	}
 
 	function create_pruefungsmoeglichkeiten_html ($id) {
-		function_debug_counter("create_pruefungsmoeglichkeiten_html");
 		$query = 'SELECT `pt`.`name`, `p`.`name`, `p`.`pruefungsnummer` FROM `pruefung` `p` LEFT JOIN `pruefungstyp` `pt` ON `pt`.`id` = `p`.`pruefungstyp_id` WHERE `p`.`veranstaltung_id` = '.esc($id);
 		$result = rquery($query);
 
@@ -5822,7 +5260,6 @@ INSERT INTO
 	}
 
 	function create_studiengang_html_vvz ($id) {
-		function_debug_counter("create_studiengang_html_vvz");
 		$query = 'SELECT `studiengang_id` FROM `veranstaltung_nach_studiengang` WHERE `veranstaltung_id` = '.esc($id);
 		$result = rquery($query);
 
@@ -5830,7 +5267,6 @@ INSERT INTO
 	}
 
 	function print_ul_li_from_result ($result) {
-		function_debug_counter("print_ul_li_from_result");
 		$i = 0;
 		while ($row = mysqli_fetch_row($result)) {
 			$name = get_studiengang_name($row[0]);
@@ -5848,7 +5284,6 @@ INSERT INTO
 	}
 
 	function create_nachpruefung_liste ($pruefung_id) {
-		function_debug_counter("create_nachpruefung_liste");
 		$query = 'SELECT `g`.`abkuerzung`, `r`.`raumnummer`, date_format(`datum`, "%d.%m.%Y") `datum`, `stunde` FROM `nachpruefung` `np` LEFT JOIN `raum` `r` ON `r`.`id` = `np`.`raum_id` LEFT JOIN `gebaeude` `g` ON `g`.`id` = `r`.`gebaeude_id` WHERE `pruefungs_id` = '.esc($pruefung_id);
 		$result = rquery($query);
 
@@ -5876,7 +5311,6 @@ INSERT INTO
 	}
 
 	function create_pruefungsplan ($veranstaltungen) {
-		function_debug_counter("create_pruefungsplan");
 		$query = 'SELECT `pt`.`name`,  `p`.`name`, `p`.`pruefungsnummer`, date_format(`p`.`datum`, "%d.%m.%Y"), `p`.`stunde`, `g`.`abkuerzung`, `r`.`raumnummer`, `v`.`titel`, `p`.`id` FROM `pruefung` `p` LEFT JOIN `raum` `r` ON `p`.`raum_id` = `r`.`id` LEFT JOIN `gebaeude` `g` ON `r`.`gebaeude_id` = `g`.`id` LEFT JOIN `pruefungstyp` `pt` ON `p`.`pruefungstyp_id` = `pt`.`id` LEFT JOIN `veranstaltung` `v` ON `v`.`id` = `p`.`veranstaltung_id` WHERE `p`.`veranstaltung_id` IN ('.join(", ", array_map('esc', $veranstaltungen)).')';
 		$result = rquery($query);
 		if(mysqli_num_rows($result)) {
@@ -5916,13 +5350,11 @@ INSERT INTO
 	}
 
 	function my_strip_tags ($str) {
-		function_debug_counter("my_strip_tags");
 		$str = preg_replace('/<br\s*\/*>/', "\n", $str);
 		return strip_tags($str);
 	}
 
 	function create_stundenplan ($veranstaltungen, $show_pruefungsleistungen = 1, $show_gebaeudeliste = 1, $bereich = null, $excel = 0, $studiengang_id = null, $dozent = null, $semester = null) {
-		function_debug_counter("create_stundenplan");
 		$stundenplan = array(
 			'Mo' => array('', '', '', '', '', '', '', '', ''),
 			'Di' => array('', '', '', '', '', '', '', '', ''),
@@ -6255,7 +5687,6 @@ INSERT INTO
 	}
 
 	function comma_list_to_array ($str) {
-		function_debug_counter("comma_list_to_array");
 		$array = array();
 
 		$str = preg_replace('/^,+/', '', $str);
@@ -6269,7 +5700,6 @@ INSERT INTO
 	/* Datenfunktionen */
 
 	function create_page_info_parent ($parent, $user_role_id_data = null) {
-		function_debug_counter("create_page_info_parent");
 		$page_infos = array();
 		$query = 'SELECT `p`.`id`, `p`.`name`, `p`.`file`, `pi`.`info`, `p`.`parent` FROM `page` `p` LEFT JOIN `page_info` `pi` ON `pi`.`page_id` = `p`.`id` WHERE `p`.`show_in_navigation` = "1" AND `parent` = '.esc($parent);
 		if(isset($user_role_id_data)) {
@@ -6284,7 +5714,6 @@ INSERT INTO
 	}
 
 	function table_has_mergeable_structure ($table) {
-		function_debug_counter("table_has_mergeable_structure");
 		if(preg_match('/^view_/', $table)) {
 			return 0;
 		}
@@ -6304,7 +5733,6 @@ INSERT INTO
 	}
 
 	function get_father_page ($id) {
-		function_debug_counter("get_father_page");
 		$query = 'SELECT `parent` FROM `page` WHERE `id` = '.esc($id);
 		$result = rquery($query);
 
@@ -6320,7 +5748,6 @@ INSERT INTO
 	}
 
 	function create_page_info () {
-		function_debug_counter("create_page_info");
 		$page_infos = array();
 		$query = 'select p.id, p.name, p.file, pi.info, p.parent from page p left join page_info pi on pi.page_id = p.id where p.show_in_navigation = "1" ORDER BY p.name';
 		$result = rquery($query);
@@ -6331,7 +5758,6 @@ INSERT INTO
 	}
 
 	function create_studiengaenge_mit_veranstaltungen_array ($semester = null, $institut = null) {
-		function_debug_counter("create_studiengaenge_mit_veranstaltungen_array");
 		$studiengaenge = array();
 		$query = 'SELECT `s`.`id`, `s`.`name` FROM `studiengang` `s` JOIN `view_veranstaltung_nach_studiengang` `vs` ON `s`.`id` = `vs`.`studiengang_id` JOIN `veranstaltung` `v` ON `v`.`id` = `vs`.`veranstaltung_id` WHERE 1 ';
 		if(isset($semester) && !is_array($semester)) {
@@ -6352,7 +5778,6 @@ INSERT INTO
 	}
 
 	function create_zeitraum_array () {
-		function_debug_counter("create_zeitraum_array");
 		$studiengaenge = array();
 		$query = 'SELECT `id`, `name` FROM `pruefung_zeitraum`';
 		$result = rquery($query);
@@ -6363,7 +5788,6 @@ INSERT INTO
 	}
 
 	function create_studiengaenge_array ($institut_id = null) {
-		function_debug_counter("create_studiengaenge_array");
 		$studiengaenge = array();
 		$query = 'SELECT `id`, `name` FROM `studiengang`';
 		if($institut_id) {
@@ -6377,7 +5801,6 @@ INSERT INTO
 	}
 
 	function create_semester_array_short () {
-		function_debug_counter("create_semester_array_short");
 		$semester = array();
 		$query = 'SELECT `id`, concat(`typ`, " ", `jahr`) FROM `semester` ORDER BY `jahr`, `typ`';
 		$result = rquery($query);
@@ -6392,7 +5815,6 @@ INSERT INTO
 	}
 
 	function create_semester_array ($mit_veranstaltungen = 0, $split_typen = 0, $id_in = null) {
-		function_debug_counter("create_semester_array");
 		$semester = array();
 		$query = 'SELECT `id`, `typ`, `jahr` FROM `semester` WHERE 1 AND ';
 
@@ -6444,7 +5866,6 @@ INSERT INTO
 	}
 
 	function create_pruefungsamt_array() {
-		function_debug_counter("create_pruefungsamt_array");
 		$pruefungsamt = array();
 		$query = 'SELECT `id`, `name` FROM `pruefungsamt`';
 		$result = rquery($query);
@@ -6455,7 +5876,6 @@ INSERT INTO
 	}
 
 	function create_institute_array () {
-		function_debug_counter("create_institute_array");
 		$institute = array();
 		$query = 'SELECT `id`, `name` FROM `institut`';
 		$result = rquery($query);
@@ -6466,7 +5886,6 @@ INSERT INTO
 	}
 
 	function create_raum_array () {
-		function_debug_counter("create_raum_array");
 		$raum = array();
 
 		$gebaeude = create_gebaeude_abkuerzungen_array();
@@ -6480,7 +5899,6 @@ INSERT INTO
 	}
 
 	function create_dozenten_first_last_name_array () {
-		function_debug_counter("create_dozenten_first_last_name_array");
 		$dozenten = array();
 		$query = 'SELECT `last_name`, `first_name` FROM `dozent`';
 		$result = rquery($query);
@@ -6491,7 +5909,6 @@ INSERT INTO
 	}
 
 	function create_dozenten_by_ids_array ($ids) {
-		function_debug_counter("create_dozenten_by_ids_array");
 		$dozenten = array();
 		$query = 'SELECT `id`, concat(`last_name`, ", ", `first_name`) FROM `dozent` WHERE `id` IN ('.multiple_esc_join($ids).')';
 		$result = rquery($query);
@@ -6502,7 +5919,6 @@ INSERT INTO
 	}
 
 	function create_dozenten_array ($show_ausgeschieden = 0) {
-		function_debug_counter("create_dozenten_array");
 		$dozenten = array();
 		$query = 'SELECT `id`, concat(`last_name`, ", ", `first_name`) FROM `dozent` `d` WHERE `d`.`ausgeschieden` = ';
 		if($show_ausgeschieden) {
@@ -6519,7 +5935,6 @@ INSERT INTO
 	}
 
 	function create_veranstaltungstyp_abkuerzung_array () {
-		function_debug_counter("create_veranstaltungstyp_abkuerzung_array");
 		$veranstaltungstyp = array();
 		$query = 'SELECT `id`, `abkuerzung` FROM `veranstaltungstyp`';
 		$result = rquery($query);
@@ -6530,7 +5945,6 @@ INSERT INTO
 	}
 
 	function create_veranstaltungstyp_abkuerzung_namen_array () {
-		function_debug_counter("create_veranstaltungstyp_abkuerzung_namen_array");
 		$veranstaltungstyp = array();
 		$query = 'SELECT `name`, `abkuerzung` FROM `veranstaltungstyp`';
 		$result = rquery($query);
@@ -6541,7 +5955,6 @@ INSERT INTO
 	}
 
 	function create_veranstaltungstyp_name_array () {
-		function_debug_counter("create_veranstaltungstyp_name_array");
 		$veranstaltungstyp = array();
 		$query = 'SELECT `id`, `name` FROM `veranstaltungstyp`';
 		$result = rquery($query);
@@ -6552,7 +5965,6 @@ INSERT INTO
 	}
 
 	function create_veranstaltungstyp_array () {
-		function_debug_counter("create_veranstaltungstyp_array");
 		$veranstaltungstyp = array();
 		$query = 'SELECT `id`, `name`, `abkuerzung` FROM `veranstaltungstyp`';
 		$result = rquery($query);
@@ -6563,13 +5975,11 @@ INSERT INTO
 	}
 
 	function create_stunden_array () {
-		function_debug_counter("create_stunden_array");
 		$data = enum_to_array($GLOBALS['dbname'], 'veranstaltung_metadaten', 'stunde');
 		return $data;
 	}
 
 	function get_vvz_start_message ($institut_id) {
-		function_debug_counter("get_vvz_start_message");
 		if(is_null($institut_id)) {
 			$institut_id = 0;
 		}
@@ -6587,7 +5997,6 @@ INSERT INTO
 	}
 
 	function enum_to_array($database, $table, $field) {    
-		function_debug_counter("enum_to_array");
 		$query = "SHOW FIELDS FROM `{$database}`.`{$table}` LIKE '{$field}'";
 		$result = rquery($query);
 		$enum = NULL;
@@ -6599,12 +6008,10 @@ INSERT INTO
 	}
 
 	function create_wann_array () {
-		function_debug_counter("create_wann_array");
 		return array("jede Woche", "gerade Woche", "ungerade Woche", 'keine Angabe');
 	}
 
 	function create_wochentag_array ($all = 0) {
-		function_debug_counter("create_wochentag_array");
 		if($all) {
 			return array('Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So', 'BS');
 		} else {
@@ -6613,7 +6020,6 @@ INSERT INTO
 	}
 
 	function create_wochentag_abk_nach_name_array () {
-		function_debug_counter("create_wochentag_abk_nach_name_array");
 		return array(
 			'Mo' => 'Montag',
 			'Di' => 'Dienstag',
@@ -6627,7 +6033,6 @@ INSERT INTO
 	}
 
 	function create_gebaeude_abkuerzungen_array() {
-		function_debug_counter("create_gebaeude_abkuerzungen_array");
 		$gebaeude = array();
 		$query = 'SELECT `id`, `abkuerzung` FROM `gebaeude`';
 		$result = rquery($query);
@@ -6637,15 +6042,30 @@ INSERT INTO
 		return $gebaeude;
 	}
 
-	function veranstaltung_has_language ($v_id, $l_id) {
-		function_debug_counter("veranstaltung_has_language");
-		$query = 'select count(*) from veranstaltung_to_language where veranstaltung_id = '.esc($v_id).' and language_id = '.esc($l_id);;
+	function veranstaltung_has_praesenztyp ($v_id, $p_id) {
+		$query = 'select count(*) from veranstaltung_to_praesenztyp where veranstaltung_id = '.esc($v_id).' and praesenztyp_id = '.esc($p_id);
 		$res = get_single_row_from_query($query);
 		return !!$res;
 	}
 
+	function veranstaltung_has_language ($v_id, $l_id) {
+		$query = 'select count(*) from veranstaltung_to_language where veranstaltung_id = '.esc($v_id).' and language_id = '.esc($l_id);
+		$res = get_single_row_from_query($query);
+		return !!$res;
+	}
+
+	function create_praesenztypen_array () {
+		$query = 'SELECT `id`, `name` FROM `praesenztyp`';
+		$result = rquery($query);
+		$typen = array();
+		while ($row = mysqli_fetch_row($result)) {
+			$typen[$row[0]] = array($row[0], $row[1]);
+		}
+		$GLOBALS['create_praesenztypen_array_cache'] = $typen;
+		return $typen;
+	}
+
 	function create_language_array () {
-		function_debug_counter("create_language_array");
 		$query = 'SELECT `id`, `name` FROM `language`';
 		$result = rquery($query);
 		$languages = array();
@@ -6657,7 +6077,6 @@ INSERT INTO
 	}
 
 	function create_studiengang_array_by_institut_id_str ($institut_id = null, $studiengaenge = array()) {
-		function_debug_counter("create_studiengang_array_by_institut_id_str");
 		$query = 'SELECT `id`, `name` FROM `studiengang`';
 		if(!is_null($institut_id) && $institut_id) {
 			$query .= ' WHERE `institut_id` = '.esc($institut_id);
@@ -6670,12 +6089,10 @@ INSERT INTO
 	}
 
 	function create_studiengang_array_by_institut_id ($institut_id = null) {
-		function_debug_counter("create_studiengang_array_by_institut_id");
 		return create_studiengang_array_by_institut_id_str($institut_id, array("alle" => "Alle Studiengänge"));
 	}
 
 	function create_pruefungsnummern_array () {
-		function_debug_counter("create_pruefungsnummern_array");
 		$pruefungsnummern = array();
 		$query = 'SELECT `p`.`id`, `p`.`pruefungsnummer`, `p`.`pruefungstyp_id`, `pt`.`name` AS `pruefungstyp_name` FROM `pruefungsnummer` `p` LEFT JOIN `pruefungstyp` `pt` ON `pt`.`id` = `p`.`pruefungstyp_id`';
 		if(strlen($modul_id)) {
@@ -6689,7 +6106,6 @@ INSERT INTO
 	}
 
 	function html_calendar ($first = 0) {
-		function_debug_counter("html_calendar");
 		$first = $GLOBALS['shown_help_ids']['calendar'];
 		if($first) {
 			$GLOBALS['shown_help_ids']['calendar'] = 1;
@@ -6700,7 +6116,6 @@ INSERT INTO
 	}
 
 	function html_map ($lat, $lon, $geb, $first = 0, $die = 0) {
-		function_debug_counter("html_map");
 		$first = $GLOBALS['shown_help_ids']['google_maps_icon'];
 		if($geb) {
 			$array = get_gebaeude_geo_coords_by_id($geb);
@@ -6722,17 +6137,14 @@ INSERT INTO
 	}
 
 	function html_checked () {
-		function_debug_counter("html_checked");
 		return '<span title="Erledigte Prüfung" class="green_large">&#10003;</span>';
 	}
 
 	function html_chosen () {
-		function_debug_counter("html_chosen");
 		return '<span title="Geplante Prüfung" class="blue_large">&#x1f58a;</span>';
 	}
 
 	function create_pruefungsnummern_array_by_modul_id ($modul_id = '', $show_disabled = 0) {
-		function_debug_counter("create_pruefungsnummern_array_by_modul_id");
 		$pruefungsnummern = array();
 		$query = '
 SELECT 
@@ -6784,7 +6196,6 @@ WHERE 1
 	}
 
 	function create_module_array_by_studiengang_and_semester ($studiengang_id, $semester = NULL) {
-		function_debug_counter("create_module_array_by_studiengang_and_semester");
 		$module = array();
 		$query = 'SELECT `id`, `name`, `studiengang_id` FROM `modul` WHERE 1';
 		if(!is_null($semester)) {
@@ -6808,12 +6219,10 @@ WHERE 1
 	}
 
 	function create_module_array_by_studiengang ($studiengang_id) {
-		function_debug_counter("create_module_array_by_studiengang");
 		return create_module_array_by_studiengang_and_semester($studiengang_id, null);
 	}
 
 	function create_modul_studiengang_array ($shorten = 70, $institut_id = null) {
-		function_debug_counter("create_modul_studiengang_array");
 		$modul = array();
 		$query = 'SELECT `m`.`id`, concat(`s`.`name`, " | ", `m`.`name`) as `name` FROM `modul` `m` LEFT JOIN `studiengang` `s` ON `s`.`id` = `m`.`studiengang_id`';
 		if($institut_id) {
@@ -6832,7 +6241,6 @@ WHERE 1
 	}
 
 	function create_bereiche_array () {
-		function_debug_counter("create_bereiche_array");
 		$modul = array();
 		$query = 'SELECT `id`, `name` FROM `bereich`';
 		$result = rquery($query);
@@ -6843,7 +6251,6 @@ WHERE 1
 	}
 
 	function create_pruefungsnummer_fach_array () {
-		function_debug_counter("create_pruefungsnummer_fach_array");
 		$modul = array();
 		$query = 'SELECT `id`, `name` FROM `pruefungsnummer_fach`';
 		$result = rquery($query);
@@ -6854,7 +6261,6 @@ WHERE 1
 	}
 
 	function create_modul_array () {
-		function_debug_counter("create_modul_array");
 		$modul = array();
 		$query = 'SELECT `id`, `name` FROM `modul`';
 		$result = rquery($query);
@@ -6865,7 +6271,6 @@ WHERE 1
 	}
 
 	function create_veranstaltungen_array ($dozent = null, $not_id = null, $shorten = 0, $semester = null, $institut = null) {
-		function_debug_counter("create_veranstaltungen_array");
 		$veranstaltungen = array();
 		$query = 'SELECT `v`.`veranstaltung_id`, `v`.`veranstaltung_name`, concat(`v`.`first_name`, " ", `v`.`last_name`) AS `dozent`, `v`.`veranstaltung_typ`, `v`.`wochentag`, `v`.`stunde` FROM `view_veranstaltung_komplett` `v` ';
 		
@@ -6935,7 +6340,6 @@ WHERE 1
 	}
 
 	function create_pruefungstypen_array () {
-		function_debug_counter("create_pruefungstypen_array");
 		$pruefungstypen = array();
 		$query = 'SELECT `id`, `name` FROM `pruefungstyp`';
 		$result = rquery($query);
@@ -6946,7 +6350,6 @@ WHERE 1
 	}
 
 	function create_seiten_array () {
-		function_debug_counter("create_seiten_array");
 		$seiten = array();
 		$query = 'SELECT `id`, `name`, `file` FROM `page`';
 		$result = rquery($query);
@@ -6957,7 +6360,6 @@ WHERE 1
 	}
 
 	function create_gebaeude_array($show_long_name = 1) {
-		function_debug_counter("create_gebaeude_array");
 		$gebaeude = array();
 		$query = 'SELECT `id`, `name`, `abkuerzung` FROM `gebaeude`';
 		$result = rquery($query);
@@ -6968,7 +6370,6 @@ WHERE 1
 	}
 
 	function create_pruefungen_veranstaltungen_array () {
-		function_debug_counter("create_pruefungen_veranstaltungen_array");
 		$pruefungen = array();
 		$query = 'SELECT `v`.`id`, count(*) AS `anzahl_pruefungen` FROM `pruefung` `p` LEFT JOIN `veranstaltung` `v` ON `v`.`id` = `p`.`veranstaltung_id` GROUP BY `v`.`id`';
 		$result = rquery($query);
@@ -6979,7 +6380,6 @@ WHERE 1
 	}
 
 	function create_studiengang_array_with_semester_data () {
-		function_debug_counter("create_studiengang_array_with_semester_data");
 		$query = 'select s.id, s.name, b.name from studiengang s left join view_modul_semester vms on vms.studiengang_id = s.id where modul_id is not null and semester is not null group by id';
 		$result = rquery($query);
 
@@ -6996,7 +6396,6 @@ WHERE 1
 	}
 
 	function print_hinweis_for_page ($chosen_page){
-		function_debug_counter("print_hinweis_for_page");
 		$hinweis = get_hinweis_for_page($chosen_page);
 		if($hinweis) {
 			print "<span class='blue_text'><i>Hinweis: </i> ".htmlentities($hinweis)."<br /><br /></span>";
@@ -7004,7 +6403,6 @@ WHERE 1
 	}
 
 	function get_hinweis_for_page ($chosen_page) {
-		function_debug_counter("get_hinweis_for_page");
 		$query = 'SELECT `hinweis` FROM `hinweise` WHERE `page_id` = '.esc($chosen_page);
 		$result = rquery($query);
 		$hinweis = '';
@@ -7017,7 +6415,6 @@ WHERE 1
 	}
 
 	function get_roles_for_page ($pageid) {
-		function_debug_counter("get_roles_for_page");
 		$rollen = array();
 		$query = 'SELECT `role_id` FROM `role_to_page` WHERE `page_id` = '.esc($pageid);
 		$result = rquery($query);
@@ -7028,7 +6425,6 @@ WHERE 1
 	}
 
 	function create_page_parent_array () {
-		function_debug_counter("create_page_parent_array");
 		$rollen = array();
 		$query = 'SELECT `id`, `name` FROM `page` WHERE `parent` IS NULL AND `file` IS NULL';
 		$result = rquery($query);
@@ -7039,7 +6435,6 @@ WHERE 1
 	}
 
 	function create_rollen_array () {
-		function_debug_counter("create_rollen_array");
 		$rollen = array();
 		$query = 'SELECT `id`, `name` FROM `role`';
 		$result = rquery($query);
@@ -7050,7 +6445,6 @@ WHERE 1
 	}
 
 	function create_user_array ($role = 0, $specific_role = null) {
-		function_debug_counter("create_user_array");
 		$user = array();
 		if($role) {
 			$query = 'SELECT `u`.`id`, `u`.`username`, `r`.`role_id` FROM `users` `u` JOIN `role_to_user` `r` ON `r`.`user_id` = `u`.`id`';
@@ -7075,7 +6469,6 @@ WHERE 1
 	/* Hilfsfunktionen */
 
 	function global_exists ($name) {
-		function_debug_counter("global_exists");
 		if(array_key_exists($name, $GLOBALS) && count($GLOBALS[$name])) {
 			return 1;
 		} else {
@@ -7084,7 +6477,6 @@ WHERE 1
 	}
 
 	function get_output_class ($name) {
-		function_debug_counter("get_output_class");
 		if($name == 'error') {
 			return "red_background";
 		} else if ($name == 'right_issue') {
@@ -7103,7 +6495,6 @@ WHERE 1
 	}
 
 	function show_output ($name, $color) {
-		function_debug_counter("show_output");
 		if(global_exists($name)) {
 			#print "<div class='square ".get_output_class($name)."'>\n";
 			print "<div class='square'>\n";
@@ -7140,7 +6531,6 @@ WHERE 1
 	}
 
 	function raum_ist_belegt ($raum_id, $datum, $stunde, $pruefung_id, $nachpruefung_id) {
-		function_debug_counter("raum_ist_belegt");
 		$raum_ist_belegt = 0;
 
 		if($raum_id && $datum && $stunde) {
@@ -7171,7 +6561,6 @@ WHERE 1
 	}
 
 	function export_pruefungsnummern_dozent ($chosen_semester, $chosen_dozent, $chosen_institut, $chosen_studiengang, $chosen_pruefungsamt, $studiengang_group_by, $html = 1) {
-		function_debug_counter("export_pruefungsnummern_dozent");
 		#			0														1
 		#	2			3		4
 		$query = 'SELECT 
@@ -7299,8 +6688,7 @@ $ret_string .= '</table>';
 			$number++;
 			$ci = 0;
 			foreach ($data as $studiengang => $local_data) {
-				$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $studiengang);
-				cellColor($objPHPExcel, $letter.$number, '99acbe');
+				set_cell_value_and_color($objPHPExcel, $letter.$number, $studiengang, '99acbe');
 				$objPHPExcel->getActiveSheet()->mergeCells("A".$number.":"."D".$number);
 				$number++;
 
@@ -7327,7 +6715,6 @@ $ret_string .= '</table>';
 	}
 
 	function create_add_where_export_dozent_pruefungsnummern ($chosen_institut, $chosen_dozent, $chosen_studiengang, $chosen_pruefungsamt) {
-		function_debug_counter("create_add_where_export_dozent_pruefungsnummern");
 		$query = '';
 		if(!is_null($chosen_institut)) {
 			$query .= ' AND `v`.`institut_id` = '.esc($chosen_institut);
@@ -7345,13 +6732,9 @@ $ret_string .= '</table>';
 	}
 
 	function export_dozent_pruefungsnummern ($chosen_semester, $chosen_dozent, $chosen_institut, $chosen_studiengang, $chosen_pruefungsamt, $html = 1) {
-		function_debug_counter("export_dozent_pruefungsnummern");
 		$query = 'SELECT concat(`d`.`last_name`, ", ",`d`.`first_name`) AS `dozent_name`, IF(`pn`.`pruefungsnummer`, `pn`.`pruefungsnummer`, "NODATA") `pruefungsdaten`, `s`.`name` AS `studiengang`, `pz`.`name` FROM `veranstaltung` `v` JOIN `pruefung` `p` ON `p`.`veranstaltung_id` = `v`.`id` JOIN `pruefungsnummer` `pn` ON `pn`.`id` = `p`.`pruefungsnummer_id` JOIN `dozent` `d` ON `v`.`dozent_id` = `d`.`id` JOIN `modul` `m` ON `m`.`id` = `pn`.`modul_id` JOIN `studiengang` `s` ON `s`.`id` = `m`.`studiengang_id` JOIN `pruefung_zeitraum` `pz` ON `pz`.`id` = `pn`.`zeitraum_id` WHERE `v`.`semester_id` = '.esc($chosen_semester);
-
-		$query .= create_add_where_export_dozent_pruefungsnummern ($chosen_institut, $chosen_dozent, $chosen_studiengang, $chosen_pruefungsamt);
-
+		$query .= create_add_where_export_dozent_pruefungsnummern($chosen_institut, $chosen_dozent, $chosen_studiengang, $chosen_pruefungsamt);
 		$query .= ' ORDER BY `studiengang`, `dozent_name`, `pruefungsdaten`';
-
 		$result = rquery($query);
 
 		$data = array();
@@ -7425,8 +6808,7 @@ $ret_string .= '</table>';
 
 			$number++;
 			foreach ($data2 as $studiengang => $local_data) {
-				$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $studiengang);
-				cellColor($objPHPExcel, $letter.$number, '99acbe');
+				set_cell_value_and_color($objPHPExcel, $letter.$number, $studiengang, '99acbe');
 				$objPHPExcel->getActiveSheet()->mergeCells("A".$number.":"."B".$number);
 				$number++;
 
@@ -7443,19 +6825,23 @@ $ret_string .= '</table>';
 				}
 			}
 
-			return auto_size_phpexcel ($objPHPExcel);
-
+			return auto_size_phpexcel($objPHPExcel);
 		}
 	}
 
-	function auto_size_phpexcel ($objPHPExcel) {
-		function_debug_counter("auto_size_phpexcel");
+	function auto_size_phpexcel ($objPHPExcel, $iterate_only_existing_cells = 1) {
 		$sheet = $objPHPExcel->getActiveSheet();
 		$cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
-		$cellIterator->setIterateOnlyExistingCells(true);
+		if($iterate_only_existing_cells) {
+			$cellIterator->setIterateOnlyExistingCells(true);
+		}
 
 		foreach ($cellIterator as $cell) {
 			$sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
+		}
+
+		foreach ($objPHPExcel->getActiveSheet()->getRowDimensions() as $rd) {
+			$rd->setRowHeight(-1);
 		}
 
 		foreach (range('A', $objPHPExcel->getActiveSheet()->getHighestDataColumn()) as $col) {
@@ -7466,7 +6852,6 @@ $ret_string .= '</table>';
 	}
 
 	function check_this_user_role ($roles = array()) {
-		function_debug_counter("check_this_user_role");
 		$valid = 0;
 		if(is_array($roles)) {
 			if(count($roles)) {
@@ -7490,7 +6875,6 @@ $ret_string .= '</table>';
 	}
 
 	function get_raumplanung_relevante_daten ($id) {
-		function_debug_counter("get_raumplanung_relevante_daten");
 		$relevante_daten = array(
 			'veranstaltung_metadaten' => array(
 				"id_name" => "veranstaltung_id",
@@ -7525,13 +6909,11 @@ $ret_string .= '</table>';
 	}
 
 	function raumplanung_update ($id) {
-		function_debug_counter("raumplanung_update");
 		$query = 'INSERT INTO raumplanung_relevante_daten_geaendert (veranstaltung_id, raumplanung_aenderung) VALUES ('.esc($id).', now()) ON DUPLICATE KEY UPDATE raumplanung_aenderung = values(raumplanung_aenderung)';
 		rquery($query);
 	}
 
 	function updated_raumplanung_relevante_daten ($id, $alte_daten) {
-		function_debug_counter("updated_raumplanung_relevante_daten");
 		$neue_daten = get_raumplanung_relevante_daten($id);
 
 		if(serialize($alte_daten) != serialize($neue_daten)) {
@@ -7541,7 +6923,6 @@ $ret_string .= '</table>';
 	}
 
 	function veranstaltung_raumplanungsrelevante_daten_geupdatet ($id) {
-		function_debug_counter("veranstaltung_raumplanungsrelevante_daten_geupdatet");
 /*
 	TODO!!!!! JAHR 2036 BUG
 
@@ -7599,7 +6980,7 @@ $ret_string .= '</table>';
 	}
 
 	function veranstaltung_is_in_schueler_uni ($id) {
-		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%sch%leruni%") and veranstaltung_id = '.esc($id);;
+		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%sch%leruni%") and veranstaltung_id = '.esc($id);
 		$result = get_single_row_from_query($query);
 		if($result[0]) {
 			return 'x';
@@ -7610,7 +6991,8 @@ $ret_string .= '</table>';
 
 
 	function veranstaltung_is_in_stex ($id) {
-		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%staatsexamen%") and veranstaltung_id = '.esc($id);;
+		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%staatsexamen%") and veranstaltung_id = '.esc($id);
+		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id where pn.modul_id in (select id from studiengang where name like "%staatsexamen%") and p.veranstaltung_id = '.esc($id);
 		$result = get_single_row_from_query($query);
 		if($result[0]) {
 			return 'x';
@@ -7620,7 +7002,7 @@ $ret_string .= '</table>';
 	}
 
 	function veranstaltung_is_in_aqua ($id) {
-		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%aqua%") and veranstaltung_id = '.esc($id);;
+		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%aqua%") and veranstaltung_id = '.esc($id);
 		$result = get_single_row_from_query($query);
 		if($result[0]) {
 			return 'x';
@@ -7630,7 +7012,7 @@ $ret_string .= '</table>';
 	}
 
 	function veranstaltung_is_in_studium_generale_or_buerger_universitaet ($id) {
-		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%rger%" or name like "%generale%") and veranstaltung_id = '.esc($id);;
+		$query = 'select count(*) from pruefung p left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id left join modul m on m.id = pn.modul_id where m.studiengang_id in (select id from studiengang where name like "%rger%" or name like "%generale%") and veranstaltung_id = '.esc($id);
 		$result = get_single_row_from_query($query);
 		if($result[0]) {
 			return 'x';
@@ -7639,8 +7021,7 @@ $ret_string .= '</table>';
 		}
 	}
 
-	function raumplanung_crazy ($institut = null, $semester, $show_html) {
-		function_debug_counter("raumplanung");
+	function get_valid_institut($institut) {
 		if(is_null($institut)) {
 			$institute = create_institute_array();
 
@@ -7669,6 +7050,18 @@ $ret_string .= '</table>';
 
 			$institut = $this_institut;
 		}
+		return $institut;
+	}
+
+	function set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $value_cell_id, $value_cell, $merge_cells, $cell_color_id, $cell_color) {
+		$objPHPExcel->getActiveSheet()->SetCellValue($value_cell_id, $value_cell);
+		$objPHPExcel->getActiveSheet()->mergeCells($merge_cells);
+		cellColor($objPHPExcel, $cell_color_id, $cell_color);
+		return $objPHPExcel;
+	}
+
+	function raumplanung_crazy ($institut = null, $semester, $show_html) {
+		$institut = get_valid_institut($institut);
 		if(is_null($semester) || !$semester) {
 			$semester = get_and_create_this_semester();
 		}
@@ -7712,7 +7105,6 @@ where 1
 			$query .= ' AND `v`.`institut_id` = '.esc($institut);
 		}
 
-
 		if($semester) {
 			$query .= ' AND `v`.`semester_id` = '.esc($semester);
 		}
@@ -7726,11 +7118,9 @@ where 1
 		$raum_name = create_raum_name_id_array();
 		$gebaeude_abkuerzung_id = create_gebaeude_abkuerzung_id_array();
 
-		$start_nr = 0;
 		$reihen = array();
 		$institut_id = null;
 		$number_of_cols = 0;
-		$ids_array = array();
 		$minicache = array('gebaeude_abkuerzung' => array(), 'raumnummer' => array());
 
 		$has_printed_rows = 0;
@@ -7738,16 +7128,15 @@ where 1
 		$data = array();
 
 		while ($row = mysqli_fetch_assoc($result)) {
+			$row["lv_nr"] = get_or_set_and_get_lv_nr_by_veranstaltung($row['veranstaltung_id']);
 			$data[] = $row;
 		}
 
 		$header = array(	
 			'LV-Nummer',
 			'Modulbezeichnung lt. Modulbeschreibung',
-			'Modulbezeichnung in CampusNet',
-			'Titel der LV',	
-			'Kurztitel der LV',
 			'Lehrend',
+			'Titel der LV',	
 			'Voraussichtlich prüfend',
 			'Prüfungsleistung',
 			'Prüfungsnummer',
@@ -7756,6 +7145,9 @@ where 1
 			'TN-Zahl',
 			'Zeitvorschlag',
 			'Alternativer Zeitvorschlag',
+			'Digitale LV',
+			'Hybride LV',
+			'Präsenz LV',
 			'Gebäude/Raumvorschlag',
 			'UR/HS',
 			'Raumausstattungsvorschlag',
@@ -7784,21 +7176,10 @@ where 1
 		$semester_data = get_semester($semester);
 		$semester_string = $semester_data[2].' '.$semester_data[1];
 
-		$objPHPExcel->getActiveSheet()->SetCellValue('B1', "Planung der Veranstaltungen für das ".$semester_string);
-		$objPHPExcel->getActiveSheet()->mergeCells('B1:F1');
-		cellColor($objPHPExcel, 'B1:F1', 'FFFF00');
-
-		$objPHPExcel->getActiveSheet()->SetCellValue('B3', "Institut: ".get_institut_name($institut));
-		$objPHPExcel->getActiveSheet()->mergeCells('B3:F3');
-		cellColor($objPHPExcel, 'B3:F3', 'E7E6E6');
-
-		$objPHPExcel->getActiveSheet()->SetCellValue('B4', "Professur: ");
-		$objPHPExcel->getActiveSheet()->mergeCells('B4:F4');
-		cellColor($objPHPExcel, 'B4:F4', 'E7E6E6');
-
-		$objPHPExcel->getActiveSheet()->SetCellValue('B5', "Bearbeitet von: ".$GLOBALS['logged_in_data'][1]);
-		$objPHPExcel->getActiveSheet()->mergeCells('B5:F5');
-		cellColor($objPHPExcel, 'B5:F5', 'E7E6E6');
+		$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, 'B1', "Planung der Veranstaltungen für das ".$semester_string, 'B1:F1', 'B1:F1', 'FFFF00');
+		$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, 'B3', "Institut: ".get_institut_name($institut), 'B3:F3', 'B3:F3', 'E7E6E6');
+		$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, 'B4', "Professur: ", 'B4:F4', 'B4:F4', 'E7E6E6');
+		$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, 'B5', "Bearbeitet von: ".$GLOBALS['logged_in_data'][1], 'B5:F5', 'B5:F5', 'E7E6E6');
 
 		$number = 7;
 		$letter = 'A';
@@ -7815,20 +7196,15 @@ where 1
 							$number_of_items--;
 							$last_letter++;
 						}
-						$objPHPExcel->getActiveSheet()->SetCellValue($letter.'7', $top);
-						$objPHPExcel->getActiveSheet()->mergeCells($start_letter.'7:'.$last_letter.'7');
-						cellColor($objPHPExcel, $start_letter.'7:'.$last_letter.'7', 'E7E6E6');
+						$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.'7', $top, $start_letter.'7:'.$last_letter.'7', $start_letter.'7:'.$last_letter.'7', 'E7E6E6');
 					}
 					foreach ($bottom as $bottom_headline) {
-						$objPHPExcel->getActiveSheet()->SetCellValue($letter.'8', $bottom_headline);
-						cellColor($objPHPExcel, $letter.'8', 'E7E6E6');
+						set_cell_value_and_color($objPHPExcel, $letter.'8', $bottom_headline, 'E7E6E6');
 						$letter++;
 					}
 				}
 			} else {
-				$objPHPExcel->getActiveSheet()->SetCellValue($letter.'7', $this_head);
-				$objPHPExcel->getActiveSheet()->mergeCells($letter.'7:'.$letter.'8');
-				cellColor($objPHPExcel, $letter.'7:'.$letter.'8', 'E7E6E6');
+				$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.'7', $this_head, $letter.'7:'.$letter.'8', $letter.'7:'.$letter.'8', 'E7E6E6');
 				$letter++;
 			}
 		}
@@ -7857,19 +7233,20 @@ SE 1/2 oder BZW
         )
 */
 
-		$lv_nr = null;
 		$last_institut_id = null;
 		$last_veranstaltung_id = null;
 		$zeile = 9;
 		$last_letter = null;
+		array_sort_by_column($data, 'lv_nr');
+
 		foreach($data as $row) {
+			$lv_nr = $row["lv_nr"];
 			if(is_null($last_veranstaltung_id)) {
 				$last_veranstaltung_id = $row['veranstaltung_id'];
 			} else {
 				if($row["veranstaltung_id"] != $last_veranstaltung_id) {
 					$last_veranstaltung_id = $row['veranstaltung_id'];
 					$zeile++;
-					$lv_nr++;
 				}
 			}
 			$letter = "A";
@@ -7887,7 +7264,6 @@ SE 1/2 oder BZW
 			$institut_id = $row["institut_id"];
 
 			if(is_null($lv_nr) || is_null($last_institut_id) || $last_institut_id != $institut_id) {
-				$lv_nr = get_startnr_by_institut($institut_id);
 				$last_institut_id = $institut_id;
 			}
 
@@ -7897,17 +7273,11 @@ SE 1/2 oder BZW
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $modulbezeichnung);
 			$letter++;
 
-			// Modulbezeichnung im CampusNet (leer)
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $lehrend);
 			$letter++;
 
 			$veranstaltungname = preg_replace("/[\n\r]/", " ", $veranstaltungname);
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $veranstaltungname);
-			$letter++;
-
-			// Kurztitel (leer)
-			$letter++;
-
-			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $lehrend);
 			$letter++;
 
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $lehrend);
@@ -7933,6 +7303,18 @@ SE 1/2 oder BZW
 			$letter++;
 
 			// Alternativer Zeitvorschlag
+			$letter++;
+
+			// Digitale LV
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, get_praesenztyp_x_from_veranstaltung($row["veranstaltung_id"], "Digital"));
+			$letter++;
+
+			// Hybride LV
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, get_praesenztyp_x_from_veranstaltung($row["veranstaltung_id"], "Hybrid"));
+			$letter++;
+
+			// Präsenz LV
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, get_praesenztyp_x_from_veranstaltung($row["veranstaltung_id"], "Präsenz"));
 			$letter++;
 
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $raum_gebaeude_vorschlag);
@@ -7995,9 +7377,28 @@ SE 1/2 oder BZW
 		return $objPHPExcel;
 	}
 
+	function get_or_set_and_get_lv_nr_by_veranstaltung ($veranstaltung_id) {
+		$query = "select lv_nr from veranstaltung_nach_lv_nr where veranstaltung_id = ".esc($veranstaltung_id);
+		$nr = get_single_row_from_query($query);
+		if(!$nr) {
+			$semester_id = get_semester_from_veranstaltung_id($veranstaltung_id)["id"];
+			$institut_id = get_institut_id_by_veranstaltung_id($veranstaltung_id);
+			$start_nr = get_startnr_by_institut($institut_id);
+
+			$neue_nr = get_single_row_from_query("select max(vl.lv_nr) + 1 from veranstaltung_nach_lv_nr vl right join veranstaltung v on v.id = vl.veranstaltung_id left join institut i on i.id = v.institut_id where v.semester_id = ".esc($semester_id));
+
+			if(is_null($neue_nr)) {
+				$neue_nr = $start_nr;
+			}
+
+			rquery("insert into veranstaltung_nach_lv_nr (veranstaltung_id, lv_nr) values (".esc($veranstaltung_id).", ".$neue_nr.")");
+
+			$nr = $neue_nr;
+		}
+		return $nr;
+	}
 
 	function raumplanung ($institut = null, $semester, $show_html) {
-		function_debug_counter("raumplanung");
 		if(is_null($semester) || !$semester) {
 			$semester = get_and_create_this_semester();
 		}
@@ -8024,11 +7425,9 @@ SE 1/2 oder BZW
 		$raum_name = create_raum_name_id_array();
 		$gebaeude_abkuerzung_id = create_gebaeude_abkuerzung_id_array();
 
-		$start_nr = 0;
 		$reihen = array();
 		$institut_id = null;
 		$number_of_cols = 0;
-		$ids_array = array();
 		$minicache = array('gebaeude_abkuerzung' => array(), 'raumnummer' => array());
 
 		$has_printed_rows = 0;
@@ -8047,9 +7446,10 @@ SE 1/2 oder BZW
 		$typen_array = array();
 
 		foreach ($data as $row) {
+			$lv_nr = get_or_set_and_get_lv_nr_by_veranstaltung($row[0]);
+
 			if(!$institut_id || $institut_id != $row[16]) {
 				$institut_id = $row[16];
-				$start_nr = get_startnr_by_institut($institut_id);
 				$reihen[] = 'Institut: '.htmlentities(get_institut_name($institut_id));
 			}
 			$gebaeude_abkuerzung = '';
@@ -8081,31 +7481,34 @@ SE 1/2 oder BZW
 				}
 			}
 			$reihe_array = array(
-				$start_nr,
-				$row[1],	# name
-				$row[2],	# dozent_name
-				$row[6],	# wochentag
-				$row[7],	# stunde
-				$row[5],	# erster_termin
-				$row[8],	# woche
-				$row[4],	# anzahl_hoerer
-				$gebaeude_abkuerzung,
-				$raumnummer,
-				$row[3],	# spezielle wünsche
-				$row[12],	# gebäude-id
-				$row[13],	# raum-id
-				$row[17]	# raummeldung
+				$lv_nr,		#			# 0
+				$row[1],	# name			# 1
+				$row[2],	# dozent_name		# 2
+				$row[6],	# wochentag		# 3
+				$row[7],	# stunde		# 4
+				$row[5],	# erster_termin		# 5
+				$row[8],	# woche			# 6
+				$row[4],	# anzahl_hoerer		# 7
+				$gebaeude_abkuerzung,			# 8
+				$raumnummer,				# 9
+				$row[3],	# spezielle wünsche	# 10
+				$row[12],	# gebäude-id		# 11
+				$row[13],	# raum-id		# 12
+				$row[17],	# raummeldung		# 13
+				$row[0]		# id			# 14
 			);
 
 			$typen_array[] = $row[15];
 
-			$ids_array[] = $row[0];
 			if(!$number_of_cols) {
 				$number_of_cols = count($reihe_array);
 			}
 			$reihen[] = $reihe_array;
-			$start_nr++;
 		}
+
+		$first_line = array_shift($reihen);
+		array_sort_by_column($reihen, 0);
+		array_unshift($reihen, $first_line);
 
 		$header = array(	
 			'LV-Nr.',			# 0
@@ -8153,75 +7556,83 @@ SE 1/2 oder BZW
 ?>
 					</tr>
 <?php
-				$user_can_edit = check_this_user_role(array(1, 3));
-				$nr = $start_nr;
+				$user_can_edit = check_this_user_role(array(1, 3, 7)); // TODO
 				$i = 0;
+
+				$colnames = array(
+					0 => "id",
+					13 => "raummeldung",
+					12 => "bestaetigter_raum",
+					11 => "bestaetigtes_gebaeude",
+					14 => "real_id"
+				);
+
 				foreach ($reihen as $this_reihe) {
 					if(is_array($this_reihe)) {
 ?>
 						<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&institut=<?php print htmlentities(get_get('institut')); ?>&semester=<?php print htmlentities($semester); ?>">
 						<tr>
 <?php
-						$j = 0;
-						foreach ($this_reihe as $this_cell) {
-							if($j == 0) { // ID
-								print "<input type='hidden' value='raumplanung_bearbeiten' name='raumplanung_bearbeiten' />\n";
-								print "<input type='hidden' value='".htmlentities($ids_array[$i])."' name='id' />\n";
-							}
+							$j = 0;
 
-							$updated = '';
-							if($j == 1) {
-								if(veranstaltung_raumplanungsrelevante_daten_geupdatet($ids_array[$i])) {
-									$updated = '<span class="largelightning">&#9889;</span>';
+							$veranstaltung_id = $this_reihe[14];
+
+							foreach ($this_reihe as $this_cell) {
+								if(array_key_exists($j, $colnames) && $colnames[$j] == "id") {
+									print "<input type='hidden' value='raumplanung_bearbeiten' name='raumplanung_bearbeiten' />\n";
+									print "<input type='hidden' value='".htmlentities($veranstaltung_id)."' name='id' />\n";
 								}
-							}
 
+								$updated = '';
+								if($j == 1) {
+									if(veranstaltung_raumplanungsrelevante_daten_geupdatet($veranstaltung_id)) {
+										$updated = '<span class="largelightning">&#9889;</span>';
+									}
 
-							if($j == 1) {
-								print "<td>".htmle($typen_array[$i])."</td>"; # TODO
-							}
+									print "<td>".htmle(get_typ_abkuerzung_by_veranstaltung_id($veranstaltung_id))."</td>"; # TODO
+								}
 
-							if($j == 13 ) { // Raummeldung
-								if($user_can_edit == 1) {
-									print "<td><input placeholder='raummeldung' class='datepicker' type='text' value='".htmlentities($this_cell)."' name='meldungsdatum' /></td>";
-									#print "<td><input type='submit' value='Speichern' /></td>";
+								if(array_key_exists($j, $colnames) && $colnames[$j] == "raummeldung") {
+									if($user_can_edit == 1) {
+										print "<td><input placeholder='raummeldung' class='datepicker' type='text' value='".htmlentities($this_cell)."' name='meldungsdatum' /></td>";
+									} else {
+										print "<td>".htmle($this_cell)."</td>\n"."<td>&mdash;</td>\n";
+									}
+								} else if(array_key_exists($j, $colnames) && $colnames[$j] == "bestaetigter_raum") { // Bestätigter Raum
+									if($user_can_edit == 1) {
+										print "<td><input type='text' placeholder='raum' name='raum' value='".(isset($this_cell) ? htmlentities($raum_name[$this_cell]) : '')."' /></td>\n";
+									} else {
+										print "<td>".(isset($this_cell) ? htmlentities($raum_name[$this_cell]) : '')."</td>\n";
+									}
+								} else if(array_key_exists($j, $colnames) && $colnames[$j] == "bestaetigtes_gebaeude") { // Bestätigtes Gebäude
+									if($user_can_edit == 1) {
+										print "<td>";
+										create_select($gebaeude, $this_cell, 'gebaeude', 1);
+										print "</td>\n";
+									} else {
+										print "<td>".get_gebaeude_abkuerzung($this_cell)."</td>\n";
+									}
 								} else {
-									print "<td>".htmle($this_cell)."</td>\n"."<td>&mdash;</td>\n";
+									if($j != 14) {
+										print "<td>$updated".((isset($this_cell) && !preg_match('/^\s+$/', $this_cell)) ? htmlentities($this_cell) : '&mdash;')."</td>\n";
+									}
 								}
-							} else if($j == 12) { // Bestätigter Raum
-								if($user_can_edit == 1) {
-									print "<td><input type='text' placeholder='raum' name='raum' value='".(isset($this_cell) ? htmlentities($raum_name[$this_cell]) : '')."' /></td>\n";
-								} else {
-									print "<td>".(isset($this_cell) ? htmlentities($raum_name[$this_cell]) : '')."</td>\n";
-								}
-							} else if($j == 11) { // Bestätigtes Gebäude
-								if($user_can_edit == 1) {
-									print "<td>";
-									create_select($gebaeude, $this_cell, 'gebaeude', 1);
-									print "</td>\n";
-								} else {
-									print "<td>".get_gebaeude_abkuerzung($this_cell)."</td>\n";
-								}
-							} else {
-								print "<td>$updated".((isset($this_cell) && !preg_match('/^\s+$/', $this_cell)) ? htmlentities($this_cell) : '&mdash;')."</td>\n";
+								$j++;
 							}
-							$j++;
-						}
 ?>
-								</tr>
-							</form>
+							</tr>
+						</form>
 <?php
 					} else {
 ?>
-								<tr>
+							<tr>
 <?php
-						print "<td class='c5e3ed_background' colspan='$number_of_cols'>$this_reihe</td>\n";
+								print "<td class='c5e3ed_background' colspan='$number_of_cols'>$this_reihe</td>\n";
 ?>
-								</tr>
+							</tr>
 <?php
 						$i--;
 					}
-					$nr++;
 					$i++;
 				}
 ?>
@@ -8314,6 +7725,7 @@ SE 1/2 oder BZW
 			);
 
 			foreach (range(1, $number - 1) as $tnumber) {
+				#print("\$objPHPExcel->getActiveSheet()->getStyle('A1:'".get_previous_letter($letter)."$tnumber)->applyFromArray(\$styleArray)");
 				$objPHPExcel->getActiveSheet()->getStyle('A1:'.get_previous_letter($letter).$tnumber)->applyFromArray($styleArray);
 			}
 
@@ -8339,7 +7751,6 @@ SE 1/2 oder BZW
 	}
 
 	function pruefung_symbole ($pn) {
-		function_debug_counter("pruefung_symbole");
 		$str = '';
 		$str .= checked_if_pruefung_already_done($pn);
 		$str .= chosen_if_pruefung_chosen($pn);
@@ -8347,7 +7758,6 @@ SE 1/2 oder BZW
 	}
 
 	function pruefung_already_done ($pn) {
-		function_debug_counter("pruefung_already_done");
 		if($pn && array_search($pn, $GLOBALS['pruefungen_already_done']) !== false) {
 			return 1;
 		} else {
@@ -8356,7 +7766,6 @@ SE 1/2 oder BZW
 	}
 
 	function pruefung_already_chosen ($pn) {
-		function_debug_counter("pruefung_already_chosen");
 		if($pn && array_search($pn, $GLOBALS['pruefungen_already_chosen']) !== false) {
 			return 1;
 		} else {
@@ -8365,14 +7774,12 @@ SE 1/2 oder BZW
 	}
 
 	function chosen_if_pruefung_chosen ($pn) {
-		function_debug_counter("chosen_if_pruefung_chosen");
 		if(pruefung_already_chosen($pn)) {
 			return html_chosen();
 		}
 	}
 
 	function checked_if_pruefung_already_done ($pn) {
-		function_debug_counter("checked_if_pruefung_already_done");
 		if(pruefung_already_done($pn)) {
 			return html_checked();
 		}
@@ -8381,7 +7788,6 @@ SE 1/2 oder BZW
 	/* Füllhilfsfunktionen */
 
 	function get_cached ($url, $return_filename = 0) {
-		function_debug_counter("get_cached");
 		$md5 = hash('md5', $url);
 		$cache_dir = '/tmp/php_get_cache';
 		$cache_file = $cache_dir.'/'.$md5;
@@ -8396,7 +7802,7 @@ SE 1/2 oder BZW
 		$return = '';
 
 		if(file_exists($cache_file)) {
-			print "Konnte get_cached(`$url`) aus dem Cache beantworten: `$cache_file`\n";;
+			print "Konnte get_cached(`$url`) aus dem Cache beantworten: `$cache_file`\n";
 			$return = file_get_contents($url);
 		} else {
 			$return = file_get_contents($url);
@@ -8411,7 +7817,6 @@ SE 1/2 oder BZW
 	}
 
 	function add_leading_zero ($v) {
-		function_debug_counter("add_leading_zero");
 		if(strlen($v) < 2) {
 			return "0$v";
 		} else {
@@ -8420,7 +7825,6 @@ SE 1/2 oder BZW
 	}
 
 	function add_next_year_to_wintersemester ($semestertype, $year) {
-		function_debug_counter("add_next_year_to_wintersemester");
 		if(preg_match('/^\d+(\/\d+)?$/', $semestertype)) {
 			$tmp = $year;
 			$year = $semestertype;
@@ -8439,13 +7843,11 @@ SE 1/2 oder BZW
 	}
 
 	function get_institut_id_by_veranstaltung_id ($veranstaltung_id) {
-		function_debug_counter("get_institut_id_by_veranstaltung_id");
 		$query = 'SELECT `v`.`institut_id` FROM `veranstaltung` `v` LEFT JOIN `institut` `i` ON `i`.`id` = `v`.`institut_id` WHERE `v`.`id` = '.esc($veranstaltung_id);
 		return get_single_row_from_query($query, '');
 	}
 
 	function get_checked_pruefungsnummern ($veranstaltung_id) {
-		function_debug_counter("get_checked_pruefungsnummern");
 		$query = 'SELECT `p`.`pruefungsnummer_id`, `pn`.`modul_id` FROM `pruefung` `p` LEFT JOIN `pruefungsnummer` `pn` ON `p`.`pruefungsnummer_id` = `pn`.`id` WHERE `p`.`veranstaltung_id` = '.esc($veranstaltung_id);
 		$result = rquery($query);
 
@@ -8462,14 +7864,12 @@ SE 1/2 oder BZW
 	}
 
 	function pruefungsnummer_is_checked ($pruefungsnummer, $modul, $veranstaltung_id) {
-		function_debug_counter("pruefungsnummer_is_checked");
 		$query = 'SELECT count(*) FROM `pruefung` `p` LEFT JOIN `pruefungsnummer` `pn` ON `p`.`pruefungsnummer_id` = `pn`.`id` WHERE `pn`.`modul_id` = '.esc($modul).' and `p`.`pruefungsnummer_id` = '.esc($pruefungsnummer).' and `p`.`veranstaltung_id` = '.esc($veranstaltung_id);
 
 		return get_single_row_from_query($query, 0);
 	}
 
 	function get_page_id_by_filename ($file) {
-		function_debug_counter("get_page_id_by_filename");
 		if(is_null($file) || !$file) {
 			return null;
 		}
@@ -8501,7 +7901,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_startnr_by_institut ($id) {
-		function_debug_counter("get_startnr_by_institut");
 		$query = 'SELECT `start_nr` FROM `institut` WHERE `id` = '.esc($id);
 		return get_single_row_from_query($query, '');
 	}
@@ -8509,7 +7908,6 @@ SE 1/2 oder BZW
 	/* Rechteverwaltung */
 
 	function easter_egg ($name) {
-		function_debug_counter("easter_egg");
 		$found = array();
 		if(preg_match('/(sex|fuck|porn|cunt|ass|arsch|anal|shit)/i', $name, $found)) {
 			show_easter_egg('<a href="https://de.wikipedia.org/wiki/Infantilismus">Haha, im Titel der Veranstaltung kommt das Wort &raquo;'.htmlentities(ucwords(strtolower($found[0]))).'&laquo; vor!</a>');
@@ -8518,7 +7916,6 @@ SE 1/2 oder BZW
 
 	function update_user_agent_counter () {
 		/*
-		function_debug_counter("update_user_agent_counter");
 		if(isset($GLOBALS['logged_in_user_id'])) {
 			return;
 		}
@@ -8538,7 +7935,6 @@ SE 1/2 oder BZW
 	}
 
 	function update_ua_call($os_id, $browser_id) {
-		function_debug_counter("update_ua_call");
 		$year = date("Y");
 		$month = date("m");
 		$day = date("d");
@@ -8548,7 +7944,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_and_create_ua_os ($os_name, $os_vers) {
-		function_debug_counter("get_and_create_ua_os");
 		$os_id = null;
 		$spec_os_id = null;
 
@@ -8597,7 +7992,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_and_create_ua_browser ($browser_name, $browser_vers) {
-		function_debug_counter("get_and_create_ua_browser");
 		$browser_id = null;
 		$spec_browser_id = null;
 
@@ -8648,7 +8042,6 @@ SE 1/2 oder BZW
 	/* Zuordnungsfunktionen */
 
 	function assign_page_to_role ($role_id, $page_id) {
-		function_debug_counter("assign_page_to_role");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `role_to_page` (`role_id`, `page_id`) VALUES ('.esc($role_id).', '.esc($page_id).')';
 		$result = rquery($query);
@@ -8663,55 +8056,30 @@ SE 1/2 oder BZW
 	}
 
 	function update_language ($id, $name, $abkuerzung) {
-		function_debug_counter("update_language");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'update `'.$GLOBALS['dbname'].'`.`language` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success("Die Sprache wurde erfolgreich geupdated.");
-		} else {
-			error("Die Sprache konnte nicht editiert werden.");
-		}
+		return simple_query_success_fail_message($query, "Die Sprache wurde erfolgreich geupdated.", "Die Sprache konnte nicht editiert werden.");
 	}
 
 	function update_semester($id, $erster_termin) {
-		function_debug_counter("update_semester");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'update `'.$GLOBALS['dbname'].'`.`semester` SET `erste_veranstaltung_default` = '.esc($erster_termin).' WHERE `id` = '.esc($id);
-		$result = rquery($query);
-		if($result) {
-			success("Das Erste-Termin-Datum wurde erfolgreich zum Semester hinzugefügt.");
-		} else {
-			error("Das Erste-Termin-Datum konnte nicht zum Semester hinzugefügt werden.");
-		}
+		return simple_query_success_fail_message($query, "Das Erste-Termin-Datum wurde erfolgreich zum Semester hinzugefügt.", "Das Erste-Termin-Datum konnte nicht zum Semester hinzugefügt werden.");
 	}
 
 	function update_dozent_titel ($dozent_id, $titel_id) {
-		function_debug_counter("update_dozent_titel");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'update `'.$GLOBALS['dbname'].'`.`dozent` SET `titel_id` = '.esc($titel_id).' WHERE `id` = '.esc($dozent_id);
-		$result = rquery($query);
-		if($result) {
-			success("Der Titel wurde erfolgreich zum Dozenten hinzugefügt.");
-		} else {
-			error("Die Titel konnte nicht zum Dozenten hinzugefügt werden.");
-		}
+		return simple_query_success_fail_message($query, "Der Titel wurde erfolgreich zum Dozenten hinzugefügt.", "Die Titel konnte nicht zum Dozenten hinzugefügt werden.");
 	}
 
 	function update_user_role ($user_id, $role_id) {
-		function_debug_counter("update_user_role");
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `role_to_user` (`role_id`, `user_id`) VALUES ('.esc($role_id).', '.esc($user_id).') ON DUPLICATE KEY UPDATE `role_id` = VALUES(`role_id`)';
-		$result = rquery($query);
-		if($result) {
-			success("Die Rolle wurde erfolgreich zum User hinzugefügt.");
-		} else {
-			error("Die Rolle konnte nicht zum User hinzugefügt werden.");
-		}
+		return simple_query_success_fail_message($query, "Die Rolle wurde erfolgreich zum User hinzugefügt.", "Die Rolle konnte nicht zum User hinzugefügt werden.");
 	}
 
 	function create_hour_from_to ($from, $to, $array = 0) {
-		function_debug_counter("create_hour_from_to");
 		$re = '/^\d+$/';
 		if(preg_match($re, $from) && preg_match($re, $to)) {
 			$times = array(
@@ -8747,27 +8115,22 @@ SE 1/2 oder BZW
 	/* Systemfunktionen */
 
 	function stderrw ($str) {
-		function_debug_counter("stderrw");
 		trigger_error($str, E_USER_WARNING);
 	}
 
 	function green_text ($str) {
-		function_debug_counter("green_text");
 		return "\033[32m".$str."\033[0m";
 	}
 
 	function red_text ($str) {
-		function_debug_counter("red_text");
 		return "\033[31m".$str."\033[0m";
 	}
 
 	function print_debug ($str) {
-		function_debug_counter("print_debug");
 		print green_text($str);
 	}
 
 	function insert_values ($database, $columns, $data, $print = 0) {
-		function_debug_counter("insert_values");
 		if($database) {
 			if(is_array($columns)) {
 				if(is_array($data)) {
@@ -8813,7 +8176,6 @@ SE 1/2 oder BZW
 	}
 
 	function run_install_query ($database, $queries_data, $print = 0) {
-		function_debug_counter("run_install_query");
 		if($database) {
 			if(is_array($queries_data) && count($queries_data)) {
 				stderrw("Befülle `$database`");
@@ -8844,7 +8206,6 @@ SE 1/2 oder BZW
 	}
 
 	function referrer_from_same_domain () {
-		function_debug_counter("referrer_from_same_domain");
 		if(isset($_SERVER['HTTP_REFERER'])) {
 			$referer = $_SERVER['HTTP_REFERER'];
 			$referer_host = parse_url($referer, PHP_URL_HOST);
@@ -8867,7 +8228,6 @@ SE 1/2 oder BZW
 	}
 
 	function sanitize_data ($data, $recursion = 0) {
-		function_debug_counter("sanitize_data");
 		if($recursion == 300) {
 			die("ERROR: Deep-Recursion! Bitte melden Sie dies dem Administrator.");
 		}
@@ -8884,7 +8244,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_sum_credit_points_anzahl_pruefungsleistungen_for_studiengang ($studiengang_id) {
-		function_debug_counter("get_sum_credit_points_anzahl_pruefungsleistungen_for_studiengang");
 		$query = "select sum(credit_points) as sum_credit_points, sum(anzahl_pruefungsleistungen) as sum_anzahl_pruefungsleistungen from modul_nach_semester_metadata where modul_id in (select id from modul where studiengang_id = ".esc($studiengang_id).")";
 
 		$result = rquery($query);
@@ -8896,7 +8255,6 @@ SE 1/2 oder BZW
 	}
 
 	function create_event_file ($veranstaltungen) {
-		function_debug_counter("create_event_file");
 		$str = "BEGIN:VCALENDAR\n";
 		$str .= "PRODID:-".$GLOBALS['university_name']."//Vorlesungsverzeichnis//DE\n";
 		$str .= "VERSION:2.0\n";
@@ -8962,9 +8320,13 @@ SE 1/2 oder BZW
 				$interval = 1;
 				$woche = get_woche_from_veranstaltung_id($this_veranstaltung);
 
-				$geocoords = get_gebaeude_geo_coords_by_id($location['gebaeude_id']);
-				if(isset($geocoords[0])) {
-					$geostring = $geocoords[0].';'.$geocoords[1];
+				$geostring = "";
+
+				if(is_array($location) && array_key_exists("gebaeude_id", $location) && isset($location["gebaeude_id"]) && !is_null($location["gebaeude_id"])) {
+					$geocoords = get_gebaeude_geo_coords_by_id($location['gebaeude_id']);
+					if(isset($geocoords[0])) {
+						$geostring = $geocoords[0].';'.$geocoords[1];
+					}
 				}
 
 				$str .= "BEGIN:VEVENT\n";
@@ -8998,7 +8360,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_veranstaltung_location ($id) {
-		function_debug_counter("get_veranstaltung_location");
 		$query = 'select v.gebaeude_id, v.raum_id, g.name, r.raumnummer, g.abkuerzung from veranstaltung v join gebaeude g on g.id = v.gebaeude_id join raum r on r.id = v.raum_id where v.id = '.esc($id);
 		$result = rquery($query);
 
@@ -9016,7 +8377,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_erste_veranstaltung ($id, $semester_data) {
-		function_debug_counter("get_erste_veranstaltung");
 		$query = 'select erster_termin from veranstaltung_metadaten where veranstaltung_id = '.esc($id);
 
 		$res = get_single_row_from_query($query);
@@ -9029,9 +8389,21 @@ SE 1/2 oder BZW
 		}
 	}
 
+	function get_typ_abkuerzung_by_veranstaltung_id ($id) {
+		$query = 'select vt.abkuerzung from veranstaltungstyp vt join veranstaltung v on v.veranstaltungstyp_id = vt.id where v.id = '.esc($id);
+		$result = rquery($query);
+
+		$id = '';
+		while ($row = mysqli_fetch_row($result)) {
+			$id = $row[0];
+		}
+
+		return $id;
+	}
+
+
 	function get_typid_by_veranstaltung_id ($id) {
-		function_debug_counter("get_typid_by_veranstaltung_id");
-		$query = 'select veranstaltungstyp_id from veranstaltung where id = '.esc($id);
+		$query = 'select vt.abkuerzung from veranstaltungstyp vt left join veranstaltung v on vt.id = v.veranstaltungstyp_id where v.id = '.esc($id);
 		$result = rquery($query);
 
 		$id = '';
@@ -9043,7 +8415,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_semester_begin_and_end ($year, $type) {
-		function_debug_counter("get_semester_begin_and_end");
 		# Wise: 01.10.2018 -- 31.03.2019
 		# Sose: 01.04.2019 -- 30.09.2019
 
@@ -9057,7 +8428,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_semester_from_veranstaltung_id ($id) {
-		function_debug_counter("get_semester_from_veranstaltung_id");
 		$query = 'select v.semester_id, s.jahr, s.typ from veranstaltung v join semester s on s.id = v.semester_id where v.id = '.esc($id);
 		$result = rquery($query);
 		$semester = array();
@@ -9071,7 +8441,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_veranstaltung_stunde ($id) {
-		function_debug_counter("get_veranstaltung_stunde");
 		$query = 'select stunde from veranstaltung_metadaten where veranstaltung_id = '.esc($id);
 		$result = rquery($query);
 		$stunde = '';
@@ -9084,7 +8453,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_tag_from_veranstaltung_id ($id) {
-		function_debug_counter("get_tag_from_veranstaltung_id");
 		$query = 'select wochentag from veranstaltung_metadaten where veranstaltung_id = '.esc($id);
 		$result = rquery($query);
 		$tag = '';
@@ -9097,7 +8465,6 @@ SE 1/2 oder BZW
 	}
 
 	function weekday_to_wochentag ($weekday) {
-		function_debug_counter("weekday_to_wochentag");
 		$selected = array();
 		switch ($weekday) {
 			case 'Monday':
@@ -9129,7 +8496,6 @@ SE 1/2 oder BZW
 	}
 
 	function wochentag_to_weekday ($wochentag) {
-		function_debug_counter("wochentag_to_weekday");
 		$selected = array();
 		switch ($wochentag) {
 			case 'Mo':
@@ -9163,7 +8529,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_woche_from_veranstaltung_id ($id) {
-		function_debug_counter("get_woche_from_veranstaltung_id");
 		$query = 'select woche from veranstaltung_metadaten where veranstaltung_id = '.esc($id);
 		$result = rquery($query);
 		$woche = '';
@@ -9176,7 +8541,6 @@ SE 1/2 oder BZW
 	}
 
 	function css ($name) {
-		function_debug_counter("css");
 		if(is_array($name)) {
 			foreach ($name as $this_name) {
 				single_css($this_name);
@@ -9187,7 +8551,6 @@ SE 1/2 oder BZW
 	}
 
 	function single_css ($name) {
-		function_debug_counter("single_css");
 		$file = $GLOBALS['datadir'].$name;
 
 		if(file_exists($file)) {
@@ -9204,7 +8567,6 @@ SE 1/2 oder BZW
 	}
 
 	function js ($name) {
-		function_debug_counter("js");
 		if(is_array($name)) {
 			foreach ($name as $this_name) {
 				single_js($this_name);
@@ -9215,7 +8577,6 @@ SE 1/2 oder BZW
 	}
 
 	function single_js ($name) {
-		function_debug_counter("single_js");
 		$file = $GLOBALS['datadir'].$name;
 
 		$path = $file;
@@ -9238,7 +8599,6 @@ SE 1/2 oder BZW
 	}
 
 	function create_title_plus ($chosen_semester, $chosen_institut, $chosen_studiengang, $chosen_dozent, $chosen_pruefungsamt) {
-		function_debug_counter("create_title_plus");
 		$title_plus = '';
 		if($chosen_semester) {
 			if(!$title_plus) {
@@ -9291,7 +8651,6 @@ SE 1/2 oder BZW
 	}
 
 	function add_to_output ($name, $msg) {
-		function_debug_counter("add_to_output");
 		if($name) {
 			if($msg) {
 				$GLOBALS[$name][] = $msg;
@@ -9302,17 +8661,14 @@ SE 1/2 oder BZW
 	}
 
 	function error ($message) {
-		function_debug_counter("error");
 		add_to_output("error", $message);
 	}
 
 	function success ($message) {
-		function_debug_counter("success");
 		add_to_output("success", $message);
 	}
 
 	function debug ($message) {
-		function_debug_counter("debug");
 		$bt = debug_backtrace();
 		$caller = array_shift($bt);
 		$data = array("msg" => $message, "caller" => $caller);
@@ -9320,27 +8676,22 @@ SE 1/2 oder BZW
 	}
 
 	function warning ($message) {
-		function_debug_counter("warning");
 		add_to_output("warning", $message);
 	}
 
 	function right_issue ($message) {
-		function_debug_counter("right_issue");
 		add_to_output("right_issue", $message);
 	}
 
 	function message ($message) {
-		function_debug_counter("message");
 		add_to_output("message", $message);
 	}
 
 	function show_easter_egg ($message) {
-		function_debug_counter("show_easter_egg");
 		add_to_output("easter_egg", $message);
 	}
 
 	function nonce () {
-		function_debug_counter("nonce");
 		if($GLOBALS['nonce']) {
 			return $GLOBALS['nonce'];
 		} else {
@@ -9350,7 +8701,6 @@ SE 1/2 oder BZW
 	}
 
 	function rollback () {
-		function_debug_counter("rollback");
 		$result = rquery("rollback");
 		if(!$result) {
 			error("Rollback ist fehlgeschlagen.");
@@ -9359,7 +8709,6 @@ SE 1/2 oder BZW
 	}
 
 	function commit () {
-		function_debug_counter("commit");
 		$result = rquery("commit");
 		if(!$result) {
 			error("Commit ist fehlgeschlagen.");
@@ -9368,7 +8717,6 @@ SE 1/2 oder BZW
 	}
 
 	function set_autocommit ($true) {
-		function_debug_counter("set_autocommit");
 		if($true) {
 			$true = 1;
 		} else {
@@ -9381,7 +8729,6 @@ SE 1/2 oder BZW
 	}
 
 	function start_transaction () {
-		function_debug_counter("start_transaction");
 		set_autocommit(0);
 		$result = rquery('start transaction');
 		if(!$result) {
@@ -9389,42 +8736,7 @@ SE 1/2 oder BZW
 		}
 	}
 
-/*
-	╔════════════════╤══════════════════╤══════╤═════╤═══════════════════╤═══════╗
-	║ Field          │ Type             │ Null │ Key │ Default           │ Extra ║
-	╟────────────────┼──────────────────┼──────┼─────┼───────────────────┼───────╢
-	║ id             │ int(10) unsigned │ NO   │ PRI │ NULL              │       ║
-	║ predecessor_id │ int(10) unsigned │ YES  │ MUL │ NULL              │       ║
-	║ name           │ varchar(100)     │ YES  │     │ NULL              │       ║
-	║ email          │ varchar(500)     │ YES  │     │ NULL              │       ║
-	║ time           │ datetime         │ YES  │     │ CURRENT_TIMESTAMP │       ║
-	║ useragent      │ varchar(500)     │ YES  │     │ NULL              │       ║
-	║ subject        │ varchar(500)     │ YES  │     │ NULL              │       ║
-	║ message        │ varchar(4096)    │ YES  │     │ NULL              │       ║
-	║ sent           │ datetime         │ YES  │     │ NULL              │       ║
-	╚════════════════╧══════════════════╧══════╧═════╧═══════════════════╧═══════╝
- */
-
-	function write_mail_to_db ($name, $email, $useragent, $subject, $message, $sent, $predecessor_id = null) {
-		function_debug_counter("write_mail_to_db");
-		if(!isset($useragent)) {
-			$useragent = $_SERVER['HTTP_USER_AGENT'];
-		}
-		if(isset($sent)) {
-			$sent = "now()";
-		} else {
-			$sent = "null";
-		}
-		$query = 'insert into emails (';
-		$query .= 'predecessor_id, name, email, useragent, subject, message, time, sent) VALUES (';
-		$query .= multiple_esc_join(array($predecessor_id, $name, $email, $useragent, $subject, $message, $send)).", now(), $sent)";
-		$query .= ')';
-
-		dier($query);
-	}
-
 	function escapeJsonString($value) { 
-		function_debug_counter("escapeJsonString");# list from www.json.org: (\b backspace, \f formfeed)
 		$escapers = array("\\", "/", "\"", "\n", "\r", "\t", "\x08", "\x0c");
 		$replacements = array("\\\\", "\\/", "\\\"", "\\n", "\\r", "\\t", "\\f", "\\b");
 		$result = str_replace($escapers, $replacements, $value);
@@ -9432,7 +8744,6 @@ SE 1/2 oder BZW
 	}
 
 	function fill_deletion_global ($post_ids, $dbname, $debugvalues = array()) {
-		function_debug_counter("fill_deletion_global");
 		if(is_array($post_ids)) {
 			$true = 1;
 			foreach ($post_ids as $this_post_id) {
@@ -9447,7 +8758,7 @@ SE 1/2 oder BZW
 				return $dbname;
 			}
 		} else {
-			if(get_post($post_ids) || array_key_exists($this_post_id, $debugvalues)) {
+			if(get_post($post_ids)) {
 				$GLOBALS['deletion_db'] = $dbname;
 				return $dbname;
 			}
@@ -9455,7 +8766,6 @@ SE 1/2 oder BZW
 	}
 
 	function get_einzelne_termine_from_post () {
-		function_debug_counter("get_einzelne_termine_from_post");
 		$einzelne_termine = array();
 
 		if(array_key_exists('einzelner_termin_start', $_POST)) {
@@ -9479,7 +8789,6 @@ SE 1/2 oder BZW
 
 
 	function fill_data_from_mysql_result ($result) {
-		function_debug_counter("fill_data_from_mysql_result");
 		$data = array();
 		while ($row = mysqli_fetch_row($result)) {
 			$data[] = $row;
@@ -9488,7 +8797,6 @@ SE 1/2 oder BZW
 	}
 
 	function fill_first_element_from_mysql_query ($query) {
-		function_debug_counter("fill_first_element_from_mysql_query");
 		$result = rquery($query);
 		$data = array();
 		while ($row = mysqli_fetch_row($result)) {
@@ -9498,19 +8806,13 @@ SE 1/2 oder BZW
 	}
 
 	function set_debug ($value) {
-		function_debug_counter("set_debug");
 		$value = !!$value;
 		$query = 'delete from debug';
 		$result = rquery($query);
 		if($result) {
 			#create table debug (debug tinyint default "0" primary key);
 			$query = 'insert into debug (debug) values ('.esc($value).')';
-			$result = rquery($query);
-			if($result) {
-				success("Debug-Status erfolgreich eingetragen.");
-			} else {
-				error("Konnte den neuen Debug-Status nicht eintragen.");
-			}
+			return simple_query_success_fail_message($query, "Debug-Status erfolgreich eingetragen.", "Konnte den neuen Debug-Status nicht eintragen.");
 		} else {
 			error("Konnte den Debug-Status nicht setzen löschen.");
 		}
@@ -9518,7 +8820,6 @@ SE 1/2 oder BZW
 	}
 
 	function is_debug () {
-		function_debug_counter("is_debug");
 		$query = 'SELECT `debug` FROM `debug`';
 		$result = rquery($query);
 		$status = 0;
@@ -9541,46 +8842,7 @@ SE 1/2 oder BZW
 		return join(' -> ', $stack).";\n";
 	} 
 
-
-	/* DO NOT REPLACE */	function function_debug_counter ($funcname) {
-		return 1;
-		$this_backtrace_string = debug_backtrace_string();
-
-		if(!in_array($this_backtrace_string, $GLOBALS['backtraces'])) {
-			@$GLOBALS["backtraces"][] = $this_backtrace_string;
-		}
-
-		if(array_key_exists($funcname, $GLOBALS["function_debugger"])) {
-			@$GLOBALS["function_debugger"][$funcname]++;
-		} else {
-			@$GLOBALS["function_debugger"][$funcname] = 1;
-		}
-	}
-
-	/* DO NOT REPLACE */	function plot_all_backtraces () {
-		$string = "strict digraph a {\n   graph [ splines = false ]\n";
-		foreach ($GLOBALS["backtraces"] as $thistrace) {
-			$string .= "$thistrace\n";
-		}
-		$string .= "}\n";
-		return plot_graphviz($string);
-	}
-
-	/* DO NOT REPLACE */	function plot_graphviz ($code) {
-		$tmpfile = tempnam("/tmp/", "backtrace_");;
-		file_put_contents($tmpfile, $code);
-		$outputfile = tempnam("/tmp/", "backtrace_");;
-		$format = "png";
-		$command = "circo -T$format $tmpfile > $outputfile";
-		system($command);
-		$file = file_get_contents($outputfile);
-		$base64 = '<img src="'.'data:image/' . $format. ';base64,' . base64_encode($file).'">';
-		return $base64;
-	}
-
 	function create_veranstaltung_pruefung_tabelle ($pruefungen) {
-		function_debug_counter("create_veranstaltung_pruefung_tabelle");
-
 ?>
 		<table class="font_size_10px">
 <?php
@@ -9642,7 +8904,7 @@ SE 1/2 oder BZW
 		}
 		$text = preg_replace('/LaTeX/', '<img width="45px" alt="LaTeX" src="'.$base_url.'i/LaTeX.svg">', $text);
 		$text = preg_replace('/\\\\git/', '<img width="45px" alt="git" src="'.$base_url.'i/git.svg">', $text);
-		$text = preg_replace('/(warnung|achtung|vorsicht)/i', '&#x26a0; \1', $text);
+		$text = preg_replace('/\b(warnung|achtung|vorsicht)\b/i', '&#x26a0; \1', $text);
 		return $text;
 	}
 
@@ -9719,4 +8981,616 @@ SE 1/2 oder BZW
 		}
 		print "</ul>\n";
 	}
+
+	function fq ($str) {
+		return "&raquo;".htmle($str)."&laquo;";
+	}
+
+	function get_crazy_ethik_export_format ($pruefungsamt_id, $semester_id, $zu_untersuchende_pls, $last_changed_date) {
+		$query = '
+select
+    m.name as modulname,
+    ifnull(replace(regexp_replace(b.name, ".*\\\\((.*)\\\\)", "\\\\1"), ", ", "\\n"), ifnull(b.name, "")) as stg,
+    ifnull(replace(pn.modulbezeichnung, ", ", "\\n"), "") as modulnummer,
+    pt.name as pruefungsleistung,
+    ifnull(pn.pruefungsnummer, "keine PN") as pruefungsnummer,
+    pn.zeitraum_id as zeitraum,
+    ifnull(p.date, "") as datum,
+    "" as uhrzeit,
+    concat(d.first_name, " ", d.last_name) as dozent_name,
+    "" as bemerkungen,
+    p.last_update
+from
+    modul m
+right join
+    pruefungsnummer pn on pn.modul_id = m.id
+left join
+    pruefungstyp pt on pt.id = pn.pruefungstyp_id
+left join
+    bereich b on b.id = pn.bereich_id
+left join
+    pruefung p on p.pruefungsnummer_id = pn.id
+left join
+    veranstaltung v on v.id = p.veranstaltung_id
+left join
+    dozent d on d.id = v.dozent_id
+where
+    disabled = "0"
+'.(!$last_changed_date ? '' : " and p.last_update >= ".esc($last_changed_date))
+.' and
+    '.(!is_null($pruefungsamt_id) ? 
+    'm.studiengang_id in (
+        select studiengang_id from pruefungsamt pa left join pruefungsamt_nach_studiengang pns on pns.pruefungsamt_id = pa.id where pns.pruefungsamt_id = '.esc($pruefungsamt_id).'
+    )' : "1").'
+and
+    v.semester_id = '.esc($semester_id).(count($zu_untersuchende_pls) ? " and pn.pruefungsnummer in (".implode(", ", array_map("esc", $zu_untersuchende_pls)).")" : "").'
+and
+    v.semester_id = '.$semester_id.'
+order by
+    b.id,
+    m.id,
+    d.id,
+    pn.id;
+';
+
+		$result = rquery($query);
+
+		$daten = array();
+
+		while ($row = mysqli_fetch_row($result)) {
+			$daten[] = $row;
+		}
+
+		return $daten;
+	}
+
+
+	function export_crazy_ethik_export_format ($pruefungsamt_id, $semester_id, $einzelne_pns = "", $html = 1, $last_changed_date = null) {
+		$zu_untersuchende_pls = array();
+		if($einzelne_pns && $einzelne_pns != "") {
+			$zu_untersuchende_pls = preg_split("/\s*,\s*/", $einzelne_pns);
+		}
+
+		$data = get_crazy_ethik_export_format($pruefungsamt_id, $semester_id, $zu_untersuchende_pls, $last_changed_date);
+
+		if($html) {
+			$ret_string = '';
+			if(count($data)) {
+				# | modulname                     | stg | modulnummer    | pruefungsnummer | pruefungsleistung | zeitraum | datum | uhrzeit | dozent_name      | bemerkungen |
+
+				$ret_string = "<table>
+					<tr>
+					<th>Modulname</th>
+					<th>Stg.</th>
+					<th>Modulnummer</th>
+					<th>Prüfungsnummer</th>
+					<th>Prüfungsleistung</th>
+					<th>Zeitraum</th>
+					<th>Datum</th>
+					<th>Uhrzeit</th>
+					<th>Prüfer</th>
+					<th>Bemerkungen</th>
+					<th>Letztes Update</th>
+					</tr>";
+				foreach ($data as $local_data) {
+					$modulname = $local_data[0];
+					$stg = $local_data[1];
+					$modulnummer = $local_data[2];
+					$pruefungsleistung = $local_data[3];
+					$pruefungsnummer = $local_data[4];
+					$zeitraum = $local_data[5];
+					$datum = $local_data[6];
+					$uhrzeit = $local_data[7];
+					$dozent_name = $local_data[8];
+					$bemerkungen = $local_data[9];
+					$last_update = $local_data[10];
+
+					$ret_string .= "<tr><td class='bg_add8e6'>".htmle($modulname)."</td>\n";
+					$ret_string .= "<td>".htmle($stg)."</td>\n";
+					$ret_string .= "<td>".htmle($modulnummer)."</td>\n";
+					$ret_string .= "<td>".htmle($pruefungsnummer)."</td>\n";
+					$ret_string .= "<td>".htmle($pruefungsleistung)."</td>\n";
+					$ret_string .= "<td>".htmle($zeitraum)."</td>\n";
+					$ret_string .= "<td>".htmle($datum)."</td>\n";
+					$ret_string .= "<td>".htmle($uhrzeit)."</td>\n";
+					$ret_string .= "<td>".htmle($dozent_name)."</td>\n";
+					$ret_string .= "<td>".htmle($bemerkungen)."</td>\n";
+					$ret_string .= "<td style='white-space: no-wrap'>".htmle($last_update)."</td></tr>\n";
+				}
+				$ret_string .= '</table>';
+			} else {
+				$ret_string .= '<i>Mit den gewählten Optionen sind keine Daten verfügbar.</i>';
+			}
+
+			return $ret_string;
+		} else {
+			$objPHPExcel = '';
+			include_once 'Classes/PHPExcel.php';
+			$objPHPExcel = new PHPExcel();
+
+			$objPHPExcel->getProperties()->setCreator(htmlentities($GLOBALS['logged_in_data'][1]));
+			$objPHPExcel->getProperties()->setTitle("Prüfungen");
+			$objPHPExcel->setActiveSheetIndex(0);
+
+			$number = 2;
+			$letter = 'A';
+
+			$title = "Prüfungsangebot ".get_pruefungsamt_name($pruefungsamt_id);
+			$title_plus = create_title_plus($semester_id, null, null, null, $pruefungsamt_id);
+
+			$title = "$title$title_plus";
+			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]);
+
+			$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.$number, $title, "A".$number.":"."K".$number, 'A'.$number.":K".$number, 'ee7f00');
+
+			$number++;
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Fakultät/Institut:");
+			$letter = "B";
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "");
+			$letter = "A";
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Ansprechpartner:");
+			$letter = "B";
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $dozent_name );
+			$letter = "A";
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Telefon:");
+			$letter = "B";
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "");
+			$letter = "A";
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Email:");
+			$letter = "B";
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "");
+			$letter = "A";
+
+			$number++;
+			$number++;
+
+			$this_letter = "a";
+			foreach (
+				array("Modulname", "Stg.", "Modulnummer", "Prüfungsleistung", "Prüfungsnummer", "Zeitraum", "Datum", "Uhrzeit", "Prüfer", "Bemerkung", "Letzte Änderung")
+				as $thisitemheadline
+			) {
+				set_cell_value_and_color($objPHPExcel, "$this_letter".$number, $thisitemheadline, 'd9d9d9');
+				$this_letter++;
+			}
+
+			$number++;
+			
+			if(count($data)) {
+				$tmp = $data[3];
+				$data[3] = $data[4];
+				$data[4] = $tmp;
+				foreach ($data as $local_data) {
+					$letter = "A";
+					foreach ($local_data as $item) {
+						$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $item);
+						if ($letter == "A") {
+							cellColor($objPHPExcel, $letter.$number, 'ee7f00');
+						}
+
+						$letter = ++$letter;
+					}
+					$number++;	
+				}
+			} else {
+				$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Keine Daten für Semester: ".get_semester_string($semester_id).(is_null($pruefungsamt_id) ? "" : ", PA: $pruefungsamt_id"));
+			}
+
+			#return $objPHPExcel;
+			return auto_size_phpexcel($objPHPExcel, 0);
+		}
+	}
+
+	function get_crazy_ethik_export_format_2 ($pruefungsamt_id, $semester_id, $zu_untersuchende_pls, $last_changed_date) {
+		$query = '
+select 
+    s.name as studiengang_name,
+    m.abkuerzung as modulabkuerzung,
+    m.name as modulname,
+    "" as regulaeres_angebot,
+    ifnull(p.date, "") as pruefungsdatum,
+    ifnull(replace(regexp_replace(b.name, ".*\\\\((.*)\\\\)", "\\\\1"), ", ", "/"), ifnull(b.name, "")) as abschluss, 
+    pn.pruefungsnummer as pruefungsnummer,
+    pt.name as pruefungsleistung,
+    concat(d.first_name, " ", d.last_name) as pruefender,
+    p.last_update
+from 
+    modul m
+left join
+    pruefungsnummer pn on pn.modul_id = m.id
+left join 
+    pruefung p on pn.id = p.pruefungsnummer_id
+left join
+    veranstaltung v on p.veranstaltung_id = v.id
+left join
+    pruefungstyp pt on pt.id = pn.pruefungstyp_id
+left join
+    dozent d on d.id = v.dozent_id
+left join 
+    bereich b on b.id = pn.bereich_id 
+left join
+    studiengang s on s.id = m.studiengang_id
+where
+    '.(!is_null($pruefungsamt_id) ? 
+    'm.studiengang_id in (
+        select studiengang_id from pruefungsamt pa left join pruefungsamt_nach_studiengang pns on pns.pruefungsamt_id = pa.id where pns.pruefungsamt_id = '.esc($pruefungsamt_id).'
+    )' : "1").'
+and
+'.(!$last_changed_date ? '' : (" p.last_update >= ".esc($last_changed_date)." and")).'
+    v.semester_id = '.esc($semester_id).(count($zu_untersuchende_pls) ? " and pn.pruefungsnummer in (".implode(", ", array_map("esc", $zu_untersuchende_pls)).")" : "").'
+order by
+	s.name,
+	m.abkuerzung,
+	m.name,
+	pt.name
+';
+
+		$result = rquery($query);
+
+		$daten = array();
+
+		while ($row = mysqli_fetch_row($result)) {
+			$daten[] = $row;
+		}
+
+		return $daten;
+	}
+
+	function set_cell_value_and_color ($objPHPExcel, $cell_id, $text, $color) {
+		$objPHPExcel->getActiveSheet()->SetCellValue($cell_id, $text);
+		cellColor($objPHPExcel, $cell_id, $color);
+		return $objPHPExcel;
+	}
+
+
+	function export_crazy_ethik_export_format_2 ($pruefungsamt_id, $semester_id, $einzelne_pns = "", $html = 1, $last_changed_date = null) {
+		$zu_untersuchende_pls = array();
+		if($einzelne_pns && $einzelne_pns != "") {
+			$zu_untersuchende_pls = preg_split("/\s*,\s*/", $einzelne_pns);
+		}
+
+		if(!$pruefungsamt_id && !count($zu_untersuchende_pls)) {
+			if ($html) {
+				return "";
+			} else {
+				return null;
+			}
+		}
+
+		$data = get_crazy_ethik_export_format_2($pruefungsamt_id, $semester_id, $zu_untersuchende_pls, $last_changed_date);
+
+		if($html) {
+			$ret_string = '';
+			if(count($data)) {
+
+
+				$ret_string = "<table>
+					<tr>
+					<th></th>
+					<th>Modul</th>
+					<th>Regul&auml;res Angebot</th>
+					<th>Prüfungsdatum</th>
+					<th>Abschluss</th>
+					<th>Prüfungsnummer</th>
+					<th>Prüfungsleistung</th>
+					<th>Name des Prüfenden</th>
+					<th>Letztes Update</th>
+					</tr>";
+
+				$letzter_studiengang = "";
+				$letzter_modulname = "";
+				foreach ($data as $local_data) {
+#| studiengang_name | modulabkuerzung | modulname              | regulaeres_angebot | pruefungsdatum | abschluss | pruefungsnummer | pruefungsleistung | pruefender      |
+					$studiengang_name = $local_data[0];
+					$modulabkuerzung = $local_data[1];
+					$modulname = $local_data[2];
+					$regulaeres_angebot = $local_data[3];
+					$pruefungsdatum = $local_data[4];
+					$abschluss = $local_data[5];
+					$pruefungsnummer = $local_data[6];
+					$pruefungsleistung = $local_data[7];
+					$pruefer = $local_data[8];
+					$last_update = $local_data[9];
+
+					if($letzter_studiengang != $studiengang_name) {
+						$ret_string .= "<tr><td colspan='9' class='bg_add8e6'>".htmle($studiengang_name)."</td></tr>\n";
+						$letzter_studiengang = $studiengang_name;
+					}
+
+					if($letzter_modulname != $modulname) {
+						$letzter_modulname = $modulname;
+					} else {
+						$modulname = "";
+					}
+
+					$ret_string .= "<tr>\n";
+					$ret_string .= "<td>".htmle($modulname)."</td>\n";
+					$ret_string .= "<td>".htmle($regulaeres_angebot)."</td>\n";
+					$ret_string .= "<td>".htmle($pruefungsleistung)."</td>\n";
+					$ret_string .= "<td>".htmle($pruefungsdatum)."</td>\n";
+					$ret_string .= "<td>".htmle($abschluss)."</td>\n";
+					$ret_string .= "<td>".htmle($pruefungsnummer)."</td>\n";
+					$ret_string .= "<td>".htmle($pruefungsleistung)."</td>\n";
+					$ret_string .= "<td>".htmle($pruefer)."</td>\n";
+					$ret_string .= "<td style='white-space: no-wrap'>".htmle($last_update)."</td></tr>\n";
+				}
+				$ret_string .= '</table>';
+			} else {
+				$ret_string .= '<i>Mit den gewählten Optionen sind keine Daten verfügbar.</i>';
+			}
+
+			return $ret_string;
+		} else {
+			$objPHPExcel = '';
+			include_once 'Classes/PHPExcel.php';
+			$objPHPExcel = new PHPExcel();
+
+			$objPHPExcel->getProperties()->setCreator(htmlentities($GLOBALS['logged_in_data'][1]));
+			$objPHPExcel->getProperties()->setTitle("Prüfungsangebot");
+			$objPHPExcel->setActiveSheetIndex(0);
+
+			$number = 3;
+			$letter = 'A';
+
+			$title = "Prüfungsangebot ".get_pruefungsamt_name($pruefungsamt_id);
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $title);
+			$objPHPExcel->getActiveSheet()->mergeCells("A".$number.":"."H".$number);
+
+			$semester_data = get_semester($semester_id);
+			$semestertyp = $semester_data[2];
+			$semesterjahre = $semester_data[1];
+
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue("B$number", $semestertyp);
+			$objPHPExcel->getActiveSheet()->SetCellValue("C$number", $semesterjahre);
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Angaben zum Studienfachberater/Bearbeiter:");
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Name, Vorname:");
+			$letter = "B";
+			$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.$number, "", "B".$number.":"."H".$number, "B".$number, 'ffff00');
+			$letter = "A";
+
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Fakultät/Institut:");
+			$letter = "B";
+			$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.$number, "", "B".$number.":"."H".$number, "B".$number, 'ffff00');
+			$letter = "A";
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Telefonnummer:");
+			$letter = "B";
+			$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.$number, "", "B".$number.":"."H".$number, "B".$number, 'ffff00');
+			$letter = "A";
+
+
+			$number++;
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Email:");
+			$letter = "B";
+			$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.$number, "", "B".$number.":"."H".$number, "B".$number, 'ffff00');
+			$letter = "A";
+
+			$number += 2;
+			set_cell_value_and_color($objPHPExcel, "C".$number, "* Bitte ankreuzen", 'ffff99');
+
+			$number++;
+
+			set_cell_value_and_color($objPHPExcel, "a".$number, "", 'c0c0c0');
+			set_cell_value_and_color($objPHPExcel, "b".$number, "Modul", 'c0c0c0');
+			set_cell_value_and_color($objPHPExcel, "c".$number, "Reguläres Angebot *", 'ffff99');
+			set_cell_value_and_color($objPHPExcel, "d".$number, "Prüfungsdatum", 'c0c0c0');
+			set_cell_value_and_color($objPHPExcel, "e".$number, "Abschluss", 'c0c0c0');
+			set_cell_value_and_color($objPHPExcel, "f".$number, "Prüfungsnummer", 'c0c0c0');
+			set_cell_value_and_color($objPHPExcel, "g".$number, "Prüfungsleistung", 'c0c0c0');
+			set_cell_value_and_color($objPHPExcel, "h".$number, "Name des Prüfenden", 'c0c0c0');
+			set_cell_value_and_color($objPHPExcel, "i".$number, "Letztes Update", 'c0c0c0');
+			
+			if(count($data)) {
+				$letzter_studiengang = "";
+				$letzter_modulname = "";
+				$letzte_modulabkuerzung = "";
+				foreach ($data as $local_data) {
+					$letter = "A";
+					$i = 0;
+
+					foreach ($local_data as $item) {
+						if($i == 0 && $letzter_studiengang != $item) {
+							$number++;
+							$objPHPExcel = set_cell_value_and_merge_cells_and_cell_color($objPHPExcel, $letter.$number, $item, "A".$number.":"."I".$number, $letter.$number, 'c5f6f6');
+							$letzter_studiengang = $item;
+							$number++;
+						}
+
+						if($i == 1) {
+							if($letzte_modulabkuerzung != $item) {
+								$letzte_modulabkuerzung = $item;
+							} else {
+								$item = "";
+							}
+						}
+
+						if($i == 2) {
+							if($letzter_modulname != $item) {
+								$letzter_modulname = $item;
+							} else {
+								$item = "";
+							}
+						}
+
+
+						if($i == 0) {
+							# mache nichts mit dem studiennamen in i = 0
+						} else {
+							$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $item);
+							if ($letter == "C" || $letter == "D" || $letter == "E") {
+								cellColor($objPHPExcel, $letter.$number, 'ffff99');
+							}
+
+							$letter = ++$letter;
+						}
+						$i++;
+					}
+					$number++;	
+				}
+			} else {
+				$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Keine Daten für Semester: ".get_semester_string($semester_id).(is_null($pruefungsamt_id) ? "" : ", PA: $pruefungsamt_id"));
+			}
+
+			#return $objPHPExcel;
+			return auto_size_phpexcel($objPHPExcel, 0);
+		}
+	}
+
+	function role_has_access_to_page ($role, $page) {
+		$query = "select count(*) from role_to_page where role_id = ".esc($role)." and page_id = ".esc($page);
+		return !!get_single_row_from_query($query);
+	}
+
+	function get_semester_string ($semester_id) {
+		$semester_data = get_semester($semester_id);
+		$string = $semester_data[2]." ".$semester_data[1];
+		return $string;
+	}
+
+	function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
+		$sort_col = array();
+		foreach ($arr as $key => $row) {
+			$sort_col[$key] = $row[$col];
+		}
+
+		array_multisort($sort_col, $dir, $arr);
+	}
+
+	function get_praesenztyp_from_veranstaltung_id ($id) {
+		$query = "select * from veranstaltung_to_praesenztyp where veranstaltung_id = ".esc($id);
+		$return = null;
+		$row = get_single_row_from_query($query);
+		if($row) {
+			$return = $row[0];
+		}
+		return $return;
+	}
+	
+	function get_praesenztyp_id_from_name ($name) {
+		if(!array_key_exists($name, $GLOBALS['get_praesenztyp_id_from_name_cache'])) {
+			$query = "select id from praesenztyp where name = ".esc($name);
+			$return = null;
+			$row = get_single_row_from_query($query);
+			if($row) {
+				$return = $row[0];
+			}
+			$GLOBALS['get_praesenztyp_id_from_name_cache'][$name] = $return;
+			return $return;	
+		} else {
+			return $GLOBALS['get_praesenztyp_id_from_name_cache'][$name];
+		}
+	}
+
+	function get_praesenztyp_name_from_id ($id) {
+		$query = "select name from praesenztyp where id = ".esc($id);
+		$return = null;
+		$row = get_single_row_from_query($query);
+		if($row) {
+			$return = $row[0];
+		}
+		return $return;	
+	}
+
+	function get_praesenztyp_x_from_veranstaltung ($v_id, $pt_name) {
+		$pt_id = get_praesenztyp_id_from_name($pt_name);
+		#dier("$v_id, $pt_id, ".veranstaltung_has_praesenztyp($v_id, $pt_id));
+		if(veranstaltung_has_praesenztyp($v_id, $pt_id)) {
+			return "x";
+		}
+		return "";
+	}
+
+	function video_conference_link ($v_id) {
+		$query = 'select videolink from veranstaltung_metadaten where veranstaltung_id = '.esc($v_id);
+		$row = get_single_row_from_query($query);
+		if($row) {
+			return "<a href='".htmlentities($row)."'>&#128249;</a>";
+		}
+		return "";
+	}
+
+	function get_module () {
+		$array = [];
+		$query = "select id, name from modul";
+		$result = rquery($query);
+
+		while ($row = mysqli_fetch_row($result)) {
+			$array[] = $row;
+		}
+		
+		return $array;
+	}
+
+	function get_current_semester_id () {
+		$query = 'select id from semester where `default` = "1"';
+		return get_single_row_from_query($query);
+	}
+
+	function get_anzahl_pruefungen_pro_modul_pro_semester ($modul_id, $semester_id) {
+		$query = "select count(*) from pruefung p left join veranstaltung v on v.id = p.veranstaltung_id left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id where pn.modul_id = ".esc($modul_id)." and v.semester_id = ".esc($semester_id);
+		return get_single_row_from_query($query);
+	}
+
+	function get_anzahl_pl_pro_semester ($pruefungsnummer, $semester_id) {
+		$query = "select count(*) as anzahl from pruefung p left join veranstaltung v on v.id = p.veranstaltung_id left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id where semester_id = ".esc($semester_id)." and pn.pruefungsnummer = ".esc($pruefungsnummer)." group by pn.id";
+		$res = get_single_row_from_query($query)[0];
+		if($res) {
+			return $res;
+		} else {
+			return 0;
+		}
+	}
+
+	function get_studiengang_modul_pruefungsnummer_array () {
+		$query = "select s.name as studiengang_name, m.name as modul_name, ifnull(pn.pruefungsnummer, 'Keine Prüfungsnummer') as pruefungsnummer, b.name as bereich_name, pt.name as pruefungstyp_name from pruefungsnummer pn left join modul m on m.id = pn.modul_id left join studiengang s on s.id = m.studiengang_id left join bereich b on pn.bereich_id = b.id left join pruefungstyp pt on pt.id = pn.pruefungstyp_id";
+		$result = rquery($query);
+		$array = array();
+
+		while ($row = mysqli_fetch_row($result)) {
+			$array[] = $row;
+		}
+
+		return $array;
+	}
+
+	function get_longest_function_names () {
+		$functions_by_length = array();
+		foreach (get_defined_functions()["user"] as $this_func) {
+			if(function_exists($this_func)) {
+				$func = new ReflectionFunction($this_func);
+				$filename = $func->getFileName();
+				$start_line = $func->getStartLine() - 1; // it's actually - 1, otherwise you wont get the function() block
+				$end_line = $func->getEndLine();
+				$length = $end_line - $start_line;
+
+				$source = file($filename);
+				$function_body = implode("", array_slice($source, $start_line, $length));
+				$functions_by_length[$this_func] = substr_count($function_body, "\n") - 2;
+			}
+		}
+
+		ksort($functions_by_length);
+		asort($functions_by_length);
+
+		dier($functions_by_length);
+
+	}
+
+	#get_longest_function_names();
 ?>

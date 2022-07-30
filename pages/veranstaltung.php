@@ -81,6 +81,7 @@
 					<table>
 						<tr>
 							<th>Sprache (optional)</th>
+							<th>Präsenztyp</th>
 							<th>Tag</th>
 							<th>Stunde</th>
 							<th>Woche</th>
@@ -91,16 +92,17 @@
 							<th>Gebäude&shy;wunsch</th>
 							<th>Raum&shy;wunsch</th>
 							<th>Master-Niveau?</th>
+							<th>Fester BBB-Raum?</th>
 						</tr>
 <?php
-						$columns = array('wunsch', 'hinweis', 'opal_link', 'wochentag', 'stunde', 'woche', 'anzahl_hoerer', 'erster_termin', 'abgabe_pruefungsleistungen', 'raumwunsch', 'gebaeudewunsch', 'last_change', 'master_niveau', 'language_id', 'related_veranstaltung');
+						$columns = array('wunsch', 'hinweis', 'opal_link', 'wochentag', 'stunde', 'woche', 'anzahl_hoerer', 'erster_termin', 'abgabe_pruefungsleistungen', 'raumwunsch', 'gebaeudewunsch', 'last_change', 'master_niveau', 'language_id', 'related_veranstaltung', 'fester_bbb_raum', 'videolink');
 						$this_data = array();
 
 						foreach ($columns as $this_column) {
 							$this_data[$this_column] = '';
 						}
 
-						$query = 'SELECT `vm`.`wunsch`, `vm`.`hinweis`, `vm`.`opal_link`, `vm`.`wochentag`, `vm`.`stunde`, `vm`.`woche`, `vm`.`anzahl_hoerer`, `vm`.`erster_termin`, `vm`.`abgabe_pruefungsleistungen`, `v`.`raumwunsch_id`, `v`.`gebaeudewunsch_id`, `v`.`last_change`, `v`.`master_niveau`, `vm`.`language_id`, `vm`.`related_veranstaltung` FROM `veranstaltung_metadaten` `vm` JOIN `veranstaltung` `v` ON `v`.`id` = `vm`.`veranstaltung_id` WHERE `veranstaltung_id` = '.esc(get_get('id'));
+						$query = 'SELECT `vm`.`wunsch`, `vm`.`hinweis`, `vm`.`opal_link`, `vm`.`wochentag`, `vm`.`stunde`, `vm`.`woche`, `vm`.`anzahl_hoerer`, `vm`.`erster_termin`, `vm`.`abgabe_pruefungsleistungen`, `v`.`raumwunsch_id`, `v`.`gebaeudewunsch_id`, `v`.`last_change`, `v`.`master_niveau`, `vm`.`language_id`, `vm`.`related_veranstaltung`, `vm`.`fester_bbb_raum`, `vm`.`videolink` FROM `veranstaltung_metadaten` `vm` JOIN `veranstaltung` `v` ON `v`.`id` = `vm`.`veranstaltung_id` WHERE `veranstaltung_id` = '.esc(get_get('id'));
 						$result = rquery($query);
 						while ($row = mysqli_fetch_row($result)) {
 							$i = 0;
@@ -115,19 +117,41 @@
 						<tr>
 							<td class="text_align_left_nowrap"><?php
 								foreach (create_language_array() as $this_language) {
-									$language_id = $this_language[0];
+									$praesenz_id = $this_language[0];
 									$language_name = $this_language[1];
 
 									$checked = '';
 
-									if(veranstaltung_has_language($veranstaltung_id, $language_id)) {
+									if(veranstaltung_has_language($veranstaltung_id, $praesenz_id)) {
 										$checked = ' checked="checked" ';
 									}
 ?>
-									<input type="checkbox" name="language[]" value="<?php print htmlentities($language_id); ?>" <?php print $checked; ?> /> <?php print htmlentities($language_name); ?><br />
+									<input type="checkbox" name="language[]" value="<?php print htmlentities($praesenz_id); ?>" <?php print $checked; ?> /> <?php print htmlentities($language_name); ?><br />
 <?php
 								}
 							?></td>
+							<td class="text_align_left_nowrap">
+								<select name="praesenztyp[]">
+									<?php
+										if(get_praesenztyp_from_veranstaltung_id($veranstaltung_id) == null) {
+											print "<option>Bisher noch nicht gesetzt</option>";
+										}
+										foreach (create_praesenztypen_array() as $this_praesenztyp) {
+											$praesenztyp_id = $this_praesenztyp[0];
+											$praesenz_name = $this_praesenztyp[1];
+
+											$checked = '';
+
+											if(veranstaltung_has_praesenztyp($veranstaltung_id, $praesenztyp_id)) {
+												$checked = ' selected="SELECTED" ';
+											}
+		?>
+											<option value="<?php print htmlentities($praesenztyp_id); ?>" <?php print $checked; ?>> <?php print htmlentities($praesenz_name); ?></option>
+		<?php
+										}
+									?>
+								</select>
+							</td>
 							<td><?php print create_select(create_wochentag_array(), $this_data['wochentag'], 'tag'); ?></td>
 							<td><?php print create_select($stunden, $this_data['stunde'], 'stunde'); ?></td>
 							<td><?php print create_select(create_wann_array(), $this_data['woche'], 'woche'); ?></td>
@@ -139,6 +163,7 @@
 							<td><?php print create_select($gebaeude, $this_data['gebaeudewunsch'], 'gebaeudewunsch', 1); ?></td>
 							<td><input type="text" value="<?php print get_raum_name_by_id($this_data['raumwunsch']); ?>" name="raumwunsch" />
 							<td><input type="checkbox" value="1" name="master_niveau" <?php print $this_data['master_niveau'] ? 'checked="checked"' : ''; ?>/></td>
+							<td><input type="checkbox" value="1" name="fester_bbb_raum" <?php print $this_data['fester_bbb_raum'] ? 'checked="checked"' : ''; ?>/></td>
 						</tr>
 					</table>
 					<br />
@@ -151,12 +176,14 @@
 ?>
 					<table>
 						<tr>
-							<th>Hinweise für die Raumplanung</th>
+							<th>Konferenzraum-Link</th>
+							<th>Hinweise für Raumplanung</th>
 							<th>Hinweise für Studenten</th>
 						</tr>
 						<tr>
-							<td><textarea name="wunsch" class="veranstaltung_textarea"><?php print htmlentities($this_data['wunsch']); ?></textarea></td>
-							<td><textarea name="hinweis" class="veranstaltung_textarea"><?php print htmlentities($this_data['hinweis']); ?></textarea></td>
+							<td><textarea name="videolink" class="veranstaltung_textarea" placeholder="https://example.org/videokonferenzlink"><?php print htmlentities($this_data['videolink']); ?></textarea></td>
+							<td><textarea name="wunsch" class="veranstaltung_textarea" placeholder="Diese Hinweise werden für den Raumplaner angezeigt"><?php print htmlentities($this_data['wunsch']); ?></textarea></td>
+							<td><textarea name="hinweis" class="veranstaltung_textarea" placeholder="Diese Hinweise werden auf der Startseite angezeigt"><?php print htmlentities($this_data['hinweis']); ?></textarea></td>
 						</tr>
 					</table>
 					<br />

@@ -32,40 +32,20 @@
 						<td><input type="text" value="<?php print htmlentities($row[1]); ?>" name="neue_rolle" /></td>
 						<td>
 <?php
-							$tquery = 'SELECT `page_id` FROM `role_to_page` WHERE `role_id` = '.esc($row[0]);
-							$tresult = rquery($tquery);
-
-							while ($trow = mysqli_fetch_row($tresult)) {
+							foreach ($seiten as $data) {
 ?>
-								<select name="page[]">
-									<option value="">Diese Seite löschen</option>
-<?php
-									foreach ($seiten as $data) {
-?>
-										<option value="<?php print $data[0]; ?>" <?php print $data[0] == $trow[0] ? 'selected' : ''; ?>><?php print htmlentities($data[1]); ?></option>
-<?php
-									}
-?>
-								</select>
-								<br />
+								<input name="page[]" type="checkbox" value="<?php print $data[0]; ?>" <?php print role_has_access_to_page($row[0], $data[0]) ? 'checked="checked"' : ''; ?>><?php print $data[1]; ?><br>
 <?php
 							}
 ?>
-							<select name="page[]">
-								<option value="">Neue Seite hinzufügen</option>
-<?php
-								foreach ($seiten as $data) {
-?>
-									<option value="<?php print $data[0]; ?>"><?php print htmlentities($data[1]); ?></option>
-<?php
-								}
-?>
-							</select>
 						</td>
 						<td><input name="beschreibung" type="text" value="<?php print get_rolle_beschreibung($row[0]); ?>" /></td>
 						<td><input type="submit" value="Speichern" /></td>
 						<td><input type="submit" name="delete" value="Löschen" /></td>
 					</form>
+				</tr>
+				<tr>
+					<td colspan="5"><hr><hr><hr></td>
 				</tr>
 <?php
 			}
@@ -74,15 +54,13 @@
 				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
 					<td><input type="text" value="" name="neue_rolle" /></td>
 					<td>
-						<select name="page[]">
 <?php
-							foreach ($seiten as $data) {
+						foreach ($seiten as $data) {
 ?>
-								<option value="<?php print $data[0]; ?>"><?php print htmlentities($data[1]); ?></option>
+							<input name="page[]" type="checkbox" value="<?php print $data[0]; ?>" ><?php print $data[1]; ?><br>
 <?php
-							}
+						}
 ?>
-						</select>
 					</td>
 					<td><input name="beschreibung" type="text" value="" /></td>
 					<td><input type="submit" value="Speichern" /></td>
