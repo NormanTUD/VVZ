@@ -232,6 +232,20 @@
   UNIQUE KEY `jahr_typ` (`jahr`,`typ`)
 ) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;",
 
+'pruefung_zeitraum' => 'CREATE TABLE `pruefung_zeitraum` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;',
+
+'start_message' => 'CREATE TABLE `start_message` (
+  `institut_id` int(10) unsigned NOT NULL,
+  `message` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`institut_id`),
+  CONSTRAINT `institut_id_fk1` FOREIGN KEY (`institut_id`) REFERENCES `institut` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+
 'function_rights' => 'create table if not exists function_rights (
 	id int unsigned auto_increment primary key,
 	name varchar(255),
