@@ -18,6 +18,12 @@ eval `resize`
 set -x
 
 INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
+if [ $? == 1 ]; then
+    echo "User selected Cancel."
+    exit
+fi
+
+INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/$##')
 
 if [ -d "$INSTALL_PATH" ]; then
 	MOVE_TO=$INSTALL_PATH
@@ -34,8 +40,20 @@ mkdir -p $INSTALL_PATH
 cd $INSTALL_PATH
 
 PASSWORD=$(whiptail --passwordbox "What is your DB password" $LINES $COLUMNS --title "DB-password" 3>&1 1>&2 2>&3)
+if [ $? == 1 ]; then
+    echo "User selected Cancel."
+    exit
+fi
 ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
+if [ $? == 1 ]; then
+    echo "User selected Cancel."
+    exit
+fi
 ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password?" $LINES $COLUMNS --title "Admin-password" 3>&1 1>&2 2>&3)
+if [ $? == 1 ]; then
+    echo "User selected Cancel."
+    exit
+fi
 
 git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
 
@@ -80,6 +98,10 @@ function new_setup {
 
 function create_institut {
 	INSTITUT_NAME=$(whiptail --inputbox "Initial Institut?" $LINES $COLUMNS "$INSTITUT_NAME" --title "Name of the Default Institut" 3>&1 1>&2 2>&3)
+	if [ $? == 1 ]; then
+	    echo "User selected Cancel."
+	    exit
+	fi
 	echo "$INSTITUT_NAME" > /etc/default_institut_name
 }
 
@@ -98,6 +120,10 @@ WHAT_TO_DO=$(
 	"create_institut" "Create a default Institut" ON \
 	3>&1 1>&2 2>&3
 )
+if [ $? == 1 ]; then
+    echo "User selected Cancel."
+    exit
+fi
 
 
 for task in $WHAT_TO_DO; do
