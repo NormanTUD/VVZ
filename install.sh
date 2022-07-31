@@ -28,7 +28,7 @@ INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/*$##')
 if [ -d "$INSTALL_PATH" ]; then
 	MOVE_TO=$INSTALL_PATH
 	i=0
-	while [ -d "${INSTALL_PATH}_${i}" ]; do
+	while [ -d "${MOVE_TO}" ]; do
 		i=$((i+1))
 		MOVE_TO=${INSTALL_PATH}_${i}
 	done
