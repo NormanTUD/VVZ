@@ -131,9 +131,9 @@ done
 LOCAL_IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
 
 
-set +e
+set +x
 curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD"
-set -e
+set -x
 
 rm $INSTALL_PATH/new_setup
 
