@@ -13,6 +13,23 @@ sudo apt-get install xterm whiptail sudo git -y
 
 set -x
 
+INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" 8 39 "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
+
+if [ -d "$INSTALL_PATH" ]; then
+	MOVE_TO=$INSTALL_PATH
+	i=0
+	while [ -d "$MOVE_TO" ]; do
+		i=$((i+1))
+		MOVE_TO=${MOVE_TO}_${i}
+	done
+
+	mv "$INSTALL_PATH" "$MOVE_TO"
+fi
+
+cd $INSTALL_PATH
+
+git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
+
 function apt_get_upgrade {
 	sudo apt-get upgrade -y
 }
@@ -44,10 +61,6 @@ FLUSH PRIVILEGES;
 EOF
 }
 
-function custompath {
-	INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" 8 39 "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
-}
-
 function copy_to_path {
 	sudo mv $INSTALL_PATH /var/www/old_html
 	sudo mkdir -p $INSTALL_PATH
@@ -75,7 +88,6 @@ WHAT_TO_DO=$(
 	"install_php" "Install PHP" ON \
 	"install_mariadb" "Install MariaDB" ON \
 	"setup_mariadb" "Setup MariaDB" ON \
-	"custompath" "Set custom install path?" OFF \
 	"copy_to_path" "Copy files to the apache path" ON \
 	"new_setup" "Create new_setup file" ON \
 	"create_institut" "Create a default Institut" ON \
