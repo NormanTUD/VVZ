@@ -24,9 +24,8 @@ Aktuell läuft die Software unter vvz.phil.tu-dresden.de.
 # Installation
 
 ```console
-git clone --depth 1 https://github.com/NormanTUD/VVZ.git
-cd VVZ
-bash install.sh
+export PRIVATE_ACCESS_TOKEN=gpb_... # Ask me to get private access!
+curl -H "Authorization: token $PRIVATE_ACCESS_TOKEN" -H 'Accept: application/vnd.github.v3.raw' -L https://raw.githubusercontent.com/NormanTUD/VVZ/master/install.sh | bash
 ```
 
 Open the URL in the browser after doing this and follow the instructions.
