@@ -24,6 +24,7 @@ Aktuell läuft die Software unter vvz.phil.tu-dresden.de.
 # Installation
 
 ```console
+sudo apt-get install curl
 export PRIVATE_ACCESS_TOKEN=gpb_... # Ask me to get private access!
 curl -H "Authorization: token $PRIVATE_ACCESS_TOKEN" -H 'Accept: application/vnd.github.v3.raw' -L https://raw.githubusercontent.com/NormanTUD/VVZ/master/install.sh | bash
 ```
