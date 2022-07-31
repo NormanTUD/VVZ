@@ -17,7 +17,7 @@ eval `resize`
 
 set -x
 
-INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS $(( $LINES - 8 )) "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
+INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
 
 if [ -d "$INSTALL_PATH" ]; then
 	MOVE_TO=$INSTALL_PATH
@@ -75,11 +75,11 @@ function new_setup {
 }
 
 function create_institut {
-	INSTITUT_NAME=$(whiptail --inputbox "Initial Institut?" $LINES $COLUMNS $(( $LINES - 8 )) "$INSTITUT_NAME" --title "Name of the Default Institut" 3>&1 1>&2 2>&3)
+	INSTITUT_NAME=$(whiptail --inputbox "Initial Institut?" $LINES $COLUMNS "$INSTITUT_NAME" --title "Name of the Default Institut" 3>&1 1>&2 2>&3)
 	echo "$INSTITUT_NAME" > /etc/default_institut_name
 }
 
-PASSWORD=$(whiptail --passwordbox "What is your DB password" $LINES $COLUMNS $(( $LINES - 8 )) --title "DB-password" 3>&1 1>&2 2>&3)
+PASSWORD=$(whiptail --passwordbox "What is your DB password" $LINES $COLUMNS --title "DB-password" 3>&1 1>&2 2>&3)
 echo "$PASSWORD" > /etc/vvzdbpw
 
 WHAT_TO_DO=$(
@@ -103,11 +103,11 @@ done
 
 LOCAL_IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
 
-ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS $(( $LINES - 8 )) "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
-ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password=" $LINES $COLUMNS $(( $LINES - 8 )) --title "Admin-password" 3>&1 1>&2 2>&3)
+ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
+ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password=" $LINES $COLUMNS --title "Admin-password" 3>&1 1>&2 2>&3)
 
 curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD"
 
 rm $INSTALL_PATH/new_setup
 
-whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS $(( $LINES - 8 ))
+whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS
