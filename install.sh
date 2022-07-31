@@ -33,18 +33,7 @@ function install_mariadb {
 }
 
 function setup_mariadb {
-	set +x
-	mysql_secure_installation <<EOF
-
-y
-$PASSWORD
-$PASSWORD
-y
-y
-y
-y
-EOF
-set -x
+	mysql_secure_installation
 }
 
 function custompath {
