@@ -23,14 +23,14 @@ if [ $? == 1 ]; then
     exit
 fi
 
-INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/$##')
+INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/*$##')
 
 if [ -d "$INSTALL_PATH" ]; then
 	MOVE_TO=$INSTALL_PATH
 	i=0
-	while [ -d "$MOVE_TO" ]; do
+	while [ -d "${INSTALL_PATH}_${i}" ]; do
 		i=$((i+1))
-		MOVE_TO=${MOVE_TO}_${i}
+		MOVE_TO=${INSTALL_PATH}_${i}
 	done
 
 	mv "$INSTALL_PATH" "$MOVE_TO"
@@ -110,6 +110,7 @@ echo "$PASSWORD" > /etc/vvzdbpw
 WHAT_TO_DO=$(
 	whiptail --title "What to do?" --checklist \
 	"Chose what you want to do" $LINES $COLUMNS $(( $LINES - 8 )) \
+	"create_institut" "Create a default Institut" ON \
 	"apt_get_upgrade" "run apt-get upgrade" ON \
 	"install_apache" "Install Apache2" ON \
 	"install_php" "Install PHP" ON \
@@ -117,7 +118,6 @@ WHAT_TO_DO=$(
 	"setup_mariadb" "Setup MariaDB" ON \
 	"copy_to_path" "Copy files to the apache path" ON \
 	"new_setup" "Create new_setup file" ON \
-	"create_institut" "Create a default Institut" ON \
 	3>&1 1>&2 2>&3
 )
 if [ $? == 1 ]; then
