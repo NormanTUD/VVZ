@@ -15,13 +15,14 @@ git config --global credential.helper store
 
 eval `resize`
 
-set -x
-
-INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
-if [ $? == 1 ]; then
-    echo "User selected Cancel."
-    exit
-fi
+INSTALL_PATH=""
+while [[ -z "$INSTALL_PATH" ]]; do
+	INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
+	if [ $? == 1 ]; then
+	    echo "User selected Cancel."
+	    exit
+	fi
+done
 
 INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/*$##')
 
@@ -39,21 +40,32 @@ fi
 mkdir -p $INSTALL_PATH
 cd $INSTALL_PATH
 
-PASSWORD=$(whiptail --passwordbox "What is your DB password" $LINES $COLUMNS --title "DB-password" 3>&1 1>&2 2>&3)
-if [ $? == 1 ]; then
-    echo "User selected Cancel."
-    exit
-fi
-ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
-if [ $? == 1 ]; then
-    echo "User selected Cancel."
-    exit
-fi
-ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password?" $LINES $COLUMNS --title "Admin-password" 3>&1 1>&2 2>&3)
-if [ $? == 1 ]; then
-    echo "User selected Cancel."
-    exit
-fi
+PASSWORD=""
+while [[ -z "$PASSWORD" ]]; do
+	PASSWORD=$(whiptail --passwordbox "What is your DB password" $LINES $COLUMNS --title "DB-password" 3>&1 1>&2 2>&3)
+	if [ $? == 1 ]; then
+	    echo "User selected Cancel."
+	    exit
+	fi
+done
+
+ADMIN_USERNAME=""
+while [[ -z "$ADMIN_USERNAME" ]]; do
+	ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
+	if [ $? == 1 ]; then
+	    echo "User selected Cancel."
+	    exit
+	fi
+done
+
+ADMIN_PASSWORD=""
+while [[ -z "$ADMIN_PASSWORD" ]]; do
+	ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password?" $LINES $COLUMNS --title "Admin-password" 3>&1 1>&2 2>&3)
+	if [ $? == 1 ]; then
+	    echo "User selected Cancel."
+	    exit
+	fi
+done
 
 git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
 
@@ -130,10 +142,7 @@ done
 
 LOCAL_IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
 
-
-set +x
-curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD"
-set -x
+curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD" 2>&1 > /dev/null
 
 rm $INSTALL_PATH/new_setup
 
