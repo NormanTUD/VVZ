@@ -9,7 +9,7 @@ INSTALL_PATH=/var/www/html
 INSTITUT_NAME="Institut für Philosophie"
 
 sudo apt-get update
-sudo apt-get install xterm whiptail sudo -y
+sudo apt-get install xterm whiptail sudo git -y
 
 set -x
 
