@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 if [ "$EUID" -ne 0 ]; then
 	echo "Please run as root"
 	exit
@@ -12,6 +10,8 @@ INSTITUT_NAME="Institut für Philosophie"
 
 apt-get update
 apt-get install xterm whiptail curl git -y
+
+git config --global credential.helper store
 
 eval `resize`
 
@@ -32,6 +32,10 @@ fi
 
 mkdir -p $INSTALL_PATH
 cd $INSTALL_PATH
+
+PASSWORD=$(whiptail --passwordbox "What is your DB password" $LINES $COLUMNS --title "DB-password" 3>&1 1>&2 2>&3)
+ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
+ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password?" $LINES $COLUMNS --title "Admin-password" 3>&1 1>&2 2>&3)
 
 git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
 
@@ -79,7 +83,6 @@ function create_institut {
 	echo "$INSTITUT_NAME" > /etc/default_institut_name
 }
 
-PASSWORD=$(whiptail --passwordbox "What is your DB password" $LINES $COLUMNS --title "DB-password" 3>&1 1>&2 2>&3)
 echo "$PASSWORD" > /etc/vvzdbpw
 
 WHAT_TO_DO=$(
@@ -103,8 +106,6 @@ done
 
 LOCAL_IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
 
-ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
-ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password=" $LINES $COLUMNS --title "Admin-password" 3>&1 1>&2 2>&3)
 
 curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD"
 
