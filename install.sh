@@ -9,7 +9,7 @@ INSTALL_PATH=/var/www/html
 INSTITUT_NAME="Institut für Philosophie"
 
 sudo apt-get update
-sudo apt-get install xterm whiptail sudo -y
+sudo apt-get install xterm whiptail expect sudo -y
 
 set -x
 
@@ -33,7 +33,15 @@ function install_mariadb {
 }
 
 function setup_mariadb {
-	mysql_secure_installation
+	#mysql_secure_installation
+
+	mysql -u root <<-EOF
+UPDATE mysql.user SET Password=PASSWORD('$PASSWORD') WHERE User='root';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
+FLUSH PRIVILEGES;
+EOF
 }
 
 function custompath {
