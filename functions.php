@@ -5190,7 +5190,7 @@ INSERT INTO
 <?php
 					if(in_array('studienordnung', $columnnames)) {
 ?>
-						<td><input type="text" class="width500px" name="studienordnung" value="<?php print htmlentities($row[3]); ?>" /></td>
+						<td><input type="text" class="width500px" name="studienordnung" value="<?php print htmlentities($row[3] ?? ""); ?>" /></td>
 <?php
 					}
 					if(in_array('bereich_id', $columnnames)) {
