@@ -1514,7 +1514,7 @@
 	}
 
 	function show_semester_selector () {
-		$semester_array = create_semester_array(1, 0, array(get_get('semester'), $GLOBALS['this_semester'][0]));
+		$semester_array = table_exists($GLOBALS["dbname"], "semester") ? create_semester_array(1, 0, array(get_get('semester'), $GLOBALS['this_semester'][0])) : array();
 		if(count($semester_array) >= 2) {
 ?>
 			<form method="get">
@@ -1677,8 +1677,10 @@
 
 ?>
 					<h2 class="text-center"><?php print isset($GLOBALS['this_institut']) ? htmlentities(get_institut_name($GLOBALS['this_institut'])) : ''; ?></h2>
-					<h3 class="text-center"><?php print add_next_year_to_wintersemester($GLOBALS['this_semester'][1], $GLOBALS['this_semester'][2]); ?></h3>
-					<p class="text-center"><?php print htmlentities(get_studiengang_name(get_get('studiengang') ?? "") ?? ""); ?></p>
+					<h3 class="text-center"><?php 
+						print table_exists($GLOBALS["dbname"], "semester") ? add_next_year_to_wintersemester($GLOBALS['this_semester'][1], $GLOBALS['this_semester'][2]) : ''; 
+					?></h3>
+					<p class="text-center"><?php print table_exists($GLOBALS["dbname"], "studiengang") ? htmlentities(get_studiengang_name(get_get('studiengang') ?? "") ?? "") : ""; ?></p>
 <?php
 					show_institute_selector();
 

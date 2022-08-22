@@ -8153,7 +8153,6 @@ SE 1/2 oder BZW
 		if($database) {
 			if(is_array($columns)) {
 				if(is_array($data)) {
-					stderrw("Befülle `$database`\n");
 					$query = 'DELETE FROM `'.$database.'`'."\n";
 					if($print) {
 						print green_text($query);

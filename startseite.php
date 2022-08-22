@@ -86,7 +86,9 @@
 					$GLOBALS['this_institut'] = 1;
 				}
 			} else {
-				die("Es konnten keine Institute gefunden werden. Ohne eingetragene Institute kann die Software nicht benutzt werden. Bitte kontaktieren Sie die Administratoren über die Kontaktseite.");
+				if(table_exists($GLOBALS["dbname"], "institut")) {
+					die("Es konnten keine Institute gefunden werden. Ohne eingetragene Institute kann die Software nicht benutzt werden. Bitte kontaktieren Sie die Administratoren über die Kontaktseite.");
+				}
 			}
 		}
 	}
@@ -154,7 +156,9 @@
 		} else if (get_get('alle_pruefungsnummern')) {
 			show_alle_pruefungsnummern_daten();
 		} else {
-			show_studiengaenge_uebersicht();
+			if(table_exists($GLOBALS["dbname"], "studiengaenge")) {
+				show_studiengaenge_uebersicht();
+			}
 		}
 
 		include("footer.php");
