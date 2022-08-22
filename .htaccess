@@ -4,6 +4,7 @@ RewriteBase /
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On
+	RewriteRule ^vvz_(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4/$5 [NE,E=SFURI:$1]
 	RewriteRule ^vvz_(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4 [NE,E=SFURI:$1]
 	RewriteRule ^vvz_(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
 	RewriteRule ^vvz_(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
