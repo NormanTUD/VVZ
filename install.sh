@@ -131,3 +131,5 @@ service apache2 restart
 curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD" 2>&1 > /dev/null
 
 whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS
+
+touch /etc/hardcore_debugging

@@ -2202,6 +2202,11 @@ declare(ticks=1);
 		if(get_kunden_db_name() == "startpage") {
 			return;
 		}
+
+		if($GLOBALS["db_freshly_created"]) {
+			return;
+		}
+
 		if($GLOBALS['already_deleted_old_session_ids']) {
 			return;
 		}
