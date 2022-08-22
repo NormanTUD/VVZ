@@ -7895,7 +7895,7 @@ SE 1/2 oder BZW
 		}
 
 		$key = "get_page_id_by_filename($file)";
-		if(array_key_exists($key, $GLOBALS['memoize'])) {
+		if(array_key_exists($key, $GLOBALS['memoize']) && $GLOBALS['memoize'][$key]) {
 			return $GLOBALS['memoize'][$key];
 		}
 
@@ -7906,6 +7906,7 @@ SE 1/2 oder BZW
 			$return = get_get('page');
 		} else {
 			$query = 'SELECT `id` FROM `page` WHERE `file` = '.esc($file);
+			die($query);
 			$result = rquery($query);
 
 			$return = '';
@@ -7917,7 +7918,11 @@ SE 1/2 oder BZW
 
 		$GLOBALS['memoize'][$key] = $return;
 
-		return $return;
+		if(!$return) {
+			return "LEER";
+		} else {
+			return $return;
+		}
 	}
 
 	function get_startnr_by_institut ($id) {
