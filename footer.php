@@ -34,11 +34,11 @@
 		if(!($url == 'faq' && !faq_has_entry())) {
 			if($url == $this_page_file) {
 ?>
-				<b><a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_name()."/".$url; ?>"><?php print htmlentities($name); ?></a></b>
+				<b><a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a></b>
 <?php
 			} else {
 ?>
-				<a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_name()."/".$url; ?>"><?php print htmlentities($name); ?></a>
+				<a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a>
 <?php
 			}
 			$c++;

@@ -185,7 +185,9 @@
 
 		if(!get_single_row_from_query("select count(*) from users")[0]) {
 			$salt = generate_random_string(100);
-			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc(get_post('username')).', '.esc(hash('sha256', get_post('password').$salt)).', '.esc($salt).', 1, 1)';
+			$default_username = "Admin";
+			$default_password = "test";
+			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
 			rquery($query);
 		}
 
