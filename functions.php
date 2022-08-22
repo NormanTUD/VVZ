@@ -5815,7 +5815,7 @@ INSERT INTO
 
 	function create_semester_array_short () {
 		$semester = array();
-		if(table_exists($GLOBALS["dbname"], "semester")) {
+		if(!table_exists($GLOBALS["dbname"], "semester")) {
 			return $semester;
 		}
 		$query = 'SELECT `id`, concat(`typ`, " ", `jahr`) FROM `semester` ORDER BY `jahr`, `typ`';

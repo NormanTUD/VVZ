@@ -68,7 +68,7 @@
 ?>
 					<form method="get">
 						<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
-						<input type="hidden" name="dozent_id" value="<?php print htmlentities(get_get('dozent_id')); ?>" />
+						<input type="hidden" name="dozent_id" value="<?php print htmlentities(get_get('dozent_id') ?? ""); ?>" />
 						<?php create_select($semester, $chosen_semester, 'semester'); ?>
 						<input type="submit" value="Nur Veranstaltungen aus diesem Semester anzeigen" />
 					</form>
@@ -81,7 +81,7 @@
 								<form method="get">
 									<input type="hidden" name="dozent_id" value="<?php print $GLOBALS['user_dozent_id']; ?>" />
 									<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
-									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester')); ?>" />
+									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
 									<input type="submit" value="Nur meine Veranstaltungen anzeigen" />
 								</form>
 <?php
@@ -89,9 +89,9 @@
 ?>
 								<form method="get">
 									<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
-									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester')); ?>" />
+									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
 									<input type="submit" value="Wieder alle Veranstaltungen anzeigen" />
-								</form>					
+ 								</form>					
 <?php
 							}
 
@@ -99,7 +99,7 @@
 ?>
 							<form method="get">
 								<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
-								<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester')); ?>" />
+								<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
 <?php
 								print create_select($dozenten, get_get('dozent_id'), 'dozent_id', 1);
 ?>
@@ -215,10 +215,10 @@
 										if(isset($GLOBALS['user_dozent_id']) && get_get('dozent_id')) {
 											print '&dozent_id='.$GLOBALS['user_dozent_id'];
 										}
-										print '&semester='.htmlentities(get_get('semester'));
+										print '&semester='.htmlentities(get_get('semester') ?? "");
 									?>">
 									<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
-									<input type="hidden" value="<?php print htmlentities(get_get('semester')); ?>" name="semester" />
+									<input type="hidden" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" name="semester" />
 									<input type="hidden" value="1" name="update_veranstaltung" />
 									<input type="hidden" value="<?php print $row[0]; ?>" name="id" />
 									<td><textarea class="veranstaltungen_textarea" name="name"><?php print htmlentities($row[2]); ?></textarea></td>
@@ -267,13 +267,13 @@
 									}
 
 									if(get_get('semester')) {
-										print '&semester='.htmlentities(get_get('semester'));
+										print '&semester='.htmlentities(get_get('semester') ?? "");
 									}
 
 									?>">
 									<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
 									<input type="hidden" value="" name="id" />
-									<input type="hidden" value="<?php print htmlentities(get_get('semester')); ?>" name="semester" />
+									<input type="hidden" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" name="semester" />
 									<input type="hidden" value="1" name="neue_veranstaltung" />
 									<td><textarea class="veranstaltungen_textarea" name="name"></textarea></td>
 									<td><?php create_select($semester, $chosen_semester, 'semester'); ?></td>
