@@ -226,7 +226,7 @@
 					$pagenr = get_post('page');
 				}
 
-				if(!preg_match('/^\d+$/', $pagenr)) {
+				if(!preg_match('/^\d+$/', $pagenr ?? "")) {
 					$pagenr = null;
 				}
 
