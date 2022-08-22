@@ -115,10 +115,6 @@
 	 */
 
         function selftest () {
-		if(!$GLOBALS["db_freshly_created"]) {
-			return;
-		}
-
 		print "Generating tables for your VVZ installation...";
 
                 $tables = $GLOBALS["databases"];

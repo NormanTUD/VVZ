@@ -923,7 +923,7 @@ declare(ticks=1);
 			}
 			
 			$new_faculty_name = get_post('new_faculty_name');
-			if(strlen($new_faculty_name)) {
+			if(strlen($new_faculty_name ?? "")) {
 				create_institut($new_faculty_name, get_post('new_start_nr'));
 			} else if (isset($new_faculty_name)) {
 				error('Jede Institut muss einen Namen haben.');
@@ -7062,6 +7062,7 @@ $ret_string .= '</table>';
 							$this_institut = 1;
 						}
 					} else {
+
 						die("Es konnten keine Institute gefunden werden. Ohne eingetragene Institute kann die Software nicht benutzt werden. Bitte kontaktieren Sie die Administratoren über die Kontaktseite.");
 					}
 				}

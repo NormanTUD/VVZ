@@ -87,7 +87,7 @@
 				}
 			} else {
 				if(table_exists($GLOBALS["dbname"], "institut")) {
-					die("Es konnten keine Institute gefunden werden. Ohne eingetragene Institute kann die Software nicht benutzt werden. Bitte kontaktieren Sie die Administratoren über die Kontaktseite.");
+					#die("Es konnten keine Institute gefunden werden. Ohne eingetragene Institute kann die Software nicht benutzt werden. Bitte kontaktieren Sie die Administratoren über die Kontaktseite.");
 				}
 			}
 		}
