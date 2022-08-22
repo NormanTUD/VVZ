@@ -253,7 +253,7 @@
 
 			while ($row = mysqli_fetch_row($result)) {
 ?>
-				<option value="<?php print $row[0]; ?>" <?php print $row[0] == get_get('dozent') ? 'selected' : ''; ?>><?php print htmlentities($row[1]); ?></option>
+				<option value="<?php print $row[0]; ?>" <?php print $row[0] == get_get('dozent') ? 'selected' : ''; ?>><?php print htmlentities($row[1] ?? ""); ?></option>
 <?php
 			}
 ?>
@@ -271,7 +271,7 @@
 
 			while ($row = mysqli_fetch_row($result)) {
 ?>
-				<option value="<?php print $row[0]; ?>" <?php print $row[0] == get_get('gebaeude') ? 'selected' : ''; ?>><?php print htmlentities($row[1])." (".htmlentities($row[2]).")"; ?></option>
+				<option value="<?php print $row[0]; ?>" <?php print $row[0] == get_get('gebaeude') ? 'selected' : ''; ?>><?php print htmlentities($row[1] ?? "")." (".htmlentities($row[2] ?? "").")"; ?></option>
 <?php
 			}
 ?>
@@ -296,7 +296,7 @@
 						Vorlesungsname enthält im Titel:
 					</td>
 					<td>
-						<input label="Vorlesungsname enthält im Titel" type="text" name="vltitel" value="<?php print htmlentities(get_get('vltitel')); ?>" />
+						<input label="Vorlesungsname enthält im Titel" type="text" name="vltitel" value="<?php print htmlentities(get_get('vltitel') ?? ""); ?>" />
 					</td>
 				</tr>
 <?php
@@ -378,7 +378,7 @@
 				</tr>
 				<tr>
 					<td>OPAL-Seite vorhanden?</td>
-					<td><input label="OPAL-Seite vorhanden?" type="checkbox" value="1" name="opal_zwingend" <?php print htmlentities(get_get('opal_zwingend')) ? 'checked="CHECKED"' : '' ?> /></td>
+					<td><input label="OPAL-Seite vorhanden?" type="checkbox" value="1" name="opal_zwingend" <?php print htmlentities(get_get('opal_zwingend') ?? "") ? 'checked="CHECKED"' : '' ?> /></td>
 				</tr>
 				<tr>
 					<td></td>
@@ -669,7 +669,7 @@
 	}
 
 	function warn_if_attention_match ($hinweis) {
-		if(preg_match('/(warnung|achtung|vorsicht)/i', $hinweis, $founds)) {
+		if(preg_match('/(warnung|achtung|vorsicht)/i', $hinweis ?? "", $founds)) {
 			print "<span class='calendarlarge' alt='Im Hinweis kommt das Wort ".$founds[1]." vor'>&#x26a0;</span>";
 		}
 	}
@@ -706,11 +706,11 @@
 
 	function show_sws ($stunde, $woche) {
 				$sws = get_sws($stunde, $woche);
-				if($sws[0]) { 
+				if($sws[0] ?? "") { 
 					print ", Etwa* ";
 					$GLOBALS['shown_etwa'] = 1;
 				}
-				if($sws[1]) {
+				if($sws[1] ?? "") {
 					if(!$GLOBALS['shown_etwa']) {
 						print ", "; 
 					};
@@ -1574,10 +1574,10 @@
 				}
 ?>
 				<input type="hidden" value="1" name="stundenplan_to_be_created" />
-				<input type="hidden" value="<?php print htmlentities(get_get('bereich')); ?>" name="bereich" />
+				<input type="hidden" value="<?php print htmlentities(get_get('bereich') ?? ""); ?>" name="bereich" />
 				<input type="hidden" value="<?php print htmlentities($GLOBALS['this_institut']); ?>" name="institut" />
 				<input type="hidden" value="<?php print htmlentities($GLOBALS['this_semester'][0]); ?>" name="semester" />
-				<input type="hidden" value="<?php print htmlentities(get_get('semester')); ?>" name="semester" />
+				<input type="hidden" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" name="semester" />
 <?php
 				show_auswaehlbare_veranstaltungen_stuff();
 ?>

@@ -2949,16 +2949,16 @@ JOIN
 	`m`.`studiengang_id` = `s`.`id`
 WHERE 1
 ";
-		if(preg_match('/^\d+$/', $studiengang)) {
+		if(preg_match('/^\d+$/', $studiengang ?? "")) {
 			$query .= ' AND `studiengang_id` = '.esc($studiengang);
 		} else {
-			debug("Studiengang ist keine Zahl, sondern `".htmlentities($studiengang)."`. Daher keine Suche nach studiengang_id");
+			debug("Studiengang ist keine Zahl, sondern `".htmlentities($studiengang ?? "")."`. Daher keine Suche nach studiengang_id");
 		}
 
-		if(preg_match('/^\d+$/', $bereich)) {
+		if(preg_match('/^\d+$/', $bereich ?? "")) {
 			$query .= ' AND `bereich_id` = '.esc($bereich);
 		} else {
-			debug("Bereich ist keine Zahl, sondern `".htmlentities($bereich)."`, daher keine Suche nach bereich_id");
+			debug("Bereich ist keine Zahl, sondern `".htmlentities($bereich ?? "")."`, daher keine Suche nach bereich_id");
 		}
 
 		$query .= ' GROUP BY s.name, `p`.`veranstaltung_id`, `pruefungsnummer`, `m`.`name`, `pt`.`name`, `b`.`name` ';
