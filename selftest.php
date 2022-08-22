@@ -118,6 +118,7 @@
 		rquery("insert ignore into `titel` VALUES (1,'Doktor der Philosophie','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor','Prof. Dr.');");
 
 		rquery("INSERT ignore INTO `role_to_user` VALUES (1,1);");
+
 		$show_importer = 0;
 
 		$veranstaltungstypen = array(
@@ -167,10 +168,8 @@
 			}
 		}
 
-		$query = 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "'.$GLOBALS['dbname'].'"';
-		$result = rquery($query);
-
-		rquery('use `'.$GLOBALS['dbname'].'`');
+		#$query = 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "'.$GLOBALS['dbname'].'"';
+		#$result = rquery($query);
 
 		rquery('set FOREIGN_KEY_CHECKS=1');
 
