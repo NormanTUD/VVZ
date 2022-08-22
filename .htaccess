@@ -1,0 +1,6 @@
+Options +FollowSymLinks -MultiViews
+RewriteEngine On
+RewriteBase /
+
+#RewriteRule kunden/vvz_(*) - [E:kunde=\1]
+SetEnvIfNocase request_uri ^/file.php$ foo=bar
