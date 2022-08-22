@@ -18,4 +18,10 @@
 
 		return "startpage";
 	}
+
+	function get_kunde_name() {
+		$dbn = get_kunden_db_name();
+		$n = preg_replace("/^db_vvz_/", "", $dbn);
+		return $n;
+	}
 ?>
