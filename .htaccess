@@ -1,6 +1,7 @@
 Options +FollowSymLinks -MultiViews
 RewriteEngine On
 RewriteBase /
+AddDefaultCharset UTF-8
 
 <IfModule mod_rewrite.c>
 	DirectoryIndex startseite.php

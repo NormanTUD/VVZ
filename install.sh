@@ -48,6 +48,7 @@ while [[ -z "$PASSWORD" ]]; do
 	fi
 done
 
+'
 ADMIN_USERNAME=""
 while [[ -z "$ADMIN_USERNAME" ]]; do
 	ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
@@ -65,6 +66,7 @@ while [[ -z "$ADMIN_PASSWORD" ]]; do
 	    exit
 	fi
 done
+'
 
 git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
 
@@ -128,7 +130,8 @@ a2enmod env
 
 service apache2 restart
 
-curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD" 2>&1 > /dev/null
+#curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD" 2>&1 > /dev/null
+curl "http://$LOCAL_IP/"
 
 whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS
 
