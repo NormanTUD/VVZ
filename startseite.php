@@ -43,7 +43,7 @@
 
 	$GLOBALS['this_semester'] = null;
 
-	if(preg_match('/^\d+$/', get_get('semester'))) {
+	if(get_get("semester") && preg_match('/^\d+$/', get_get('semester'))) {
 		$GLOBALS['this_semester'] = get_semester(get_get('semester'), 0);
 	}
 
@@ -68,7 +68,7 @@
 
 	$GLOBALS['this_institut'] = null;
 
-	if(preg_match('/^\d+$/', get_get('institut'))) {
+	if(get_get("institut") && preg_match('/^\d+$/', get_get('institut'))) {
 		$GLOBALS['this_institut'] = get_get('institut');
 	} else {
 		if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
