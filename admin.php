@@ -370,7 +370,7 @@
 ?>
 				
 				<form>
-					<input type="hidden" name="page" value="<?php print htmlentities(get_get('page')); ?>" />
+					<input type="hidden" name="page" value="<?php print htmlentities(get_get('page') ?? ""); ?>" />
 					<input type="hidden" name="show_items" value="<?php print htmlentities(get_get('show_items') ?? ""); ?>" />
 					Ankreuzeln, wenn einverstanden, dann &raquo;Akzeptieren&laquo; drücken! &rarr; <input type="checkbox" name="sdsg_einverstanden" value="1" />
 					<input type="submit" value="Akzeptieren" />

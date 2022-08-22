@@ -28,10 +28,10 @@
 
 	function get_kunde_url() {
 		$n = get_kunde_name();
-		if(array_key_exists('REQUEST_URI', $_SERVER) && preg_match("/^\Q".$n."\E/", $_SERVER['REQUEST_URI'])) {
+		if(array_key_exists('REQUEST_URI', $_SERVER) && preg_match("/^\Q".$n."\E/", $_SERVER['REQUEST_URI']) || preg_match("/^\/vvz_".$n."/", $_SERVER["REQUEST_URI"])) {
 			return "";
 		} else {
-			return $n."/";
+			return "vvz_$n/";
 		}
 	}
 ?>
