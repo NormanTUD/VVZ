@@ -9,7 +9,7 @@ INSTALL_PATH=/var/www/html
 INSTITUT_NAME="Institut für Philosophie"
 
 apt-get update
-apt-get install xterm whiptail curl git -y
+apt-get install xterm whiptail curl git etckeeper -y
 
 git config --global credential.helper store
 
@@ -141,6 +141,13 @@ for task in $WHAT_TO_DO; do
 done
 
 LOCAL_IP=$(ip -o route get to 8.8.8.8 | sed -n 's/.*src \([0-9.]\+\).*/\1/p')
+
+sed -i "s:AllowOverride None:AllowOverride All:g" /etc/apache2/apache2.conf
+
+a2enmod rewrite
+a2enmod env
+
+service apache2 restart
 
 curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD" 2>&1 > /dev/null
 
