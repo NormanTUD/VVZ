@@ -13,6 +13,8 @@
 		$query = "show databases like 'db_vvz_%'";
 		$result = rquery($query);
 		print "<ul>";
+		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
+		print "<li><a href='?new_uni_name=".generate_random_string(30)."'>Zufällige neue Seite</a></li>";
 		while ($row = mysqli_fetch_row($result)) {
 			$db_name = $row[0];
 			$kunde_name = $db_name;
@@ -20,7 +22,6 @@
 
 			print "<li><a href='/vvz_$kunde_name'>$kunde_name</a></li>";
 		}
-		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
 		print "</ul>";
 
 		exit(0);
