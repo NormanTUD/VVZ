@@ -2,7 +2,7 @@
 	$GLOBALS["error_page_shown"] = 0;
 	function create_uni_name ($name) {
 		$name = strtolower($name ?? "");
-		$name = preg_replace("/\d+/", "", $name);
+		$name = preg_replace("/\d+/", "-", $name);
 		$name = preg_replace("/\s/", "_", $name);
 		$name = preg_replace("/_+/", "_", $name);
 		$name = preg_replace("/-+/", "_", $name);
