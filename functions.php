@@ -4760,7 +4760,7 @@ INSERT INTO
 	}
 
 	function user_is_logged_in () {
-		if(preg_match('/^\d+$/', $GLOBALS["logged_in_user_id"])) {
+		if(preg_match('/^\d+$/', $GLOBALS["logged_in_user_id"] ?? "")) {
 			return 1;
 		} else {
 			return 0;

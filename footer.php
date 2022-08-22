@@ -30,7 +30,6 @@
 ?>
 	<i>
 <?php
-	dier(get_kunden_db_name());
 	if(get_kunden_db_name() != "startpage") {
 		$c = 0;
 		foreach ($sites as $url => $site_data) {
@@ -61,7 +60,9 @@
 	</div>
 
 <?php
-	include('query_analyzer.php');
+	if(get_kunden_db_name() != "startpage") {
+		include('query_analyzer.php');
+	}
 
 	if($GLOBALS['end_html']) {
 	
