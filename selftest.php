@@ -9,122 +9,8 @@
 
 	include_once("sql_datenbanken.php");
 
-	/*
-        if(!function_exists("insert_settings")) {
-        function insert_settings ($errormsg = array()) {
-                $settings = array(
-                        "auto_move" => array("setting" => "0", "default_value" => "0", "description" => "Nicht immer nachfragen ob folgende Termine verschoben werden sollen (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "reload_page_instead_of_line" => array("setting" => "0", "default_value" => "0", "description" => "Lade die ganze Tabelle neu statt nur der geänderten Zeile (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "check_for_changed_table" => array("setting" => "1", "default_value" => "1", "description" => "Schaue 1x die Sekunde nach ob in der DB was geändert worden ist (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "enable_delete" => array("setting" => "1", "default_value" => "1", "description" => "Aktiviert ob einzelne Termine gelöscht werden können (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "enable_add" => array("setting" => "1", "default_value" => "1", "description" => "Aktiviert ob einzelne Termine manuell hinzugefügt werden können (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "debug" => array("setting" => "0", "default_value" => "0", "description" => "Aktiviert Debugging (1 ja, 0 nein)", "category" => "Debug"),
-                        "debug_truncate" => array("setting" => "1", "default_value" => "1", "description" => "Truncate lange debug arrays (1 ja, 0 nein)", "category" => "Debug"),
-                        "add_javascript_query_debug" => array("setting" => "0", "default_value" => "0", "description" => "Fügt Meldungen über AJAX im Query-Debugger ein (1 ja, 0 nein)", "category" => "Debug"),
-                        "enable_query_debugger" => array("setting" => "0", "default_value" => "0", "description" => "Aktiviert Query-Debugger (1 ja, 0 nein)", "category" => "Debug"),
-                        "highlight_debugger" => array("setting" => "0", "default_value" => "0", "description" => "Aktiviert Highligthing im Query-Debugger (1 ja, 0 nein)", "category" => "Debug"),
-                        "hide_debugger" => array("setting" => "1", "default_value" => "1", "description" => "Versteckt Query-Debugger per Default (1 ja, 0 nein)", "category" => "Debug"),
-                        "debug_truncate_limit" => array("setting" => "100", "default_value" => "100", "description" => "Anzahl der maximalen Zeichen im JS-Debugger-Output", "category" => "Debug"),
-                        "min_width_column" => array("setting" => "130", "default_value" => "130", "description" => "Minimale Breite der Wartungstabelle-Spalten", "category" => "Wartungstabelle"),
-                        "show_spinner" => array("setting" => "1", "default_value" => "1", "description" => "Spinner anzeigen (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "jahre_plus_nach_erstellen_anlage" => array("setting" => "5", "default_value" => "5", "description" => "Für wie viele Jahre Termine angelegt werden sollen", "category" => "Wartungstabelle"),
-                        "jahre_minus_nach_erstellen_anlage" => array("setting" => "5", "default_value" => "5", "description" => "Für wie viele Jahre Termine angelegt werden sollen", "category" => "Wartungstabelle"),
-                        "show_draggable_icon" => array("setting" => "1", "default_value" => "1", "description" => "Ein Icon fürs Verschieben anzeigen? (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "opaque_after_ende_gewaehrleistung" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt Termine nach Ende Gewährleistung halbtransparent? (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_folder_icon" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt Order-Icon an? (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "base_folder" => array("setting" => "m:\\Service\\Projekt - Ort - Kunde\\", "default_value" => "m:\\Service\\Projekt - Ort - Kunde\\", "description" => "Basis-Ordner für Folder-Icon", "category" => "Wartungstabelle"),
-                        "wait_ms_before_reload_line" => array("setting" => "10", "default_value" => "10", "description" => "Anzahl Millisekunden Warten bevor reload_line", "category" => "Wartungstabelle"),
-                        "show_seperator_between_kunden" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt einen Seperator zwischen verschiedenen Kunden (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "status_ok" => array("setting" => "1", "default_value" => "1", "description" => "Welche Status-ID gilt als OK?", "category" => "Wartungstabelle"),
-                        "warn_before_delete" => array("setting" => "1", "default_value" => "1", "description" => "Warnen bevor ein Termin gelöscht wird? (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "wait_ms_ok" => array("setting" => "5000", "default_value" => "5000", "description" => "Anzahl Millisekunden die Ok-Meldungen angezeigt werden sollen", "category" => "Wartungstabelle"),
-                        "wait_ms_error" => array("setting" => "10000", "default_value" => "10000", "description" => "Anzahl Millisekunden die Fehlermeldungen angezeigt werden sollen", "category" => "Wartungstabelle"),
-                        "status_default" => array("setting" => "2", "default_value" => "2", "description" => "Default Status", "category" => "Wartungstabelle"),
-                        "status_geplant" => array("setting" => "3", "default_value" => "3", "description" => "Status geplant", "category" => "Wartungstabelle"),
-                        "debug_js_time" => array("setting" => "0", "default_value" => "0", "description" => "Zeigt Zeit-Debugging-Infos für Javascript (1 ja, 0 nein)", "category" => "Debug"),
-                        "th_border_color" => array("setting" => "#565656", "default_value" => "#565656", "description" => "Farbe des Tabellen-THs", "category" => "Wartungstabelle"),
-                        "active_month_column_color" => array("setting" => "#ff9200", "default_value" => "#ff9200", "description" => "Farbe der Spalte im aktuellen Monat", "category" => "Wartungstabelle"),
-                        "th_border_size" => array("setting" => "1", "default_value" => "1", "description" => "Breite der Borders um ths und tds", "category" => "Wartungstabelle"),
-                        "table_font_size" => array("setting" => "0.8em", "default_value" => "0.8em", "description" => "Größe der Tabellenfontsize", "category" => "Wartungstabelle"),
-                        "comment_box_width" => array("setting" => "72px", "default_value" => "72px", "description" => "Größe der Commentbox", "category" => "Wartungstabelle"),
-                        "tr_even_color" => array("setting" => "#f5f5f5", "default_value" => "#f5f5f5", "description" => "Farbe von geraden TRs", "category" => "Wartungstabelle"),
-                        "tr_odd_color" => array("setting" => "#ededed", "default_value" => "#ededed", "description" => "Farbe von ungeraden TRs", "category" => "Wartungstabelle"),
-                        "shy_inserter" => array("setting" => "15", "default_value" => "15", "description" => "Anzahl Zeichen bevor ein Soft-Hyphen eingefügt wird beim Anlagennamen", "category" => "Wartungstabelle"),
-                        "show_phone_number" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Telefonnummer in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_phone_number2" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Telefonnummer in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_email" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Email in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_email2" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Email in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_anzahl_anlagen" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Anz. Anlagen in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_min_max_avg_wartungszeit" => array("setting" => "1", "default_value" => "1", "description" => "Zeige min/max/avg Wartungszeit in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_zeit_pro_wartung_or_min_max_avg_wartungszeit" => array("setting" => "1", "default_value" => "1", "description" => "Zeige entweder min/max/avg Wartungszeit oder Zeit pro Wartung in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_anlage_comment" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Anlagekommentar in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_rechnungsnummer" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Rechnungsnummer (von Anlage, wenn leer von Kunde) in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "anlage_commentbox_color" => array("setting" => "#FFFF00", "default_value" => "#FFFF00", "description" => "Color of the column of the anlage commentbox", "category" => "Wartungstabelle"),
-                        "shy_kundennamen" => array("setting" => "10", "default_value" => "10", "description" => "Anzahl Zeichen bevor ein Soft-Hyphen eingefügt wird beim Kundennamen", "category" => "Wartungstabelle"),
-                        "enable_ersatzteile" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt das Ersatzteilmenü an (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_ansprechpartner" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Ansprechpartner in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_ansprechpartner2" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Ansprechpartner in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_h_pro_wartung" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt Anzahl Stunden pro Wartung an (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_debiturnummer" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt Debitornummer in Wartungstabelle an (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "enable_droppable" => array("setting" => "0", "default_value" => "0", "description" => "Erlaubt es Elemente mit der Maus zu ziehen (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_left_right_icons" => array("setting" => "1", "default_value" => "1", "description" => "Erlaubt Einträge zu verschieben mit Icons statt Drag&Drop (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "same_width_every_td" => array("setting" => "0", "default_value" => "0", "description" => "Jedes TD hat die selbe Breite (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_double_left_right_icons" => array("setting" => "1", "default_value" => "1", "description" => "Doppelte Links/Rechts-Verschieben-Icons anzeigen (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "monat_th_size" => array("setting" => "15", "default_value" => "15", "description" => "Font-Size in px of th Monat", "category" => "Wartungstabelle"),
-                        "show_plz" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Plz in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_ort" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Ort in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_strasse" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Straße in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_hausnummer" => array("setting" => "1", "default_value" => "1", "description" => "Zeige Hausnummer in Wartungstabelle (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "icon_size" => array("setting" => "15", "default_value" => "15", "description" => "Größe Icons in Wartungstabelle", "category" => "Wartungstabelle"),
-                        "full_price_in_wartungstabelle" => array("setting" => "1", "default_value" => "1", "description" => "Preis pro Wartung beinhaltet Wartungspauschale und Wartungskosten (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_material_wartung" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt Material/Wartung in der Tabelle an (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "show_print" => array("setting" => "1", "default_value" => "1", "description" => "Zeigt einen Link zum Ausdrucken an (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "x11_debugging_mode" => array("setting" => "0", "default_value" => "0", "description" => "Deaktiviert Dinge, die im randomisiertem X11-Test Probleme machen (1 ja, 0 nein)", "category" => "Debug"),
-                        "open_stuff_in_blank_page" => array("setting" => "1", "default_value" => "1", "description" => "Öffnet einige Links in neuer Seite (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "sort_by_wartungstabelle" => array("setting" => "ort", "default_value" => "ort", "description" => "sort by id, kunde, plz, ort, strasse, hausnummern, phone, email", "category" => "Wartungstabelle"),
-                        "sort_by_wartungstabelle_2" => array("setting" => "plz", "default_value" => "plz", "description" => "sort by id, kunde, plz, ort, strasse, hausnummern, phone, email", "category" => "Wartungstabelle"),
-                        "sort_by_wartungstabelle_3" => array("setting" => "kunde", "default_value" => "kunde", "description" => "sort by id, kunde, plz, ort, strasse, hausnummern, phone, email", "category" => "Wartungstabelle"),
-                        "sort_by_wartungstabelle_4" => array("setting" => "id", "default_value" => "id", "description" => "sort by id, kunde, plz, ort, strasse, hausnummern, phone, email", "category" => "Wartungstabelle"),
-                        "sort_by_wartungstabelle_asc" => array("setting" => "1", "default_value" => "1", "description" => "Aufsteigend sortieren (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "sort_wartungstabelle_by_ort" => array("setting" => "1", "default_value" => "1", "description" => "Nach Ort sortieren, nicht gruppieren (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "format_phone_number" => array("setting" => "1", "default_value" => "1", "description" => "Macht die Telefonnummern in der Wartungstabelle besser lesbar (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "always_show_small_add_icon" => array("setting" => "0", "default_value" => "0", "description" => "Zeigt immer ein kleines + statt der großen Plus-Grafik zum Hinzufügen von Terminen (1 ja, 0 nein)", "category" => "Wartungstabelle"),
-                        "add_icon_width" => array("setting" => "30", "default_value" => "30", "description" => "Breite des Hinzufügen Icons in der Wartungstabelle in Pixeln", "category" => "Wartungstabelle"),
-                        "headerorder" => array("setting" => "plzort,kunde,turnus,erinnerungprfg,prfganlagen,prfgabgelehnt,letztewartung,naechstewartung", "default_value" => "plzort,kunde,turnus,erinnerungprfg,prfganlagen,prfgabgelehnt,letztewartung,naechstewartung", "description" => "Reihenfolge der Header", "category" => "Wartungstabelle")
-                );
-
-
-                $GLOBALS['settings_cache'] = array();
-
-                foreach ($settings as $this_setting_name => $this_setting_values) {
-                        if(is_null(get_setting($this_setting_name))) {
-                                $errormsg[] = "Fehlende Einstellung ".fq($this_setting_name)." existierte nicht und wurde eingefügt.";
-                                $query = 'insert into config (name, setting, default_value, description, category) values ('.esc($this_setting_name).', '.
-                                        esc($this_setting_values['setting']).', '.esc($this_setting_values['default_value']).', '.esc($this_setting_values['description']).
-                                        ', '.esc($this_setting_values['category']).
-                                        ') on duplicate key update setting=values(setting), description=values(description), category=values(category)';
-                                if(!rquery($query)) {
-                                        $errormsg[] = "Die Einstellung ".fq($this_setting_name)." wurde ***nicht*** eingerichtet";
-                                }
-                        }
-                }
-
-                return $errormsg;
-        }
-        }
-	 */
-
         function selftest () {
                 $tables = $GLOBALS["databases"];
-
-                /*
-                $string = '';
-                foreach ($tables as $this_table => $create_query) {
-                        $create_table = get_single_row_from_query("show create table ".$this_table)[1];
-                        $string .= esc($this_table).' => '.esc($create_table).",\n";
-                }
-                dier($string);
-                 */
 
                 $missing_tables = array();
 
@@ -182,7 +68,10 @@
 			$default_username = "Admin";
 			$default_password = "test";
 			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
-			rquery($query);
+			$result = rquery($query);
+			if($result) {
+				set_session_id(1);
+			}
 		}
 
 		if(!get_single_row_from_query("select count(*) from role")[0]) {

@@ -155,9 +155,7 @@
 		} else if (get_get('alle_pruefungsnummern')) {
 			show_alle_pruefungsnummern_daten();
 		} else {
-			if(table_exists($GLOBALS["dbname"], "studiengaenge")) {
-				show_studiengaenge_uebersicht();
-			}
+			show_studiengaenge_uebersicht();
 		}
 
 		include("footer.php");
