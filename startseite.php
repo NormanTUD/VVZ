@@ -94,7 +94,7 @@
 	}
 ?>
 	<div id="mainindex" <?php if($GLOBALS['show_comic_sans']) { print ' class="bgaf"'; } ?>>
-		<a href="index.php?semester=<?php print isset($GLOBALS['this_semester'][0]) ? htmlentities($GLOBALS['this_semester'][0]) : ''; ?>&institut=<?php print isset($GLOBALS['this_institut']) ? htmlentities($GLOBALS['this_institut']) : ''; ?>" border="0"><img alt="TUD-Logo, Link zur Startseite" src="tudlogo.svg" width=300 /></a>
+		<a href="index?semester=<?php print isset($GLOBALS['this_semester'][0]) ? htmlentities($GLOBALS['this_semester'][0]) : ''; ?>&institut=<?php print isset($GLOBALS['this_institut']) ? htmlentities($GLOBALS['this_institut']) : ''; ?>" border="0"><img alt="TUD-Logo, Link zur Startseite" src="tudlogo.svg" width=300 /></a>
 		<div class="iframewarning red_giant"></div>
 
 <?php

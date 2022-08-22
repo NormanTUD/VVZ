@@ -12,17 +12,17 @@
 	$this_page_file = preg_replace('/\?.*/', '', $this_page_file);
 
 	$sites = array(
-		'index.php' => array("name" => 'Startseite', "id" => 'startseite_link'),
-		'api.php' => array("name" => 'API', "id" => 'api_link'),
-		'admin.php' => array("name" => 'Administration', "id" => 'admin_link'),
-		'dokumente.php' => array("name" => 'Dokumente', "id" => 'dokumente_link'),
-		//'rechtliches.php' => array("name" => 'Rechtliches', "id" => 'rechtliches_link'),
-		'impressum.php' => array("name" => 'Impressum', "id" => 'impressum_link'),
-		'zeitraster.php' => array("name" => "Zeitraster", "id" => "zeitraster"),
-		'faq.php' => array("name" => 'FAQ', "id" => 'faq_link'),
+		'startseite' => array("name" => 'Startseite', "id" => 'startseite_link'),
+		'api' => array("name" => 'API', "id" => 'api_link'),
+		'admin' => array("name" => 'Administration', "id" => 'admin_link'),
+		'dokumente' => array("name" => 'Dokumente', "id" => 'dokumente_link'),
+		//'rechtliches' => array("name" => 'Rechtliches', "id" => 'rechtliches_link'),
+		'impressum' => array("name" => 'Impressum', "id" => 'impressum_link'),
+		'zeitraster' => array("name" => "Zeitraster", "id" => "zeitraster"),
+		'faq' => array("name" => 'FAQ', "id" => 'faq_link'),
 		'front.pdf' => array("name" => 'Dokumentation', "id" => 'doku_link'),
-		#'simpsons.php' => array("name" => 'Die Simpsons', "id" => 'simpsons'),
-		'kontakt.php' => array("name" => 'Kontakt', "id" => 'kontakt_link')
+		#'simpsons' => array("name" => 'Die Simpsons', "id" => 'simpsons'),
+		'kontakt' => array("name" => 'Kontakt', "id" => 'kontakt_link')
 	);
 ?>
 	<i>
@@ -31,7 +31,7 @@
 	foreach ($sites as $url => $site_data) {
 		$name = $site_data['name'];
 		$id = $site_data['id'];
-		if(!($url == 'faq.php' && !faq_has_entry())) {
+		if(!($url == 'faq' && !faq_has_entry())) {
 			if($url == $this_page_file) {
 ?>
 				<b><a id="<?php print $id; ?>" href="<?php print $url; ?>"><?php print htmlentities($name); ?></a></b>
