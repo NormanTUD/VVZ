@@ -115,6 +115,12 @@
 	 */
 
         function selftest () {
+		if(!$GLOBALS["db_freshly_created"]) {
+			return;
+		}
+
+		print "Generating tables for your VVZ installation...";
+
                 $tables = $GLOBALS["databases"];
 
                 /*
@@ -280,10 +286,12 @@
 		rquery('use `'.$GLOBALS['dbname'].'`');
 
 		rquery('set FOREIGN_KEY_CHECKS=1');
+
 	}
 
 
         if(!get_get('noselftest') && !$GLOBALS["no_selftest"]) {
                 selftest();
         }
+
 ?>

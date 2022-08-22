@@ -1,6 +1,8 @@
 <?php
 	include_once("config.php");
 
+	$GLOBALS["db_freshly_created"] = 0;
+
 	$dbfile = '/etc/vvzdbpw';
 
 	if(file_exists($dbfile)) {
@@ -24,9 +26,9 @@
 				$sql = "CREATE DATABASE ".$GLOBALS["dbname"];
 				if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
 					die("Error creating database: ".$GLOBALS["dbh"]->error);
+				} else {
+					$GLOBALS["db_freshly_created"] = 1;
 				}
-
-
 			}
 			if (!$GLOBALS['dbh']) {
 				dier("Kann nicht zur Datenbank verbinden!");

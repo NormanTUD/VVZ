@@ -7,21 +7,40 @@
 		exit(0);
 	}
 
+	include_once("config.php");
+	include("startseite_functions.php");
+	include_once("functions.php");
 
 	if(get_kunden_db_name() == "startpage") {
-		print "VVZ";
+		print "<h2>VVZ-Startseite</h2>";
+		print "Aktuelle Instanzen:<br>";
+		$query = "show databases like 'db_vvz_%'";
+		$result = rquery($query);
+		print "<ul>";
+		while ($row = mysqli_fetch_row($result)) {
+			$db_name = $row[0];
+			$kunde_name = $db_name;
+			$kunde_name = preg_replace("/^db_vvz_/", "", $kunde_name);
+
+			print "<li><a href='/vvz_$kunde_name'>$kunde_name</a></li>";
+		}
+		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
+		print "</ul>";
+
+		exit;
 	} else {
 		include("selftest.php");
-		die("Versuche Einzelne vvz startseite anzuzeigen für ".get_kunden_db_name());
+		if($GLOBALS["db_freshly_created"]) {
+			print "<script nonce='".nonce()."'>window.location.reload();</script>";
+			exit;
+		}
 	}
 
 	$GLOBALS['metadata_shown'] = 0;
 
-	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
 	$filename = 'index.php';
 	include("header.php");
-	include("startseite_functions.php");
 
 	$GLOBALS['linkicon'] = '<i class="fa float-right"><img alt="Link zum Studiengang" src="icon.svg" /></i>';
 
