@@ -1,4 +1,5 @@
 <?php
+	include_once("kundenkram.php");
 if(file_exists('/etc/hardcore_debugging')) {
 	error_reporting(E_ALL);
 	set_error_handler(function ($severity, $message, $file, $line) {
@@ -199,7 +200,7 @@ declare(ticks=1);
 		setcookie('session_id', $session_id, time() + 86400, "/");
 	}
 
-	if(!$GLOBALS['setup_mode']) {
+	if(!$GLOBALS['setup_mode'] && get_kunden_db_name() != "startpage") {
 		if(get_post('try_login')) {
 			$GLOBALS['logged_in_was_tried'] = 1;
 		}
@@ -2198,6 +2199,9 @@ declare(ticks=1);
 	}
 
 	function delete_old_session_ids ($user_id = null) {
+		if(get_kunden_db_name() == "startpage") {
+			return;
+		}
 		if($GLOBALS['already_deleted_old_session_ids']) {
 			return;
 		}
