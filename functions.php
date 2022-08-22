@@ -164,7 +164,6 @@ declare(ticks=1);
 	}
 
 	rquery("SET NAMES utf8");
-	dier(get_kunde_name());
 
 	/* Login-Kram */
 	$GLOBALS['logged_in_was_tried'] = 0;

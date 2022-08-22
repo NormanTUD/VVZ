@@ -6,8 +6,6 @@
 	$GLOBALS['adminpage'] = 1;
 	include("header.php");
 
-
-
 	if(!$GLOBALS['logged_in']) {
 ?>
 		<div id="main">
