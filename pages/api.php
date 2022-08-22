@@ -33,11 +33,11 @@
 			<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 				<tr>
 					<input type="hidden" name="api_change" value="api_change" />
-					<input type="hidden" name="auth_code" value="<?php print htmlentities($row[0]); ?>" />
-					<td><?php print htmlentities($row[0]); ?></td>
-					<td><input type="text" name="ansprechpartner" value="<?php print htmlentities($row[1]); ?>"</td>
-					<td><input type="text" name="email" value="<?php print htmlentities($row[2]); ?>" /></td>
-					<td><textarea name="grund"><?php print htmlentities($row[4]); ?></textarea></td>
+					<input type="hidden" name="auth_code" value="<?php print htmlentities($row[0] ?? ""); ?>" />
+					<td><?php print htmlentities($row[0] ?? ""); ?></td>
+					<td><input type="text" name="ansprechpartner" value="<?php print htmlentities($row[1] ?? ""); ?>"</td>
+					<td><input type="text" name="email" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
+					<td><textarea name="grund"><?php print htmlentities($row[4] ?? ""); ?></textarea></td>
 					<td><?php print $row[5]; ?></td>
 					<td><?php print htmlentities(get_user_name($row[6])); ?></td>
 					<td><a href="admin?page=<?php print urlencode($GLOBALS['this_page_number']); ?>&id=<?php print urlencode($row[0]); ?>">Log Anzeigen</a></td>
@@ -83,11 +83,11 @@
 ?>
 
 						<tr>
-							<td><?php print htmlentities(get_auth_code_by_id($row[0])); ?></td>
-							<td><?php print htmlentities($row[1]); ?></td>
-							<td><?php print htmlentities($row[2]); ?></td>
-							<td><?php print htmlentities($row[3]); ?></td>
-							<td><?php print htmlentities($row[4]); ?></td>
+							<td><?php print htmlentities(get_auth_code_by_id($row[0]) ?? ""); ?></td>
+							<td><?php print htmlentities($row[1] ?? ""); ?></td>
+							<td><?php print htmlentities($row[2] ?? ""); ?></td>
+							<td><?php print htmlentities($row[3] ?? ""); ?></td>
+							<td><?php print htmlentities($row[4] ?? ""); ?></td>
 						</tr>
 <?php
 					}
