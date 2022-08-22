@@ -1,6 +1,6 @@
 <?php
 	$GLOBALS['setup_mode'] = 0;
-	include("functions.php");
+	include_once("functions.php");
 
 	if(get_get('veranstaltung')) {
 		$filedate = date('Y-m-d_H-m-s', time());

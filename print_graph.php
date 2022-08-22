@@ -1,5 +1,5 @@
 <?php
-	include("functions.php");
+	include_once("functions.php");
 	$query = 'select sum(c) as c, concat(year, "-", month, "-", day) as date from ua_overview where 1';
 	if(isset($query_addon)) {
 		$query .= $query_addon;

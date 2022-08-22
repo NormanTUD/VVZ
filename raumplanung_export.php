@@ -1,6 +1,6 @@
 <?php
 	$setup_mode = 0;
-	include("functions.php");
+	include_once("functions.php");
 
 	if(check_page_rights(get_page_id_by_filename('raumplanung.php'))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 		if(get_get('semester')) {

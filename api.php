@@ -1,7 +1,7 @@
 <?php
 	$php_start = microtime(true);
 	$setup_mode = 0;
-	include("functions.php");
+	include_once("functions.php");
 
 	$query_string = $_SERVER['QUERY_STRING'];
 	$log_data = array(

@@ -8,7 +8,7 @@
 	$is_setup = 1;
 
 	if(!function_exists('rquery')) {
-		include("functions.php");
+		include_once("functions.php");
 	}
 
 	/*
