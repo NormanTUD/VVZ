@@ -66,9 +66,7 @@
 			<title><?php print htmlentities($page_title); ?></title>
 <?php
 		}
-		if(isset($filename) && $filename == 'startseite.php') {
-			css(array("foundation.min.css", "font-awesome.min.css"));
-		}
+		css(array("foundation.min.css", "font-awesome.min.css"));
 ?>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 
