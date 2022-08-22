@@ -6644,7 +6644,7 @@ WHERE
 			if(array_key_exists('dozenten', $data[$studiengang][$pn]) && is_null($data[$studiengang][$pn]['dozenten'])) {
 				@$data[$studiengang][$pn]['dozenten'] = array();
 			}
-			if(!in_array($dozent_name, $data[$studiengang][$pn]['dozenten'])) {
+			if(array_key_exists("dozenten", $data[$studiengang][$pn]) && !in_array($dozent_name, $data[$studiengang][$pn]['dozenten'])) {
 				$data[$studiengang][$pn]['dozenten'][] = $dozent_name;
 			}
 			$zeitraeume[$id] = $zeitraum;
@@ -6660,19 +6660,22 @@ WHERE
 					<th>Zeitraum</th>
 					<th>Abgabe Prüfungsleistungen</th>
 					</tr>";
-$ic = 0;
 
-foreach ($data as $studiengang => $local_data) {
-	$ret_string .= "<tr><td colspan='4' class='bg_add8e6'>".htmle($studiengang)."</td></tr>\n";
-	foreach ($local_data as $pnname => $pruefungsnummer_array) {
-		$ret_string .= "<tr><td>".htmle($pnname)."</td><td>\n";
-		$ret_string .= join("<br />\n", array_unique($pruefungsnummer_array['dozenten']));
-		$ret_string .= "<td>".$pruefungsnummer_array['zeitraum']."</td>\n";
-		$ret_string .= "<td>".htmle($pruefungsnummer_array['abgabe_pruefungsleistungen'])."</td></tr>\n";
-		$ic++;
-	}
-}
-$ret_string .= '</table>';
+				$ic = 0;
+
+				foreach ($data as $studiengang => $local_data) {
+					$ret_string .= "<tr><td colspan='4' class='bg_add8e6'>".htmle($studiengang)."</td></tr>\n";
+					foreach ($local_data as $pnname => $pruefungsnummer_array) {
+						$ret_string .= "<tr><td>".htmle($pnname)."</td><td>\n";
+						if(array_key_exists("dozenten", $pruefungsnummer_array)) {
+							$ret_string .= join("<br />\n", array_unique($pruefungsnummer_array['dozenten']));
+						}
+						$ret_string .= "<td>".$pruefungsnummer_array['zeitraum']."</td>\n";
+						$ret_string .= "<td>".htmle($pruefungsnummer_array['abgabe_pruefungsleistungen'])."</td></tr>\n";
+						$ic++;
+					}
+				}
+				$ret_string .= '</table>';
 			} else {
 				$ret_string .= '<i>Mit den gewählten Optionen sind keine Daten verfügbar.</i>';
 			}

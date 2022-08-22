@@ -29,7 +29,7 @@
 ?>
 		<form method="get">
 			<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
-			<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang')); ?>" />
+			<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang') ?? ""); ?>" />
 			Semester: <?php create_select($semester, $chosen_semester, 'semester'); ?><br>
 			<?php if(count($institute) > 1) { print "Institut: "; create_select($institute, $chosen_institut, 'institut'); print "<br />"; } ?>
 			<?php if(count($dozenten) > 1) { print "Dozent:"; create_select($dozenten, $chosen_dozent, 'dozent', 1); print "</br>"; } ?>
@@ -43,11 +43,11 @@
 		print export_pruefungsnummern_dozent($chosen_semester, $chosen_dozent, $chosen_institut, $chosen_studiengang, $chosen_pruefungsamt, $studiengang_group_by);
 ?>
 		<form method="get" action="export_pruefungsnummern_dozenten.php">
-			<input type="hidden" name="semester" value="<?php print htmlentities($chosen_semester); ?>" />
-			<input type="hidden" name="institut" value="<?php print htmlentities($chosen_institut); ?>" />
-			<input type="hidden" name="dozent" value="<?php print htmlentities($chosen_dozent); ?>" />
-			<input type="hidden" name="studiengang" value="<?php print htmlentities($chosen_studiengang); ?>" />
-			<input type="hidden" name="pruefungsamt" value="<?php print htmlentities($chosen_pruefungsamt); ?>" />
+			<input type="hidden" name="semester" value="<?php print htmlentities($chosen_semester ?? ""); ?>" />
+			<input type="hidden" name="institut" value="<?php print htmlentities($chosen_institut ?? ""); ?>" />
+			<input type="hidden" name="dozent" value="<?php print htmlentities($chosen_dozent ?? ""); ?>" />
+			<input type="hidden" name="studiengang" value="<?php print htmlentities($chosen_studiengang ?? ""); ?>" />
+			<input type="hidden" name="pruefungsamt" value="<?php print htmlentities($chosen_pruefungsamt ?? ""); ?>" />
 			<input type="submit" value="Diese Liste als Excel-Datei downloaden" />
 		</form>
 	</div>

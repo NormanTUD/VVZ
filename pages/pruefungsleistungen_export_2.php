@@ -28,11 +28,11 @@
 ?>
 		<form method="get">
 			<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
-			<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang')); ?>" />
+			<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang') ?? ""); ?>" />
 			Semester: <?php create_select($semester, $chosen_semester, 'semester'); ?><br>
 			<?php if(count($pruefungsaemter) > 1) { print "Prüfungsamt"; create_select($pruefungsaemter, $chosen_pruefungsamt, 'pruefungsamt', 1); print "</br>"; } ?>
-			Einzelne Prüfungsnummern (mit Komma getrennt): <input name="einzelne_pns" value="<?php print(htmlentities(get_get("einzelne_pns"))); ?>" /><br>
-			Nur Einträge mit Veränderungen nach diesem Datum anzeigen (YYYY-MM-DD HH:MM:SS): <input name="last_changed_date" value="<?php print(htmlentities(get_get("last_changed_date"))); ?>" /><br>
+			Einzelne Prüfungsnummern (mit Komma getrennt): <input name="einzelne_pns" value="<?php print(htmlentities(get_get("einzelne_pns") ?? "")); ?>" /><br>
+			Nur Einträge mit Veränderungen nach diesem Datum anzeigen (YYYY-MM-DD HH:MM:SS): <input name="last_changed_date" value="<?php print(htmlentities(get_get("last_changed_date") ?? "")); ?>" /><br>
 			<input type="submit" value="Nur Veranstaltungen anzeigen, die den Suchkriterien entsprechen" />
 		</form>
 <?php
@@ -40,10 +40,10 @@
 		print $export_html;
 ?>
 		<form method="get" action="pruefungsleistungen_export_2.php">
-			<input type="hidden" name="semester" value="<?php print htmlentities($chosen_semester); ?>" />
-			<input type="hidden" name="pruefungsamt" value="<?php print htmlentities($chosen_pruefungsamt); ?>" />
-			<input type="hidden" name="einzelne_pns" value="<?php print htmlentities(get_get("einzelne_pns")); ?>" />
-			<input type="hidden" name="last_changed_date" value="<?php print htmlentities(get_get("last_changed_date")); ?>" />
+			<input type="hidden" name="semester" value="<?php print htmlentities($chosen_semester ?? ""); ?>" />
+			<input type="hidden" name="pruefungsamt" value="<?php print htmlentities($chosen_pruefungsamt ?? ""); ?>" />
+			<input type="hidden" name="einzelne_pns" value="<?php print htmlentities(get_get("einzelne_pns") ?? ""); ?>" />
+			<input type="hidden" name="last_changed_date" value="<?php print htmlentities(get_get("last_changed_date") ?? ""); ?>" />
 <?php
 			if($export_html) {
 ?>
