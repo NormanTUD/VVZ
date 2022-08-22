@@ -3402,7 +3402,7 @@ WHERE 1
 		if($allow_html) {
 			return $id;
 		} else {
-			return htmlentities($id);
+			return htmlentities($id ?? "");
 		}
 	}
 

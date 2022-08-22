@@ -16,7 +16,7 @@
 			include_once('hinweise.php');
 			if($GLOBALS['user_role_id'] == 1) {
 				$this_institut = get_get('institut');
-				if(!preg_match('/^\d+$/', $this_institut) && strlen($this_institut)) {
+				if(!preg_match('/^\d+$/', $this_institut ?? "") && strlen($this_institut ?? "")) {
 					$this_institut = 1;
 				}
 			} else {
