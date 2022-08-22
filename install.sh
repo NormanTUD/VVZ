@@ -6,7 +6,6 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 INSTALL_PATH=/var/www/html
-INSTITUT_NAME="Institut für Philosophie"
 
 apt-get update
 apt-get install xterm whiptail curl git etckeeper -y
@@ -98,36 +97,16 @@ FLUSH PRIVILEGES;
 EOF
 }
 
-function copy_to_path {
-	cp -r * $INSTALL_PATH
-}
-
-function new_setup {
-	touch $INSTALL_PATH/new_setup
-}
-
-function create_institut {
-	INSTITUT_NAME=$(whiptail --inputbox "Initial Institut?" $LINES $COLUMNS "$INSTITUT_NAME" --title "Name of the Default Institut" 3>&1 1>&2 2>&3)
-	if [ $? == 1 ]; then
-	    echo "User selected Cancel."
-	    exit
-	fi
-	echo "$INSTITUT_NAME" > /etc/default_institut_name
-}
-
 echo "$PASSWORD" > /etc/vvzdbpw
 
 WHAT_TO_DO=$(
 	whiptail --title "What to do?" --checklist \
 	"Chose what you want to do" $LINES $COLUMNS $(( $LINES - 8 )) \
-	"create_institut" "Create a default Institut" ON \
 	"apt_get_upgrade" "run apt-get upgrade" ON \
 	"install_apache" "Install Apache2" ON \
 	"install_php" "Install PHP" ON \
 	"install_mariadb" "Install MariaDB" ON \
 	"setup_mariadb" "Setup MariaDB" ON \
-	"copy_to_path" "Copy files to the apache path" ON \
-	"new_setup" "Create new_setup file" ON \
 	3>&1 1>&2 2>&3
 )
 if [ $? == 1 ]; then
@@ -150,7 +129,5 @@ a2enmod env
 service apache2 restart
 
 curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD" 2>&1 > /dev/null
-
-rm $INSTALL_PATH/new_setup
 
 whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS
