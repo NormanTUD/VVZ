@@ -2030,24 +2030,21 @@ declare(ticks=1);
 
 	function might_be_query ($data) {
 		if(isset($data)) {
-			if(is_array($data)) {
-				return 0;
-			} else {
+			if(!is_array($data)) {
 				# ist vorhanden und ein string
-
-				if(preg_match('/^SELECT\s+.*FROM\s+.*/i', $data)) {
-					return 1;
-				} else if(preg_match('/^UPDATE\s+.*SET\s+/i', $data)) {
-					return 1;
-				} else if(preg_match('/^DELETE\s+FROM\s+/i', $data)) {
-					return 1;
-				} else {
-					return 0;
+				if(is_string($data)) {
+					if(preg_match('/^SELECT\s+.*FROM\s+.*/i', $data)) {
+						return 1;
+					} else if(preg_match('/^UPDATE\s+.*SET\s+/i', $data)) {
+						return 1;
+					} else if(preg_match('/^DELETE\s+FROM\s+/i', $data)) {
+						return 1;
+					}
 				}
 			}
-		} else {
-			return 0;
 		}
+
+		return 0;
 	}
 
 	function dier ($data, $sql = 0, $show_error = 1) {

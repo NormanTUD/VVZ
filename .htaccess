@@ -2,5 +2,17 @@ Options +FollowSymLinks -MultiViews
 RewriteEngine On
 RewriteBase /
 
-#RewriteRule kunden/vvz_(*) - [E:kunde=\1]
-SetEnvIfNocase request_uri ^/file.php$ foo=bar
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    #RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
+    #RewriteRule ^(.*) - [E=BASE:%1]
+
+    #RewriteCond %{ENV:REDIRECT_STATUS} ^$
+    #RewriteRule ^vvz_(.*)(/(.*)|$) %1/%{ENV:BASE}/$2 [R=301,L]
+
+    #RewriteCond %{REQUEST_FILENAME} -f
+    #RewriteRule .? - [L]
+
+    RewriteRule ^vvz_(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
+</IfModule>
