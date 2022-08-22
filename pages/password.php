@@ -14,7 +14,7 @@
 <?php
 		include_once('hinweise.php');
 ?>
-		<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+		<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 			<table>
 				<tr>
 					<th>Benutzer</th>
@@ -41,7 +41,7 @@
 ?>
 			</table>
 		</form>
-		<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+		<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 			<table>
 				<tr>
 					<th>Barrierefreie Gebäude bevorzugen?</th>

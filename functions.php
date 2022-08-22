@@ -246,7 +246,7 @@ declare(ticks=1);
 			$script_name = basename($_SERVER['REQUEST_URI']);
 			$page_id = get_page_id_by_filename($script_name);
 			if($page_id) {
-				$header = 'Location: ../admin.php?page='.$page_id;
+				$header = 'Location: ../admin?page='.$page_id;
 				header($header);
 			} else {
 				die("Die internen Seiten dürfen nicht direkt aufgerufen werden. Die gesuchte Seite konnte nicht gefunden werden. Nehmen Sie &mdash; statt der direkten Datei-URL &mdash; den Weg über das Administrationsmenü.");
@@ -527,7 +527,7 @@ declare(ticks=1);
 							update_veranstaltung(get_post('id'), get_post('name'), get_post('dozent'), get_post('veranstaltungstyp'), get_post('institut'), get_post('semester'), get_post('master_niveau'), get_post("fester_bbb_raum"));
 							if(get_post('speichern_metainfos')) {
 								if(preg_match('/^\d+$/', $this_id)) {
-									header('Location: admin.php?page='.get_page_id_by_filename('veranstaltung.php').'&id='.$this_id);
+									header('Location: admin?page='.get_page_id_by_filename('veranstaltung.php').'&id='.$this_id);
 								}
 							}
 						} else if (get_post('update_veranstaltung')) {
@@ -2231,10 +2231,10 @@ declare(ticks=1);
 			$str .= "\t<ul>\n";
 			while ($row = mysqli_fetch_row($result)) {
 				if($row[2] == get_get('page')) {
-					$str .= "\t\t<li class='font_weight_bold'><a href='admin.php?page=".$row[2]."'>&rarr; $row[0]</a></li>\n";
+					$str .= "\t\t<li class='font_weight_bold'><a href='admin?page=".$row[2]."'>&rarr; $row[0]</a></li>\n";
 					$subnav_selected = 1;
 				} else {
-					$str .= "\t\t<li><a href='admin.php?page=".$row[2]."'>$row[0]</a></li>\n";
+					$str .= "\t\t<li><a href='admin?page=".$row[2]."'>$row[0]</a></li>\n";
 				}
 			}
 			$str .= "\t</ul>\n";
@@ -4979,7 +4979,7 @@ INSERT INTO
 		while($row = mysqli_fetch_row($result)) {
 ?>
 			<tr>
-				<form class="form" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
+				<form class="form" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
 					<input type="hidden" name="update_<?php print $table; ?>" value="1" />
 <?php
 					$i = 0;
@@ -5050,7 +5050,7 @@ INSERT INTO
 		if(!$disable_new) {
 ?>
 			<tr>
-				<form class="form" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
+				<form class="form" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
 					<input type="hidden" name="create_<?php print $table; ?>" value="1" />
 <?php
 					$i = 0;
@@ -5142,7 +5142,7 @@ INSERT INTO
 		while ($row = mysqli_fetch_row($result)) {
 ?>
 			<tr>
-				<form class="form" method="post" action="admin.php?page=<?php print htmlentities($page) ?>">
+				<form class="form" method="post" action="admin?page=<?php print htmlentities($page) ?>">
 					<input type="hidden" name="id" value="<?php print $row[0]; ?>" />
 					<td>
 						<?php create_select($data, $row[1], $select_name); ?>
@@ -5182,7 +5182,7 @@ INSERT INTO
 		}
 ?>
 			<tr>
-				<form class="form" method="post" action="admin.php?page=<?php print htmlentities($page) ?>">
+				<form class="form" method="post" action="admin?page=<?php print htmlentities($page) ?>">
 					<td>
 <?php create_select($data, NULL, $select_name); ?>
 					</td>
@@ -7587,7 +7587,7 @@ SE 1/2 oder BZW
 				foreach ($reihen as $this_reihe) {
 					if(is_array($this_reihe)) {
 ?>
-						<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&institut=<?php print htmlentities(get_get('institut') ?? ""); ?>&semester=<?php print htmlentities($semester ?? ""); ?>">
+						<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&institut=<?php print htmlentities(get_get('institut') ?? ""); ?>&semester=<?php print htmlentities($semester ?? ""); ?>">
 						<tr>
 <?php
 							$j = 0;

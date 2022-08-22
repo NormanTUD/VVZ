@@ -54,7 +54,7 @@
 	while ($row = mysqli_fetch_row($result)) {
 ?>
 		<tr>
-			<form class="form" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>">
+			<form class="form" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>">
 				<input type="hidden" name="page_id" value="<?php print htmlentities($row[0]); ?>" />
 				<input type="hidden" name="update_hinweis" value="<?php print htmlentities($row[0]); ?>" />
 				<td><?php print htmlentities($row[1]); ?></td>
@@ -85,7 +85,7 @@
 	while ($row = mysqli_fetch_row($result)) {
 ?>
 		<tr>
-			<form class="form" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>">
+			<form class="form" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>">
 				<input type="hidden" name="page_id" value="<?php print $row[0]; ?>" />
 				<input type="hidden" name="update_text" value="<?php print $row[0]; ?>" />
 				<td><?php print htmlentities($row[1]); ?></td>

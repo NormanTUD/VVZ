@@ -21,7 +21,7 @@
 <?php
 		$valid_semesters = create_semester_array(0, 0, array(get_get('semester')));
 ?>
-		<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+		<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 <?php
 			create_select($valid_semesters, get_this_semester()[0], 'setze_semester');
 ?>

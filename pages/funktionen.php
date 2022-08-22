@@ -30,7 +30,7 @@
 			while ($row = mysqli_fetch_row($result)) {
 ?>
 				<tr>
-					<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+					<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 						<input type="hidden" value="<?php print htmlentities($row[0]); ?>" name="id" />
 						<td><input type="text" value="<?php print htmlentities($row[1]); ?>" name="funktion_name" /></td>
 						<td><input type="submit" value="Speichern" /></td>
@@ -41,7 +41,7 @@
 			}
 ?>
 			<tr>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<input type="hidden" value="1" name="new_function_right" />
 					<td><input type="text" value="" placeholder="Name der neuen Funktion" name="funktion_name" /></td>
 					<td><input type="submit" value="Speichern" /></td>
@@ -66,7 +66,7 @@
 			while ($row = mysqli_fetch_row($result)) {
 				$selected_pages = explode(',', $row[1]);
 ?>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<tr>
 						<input type="hidden" name="update_right_to_page" value="1" />
 						<td><?php print $row[2]; ?></td>
@@ -103,7 +103,7 @@
 			while ($row = mysqli_fetch_row($result)) {
 				$selected_roles = explode(',', $row[1]);
 ?>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<tr>
 						<input type="hidden" name="update_right_to_user_role" value="1" />
 						<td><?php print $row[2]; ?></td>

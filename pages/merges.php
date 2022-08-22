@@ -36,7 +36,7 @@
 <?php
 					foreach ($tables as $this_table) {
 ?>
-						<li><a href="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&table=<?php print htmlentities($this_table); ?>"><?php print htmle($this_table); ?></a></li>
+						<li><a href="admin?page=<?php print $GLOBALS['this_page_number']; ?>&table=<?php print htmlentities($this_table); ?>"><?php print htmle($this_table); ?></a></li>
 <?php
 					}
 ?>
@@ -47,7 +47,7 @@
 					if(table_exists($GLOBALS['dbname'], get_get('table'))) {
 						if(table_has_mergeable_structure(get_get('table'))) {
 ?>
-							<form method="post" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&table=<?php print htmlentities(get_get('table')); ?>">
+							<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&table=<?php print htmlentities(get_get('table')); ?>">
 								<table>
 									<tr>
 										<th>&mdash;</th>

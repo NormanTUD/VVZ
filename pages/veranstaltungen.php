@@ -211,7 +211,7 @@
 						}
 ?>
 							<tr>
-								<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?><?php
+								<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?><?php
 										if(isset($GLOBALS['user_dozent_id']) && get_get('dozent_id')) {
 											print '&dozent_id='.$GLOBALS['user_dozent_id'];
 										}
@@ -261,7 +261,7 @@
 								<td colspan="9" class="neue_veranstaltung">Neue Veranstaltungen eintragen</td>
 							</tr>
 							<tr>
-								<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?><?php
+								<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?><?php
 									if(isset($GLOBALS['user_dozent_id']) && get_get('dozent_id')) {
 										print '&dozent_id='.$GLOBALS['user_dozent_id'];
 									}

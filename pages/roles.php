@@ -27,7 +27,7 @@
 			foreach (create_rollen_array() as $row) {
 ?>
 				<tr>
-					<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
+					<form method="post" enctype="multipart/form-data" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
 						<input type="hidden" value="<?php print htmlentities($row[0]); ?>" name="id" />
 						<td><input type="text" value="<?php print htmlentities($row[1]); ?>" name="neue_rolle" /></td>
 						<td>
@@ -51,7 +51,7 @@
 			}
 ?>
 			<tr>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']); ?>">
 					<td><input type="text" value="" name="neue_rolle" /></td>
 					<td>
 <?php

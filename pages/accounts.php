@@ -42,7 +42,7 @@
 			while ($row = mysqli_fetch_row($result)) {
 ?>
 				<tr>
-					<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+					<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 						<input type="hidden" name="id" value="<?php print htmlentities($row[0]); ?>" />
 						<td><input type="text" name="name" value="<?php print htmlentities($row[1]); ?>" /></td>
 						<td><input type="password" name="password" value="" placeholder="passwort" /></td>
@@ -81,7 +81,7 @@
 			}
 ?>
 			<tr>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<input type="hidden" name="new_user" value="1" />
 					<td><input type="text" name="name" value="" /></td>
 					<td><input type="password" name="password" value="" placeholder="passwort" /></td>

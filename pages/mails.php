@@ -40,8 +40,8 @@
 				}
 			} else {
 ?>
-				<a href="admin.php?page=<?php print htmlentities(get_get('page')); ?>&unreplied=1">Noch nicht beantwortete Mails</a><br />
-				<a href="admin.php?page=<?php print htmlentities(get_get('page')); ?>&unreplied=0">Beantwortete Mails</a><br />
+				<a href="admin?page=<?php print htmlentities(get_get('page')); ?>&unreplied=1">Noch nicht beantwortete Mails</a><br />
+				<a href="admin?page=<?php print htmlentities(get_get('page')); ?>&unreplied=0">Beantwortete Mails</a><br />
 <?php
 			}
 		}

@@ -15,7 +15,7 @@
 		include_once('hinweise.php');
 		if($studiengaenge) {
 ?>
-			<form method="get" action="admin.php">
+			<form method="get" action="admin">
 				<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
 				Studiengang: <?php create_select(create_studiengang_array_by_institut_id_str(), $studiengang, 'studiengang'); ?>
 				<input type="submit" value="Filtern" />
@@ -37,7 +37,7 @@
 <?php
 					while ($row = mysqli_fetch_row($result)) {
 ?>
-						<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print $studiengang; ?>">
+						<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print $studiengang; ?>">
 							<tr>
 								<input type="hidden" name="modul_nach_semester" value="1" />
 								<input type="hidden" name="modul" value="<?php print $row[1]; ?>" />
@@ -87,7 +87,7 @@
 
 							$veranstaltungstyp_anzahl = create_array_veranstaltungstyp_anzahl_by_modul_id_semester($this_modul[0], $this_semester);
 ?>
-							<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print htmlentities($studiengang); ?>">
+							<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print htmlentities($studiengang); ?>">
 								<tr>
 									<input type="hidden" name="semester" value="<?php print htmlentities($this_semester); ?>" />
 									<input type="hidden" name="update_modul_semester_data" value="1" />

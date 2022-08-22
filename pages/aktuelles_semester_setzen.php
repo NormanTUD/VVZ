@@ -39,7 +39,7 @@
 <?php
 								} else {
 ?>
-									<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+									<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 										<input type="hidden" name="delete_semester" value="1">
 										<input type="hidden" name="delete" value="1">
 										<input type="hidden" name="id" value="<?php print htmlentities($row[0]); ?>">

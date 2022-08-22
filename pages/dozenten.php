@@ -20,7 +20,7 @@
 			$semester = $GLOBALS['this_semester_id'][0];
 		}
 ?>
-		<form method="get" action="admin.php">
+		<form method="get" action="admin">
 			<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
 			Semester: <?php create_select(create_semester_array(), $semester, 'semester'); ?>
 			<input type="submit" value="Filtern" />
@@ -75,7 +75,7 @@
 				$titelarray = create_titel_abk_array();
 				while ($row = mysqli_fetch_row($result)) {
 ?>
-					<form method="post" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+					<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 						<tr>
 							<input type="hidden" value="1" name="update_dozent_titel" />
 							<input type="hidden" value="<?php print htmlentities($row[3]); ?>" name="id" />

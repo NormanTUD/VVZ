@@ -19,7 +19,7 @@
 		}
 ?>
 		<div id="accounts">
-			<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+			<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 				<input type="text" placeholder="Von..." style="width: 100px;" name="from" class="datepicker" value="<?php print htmlentities(get_post('from')); ?>" />
 				<input type="text" placeholder="... bis" style="width: 100px;" name="to" class="datepicker" value="<?php print htmlentities(get_post('to')); ?>" />
 				Bots anzeigen? <input type="checkbox" name="show_bots" value="1" <?php print get_post('show_bots') ? 'checked="CHECKED"' : ''; ?> />

@@ -75,7 +75,7 @@
 <?php
 				include_once('hinweise.php');
 ?>
-				<form method="post" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
+				<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
 					<input type="submit" class="text_30px" value="Speichern" />
 
 					<table>
@@ -403,7 +403,7 @@
 						}
 						if(count($veranstaltungen)) {
 ?>
-						<form method="post" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
+						<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
 							<p>Beim Kopieren von Prüfungen werden alle eingetragenen Prüfungen gelöscht und die ausgewählten Prüfungsnummern einer anderen Veranstaltung dieser hier zugeordnet. Dies dient dazu, einfach Veranstaltungenseinstellungen zu &raquo;klonen&laquo;.</p>
 <?php
 								usort($veranstaltungen, function($a, $b) {

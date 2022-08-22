@@ -39,7 +39,7 @@
 <?php
 			foreach ($pruefungsaemter as $this_pa) {
 ?>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<input type="hidden" name="pruefungsamt_id" value="<?php print htmlentities($this_pa[0]); ?>" />
 					<tr>
 						<td><?php print htmle($this_pa[1]); ?></td>

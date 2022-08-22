@@ -66,7 +66,9 @@
 			<title><?php print htmlentities($page_title); ?></title>
 <?php
 		}
-		css(array("foundation.min.css", "font-awesome.min.css"));
+		if(array_key_exists("SCRIPT_NAME", $_SERVER) && $_SERVER["SCRIPT_NAME"] != "/admin.php") {
+			css(array("foundation.min.css", "font-awesome.min.css"));
+		}
 ?>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 

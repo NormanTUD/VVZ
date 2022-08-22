@@ -30,7 +30,7 @@
 <?php
 			foreach ($user as $this_user_id => $this_user) {
 ?>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<input type="hidden" name="dozent_id" value="<?php print htmlentities($this_user[0]); ?>" />
 					<tr>
 						<td><?php print htmlentities($this_user[1]); ?></td>

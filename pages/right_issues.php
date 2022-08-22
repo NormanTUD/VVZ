@@ -15,7 +15,7 @@
 ?>
 		Jeder Benutzer hat eine Rolle. Rollen definieren, was der Nutzer sehen und was er verändern darf.
 		Jeder Versuch, etwas auszuführen, für das der Nutzer keine Rechte hat, wird hier aufgezeichnet. Die Liste reicht 3 Monate zurück.
-		<form method="post" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+		<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 			Benutzer: <?php create_select($users, get_post('id'), 'id', 1); ?>
 			<input type="submit" value="Filtern" />
 		</form>

@@ -51,7 +51,7 @@
 						}
 						$hinweis = get_hinweis_for_page($id);
 ?>
-						<form method="post" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+						<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 							<tr>
 								<input type="hidden" name="updatepage" value="1" />
 								<input type="hidden" name="id" value="<?php print htmle($id); ?>" />
@@ -90,7 +90,7 @@
 <?php
 				}
 ?>
-					<form method="post" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+					<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 						<tr>
 							<input type="hidden" name="newpage" value="1" />
 							<input type="hidden" name="id" value="" />

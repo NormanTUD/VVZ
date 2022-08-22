@@ -14,7 +14,7 @@
 			include_once('hinweise.php');
 			if ($GLOBALS['user_role_id'] == 1) {
 ?>
-				Nur für Administratoren: <a href="admin.php?page=<?php print get_page_id_by_filename('edit_page_info.php'); ?>">Seiteninformationen bearbeiten.</a>
+				Nur für Administratoren: <a href="admin?page=<?php print get_page_id_by_filename('edit_page_info.php'); ?>">Seiteninformationen bearbeiten.</a>
 <?php
 			}
 			if(!file_exists('/etc/x11test')) {
@@ -52,7 +52,7 @@
 								if(!$thispage[2]) {
 									$linkname = 'show_items';
 								}
-								print "<li class='margin_10px_0'>&raquo;<b><a href='admin.php?$linkname=$thispage[0]'>".$thispage[1]."</a></b>&laquo; &mdash; ".$thispage[3];
+								print "<li class='margin_10px_0'>&raquo;<b><a href='admin?$linkname=$thispage[0]'>".$thispage[1]."</a></b>&laquo; &mdash; ".$thispage[3];
 								$subpagedata = create_page_info_parent($thispage[0], $GLOBALS['user_role_id']);
 								if(count($subpagedata)) {
 									print "<ul>\n";
@@ -60,7 +60,7 @@
 										if(!$thissubpage[3]) {
 											$thissubpage[3] = '<i>Diese Seite wurde noch nicht beschrieben.</i>';
 										}
-										print "<li class='margin_3px_0'>&raquo;<b><a href='admin.php?page=$thissubpage[0]'>".$thissubpage[1]."</a></b>&laquo; &mdash; ".$thissubpage[3]."</li>\n";
+										print "<li class='margin_3px_0'>&raquo;<b><a href='admin?page=$thissubpage[0]'>".$thissubpage[1]."</a></b>&laquo; &mdash; ".$thissubpage[3]."</li>\n";
 									}
 									print "</ul>\n";
 								}

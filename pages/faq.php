@@ -31,7 +31,7 @@
 <?php
 			while ($row = mysqli_fetch_row($result)) {
 ?>
-				<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<tr>
 						<input type="hidden" name="id" value="<?php print htmlentities($row[0]); ?>" />
 						<input type="hidden" name="faq_update" value="faq_update" />
@@ -45,7 +45,7 @@
 <?php		
 			}
 ?>
-			<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+			<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 				<tr>
 					<input type="hidden" name="create_faq" value="faq_update" />
 					<td><input type="text" name="frage" value="" /></td>
