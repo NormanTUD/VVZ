@@ -41,8 +41,8 @@
 							<tr>
 								<input type="hidden" name="modul_nach_semester" value="1" />
 								<input type="hidden" name="modul" value="<?php print $row[1]; ?>" />
-								<td><?php print htmlentities($row[0]); ?></td>
-								<td><input type="text" name="semester" value="<?php print htmlentities($row[2]); ?>" /></td>
+								<td><?php print htmlentities($row[0] ?? ""); ?></td>
+								<td><input type="text" name="semester" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
 								<td><input type="submit" value="Speichern" /></td>
 							</tr>
 						</form>
@@ -87,11 +87,11 @@
 
 							$veranstaltungstyp_anzahl = create_array_veranstaltungstyp_anzahl_by_modul_id_semester($this_modul[0], $this_semester);
 ?>
-							<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print htmlentities($studiengang); ?>">
+							<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print htmlentities($studiengang ?? ""); ?>">
 								<tr>
-									<input type="hidden" name="semester" value="<?php print htmlentities($this_semester); ?>" />
+									<input type="hidden" name="semester" value="<?php print htmlentities($this_semester ?? ""); ?>" />
 									<input type="hidden" name="update_modul_semester_data" value="1" />
-									<input type="hidden" name="studiengang" value="<?php print htmlentities($studiengang); ?>" />
+									<input type="hidden" name="studiengang" value="<?php print htmlentities($studiengang ?? ""); ?>" />
 									<input type="hidden" name="modul" value="<?php print htmlentities($this_modul[0]); ?>" />
 									<td><?php print htmle($this_semester); ?></td>
 									<td><?php print htmle($this_modul[1]); ?></td>
@@ -109,8 +109,8 @@
 										}
 ?>
 									</td>
-									<td><input type="text" value="<?php print htmlentities($credit_points); ?>" name="credit_points" /></td>
-									<td><input type="text" value="<?php print htmlentities($anzahl_pruefungsleistungen); ?>" name="pruefungsleistung_anzahl" /></td>
+									<td><input type="text" value="<?php print htmlentities($credit_points ?? ""); ?>" name="credit_points" /></td>
+									<td><input type="text" value="<?php print htmlentities($anzahl_pruefungsleistungen ?? ""); ?>" name="pruefungsleistung_anzahl" /></td>
 									<td><input type="submit" value="Speichern" /><td>
 								</tr>
 							</form>

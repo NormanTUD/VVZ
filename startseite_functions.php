@@ -1169,10 +1169,10 @@
 ?>
 			<form method="get">
 				<input type="hidden" name="create_stundenplan" value="1" />
-				<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang')); ?>" />
-				<input type="hidden" name="bereich" value="<?php print htmlentities(get_get('bereich')); ?>" />
-				<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester')); ?>" />
-				Semester: <?php create_select($semester_array, get_get('chosen_semester'), 'chosen_semester'); ?><br />
+				<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang') ?? ""); ?>" />
+				<input type="hidden" name="bereich" value="<?php print htmlentities(get_get('bereich') ?? ""); ?>" />
+				<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
+				Semester: <?php create_select($semester_array, get_get('chosen_semester') ?? "", 'chosen_semester'); ?><br />
 				<input type="submit" value="Weiter" />
 			</form>
 <?php
