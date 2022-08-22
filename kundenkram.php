@@ -1,10 +1,26 @@
 <?php
 	$GLOBALS["error_page_shown"] = 0;
+	function create_uni_name ($name) {
+		$name = strtolower($name ?? "");
+		$name = preg_replace("/\d+/", "", $name);
+		$name = preg_replace("/\s/", "_", $name);
+		$name = preg_replace("/_+/", "_", $name);
+		$name = preg_replace("/-+/", "_", $name);
+		$name = preg_replace("/ä/", "ae", $name);
+		$name = preg_replace("/ü/", "ue", $name);
+		$name = preg_replace("/ö/", "oe", $name);
+		$name = preg_replace("/ß/", "ss", $name);
+		$name = preg_replace("/_$/", "", $name);
+		$name = preg_replace("/[^a-z_]/", "", $name);
+		$name = preg_replace("/technische_universitaet_/", "tu_", $name);
+		return $name;
+	}
+
 	function get_kunden_db_name() {
 		if(array_key_exists("new_uni_name", $_GET)) {
 			print "Die neue Uni wird erstellt. Bitte warten";
 			flush();
-			print '<meta http-equiv="refresh" content="0; url=vvz_'.$_GET["new_uni_name"].'/" />';
+			print '<meta http-equiv="refresh" content="0; url=vvz_'.create_uni_name($_GET["new_uni_name"]).'/" />';
 			flush();
 			exit;
 		}
