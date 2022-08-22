@@ -5,9 +5,6 @@
 		$GLOBALS["error_page_shown"] = 1;
 	}
 	$php_start = microtime(true);
-	if(file_exists('new_setup')) {
-		exit(0);
-	}
 	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
 

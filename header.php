@@ -4,13 +4,6 @@
 	}
 	include_once("functions.php");
 
-	if(file_exists('new_setup')) {
-		if(!isset($GLOBALS["setup_mode"])) {
-			include('setup.php');
-			exit(0);
-		}
-	}
-
 	if($GLOBALS['reload_page']) {
 		header("Refresh:0");
 	}

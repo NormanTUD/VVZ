@@ -157,10 +157,6 @@ declare(ticks=1);
 		$GLOBALS['setup_mode'] = 0;
 	}
 
-	if(file_exists('new_setup')) {
-		$GLOBALS['setup_mode'] = 1;
-	}
-
 	if(!$GLOBALS['setup_mode']) {
 		rquery('USE `'.$GLOBALS['dbname'].'`');
 		rquery('SELECT @@FOREIGN_KEY_CHECKS');

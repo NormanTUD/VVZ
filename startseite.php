@@ -2,11 +2,6 @@
 	include_once("kundenkram.php");
 	$php_start = microtime(true);
 
-	if(file_exists('new_setup')) {
-		include('setup.php');
-		exit(0);
-	}
-
 	include_once("config.php");
 	include("startseite_functions.php");
 	include_once("functions.php");
@@ -28,12 +23,12 @@
 		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
 		print "</ul>";
 
-		exit;
+		exit(0);
 	} else {
 		include("selftest.php");
 		if($GLOBALS["db_freshly_created"]) {
 			print "<script nonce='".nonce()."'>window.location.reload();</script>";
-			exit;
+			exit(0);
 		}
 	}
 

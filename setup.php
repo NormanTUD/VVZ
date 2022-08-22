@@ -6,7 +6,7 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 	$GLOBALS['setup_mode'] = 1;
 	$show_importer = 1;
 	$php_start = microtime(true);
-	if(file_exists('new_setup')) {
+	if(0 && file_exists('new_setup')) {
 		include_once("config.php");
 		$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];;
 		$filename = 'startseite';
