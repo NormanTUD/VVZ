@@ -588,7 +588,7 @@
 	$GLOBALS['views'] = array(
 		"view_page_and_text" => "create view `view_page_and_text` AS select `p`.`id` AS `id`,`p`.`name` AS `name`,`p`.`show_in_navigation` AS `show_in_navigation`,`h`.`text` AS `text` from (`page` `p` left join `seitentext` `h` on(`h`.`page_id` = `p`.`id`));",
 
-		"view_veranstaltung_nach_modul" => "create view `view_veranstaltung_nach_modul` AS select `m`.`name` AS `modulname`,`m`.`id` AS `modul_id`,`v`.`id` AS `veranstaltung_id`,`v`.`name` AS `name`,`m`.`studiengang_id` AS `veranstaltung_name` from ((`pruefungsnummer` `pn` left join (`veranstaltung` `v` join `pruefung` `p` on(`v`.`id` = `p`.`veranstaltung_id`)) on(`pn`.`id` = `p`.`pruefungsnummer_id`)) join `modul` `m` on(`pn`.`modul_id` = `m`.`id`)) where `v`.`name` is not null;",
+		"view_veranstaltung_nach_modul" => "create view `view_veranstaltung_nach_modul` AS select `m`.`name` AS `modulname`,`m`.`id` AS `modul_id`,`v`.`id` AS `veranstaltung_id`,`v`.`name` AS `name`,`m`.`studiengang_id` AS `veranstaltung_name` from ((`pruefungsnummer` `pn` left join (`veranstaltung` `v` join `pruefung` `p` on(`v`.`id` = `p`.`veranstaltung_id`)) on(`pn`.`id` = `p`.`pruefungsnummer_id`)) join `modul` `m` on(`pn`.`modul_id` = `m`.`id`)) where 1;",
 
 		"view_veranstaltung_nach_studiengang" => "create view `view_veranstaltung_nach_studiengang` AS select `vm`.`veranstaltung_id` AS `veranstaltung_id`,`vm`.`modul_id` AS `modul_id`,`m`.`studiengang_id` AS `studiengang_id`,`s`.`name` AS `studiengang_name` from ((`view_veranstaltung_nach_modul` `vm` left join `modul` `m` on(`m`.`id` = `vm`.`modul_id`)) join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`));",
 
