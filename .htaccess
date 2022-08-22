@@ -6,11 +6,11 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
 	DirectoryIndex startseite.php
 	RewriteEngine On
-	RewriteRule ^vvz_(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4/$5 [NE,E=SFURI:$1]
-	RewriteRule ^vvz_(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4 [NE,E=SFURI:$1]
-	RewriteRule ^vvz_(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
-	RewriteRule ^vvz_(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
-	RewriteRule ^vvz_(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
+	RewriteRule ^v/(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4/$5 [NE,E=SFURI:$1]
+	RewriteRule ^v/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4 [NE,E=SFURI:$1]
+	RewriteRule ^v/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
+	RewriteRule ^v/(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
+	RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
 
 	RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
 </IfModule>

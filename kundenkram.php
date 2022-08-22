@@ -20,7 +20,7 @@
 		if(array_key_exists("new_uni_name", $_GET)) {
 			print "Die neue Uni wird erstellt. Bitte warten";
 			flush();
-			print '<meta http-equiv="refresh" content="0; url=vvz_'.create_uni_name($_GET["new_uni_name"]).'/" />';
+			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($_GET["new_uni_name"]).'/" />';
 			flush();
 			exit;
 		}
@@ -28,7 +28,7 @@
 		if(array_key_exists("REDIRECT_URL", $_SERVER)) {
 			$url = $_SERVER["REDIRECT_URL"];
 
-			if($url && preg_match("/vvz_([a-z_-]+)/", $url, $matches)) {
+			if($url && preg_match("/v\/([a-z_-]+)/", $url, $matches)) {
 				return "db_vvz_".$matches[1];
 			}
 		}
@@ -44,10 +44,10 @@
 
 	function get_kunde_url() {
 		$n = get_kunde_name();
-		if(array_key_exists('REQUEST_URI', $_SERVER) && preg_match("/^\Q".$n."\E/", $_SERVER['REQUEST_URI']) || preg_match("/^vvz_".$n."/", $_SERVER["REQUEST_URI"])) {
+		if(array_key_exists('REQUEST_URI', $_SERVER) && preg_match("/^\Q".$n."\E/", $_SERVER['REQUEST_URI']) || preg_match("/^v\/".$n."/", $_SERVER["REQUEST_URI"])) {
 			return "";
 		} else {
-			return "vvz_$n/";
+			return "v/$n/";
 		}
 	}
 ?>
