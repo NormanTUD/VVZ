@@ -30,7 +30,7 @@
 ?>
 			<form method="get">
 				Für welches Institut soll die Prüfungsnummernverwaltung angezeigt werden? 
-				<input type="hidden" name="page" value="<?php print htmlentities(get_get('page')); ?>" />
+				<input type="hidden" name="page" value="<?php print htmlentities(get_get('page') ?? ""); ?>" />
 				<?php create_select($institute, $chosen_institut, 'institut'); ?>
 				<input type="submit" value="Anzeigen" />
 			</form>
@@ -114,7 +114,7 @@ JOIN
 						foreach ($rows as $row) {
 							if(is_null($this_studiengang) || $this_studiengang != $row[0]) {
 								$this_studiengang = $row[0];
-								print "<tr class='colordarkblue'><td class='bg_add8e6' colspan='9'>".htmlentities($this_studiengang)."</td></tr>\n";
+								print "<tr class='colordarkblue'><td class='bg_add8e6' colspan='9'>".htmlentities($this_studiengang ?? "")."</td></tr>\n";
 							}
 
 							$bgcolor = 'ededed';
@@ -123,7 +123,7 @@ JOIN
 							}
 ?>
 							<tr class="bg_<?php print $bgcolor; ?>">
-							<form class="form form_autosubmit" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>&institut=<?php print htmlentities($chosen_institut); ?>">
+							<form class="form form_autosubmit" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number'] ?? "") ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
 									<input type="hidden" value="update_pruefungsnummer" name="update_pruefungsnummer" />
 									<input type="hidden" value="<?php print $row[4]; ?>" name="modul_id" />
 									<input type="hidden" value="<?php print $row[5]; ?>" name="id" />
@@ -138,8 +138,8 @@ JOIN
 ?>
 									<td><?php create_select($bereiche, $row[6], 'bereich'); ?></td>
 									<td><?php create_select($pruefungstypen, $row[3], 'pruefungstyp'); ?></td>
-									<td><input type="text" name="modulbezeichnung" class="width_auto" value="<?php print htmlentities($row[8]); ?>" /></td>
-									<td><input type="text" name="pruefungsnummer" class="width_auto" value="<?php print htmlentities($row[2]); ?>" /></td>
+									<td><input type="text" name="modulbezeichnung" class="width_auto" value="<?php print htmlentities($row[8] ?? ""); ?>" /></td>
+									<td><input type="text" name="pruefungsnummer" class="width_auto" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
 									<td><?php create_select($zeitraum, $row[9], 'zeitraum'); ?></td>
 									<td><?php create_select(array("0" => "Nein", "1" => "Ja"), $row[10] ? 'Ja' : 'Nein', 'pndisabled')  ?></td>
 									<td><input type="submit" name="delete" value="Löschen" /></td>
@@ -150,7 +150,7 @@ JOIN
 							$j++;
 						}
 ?>
-							<form class="form" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>&institut=<?php print htmlentities($chosen_institut); ?>">
+							<form class="form" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
 							<input data-id="noautosubmit" type="hidden" value="neue_pruefungsnummer" name="neue_pruefungsnummer" />
 							<td><?php create_select($module, '', 'modul', 0, 1); ?></td>
 							<td><?php create_select($bereiche, '', 'bereich', 0, 1); ?></td>

@@ -5147,11 +5147,11 @@ INSERT INTO
 					<td>
 						<?php create_select($data, $row[1], $select_name); ?>
 					</td>
-					<td><input type="text" class="width500px" name="<?php print $dataname; ?>" value="<?php print htmlentities($row[2]); ?>" /></td>
+					<td><input type="text" class="width500px" name="<?php print $dataname; ?>" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
 <?php
 					if(in_array('studienordnung', $columnnames)) {
 ?>
-						<td><input type="text" class="width500px" name="studienordnung" value="<?php print htmlentities($row[3]); ?>" /></td>
+						<td><input type="text" class="width500px" name="studienordnung" value="<?php print htmlentities($row[3] ?? ""); ?>" /></td>
 <?php
 					}
 ?>
@@ -5164,13 +5164,13 @@ INSERT INTO
 
 					if(in_array('beschreibung', $columnnames)) {
 ?>
-						<td><input type="text" class="width500px" name="beschreibung" value="<?php print htmlentities($row[3]); ?>" /></td>
+						<td><input type="text" class="width500px" name="beschreibung" value="<?php print htmlentities($row[3] ?? ""); ?>" /></td>
 <?php
 					}
 
 					if(in_array('abkuerzung', $columnnames)) {
 ?>
-						<td><input type="text" class="width500px" name="abkuerzung" value="<?php print htmlentities($row[4]); ?>" /></td>
+						<td><input type="text" class="width500px" name="abkuerzung" value="<?php print htmlentities($row[4] ?? ""); ?>" /></td>
 <?php
 					}
 ?>
