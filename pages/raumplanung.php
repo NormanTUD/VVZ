@@ -76,13 +76,13 @@
 				if($has_printed_rows) {
 ?>
 					<form method="get" action="raumplanung_export.php">
-						<input type="hidden" name="institut" value="<?php print htmlentities($this_institut); ?>" />
-						<input type="hidden" name="semester" value="<?php print htmlentities($this_semester); ?>" />
+						<input type="hidden" name="institut" value="<?php print htmlentities($this_institut ?? ""); ?>" />
+						<input type="hidden" name="semester" value="<?php print htmlentities($this_semester ?? ""); ?>" />
 						<input type="submit" value="Als Microsoft-Excel-Tabelle herunterladen" />
 					</form>
 					<form method="get" action="raumplanung_export_2.php">
-						<input type="hidden" name="institut" value="<?php print htmlentities($this_institut); ?>" />
-						<input type="hidden" name="semester" value="<?php print htmlentities($this_semester); ?>" />
+						<input type="hidden" name="institut" value="<?php print htmlentities($this_institut ?? ""); ?>" />
+						<input type="hidden" name="semester" value="<?php print htmlentities($this_semester ?? ""); ?>" />
 						<input type="submit" value="Als Microsoft-Excel-Tabelle herunterladen (verr&uuml;cktes Format)" />
 					</form>
 <?php

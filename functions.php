@@ -5832,9 +5832,6 @@ INSERT INTO
 
 	function create_semester_array ($mit_veranstaltungen = 0, $split_typen = 0, $id_in = null) {
 		$semester = array();
-		if(table_exists($GLOBALS["dbname"], "semester")) {
-			return $semester;
-		}
 		$query = 'SELECT `id`, `typ`, `jahr` FROM `semester` WHERE 1 AND ';
 
 		$added_to_query = 0;
@@ -7046,7 +7043,7 @@ $ret_string .= '</table>';
 
 			$this_institut = null;
 
-			if(preg_match('/^\d+$/', get_get('institut'))) {
+			if(preg_match('/^\d+$/', get_get('institut') ?? "")) {
 				$this_institut = get_get('institut');
 			} else {
 				if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
@@ -7491,7 +7488,7 @@ SE 1/2 oder BZW
 					$minicache['raumnummer'][$row[11]] = $raumnummer;
 				}
 			}
-			if(!preg_match('/barrierefrei/i', $row[3])) {
+			if(!preg_match('/barrierefrei/i', $row[3] ?? "")) {
 				if(array_key_exists($row[20], $dozenten_barrierefrei) && $dozenten_barrierefrei[$row[20]]) {
 					if($row[3]) {
 						$row[3] = "Barrierefrei, $row[3]";
@@ -7590,7 +7587,7 @@ SE 1/2 oder BZW
 				foreach ($reihen as $this_reihe) {
 					if(is_array($this_reihe)) {
 ?>
-						<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&institut=<?php print htmlentities(get_get('institut')); ?>&semester=<?php print htmlentities($semester); ?>">
+						<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>&institut=<?php print htmlentities(get_get('institut') ?? ""); ?>&semester=<?php print htmlentities($semester ?? ""); ?>">
 						<tr>
 <?php
 							$j = 0;
@@ -7614,7 +7611,7 @@ SE 1/2 oder BZW
 
 								if(array_key_exists($j, $colnames) && $colnames[$j] == "raummeldung") {
 									if($user_can_edit == 1) {
-										print "<td><input placeholder='raummeldung' class='datepicker' type='text' value='".htmlentities($this_cell)."' name='meldungsdatum' /></td>";
+										print "<td><input placeholder='raummeldung' class='datepicker' type='text' value='".htmlentities($this_cell ?? "")."' name='meldungsdatum' /></td>";
 									} else {
 										print "<td>".htmle($this_cell)."</td>\n"."<td>&mdash;</td>\n";
 									}
@@ -7634,7 +7631,7 @@ SE 1/2 oder BZW
 									}
 								} else {
 									if($j != 14) {
-										print "<td>$updated".((isset($this_cell) && !preg_match('/^\s+$/', $this_cell)) ? htmlentities($this_cell) : '&mdash;')."</td>\n";
+										print "<td>$updated".((isset($this_cell) && !preg_match('/^\s+$/', $this_cell ?? "")) ? htmlentities($this_cell) : '&mdash;')."</td>\n";
 									}
 								}
 								$j++;
@@ -9624,6 +9621,6 @@ order by
 
 	function print_uni_logo() {
 		$kunde_db_name = get_kunden_db_name();
-		print '<img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /> (Kundenlogo: '.$kunde_db_name.')';
+		print '<img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" />';
 	}
 ?>
