@@ -1,9 +1,18 @@
 <?php
+	include_once("kundenkram.php");
 	$php_start = microtime(true);
 
 	if(file_exists('new_setup')) {
 		include('setup.php');
 		exit(0);
+	}
+
+
+	if(get_kunden_db_name() == "startpage") {
+		print "VVZ";
+	} else {
+		include("selftest.php");
+		die("Versuche Einzelne vvz startseite anzuzeigen für ".get_kunden_db_name());
 	}
 
 	$GLOBALS['metadata_shown'] = 0;

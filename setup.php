@@ -55,16 +55,6 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 			}
 
 
-
-			rquery('use `'.$GLOBALS['dbname'].'`');
-
-			rquery("insert INTO `dozent` VALUES (1,'Admin','Istrator', null, '0')");
-
-			if(file_exists("/etc/default_institut_name")) {
-				$default_institut_name = file_get_contents("/etc/default_institut_name");
-				rquery("insert into uni.institut VALUES (1, ".esc($default_institut_name).", 1);");
-			}
-
 			$salt = generate_random_string(100);
 			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc(get_post('username')).', '.esc(hash('sha256', get_post('password').$salt)).', '.esc($salt).', 1, 1)';
 			rquery($query);

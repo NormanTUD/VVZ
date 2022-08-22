@@ -1,15 +1,6 @@
 <?php
-	function get_kunden_name() {
-		if(array_key_exists("REDIRECT_URL", $_SERVER)) {
-			$url = $_SERVER["REDIRECT_URL"];
+	include_once("kundenkram.php");
 
-			if($url && preg_match("/vvz_([a-z_-]+)/", $url, $matches)) {
-				return $matches[1];
-			}
-		}
-
-		return "uni";
-	}
 /*
 	Global stuff
  */
@@ -41,7 +32,7 @@
 
 	Set the password in the file '/etc/vvzdbpw'
  */
-	$GLOBALS['dbname'] = get_kunden_name();
+	$GLOBALS['dbname'] = get_kunden_db_name();
 	$GLOBALS["db_username"] = 'root';
 
 /*
