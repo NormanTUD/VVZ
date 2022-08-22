@@ -201,7 +201,7 @@ declare(ticks=1);
 			$GLOBALS['logged_in_was_tried'] = 1;
 		}
 
-		if(get_cookie('session_id')) {
+		if(get_cookie('session_id') && !$GLOBALS["db_freshly_created"] && table_exists($GLOBALS["dbname"], "view_user_session_id")) {
 			#delete_old_session_ids();
 			$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `session_id` = '.esc($_COOKIE['session_id']).' AND `enabled` = "1"';
 			$result = rquery($query);
@@ -2075,7 +2075,7 @@ declare(ticks=1);
 			$message .= "DBH: ".print_r($GLOBALS['dbh'], true)."\n";
 			$message .= "\n";
 			$message .= "Nachricht ===============================\n";
-			$message .= htmlentities($data)."\n";
+			$message .= htmlentities($data ?? "")."\n";
 			$message .= "========================== Nachricht Ende\n";
 
 			$headers = '';
@@ -2681,10 +2681,17 @@ declare(ticks=1);
 	}
 
 	function get_and_create_this_semester ($swap = 0) {
+		if(!table_exists($GLOBALS["dbname"], "semester")) {
+			return;
+		}
+
 		return get_and_create_semester_id_by_jahr_monat_tag(date('Y'), date('m'), date('d'), $swap);
 	}
 
 	function get_this_semester () {
+		if(!table_exists($GLOBALS["dbname"], "semester")) {
+			return;
+		}
 		$query = 'select id from semester where `default` = "1" order by id asc';
 		$result = rquery($query);
 
@@ -5808,6 +5815,9 @@ INSERT INTO
 
 	function create_semester_array_short () {
 		$semester = array();
+		if(table_exists($GLOBALS["dbname"], "semester")) {
+			return $semester;
+		}
 		$query = 'SELECT `id`, concat(`typ`, " ", `jahr`) FROM `semester` ORDER BY `jahr`, `typ`';
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
@@ -5822,6 +5832,9 @@ INSERT INTO
 
 	function create_semester_array ($mit_veranstaltungen = 0, $split_typen = 0, $id_in = null) {
 		$semester = array();
+		if(table_exists($GLOBALS["dbname"], "semester")) {
+			return $semester;
+		}
 		$query = 'SELECT `id`, `typ`, `jahr` FROM `semester` WHERE 1 AND ';
 
 		$added_to_query = 0;

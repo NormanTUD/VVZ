@@ -52,11 +52,13 @@
 		if(!$GLOBALS['this_semester']) {
 			$GLOBALS['this_semester'] = get_and_create_this_semester(1);
 			if(!$GLOBALS['this_semester']) {
-				$valid_semesters = create_semester_array(1, 1, array(get_get('semester')));
-				if(is_array($valid_semesters) && count($valid_semesters)) {
-					$GLOBALS['this_semester'] = $valid_semesters[1];
-				} else {
-					die("Es existieren keine validen, eingetragenen Semester.");
+				if(table_exists($GLOBALS["dbname"], "semester")) {
+					$valid_semesters = create_semester_array(1, 1, array(get_get('semester')));
+					if(is_array($valid_semesters) && count($valid_semesters)) {
+						$GLOBALS['this_semester'] = $valid_semesters[1];
+					} else {
+						die("Es existieren keine validen, eingetragenen Semester.");
+					}
 				}
 			}
 		}
@@ -64,7 +66,7 @@
 
 	$GLOBALS['shown_etwa'] = 0;
 
-	$GLOBALS['institute'] = create_institute_array();
+	$GLOBALS['institute'] = table_exists($GLOBALS["dbname"], "institute") ? create_institute_array() : Array();
 
 	$GLOBALS['this_institut'] = null;
 
