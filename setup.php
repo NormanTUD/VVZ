@@ -9,14 +9,14 @@ Ordner, Datenbanken etc. erstellt und mit den ersten, einfachen Daten befüllt.
 	if(file_exists('new_setup')) {
 		include_once("config.php");
 		$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];;
-		$filename = 'index.php';
+		$filename = 'startseite';
 		include("header.php");
 
 		rquery('select @@FOREIGN_KEY_CHECKS');
 		rquery('set FOREIGN_KEY_CHECKS=0');
 ?>
 	<div id="mainindex">
-		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?></a>
 		<h1>Setup</h1>
 
 <?php

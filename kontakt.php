@@ -6,7 +6,7 @@
 	}
 	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | Kontakt";
-	$filename = 'index.php';
+	$filename = 'startseite';
 	if(!isset($GLOBALS['adminpage'])) {
 		include("header.php");
 	}
@@ -30,7 +30,7 @@
 <?php
 		if(!isset($GLOBALS['adminpage'])) {
 ?>
-			<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
 <?php
 	}
 ?>

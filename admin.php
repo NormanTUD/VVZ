@@ -6,7 +6,7 @@
 	}
 	include_once("config.php");
 	$page_title = $GLOBALS['university_name']." | Administration";
-	$filename = 'admin.php';
+	$filename = 'admin';
 	$GLOBALS['adminpage'] = 1;
 	include("header.php");
 
@@ -15,7 +15,7 @@
 	if(!$GLOBALS['logged_in']) {
 ?>
 		<div id="main">
-			<a href="admin.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+			<a href="admin" border="0"><?php print_uni_logo(); ?></a>
 			<div id="wrapper" class="text_align_center">
 			<div class="login_admin">
 <?php
@@ -73,7 +73,7 @@
 		if(!count($studiengaenge)) {
 			$fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
+				$fehler .= "<a href='admin?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
 			}
@@ -85,7 +85,7 @@
 		if(!count($bereiche)) {
 			$fehler = "Es sind keine Bereiche vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("bereiche.php")."'>Hier können Sie welche hinzufügen.</a>";
+				$fehler .= "<a href='admin?page=".get_page_id_by_filename("bereiche.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
@@ -96,7 +96,7 @@
 		if(!count($module)) {
 			$fehler = "Es sind keine Module vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("modul.php")."'>Hier können Sie welche hinzufügen.</a>";
+				$fehler .= "<a href='admin?page=".get_page_id_by_filename("modul.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
@@ -107,7 +107,7 @@
 		if(!count($gebaeude)) {
 			$fehler = "Es sind keine Gebäude vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("gebaeude.php")."'>Hier können Sie welche hinzufügen.</a>";
+				$fehler .= "<a href='admin?page=".get_page_id_by_filename("gebaeude.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
@@ -118,7 +118,7 @@
 		if(!count($pruefungsnummern)) {
 			$fehler = "Es sind keine Prüfungsnummern vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin.php?page=".get_page_id_by_filename("pruefungsnummern.php")."'>Hier können Sie welche hinzufügen.</a>";
+				$fehler .= "<a href='admin?page=".get_page_id_by_filename("pruefungsnummern.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
@@ -149,7 +149,7 @@
 <?php
 			if(!file_exists('/etc/x11test')) {
 ?>
-				<a href="admin.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+			<a href="admin" border="0"><?php print_uni_logo(); ?></a>
 <?php
 			}
 ?>
@@ -174,7 +174,7 @@
 ?>
 			<div class="height_5px"></div>
 				<ul class="topnav">
-					<li><a href="admin.php" <?php print (get_get('page') || get_get('show_items')) ? '' : 'class="selected_tab"'; ?>><?php print (get_get('page') || get_get('show_items')) ? '' : '&rarr; '; ?>Willkommen!</a></li>
+					<li><a href="admin" <?php print (get_get('page') || get_get('show_items')) ? '' : 'class="selected_tab"'; ?>><?php print (get_get('page') || get_get('show_items')) ? '' : '&rarr; '; ?>Willkommen!</a></li>
 <?php
 					if(count($GLOBALS['pages'])) {
 						foreach ($GLOBALS['pages'] as $this_page) {
@@ -184,25 +184,25 @@
 								if($this_page[1]) { # Kein Dropdown
 									if(!$this_page[4]) {
 										if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
-											print "<li class='selected_tab'><a href='admin.php?page=".$this_page[2]."'>&rarr; $this_page[0]</a></li>\n";
+											print "<li class='selected_tab'><a href='admin?page=".$this_page[2]."'>&rarr; $this_page[0]</a></li>\n";
 										} else {
-											print "<li><a href='admin.php?page=".$this_page[2]."'>$this_page[0]</a></li>\n";
+											print "<li><a href='admin?page=".$this_page[2]."'>$this_page[0]</a></li>\n";
 										}
 									}
 								} else { # Dropdown
 									$subnav_data = print_subnavigation($this_page[2]);
 									if($subnav_data[0]) {
 ?>
-										<li class='selected_tab'><a href='admin.php?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+										<li class='selected_tab'><a href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
 									} else {
 										if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
 ?>
-											<li class="dropdown selected_tab"><a href='admin.php?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+											<li class="dropdown selected_tab"><a href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
 										} else {
 ?>
-											<li class="dropdown"><a href='admin.php?show_items=<?php print $this_page[2];?>'><?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+											<li class="dropdown"><a href='admin?show_items=<?php print $this_page[2];?>'><?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
 										}
 									}
@@ -256,7 +256,7 @@
 						print "<ul>\n";
 						foreach ($subpage_data as $row) {
 							if($row[1]) {
-								print "<li class='margin_5px_0'><a href='admin.php?page=$row[0]'>$row[1]</a> ".($subpage_texts[$row[0]] ? "&mdash; ".htmlentities($subpage_texts[$row[0]]) : "")."</li>\n";
+								print "<li class='margin_5px_0'><a href='admin?page=$row[0]'>$row[1]</a> ".($subpage_texts[$row[0]] ? "&mdash; ".htmlentities($subpage_texts[$row[0]]) : "")."</li>\n";
 							}
 						}
 						print "</ul>\n";

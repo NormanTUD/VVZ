@@ -9595,4 +9595,9 @@ order by
 	#print_r($_SERVER);
 	#print "</pre>";
 	#die(1);
+
+	function print_uni_logo() {
+		$kunde_db_name = get_kunden_db_name();
+		print '<img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /> (Kundenlogo: '.$kunde_db_name.')';
+	}
 ?>

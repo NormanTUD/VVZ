@@ -6,11 +6,11 @@
 	}
 	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
-	$filename = 'index.php';
+	$filename = 'startseite';
 	include("header.php");
 ?>
 	<div id="mainindex">
-		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?></a>
 		<h2>Impressum</h2>
 		Es gilt das Impressum der <a href="<?php print $GLOBALS['impressum_university_page']; ?>"><?php print $GLOBALS['university_name']; ?></a>.
 		<h2>Rechtliches</h2>

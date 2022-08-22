@@ -128,7 +128,7 @@
 		include("header.php");
 ?>
 	<div id="main">
-		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
 		<h1>Vorlesungsverzeichnis <?php print $GLOBALS['university_name']; ?></h1>
 		<h2>Was ist das hier?</h2>
 		Diese API erlaubt automatisierte Zugriffe auf die öffentlichen Daten des Vorlesungsverzeichnis der <?php print $GLOBALS['university_name']; ?>. Über diese Schnittstelle

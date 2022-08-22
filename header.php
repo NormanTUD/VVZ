@@ -73,7 +73,7 @@
 			<title><?php print htmlentities($page_title); ?></title>
 <?php
 		}
-		if(isset($filename) && $filename == 'index.php') {
+		if(isset($filename) && $filename == 'startseite.php') {
 			css(array("foundation.min.css", "font-awesome.min.css"));
 		}
 ?>
@@ -107,7 +107,7 @@
 		if($GLOBALS['show_comic_sans']) {
 			css("comicsans.css");
 
-			if(preg_match('/index.php/', $_SERVER['SCRIPT_NAME']) && (!get_get('studiengang') || is_null(get_get('studiengang')))) {
+			if(preg_match('/startseite/', $_SERVER['SCRIPT_NAME']) && (!get_get('studiengang') || is_null(get_get('studiengang')))) {
 				css("clippy.css");
 				js("clippy.js");
 				js("merlin.js");

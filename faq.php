@@ -6,11 +6,11 @@
 	}
 	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | FAQ";
-	$filename = 'index.php';
+	$filename = 'startseite';
 	include("header.php");
 ?>
 	<div id="mainindex" style="text-align: left!important">
-		<center><a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a></center>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
 		<h1>FAQ</h1>
 		<p>FAQ steht für &raquo;frequently asked questions&laquo;, d.h. häufig-gestellte-Fragen. Über das Kontaktformular
 		häufig an uns gerichtete Fragen werden hier beantworten. <a href="kontakt.php">Zögern Sie nicht, uns zu kontaktieren, wenn Sie auch

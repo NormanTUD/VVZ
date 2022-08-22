@@ -39,7 +39,7 @@
 	$GLOBALS['metadata_shown'] = 0;
 
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
-	$filename = 'index.php';
+	$filename = 'startseite';
 	include("header.php");
 
 	$GLOBALS['linkicon'] = '<i class="fa float-right"><img alt="Link zum Studiengang" src="icon.svg" /></i>';
@@ -94,7 +94,7 @@
 	}
 ?>
 	<div id="mainindex" <?php if($GLOBALS['show_comic_sans']) { print ' class="bgaf"'; } ?>>
-		<a href="index?semester=<?php print isset($GLOBALS['this_semester'][0]) ? htmlentities($GLOBALS['this_semester'][0]) : ''; ?>&institut=<?php print isset($GLOBALS['this_institut']) ? htmlentities($GLOBALS['this_institut']) : ''; ?>" border="0"><img alt="TUD-Logo, Link zur Startseite" src="tudlogo.svg" width=300 /></a>
+	<a href="index?semester=<?php print isset($GLOBALS['this_semester'][0]) ? htmlentities($GLOBALS['this_semester'][0]) : ''; ?>&institut=<?php print isset($GLOBALS['this_institut']) ? htmlentities($GLOBALS['this_institut']) : ''; ?>" border="0"><?php print_uni_logo(); ?></a>
 		<div class="iframewarning red_giant"></div>
 
 <?php

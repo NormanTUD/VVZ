@@ -91,11 +91,11 @@
 	}
 	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | FAQ";
-	$filename = 'index.php';
+	$filename = 'startseite';
 	include("header.php");
 ?>
 	<div id="mainindex">
-		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?></a>
 		<h1>Dokumente</h1>
 <?php
 		$id = get_get('id');

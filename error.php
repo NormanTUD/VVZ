@@ -11,11 +11,11 @@
 	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
 
-	$filename = 'index.php';
+	$filename = 'startseite';
 	include_once("header.php");
 ?>
 	<div id="mainindex">
-		<a href="index.php" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
 		<h2>Fehler</h2>
 <?php
 		$status_code = $_SERVER['REDIRECT_STATUS'];
