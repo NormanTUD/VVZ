@@ -157,8 +157,12 @@
 		);
 
 
-		insert_values('pruefungstyp', array('name'), $pruefungstypen);
-		insert_values('veranstaltungstyp', array('name', 'abkuerzung'), $veranstaltungstypen);
+		if(!get_single_row_from_query("select count(*) from pruefungstyp")[0]) {
+			insert_values('pruefungstyp', array('name'), $pruefungstypen);
+		}
+		if(!get_single_row_from_query("select count(*) from veranstaltungstyp")[0]) {
+			insert_values('veranstaltungstyp', array('name', 'abkuerzung'), $veranstaltungstypen);
+		}
 
 		if(table_exists($GLOBALS['dbname'], 'users')) {
 			$query = 'SELECT username FROM `'.$GLOBALS['dbname'].'`.`users` `u` JOIN `role_to_user` `ur` ON `ur`.`user_id` = `u`.`id` WHERE `role_id` = 1';
