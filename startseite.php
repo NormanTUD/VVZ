@@ -1,6 +1,7 @@
 <?php
 	include_once("kundenkram.php");
 	$php_start = microtime(true);
+	$filename = "startseite.php";
 
 	include_once("config.php");
 	include("startseite_functions.php");
