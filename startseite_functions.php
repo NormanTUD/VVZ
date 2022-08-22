@@ -1685,9 +1685,11 @@
 					show_semester_selector();
 
 
-					$vvz_start_message = get_vvz_start_message($GLOBALS['this_institut'][0]);
-					if($vvz_start_message) {
-						print "Hinweis: <span class='orange_italic'>".htmlentities($vvz_start_message)."</span>\n";
+					if(is_array($GLOBALS["this_institut"]) && array_key_exists(0, $GLOBALS['this_institut'])) {
+						$vvz_start_message = get_vvz_start_message($GLOBALS['this_institut'][0]);
+						if($vvz_start_message) {
+							print "Hinweis: <span class='orange_italic'>".htmlentities($vvz_start_message)."</span>\n";
+						}
 					}
 ?>
 				</div>
