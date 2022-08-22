@@ -17,7 +17,7 @@
 	include("header.php");
 ?>
 	<div id="mainindex">
-		<a href="index.php?semester=<?php print isset($this_semester[0]) ? htmlentities($this_semester[0]) : ''; ?>&institut=<?php print isset($this_institut) ? htmlentities($this_institut) : ''; ?>" border="0"><img alt="TUD-Logo, Link zur Startseite"  src="tudlogo.svg" width="255" /></a>
+		<a href="startseite?semester=<?php print isset($this_semester[0]) ? htmlentities($this_semester[0]) : ''; ?>&institut=<?php print isset($this_institut) ? htmlentities($this_institut) : ''; ?>" border="0"><?php print_uni_logo(); ?></a>
 <?php
 		if(isset($GLOBALS['logged_in_user_id'])) {
 			$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]));

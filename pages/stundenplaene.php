@@ -20,7 +20,7 @@
 <?php
 			foreach ($dozenten as $id => $name) {
 	?>
-				<li><a href="index.php?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $id; ?>">Stundenplan von <?php print htmle(get_dozent_name($id)); ?></a></li>
+				<li><a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $id; ?>">Stundenplan von <?php print htmle(get_dozent_name($id)); ?></a></li>
 <?php
 			}
 ?>

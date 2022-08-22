@@ -25,7 +25,7 @@
 			if(isset($aktuelles_semester) && isset($GLOBALS['user_dozent_id'])) {
 ?>
 				<h2>Eigenen Stundenplan anzeigen</h2>
-				<a href="index.php?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>">Eigenen Stundenplan für das aktuelle Semester anzeigen</a>
+				<a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>">Eigenen Stundenplan für das aktuelle Semester anzeigen</a>
 <?php
 			}
 ?>
