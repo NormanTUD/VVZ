@@ -7906,7 +7906,6 @@ SE 1/2 oder BZW
 			$return = get_get('page');
 		} else {
 			$query = 'SELECT `id` FROM `page` WHERE `file` = '.esc($file);
-			die($query);
 			$result = rquery($query);
 
 			$return = '';
