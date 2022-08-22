@@ -1,8 +1,4 @@
 <?php
-	if((!isset($GLOBALS['setup_mode']) || !$GLOBALS['setup_mode']) && !(isset($argv) && array_key_exists(1, $argv) && $argv[1] == 'print')) {
-		exit();
-	}
-
 	$GLOBALS['databases'] = array(
 'apache_restarts' => "CREATE TABLE `apache_restarts` (
   `t` datetime DEFAULT NULL,
@@ -631,9 +627,11 @@
 		"view_veranstaltung_komplett" => "create view `view_veranstaltung_komplett` AS select `v`.`id` AS `veranstaltung_id`,`vt`.`name` AS `veranstaltung_typ`,`v`.`name` AS `veranstaltung_name`,`v`.`gebaeudewunsch_id` AS `gebaeudewunsch_id`,`v`.`gebaeude_id` AS `gebaeude_id`,`v`.`raummeldung` AS `raummeldung`,`v`.`raumwunsch_id` AS `raumwunsch_id`,`v`.`raum_id` AS `raum_id`,`d`.`id` AS `dozent_id`,`d`.`first_name` AS `first_name`,`d`.`last_name` AS `last_name`,`vt`.`name` AS `name`,`vm`.`wochentag` AS `wochentag`,`vm`.`stunde` AS `stunde`,`vm`.`woche` AS `woche`,`v`.`semester_id` AS `semester_id`,`vm`.`erster_termin` AS `erster_termin`,`vm`.`hinweis` AS `hinweis` from (((`veranstaltung` `v` left join `dozent` `d` on(`v`.`dozent_id` = `d`.`id`)) left join `veranstaltungstyp` `vt` on(`vt`.`id` = `v`.`veranstaltungstyp_id`)) left join `veranstaltung_metadaten` `vm` on(`vm`.`veranstaltung_id` = `v`.`id`));"
 	);
 
+/*
 	if(isset($argv) && array_key_exists(1, $argv) && $argv[1] == 'print') {
 		foreach ($GLOBALS['databases'] as $key => $value) {
 			print "$value\n";
 		}
 	}
+*/
 ?>
