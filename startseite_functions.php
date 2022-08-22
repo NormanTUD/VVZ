@@ -1712,10 +1712,15 @@
 				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]);
 			}
 
-			if(!$GLOBALS['user_role_id'][0]) {
-				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account hat keine ihm zugeordnete Rolle! !!!</span>';
+			try {
+				if(!$GLOBALS['user_role_id'][0]) {
+					$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account hat keine ihm zugeordnete Rolle! !!!</span>';
+				}
+			} catch (\Throwable $e) {
+				print $e;
+				dier($GLOBALS["user_role_id"]);
 			}
-?>
+	?>
 			<br />Willkommen, <?php print $dozent_name; ?>! &mdash; <a class="red_large" href="logout.php">Abmelden</a>
 <?php
 		}

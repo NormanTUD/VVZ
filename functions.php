@@ -182,6 +182,7 @@ declare(ticks=1);
 			$GLOBALS['user_dozent_id'] = $row[2];
 			$GLOBALS['user_institut_id'] = $row[3];
 			$GLOBALS['user_role_id'] = get_role_id_by_user($row[0]);
+#dier($GLOBALS['user_role_id']);
 			$GLOBALS['this_semester_id'] = get_and_create_this_semester();
 			$GLOBALS['accepted_public_data'] = $row[4];
 		}
@@ -2472,21 +2473,14 @@ declare(ticks=1);
 	}
 
 	function get_role_id_by_user ($name) {
-		$key = "get_role_id_by_user($name)";
-		if(array_key_exists($key, $GLOBALS['memoize'])) {
-			$return = $GLOBALS['memoize'][$key];
-		} else {
-			$query = 'SELECT `role_id` FROM `role_to_user` `ru` LEFT JOIN `users` `u` ON `ru`.`user_id` = `u`.`id` WHERE `u`.`id` = '.esc($name);
-			$result = rquery($query);
+		$query = 'SELECT `role_id` FROM `role_to_user` `ru` LEFT JOIN `users` `u` ON `ru`.`user_id` = `u`.`id` WHERE `u`.`id` = '.esc($name);
+		$result = rquery($query);
 
-			$return = NULL;
+		$return = NULL;
 
-			while ($row = mysqli_fetch_row($result)) {
-				$return = $row[0];
-			}
-			$GLOBALS['memoize'][$key] = $return;
+		while ($row = mysqli_fetch_row($result)) {
+			$return = $row[0];
 		}
-
 		return $return;
 	}
 

@@ -63,17 +63,6 @@
 			rquery("insert into institut VALUES (1, ".esc($default_institut_name).", 1);");
 		}
 
-		if(!get_single_row_from_query("select count(*) from users")[0]) {
-			$salt = generate_random_string(100);
-			$default_username = "Admin";
-			$default_password = "test";
-			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
-			$result = rquery($query);
-			if($result) {
-				set_session_id(1);
-			}
-		}
-
 		if(!get_single_row_from_query("select count(*) from role")[0]) {
 			rquery("insert into role values ('1', 'Administrator', 'Darf alles');");
 			rquery("insert into role values ('2', 'Dozent', 'Darf eigene Sachen bearbeiten');");
@@ -82,6 +71,21 @@
 			rquery("insert into role values ('5', 'Verwalter', 'Darf auf Statistiken und Veranstaltungen zugreifen');");
 			rquery("insert into role values ('6', 'Studienverwalter', 'Darf Studiengange und Prüfungsnummern editieren');");
 			rquery("insert into role values ('7', 'Raumplanungsverwalter', 'Darf alles was der Verwalter darf + Raumplanung');");
+		}
+
+		if(!get_single_row_from_query("select count(*) from users")[0]) {
+			$salt = generate_random_string(100);
+			$default_username = "Admin";
+			$default_password = "test";
+			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
+			$result = rquery($query);
+
+			if($result) {
+				set_session_id(1);
+			}
+
+			$query = "insert into role_to_user (role_id, user_id) values (1, 1)";
+			rquery($query);
 		}
 
 		if(!get_single_row_from_query("select count(*) from page")[0]) {
