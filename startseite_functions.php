@@ -982,7 +982,7 @@
 				<input type="submit" value="Auswählen" />
 			</form>
 <?php
-			$generierter_stundenplan = create_stundenplan(get_get('veranstaltung'), 1, 1, get_get('bereich'), 0, get_get('studiengang'), get_get('dozent'), get_get('semester'));
+			$generierter_stundenplan = create_stundenplan(get_get('veranstaltung') ?? [], 1, 1, get_get('bereich'), 0, get_get('studiengang'), get_get('dozent'), get_get('semester'));
 			print $generierter_stundenplan[0];
 ?>
 		</div>

@@ -10,7 +10,7 @@
 		$veranstaltung_id = get_get('id');
 		$institut_id = null;
 		$stunden = create_stunden_array();
-		if(!preg_match('/^\d+$/', $veranstaltung_id)) {
+		if(!preg_match('/^\d+$/', $veranstaltung_id ?? "")) {
 			$veranstaltung_id = null;
 		}
 

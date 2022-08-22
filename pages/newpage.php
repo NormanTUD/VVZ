@@ -81,8 +81,8 @@
 										print "<input $tchecked type='checkbox' value='$rolle_id' name='role_to_page[]' />".htmle($rolle_name)."<br />";
 									}
 								?></td>
-								<td><textarea name="beschreibung"><?php print htmlentities($beschreibung); ?></textarea></td>
-								<td><textarea name="hinweis"><?php print htmlentities($hinweis); ?></textarea></td>
+								<td><textarea name="beschreibung"><?php print htmlentities($beschreibung ?? ""); ?></textarea></td>
+								<td><textarea name="hinweis"><?php print htmlentities($hinweis ?? ""); ?></textarea></td>
 								<td><input type="submit" value="Speichern" /></td>
 								<td><input type="submit" name="delete" value="Löschen" /></td>
 							</tr>

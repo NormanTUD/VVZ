@@ -4983,7 +4983,7 @@ INSERT INTO
 						} else {
 							if($i == 0) {
 ?>
-								<input type="hidden" value="<?php print htmlentities($row[0]); ?>" name="<?php print htmlentities($datanames[0]); ?>" />
+								<input type="hidden" value="<?php print htmlentities($row[0] ?? ""); ?>" name="<?php print htmlentities($datanames[0] ?? ""); ?>" />
 <?php
 							} else {
 								if($columnnames[$i - 1] == "ausgeschieden") {
@@ -5000,21 +5000,21 @@ INSERT INTO
 <?php
 								} else if($columnnames[$i - 1] == "erste_veranstaltung_default") {
 ?>
-	<td><input type="text" placeholder="erster_termin" name="erster_termin" class="datepicker" value="<?php print ($htmlentities ? htmlentities($row[$i]) : $row[$i]); ?>" /></td>
+	<td><input type="text" placeholder="erster_termin" name="erster_termin" class="datepicker" value="<?php print ($htmlentities ? htmlentities($row[$i] ?? "") : $row[$i]); ?>" /></td>
 <?php
 								} else if($columnnames[$i - 1] == "typ" && $table == 'semester') {
 									//<td><?php create_select(create_semester_type_array(), $row[$i], 'typ'); ? ></td>
 ?>
-									<td><?php print htmlentities($row[$i]); ?></td>
+									<td><?php print htmlentities($row[$i] ?? ""); ?></td>
 <?php
 								} else if($columnnames[$i - 1] == "jahr" && $table == 'semester') {
 									//<td><?php create_select(create_semester_type_array(), $row[$i], 'typ'); ? ></td>
 ?>
-									<td><?php print htmlentities($row[$i]); ?></td>
+									<td><?php print htmlentities($row[$i] ?? ""); ?></td>
 <?php
 								} else {
 ?>
-									<td><input class="width500px" type="<?php print $c == 'password' ? 'password' : 'text'; ?>" name="<?php print $c; ?>" placeholder="<?php print $c; ?>" value="<?php print $c == 'password' ? '' : ($htmlentities ? htmlentities($row[$i]) : $row[$i]); ?>" /></td>
+									<td><input class="width500px" type="<?php print $c == 'password' ? 'password' : 'text'; ?>" name="<?php print $c; ?>" placeholder="<?php print $c; ?>" value="<?php print $c == 'password' ? '' : ($htmlentities ? htmlentities($row[$i] ?? "") : $row[$i]); ?>" /></td>
 <?php
 								}
 							}
@@ -5538,7 +5538,7 @@ INSERT INTO
 				$str .= "</tr>\n";
 			}
 			$str .= "<tbody>\n";
-			$str .= '<input type="hidden" value="'.htmlentities(get_get('studiengang')).'" name="studiengang">';
+			$str .= '<input type="hidden" value="'.htmlentities(get_get('studiengang') ?? "").'" name="studiengang">';
 			$str .= "</table><input id='submit_button_aenderungen' class='display_none' type='submit' value='&Auml;nderungen speichern'></form>\n";
 
 			$datum = date("d.m.Y");
@@ -5589,6 +5589,8 @@ INSERT INTO
 				$str .= "</table>\n";
 			}
 
+			$shown_pruefungen = array();
+
 			if($show_pruefungsleistungen && count($veranstaltungen)) {
 				$pruefungsliste_gezeigt = 1;
 				$veranstaltungen = array_unique($veranstaltungen);
@@ -5626,7 +5628,6 @@ INSERT INTO
 				$modul_name = '';
 				$veranstaltung_name = '';
 				$c = 0;
-				$shown_pruefungen = array();
 				while ($row = mysqli_fetch_row($result)) {
 					$shown_pruefungen[] = $row[0];
 					if($row[4] == '00.00.0000') {
