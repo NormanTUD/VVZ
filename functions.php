@@ -200,13 +200,14 @@ declare(ticks=1);
 		setcookie('session_id', $session_id, time() + 86400, "/");
 	}
 
+	dier(get_kunden_db_name());
 	if(!$GLOBALS['setup_mode'] && get_kunden_db_name() != "startpage") {
 		if(get_post('try_login')) {
 			$GLOBALS['logged_in_was_tried'] = 1;
 		}
 
 		if(get_cookie('session_id')) {
-			delete_old_session_ids();
+			#delete_old_session_ids();
 			$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `session_id` = '.esc($_COOKIE['session_id']).' AND `enabled` = "1"';
 			$result = rquery($query);
 			while ($row = mysqli_fetch_row($result)) {
@@ -215,7 +216,7 @@ declare(ticks=1);
 		}
 
 		if (!$GLOBALS['logged_in'] && get_post('username') && get_post('password')) {
-			delete_old_session_ids();
+			#delete_old_session_ids();
 			$GLOBALS['logged_in_was_tried'] = 1;
 			$user = $_POST['username'];
 			$possible_user_id = get_user_id($user);
@@ -2085,9 +2086,13 @@ declare(ticks=1);
 			$headers = '';
 			$headers .= "From:" . $from."\r\n";
 
-			$fp = fsockopen("localhost", 25, $errno, $errstr, 5);
-			if($fp && mail($GLOBALS['admin_email'], $subject, $message, $headers)) {
-				$GLOBALS['messageerror'] = 'Die Administration ist informiert worden.';
+			try {
+				$fp = fsockopen("localhost", 25, $errno, $errstr, 5);
+				if($fp && mail($GLOBALS['admin_email'], $subject, $message, $headers)) {
+					$GLOBALS['messageerror'] = 'Die Administration ist informiert worden.';
+				}
+			} catch (\Throwable $e) {
+				print "No mail server";
 			}
 
 			include("error.php");
