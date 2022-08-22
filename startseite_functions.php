@@ -69,7 +69,7 @@
 	function stundenplanerstellung_link () {
 		if(studiengang_has_semester_modul_data(get_get('studiengang'))) {
 ?>
-			&mdash; <a id="create_stundenplan_link" href="index.php?create_stundenplan=1<?php
+			&mdash; <a id="create_stundenplan_link" href="startseite?create_stundenplan=1<?php
 				if(get_get('studiengang') != 'alle') {
 					print '&studiengang='.htmlentities(get_get('studiengang'));
 				}
@@ -919,7 +919,7 @@
 		if(get_get('studiengang') != 'alle') {
 ?>
 			<br />
-			<a id="fuer_diesen_studiengang_pruefungen_anzeigen" href="index.php?studiengang=<?php print htmlentities(get_get('studiengang')); ?>&show_pruefungen=1&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>"><i>Die für diesen Studiengang möglichen Prüfungen anzeigen.</i></a>
+			<a id="fuer_diesen_studiengang_pruefungen_anzeigen" href="startseite?studiengang=<?php print htmlentities(get_get('studiengang')); ?>&show_pruefungen=1&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>"><i>Die für diesen Studiengang möglichen Prüfungen anzeigen.</i></a>
 <?php
 		}
 	}
@@ -1191,7 +1191,7 @@
 ?>
 			<div class="row">
 				<div class="medium-4 medium-centered columns text-center">
-					<a href="index.php?create_stundenplan=1&studiengang=<?php print $this_studiengang[0]; ?>">
+					<a href="startseite?create_stundenplan=1&studiengang=<?php print $this_studiengang[0]; ?>">
 						<div class="callout primary">
 							<?php print $GLOBALS['linkicon']; ?>
 							<h4><?php print $this_studiengang[1]; ?></h4>
@@ -1396,7 +1396,7 @@
 ?>
 					<span class="display_none" id="pn_modul_<?php print htmlentities($this_pruefungsnummer[6]); ?>"><?php print htmlentities($this_modul[0]); ?></span>
 <?php
-					print "<a href='index.php?semester=".$GLOBALS['this_semester'][0]."&institut=".$GLOBALS['this_institut']."&studiengang=alle&pruefungsnummer_id=$this_pruefungsnummer[0]'>$str_pruefungen</a>$pruefung_already_done_string\n";
+					print "<a href='startseite?semester=".$GLOBALS['this_semester'][0]."&institut=".$GLOBALS['this_institut']."&studiengang=alle&pruefungsnummer_id=$this_pruefungsnummer[0]'>$str_pruefungen</a>$pruefung_already_done_string\n";
 ?><br />
 					<div class="height_10px"></div>
 <?php
@@ -1541,7 +1541,7 @@
 	function show_veranstaltungen_uebersicht () {
 		show_filter($GLOBALS['this_institut'], $GLOBALS['this_semester']);
 ?>
-		<form method="get" action="index.php">
+		<form method="get" action="startseite">
 <?php
 			$wochentag_abk_nach_name = create_wochentag_abk_nach_name_array();
 
@@ -1602,14 +1602,14 @@
 ?>
 			<div class="row">
 				<div class="<?php print $width_determining_class; ?> medium-centered columns">
-				<a href="index.php?studiengang=alle&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
+				<a href="startseite?studiengang=alle&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
 						<div id="alle_lehrveranstaltungen" class="callout alert text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Lehrveranstaltungen</h4></div>
 					</a>
 				</div>
 			</div>
 			<div class="row">
 				<div class="<?php print $width_determining_class; ?> medium-centered columns">
-				<a href="index.php?alle_pruefungsnummern=1&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
+				<a href="startseite?alle_pruefungsnummern=1&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
 						<div id="alle_pruefungsleistungen_anzeigen" class="callout allepls text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Prüfungsleistungen anzeigen</h4></div>
 					</a>
 				</div>
@@ -1631,7 +1631,7 @@
 ?>
 			<div class="row">
 				<div <?php print $divid ? "id='$divid'" : ''; ?> class="<?php print $width_determining_class; ?> medium-centered columns text-center">
-					<a href="index.php?studiengang=<?php print $this_studiengang_id; ?>&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
+					<a href="startseite?studiengang=<?php print $this_studiengang_id; ?>&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
 						<div class="callout primary"><?php print $GLOBALS['linkicon']; ?><h4><?php
 							if($this_studiengang_name[1] == "Werkstatt Philosophie") {
 								print "&#128295; ";

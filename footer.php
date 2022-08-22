@@ -5,7 +5,7 @@
 	}
 	$this_page_file = ($_SERVER['REQUEST_URI']);
 	if(preg_match('/\/(\?.*)?$/', $this_page_file)) {
-		$this_page_file = 'index.php';
+		$this_page_file = 'startseite.php';
 
 	}
 	$this_page_file = basename($this_page_file);
