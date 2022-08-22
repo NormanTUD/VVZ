@@ -1,4 +1,5 @@
 <?php
+	$GLOBALS["error_page_shown"] = 0;
 	function get_kunden_db_name() {
 		if(array_key_exists("new_uni_name", $_GET)) {
 			print "Die neue Uni wird erstellt. Bitte warten";

@@ -4,6 +4,9 @@
 		exit(0);
 	}
 	$this_page_file = ($_SERVER['REQUEST_URI']);
+
+	$redirect_status = array_key_exists("REDIRECT_STATUS", $_SERVER) ? $_SERVER['REDIRECT_STATUS'] : null;
+
 	if(preg_match('/\/(\?.*)?$/', $this_page_file)) {
 		$this_page_file = 'startseite.php';
 
@@ -27,26 +30,29 @@
 ?>
 	<i>
 <?php
-	$c = 0;
-	foreach ($sites as $url => $site_data) {
-		$name = $site_data['name'];
-		$id = $site_data['id'];
-		if(!($url == 'faq' && !faq_has_entry())) {
-			if($url == $this_page_file) {
-?>
-				<b><a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a></b>
-<?php
+	dier(get_kunden_db_name());
+	if(get_kunden_db_name() != "startpage") {
+		$c = 0;
+		foreach ($sites as $url => $site_data) {
+			$name = $site_data['name'];
+			$id = $site_data['id'];
+			if(!($url == 'faq' && !faq_has_entry())) {
+				if($url == $this_page_file) {
+	?>
+					<b><a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a></b>
+	<?php
+				} else {
+	?>
+					<a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a>
+	<?php
+				}
+				$c++;
+				if($c != count($sites)) {
+					print " / ";
+				}
 			} else {
-?>
-				<a id="<?php print $id; ?>" href="vvz_<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a>
-<?php
+				$c++;
 			}
-			$c++;
-			if($c != count($sites)) {
-				print " / ";
-			}
-		} else {
-			$c++;
 		}
 	}
 ?>

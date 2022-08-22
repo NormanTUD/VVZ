@@ -11,6 +11,7 @@
 	include("startseite_functions.php");
 	include_once("functions.php");
 
+
 	if(get_kunden_db_name() == "startpage") {
 		print "<h2>VVZ-Startseite</h2>";
 		print "Aktuelle Instanzen:<br>";

@@ -101,7 +101,7 @@
 			}
 		?>
 <?php
-		if($GLOBALS['logged_in_user_id']) {
+		if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id']) {
 			js(array("loggedin.js"));
 		}
 		if($GLOBALS['show_comic_sans']) {

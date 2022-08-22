@@ -18,7 +18,7 @@
 		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
 		<h2>Fehler</h2>
 <?php
-		$status_code = $_SERVER['REDIRECT_STATUS'];
+		$status_code = array_key_exists("REDIRECT_STATUS", $_SERVER) ? $_SERVER['REDIRECT_STATUS'] : null;
 		if($status_code) {
 ?>
 			Es ist ein Fehler aufgetreten. Der Status-Code lautet <?php print htmlentities($status_code); ?>.

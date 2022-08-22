@@ -168,6 +168,7 @@ declare(ticks=1);
 	}
 
 	rquery("SET NAMES utf8");
+	dier(get_kunde_name());
 
 	/* Login-Kram */
 	$GLOBALS['logged_in_was_tried'] = 0;
@@ -192,7 +193,7 @@ declare(ticks=1);
 	}
 
 	function set_session_id ($user_id) {
-		delete_old_session_ids($GLOBALS['logged_in_user_id']);
+		//delete_old_session_ids($GLOBALS['logged_in_user_id']);
 		$session_id = generate_random_string(1024);
 		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
 		rquery($query);
@@ -200,7 +201,6 @@ declare(ticks=1);
 		setcookie('session_id', $session_id, time() + 86400, "/");
 	}
 
-	dier(get_kunden_db_name());
 	if(!$GLOBALS['setup_mode'] && get_kunden_db_name() != "startpage") {
 		if(get_post('try_login')) {
 			$GLOBALS['logged_in_was_tried'] = 1;
@@ -231,7 +231,7 @@ declare(ticks=1);
 			}
 		}
 
-		if($GLOBALS['logged_in_user_id'] && basename($_SERVER['SCRIPT_NAME']) == 'admin.php') {
+		if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id'] && basename($_SERVER['SCRIPT_NAME']) == 'admin.php') {
 			$query = 'SELECT `name`, `file`, `page_id`, `show_in_navigation`, `parent` FROM `view_account_to_role_pages` WHERE `user_id` = '.esc($GLOBALS['logged_in_user_id']).' ORDER BY `parent`, `name`';
 			$result = rquery($query);
 
@@ -2092,7 +2092,7 @@ declare(ticks=1);
 					$GLOBALS['messageerror'] = 'Die Administration ist informiert worden.';
 				}
 			} catch (\Throwable $e) {
-				print "No mail server";
+				//stderrw("No mail server");
 			}
 
 			include("error.php");
