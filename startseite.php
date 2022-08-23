@@ -16,7 +16,7 @@
 		$result = rquery($query);
 
 		print "<h2>VVZ-Startseite</h2>";
-		print "<a href='?new_uni_name=".generate_random_string(30)."'><button>Demo ausprobieren</button></a>";
+		print "<a href='?new_uni_name=".generate_random_string(30)."'><button>Sofort eine kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>";
 		print "<br><br>Aktuelle Instanzen:<br>";
 		print "<ul>";
 		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
@@ -25,7 +25,7 @@
 			$kunde_name = $db_name;
 			$kunde_name = preg_replace("/^db_vvz_/", "", $kunde_name);
 
-			print "<li><a href='/vvz_$kunde_name'>$kunde_name</a></li>";
+			print "<li><a href='/v/$kunde_name/'>$kunde_name</a></li>";
 		}
 		print "</ul>";
 

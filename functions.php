@@ -9643,7 +9643,7 @@ order by
 				$query = "select now() - installation_date from ".$row[0].".instance_config where plan_id = 1";
 				$seconds_diff = get_single_row_from_query($query);
 				if($seconds_diff) {
-					if($seconds_diff > 86400) {
+					if($seconds_diff > 7 * 86400) {
 						$drop = 1;
 					}
 				} else {

@@ -90,15 +90,31 @@
 				}
 			}
 		}
+
+		if($d) {
+			if($d == 1) {
+				return "$d Tag, $h Stunden";
+			}
+			return "$d Tage, $h Stunden";
+		}
+
 		if($h) {
-			return "$h Stunden und $m Minuten";
+			if($h == 1) {
+				return "$h Stunde und $m Minuten";
+			} else {
+				return "$h Stunden und $m Minuten";
+			}
 		}
 
 		if($m) {
 			return "$m Minuten und $s Sekunden";
 		}
 
-		return "$s Sekunden";
+		if($s == 1) {
+			return "$s Sekunde";
+		} else {
+			return "$s Sekunden";
+		}
 	}
 	
 	function get_kunde_plan () {
@@ -108,9 +124,9 @@
 
 	function get_demo_expiry_time() {
 		if(get_kunde_plan() == "Demo") {
-			$ablauftimer = get_single_row_from_query("select now() - installation_date from ".get_kunden_db_name().".instance_config");
-			$ablauftimer = seconds2human(86400 - $ablauftimer);
-			return "<br><span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 24 Stunden gelöscht.<br>Ihnen verbleiden noch ".$ablauftimer." zum Testen.</span><br>";
+			$installation_age = get_single_row_from_query("select now() - installation_date from ".get_kunden_db_name().".instance_config");
+			$ablauftimer = seconds2human((86400 * 7) - $installation_age);
+			return "<br><span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiden noch ".$ablauftimer." zum Testen.</span><br>";
 		}
 		return "";
 	}
