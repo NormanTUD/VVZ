@@ -19,8 +19,6 @@
 		if(!database_exists($GLOBALS["dbname"])) {
 			print "Die neue Uni wird erstellt. Bitte warten";
 			flush();
-			print '<meta http-equiv="refresh" content="0; url=startseite" />';
-			flush();
 			exit;
 		}
 		rquery('use `'.$GLOBALS['dbname'].'`');
