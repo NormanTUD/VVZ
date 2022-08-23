@@ -2009,19 +2009,6 @@ declare(ticks=1);
 		return $result;
 	}
 
-	function esc ($parameter) { 
-		if(!is_array($parameter)) { // Kein array
-			if(isset($parameter) && strlen($parameter)) {
-				return '"'.mysqli_real_escape_string($GLOBALS['dbh'], $parameter).'"';
-			} else {
-				return 'NULL';
-			}
-		} else { // Array
-			$str = join(', ', array_map('esc', array_map('my_mysqli_real_escape_string', $parameter)));
-			return $str;
-		}
-	}
-
 	function my_mysqli_real_escape_string ($arg) {
 		return mysqli_real_escape_string($GLOBALS['dbh'], $arg);
 	}
@@ -2176,14 +2163,6 @@ declare(ticks=1);
 	function get_get ($name) {
 		if(array_key_exists($name, $_GET)) {
 			return $_GET[$name];
-		} else {
-			return NULL;
-		}
-	}
-
-	function get_post ($name) {
-		if(array_key_exists($name, $_POST)) {
-			return $_POST[$name];
 		} else {
 			return NULL;
 		}

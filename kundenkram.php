@@ -1,6 +1,33 @@
 <?php
 	$GLOBALS["error_page_shown"] = 0;
 
+	include_once("config.php");
+	include_once("mysql.php");
+
+	function esc ($parameter) { 
+		if(!is_array($parameter)) { // Kein array
+			if(isset($parameter) && strlen($parameter)) {
+				return '"'.mysqli_real_escape_string($GLOBALS['dbh'], $parameter).'"';
+			} else {
+				return 'NULL';
+			}
+		} else { // Array
+			$str = join(', ', array_map('esc', array_map('my_mysqli_real_escape_string', $parameter)));
+			return $str;
+		}
+	}
+
+
+
+	function get_post ($name) {
+		if(array_key_exists($name, $_POST)) {
+			return $_POST[$name];
+		} else {
+			return NULL;
+		}
+	}
+
+
 	function get_kunde_id_by_db_name ($dbn) {
 		$query = "select kunde_id from instance_config where dbname = ".esc($dbn);
 		return get_single_row_from_query($query);
@@ -134,5 +161,23 @@
 			return "<br><span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiden noch ".$ablauftimer." zum Testen.</span><br>";
 		}
 		return "";
+	}
+
+	function kunde_is_personalized ($id) {
+		$query = "select personalized from kundendaten where id = ".esc($id);
+		return get_single_row_from_query($query);
+	}
+
+	function update_kunde ($id, $anrede, $firma, $kundename, $kundestrasse, $kundeplz, $kundeort) {
+		$query = 'update kundendaten set anrede = '.esc($anrede).', firma = '.esc($firma).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1';
+		rquery($query);
+	}
+
+	if(get_post("update_kunde_data")) {
+		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+
+		if($id && get_post("anrede") && get_post("firma") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort")) {
+			update_kunde($id, "anrede", "firma", "kundename", "kundestrasse", "kundeplz", "kundeort");
+		}
 	}
 ?>
