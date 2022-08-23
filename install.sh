@@ -133,7 +133,7 @@ service apache2 restart
 #curl "http://$LOCAL_IP/" --data-raw "username=$ADMIN_USERNAME&password=$ADMIN_PASSWORD" 2>&1 > /dev/null
 curl "http://$LOCAL_IP/"
 
-apt-get install latexmk texlive imagemagick -y
+apt-get install latexmk texlive imagemagick texlive-lang-german -y
 
 touch /etc/hardcore_debugging
 
