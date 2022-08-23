@@ -974,3 +974,8 @@ a, a:visited, a:hover, a:active {
 *:focus {
 	outline: 2px dashed red;
 }
+
+.demo_string {
+	color: red;
+	white-space:nowrap;
+}

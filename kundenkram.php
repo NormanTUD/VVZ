@@ -51,4 +51,51 @@
 		#	return "v/$n/";
 		#}
 	}
+
+	function seconds2human($ss) {
+		$s = $ss%60;
+		$m = floor(($ss%3600)/60);
+		$h = floor(($ss%86400)/3600);
+		$d = floor(($ss%2592000)/86400);
+		$M = floor($ss/2592000);
+
+		if($M) {
+			if($M == 1) {
+				if($d) {
+					return "$M Monat und $d Tage";
+				} else {
+					return "$M Monat";
+				}
+			} else {
+				if($d) {
+					return "$M Monate und $d Tage";
+				} else {
+					return "$M Monate";
+				}
+			}
+		}
+		if($h) {
+			return "$h Stunden und $m Minuten";
+		}
+
+		if($m) {
+			return "$m Minuten und $s Sekunden";
+		}
+
+		return "$s Sekunden";
+	}
+	
+	function get_kunde_plan () {
+		$query = "select p.name from ".get_kunden_db_name().".instance_config ic left join plan p on ic.plan_id = p.id";
+		return get_single_row_from_query($query);
+	}
+
+	function get_demo_expiry_time() {
+		if(get_kunde_plan() == "Demo") {
+			$ablauftimer = get_single_row_from_query("select now() - installation_date from ".get_kunden_db_name().".instance_config");
+			$ablauftimer = seconds2human(86400 - $ablauftimer);
+			return "<br><span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 24 Stunden gelöscht. Ihnen verbleiden noch ".$ablauftimer." zum Testen.</span><br>";
+		}
+		return "";
+	}
 ?>

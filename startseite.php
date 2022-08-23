@@ -102,9 +102,11 @@
 		<div class="iframewarning red_giant"></div>
 
 <?php
+		print get_demo_expiry_time();
 		logged_in_stuff();
 
 		show_header_startseite();
+
 
 		console_browser_stuff();
 
