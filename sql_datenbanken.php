@@ -1,5 +1,16 @@
 <?php
 	$GLOBALS['databases'] = array(
+'rechnungen' => "create database rechnungen (
+	id int auto_increment,
+	datum DATETIME,
+	zahlungszyklus_monate int default 1,
+	plan_id int,
+	eingegangen DATETIME,
+	rabatt int,
+	spezialpreis int,
+	CONSTRAINT `plan_id` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+",
 'plan' => "CREATE TABLE plan (
 	id int primary key AUTO_INCREMENT,
 	name varchar(100),
