@@ -68,7 +68,7 @@
 		if(!get_single_row_from_query("select count(*) from instance_config")[0]) {
 			$name = $_SERVER["REDIRECT_SFURI"] ?? get_kunden_db_name();
 			$shortlink = $name;
-			rquery("insert into `instance_config` (name, shortlink, plan_id) VALUES (".esc($name).", ".esc($shortlink).", 1)");
+			rquery("insert into `instance_config` (name, shortlink, plan_id, dbname) VALUES (".esc($name).", ".esc($shortlink).", 1, ".esc($GLOBALS['dbname']).")");
 		}
 
 		if(!get_single_row_from_query("select count(*) from dozent")[0]) {
