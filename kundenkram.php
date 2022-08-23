@@ -5,6 +5,16 @@
 
 	include_once("mysql.php");
 
+	function get_get ($name) {
+		if(array_key_exists($name, $_GET)) {
+			return $_GET[$name];
+		} else {
+			return NULL;
+		}
+	}
+
+
+
 	function get_single_row_from_result ($result, $default = NULL) {
 		$id = $default;
 		while ($row = mysqli_fetch_row($result)) {
@@ -237,6 +247,42 @@
 		rquery($query);
 	}
 
+	function get_plan_id($name) {
+		$plan_id = null;
+		switch($name) {
+			case 'demo':
+				$plan_id = 1;
+				break;
+			case 'basic_faculty':
+				$plan_id = 2;
+				break;
+			case 'basic_university':
+				$plan_id = 3;
+				break;
+			case 'pro_faculty':
+				$plan_id = 4;
+				break;
+			case 'pro_university':
+				$plan_id = 5;
+				break;
+			default:
+				die("Unknown plan: ".get_get("product"));
+				break;
+		}
+
+		return $plan_id;
+	}
+
+	function get_plan_price_by_name($name) {
+		$plan_id = get_plan_id($name);
+
+		$monatlich_query = "select monatliche_zahlung from plan where id = ".esc($plan_id);
+		$monatlich = get_single_row_from_query($monatlich_query);
+		$jaehrlich = get_single_row_from_query("select jaehrliche_zahlung from plan where id = ".esc($plan_id));
+
+		return [$monatlich, $jaehrlich];
+	}
+
 	if(get_post("update_kunde_data")) {
 		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
@@ -251,5 +297,9 @@
 		if(get_post("daten_uebernehmen")) {
 
 		}
+	}
+
+	if(get_get("product")) {
+
 	}
 ?>

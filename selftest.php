@@ -60,9 +60,11 @@
 		}
 
 		if(!get_single_row_from_query("select count(*) from plan ")[0]) {
-			rquery("insert into `plan` (name, monatliche_zahlung) VALUES ('Demo', 0)");
-			rquery("insert into `plan` (name, monatliche_zahlung) VALUES ('Starter', 39.99)");
-			rquery("insert into `plan` (name, monatliche_zahlung) VALUES ('Pro', 49.99)");
+			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Demo', 0, 0)");
+			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic Faculity', 50, 500)");
+			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic University', 80, 800)");
+			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 80, 800)");
+			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 120, 1100)");
 		}
 
 		if(!get_single_row_from_query("select count(*) from instance_config")[0]) {

@@ -15,7 +15,8 @@
 'plan' => 'CREATE TABLE plan (
 	id int unsigned auto_increment primary key,
 	name varchar(100),
-	monatliche_zahlung float(2)
+	monatliche_zahlung float(2),
+	jaehrliche_zahlung float(2)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8',
 
 'rechnungen' => "create table rechnungen (

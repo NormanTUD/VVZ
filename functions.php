@@ -2109,15 +2109,6 @@ declare(ticks=1);
 		}
 	}
 
-	// Die get_-Funktionen sollen häßliche Konstrukte mit array_key_exists($bla, $_POST) vermeiden.
-	function get_get ($name) {
-		if(array_key_exists($name, $_GET)) {
-			return $_GET[$name];
-		} else {
-			return NULL;
-		}
-	}
-
 	function generate_random_string ($length = 50) {
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$charactersLength = strlen($characters);
