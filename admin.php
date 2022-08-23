@@ -147,7 +147,7 @@
 <?php
 			}
 ?>
-			Willkommen, <?php print $dozent_name; ?>!
+		Willkommen, <?php print $dozent_name; ?>! <?php print get_demo_expiry_time(); ?>
 <?php
 			if(get_post('password') == 'test' && get_post('try_login')) {
 ?>
