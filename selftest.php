@@ -16,6 +16,13 @@
 
                 rquery('SET foreign_key_checks = 0');
 
+		if(!database_exists($GLOBALS["dbname"])) {
+			print "Die neue Uni wird erstellt. Bitte warten";
+			flush();
+			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
+			flush();
+			exit;
+		}
 		rquery('use `'.$GLOBALS['dbname'].'`');
 
                 foreach ($tables as $this_table => $create_query) {
