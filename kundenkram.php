@@ -232,7 +232,7 @@
 		if(get_kunde_plan() == "Demo") {
 			$installation_age = get_single_row_from_query("select now() - installation_date from ".get_kunden_db_name().".instance_config");
 			$ablauftimer = seconds2human((86400 * 7) - $installation_age);
-			return "<br><span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiden noch ".$ablauftimer." zum Testen.</span><br>";
+			return "<br><span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiden noch ".$ablauftimer." zum Testen.<br>Der Standardnutzer ist <tt>Admin</tt>/<tt>test</tt></span><br>";
 		}
 		return "";
 	}
