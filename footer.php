@@ -19,12 +19,11 @@
 		'api' => array("name" => 'API', "id" => 'api_link'),
 		'admin' => array("name" => 'Administration', "id" => 'admin_link'),
 		'dokumente' => array("name" => 'Dokumente', "id" => 'dokumente_link'),
-		//'rechtliches' => array("name" => 'Rechtliches', "id" => 'rechtliches_link'),
 		'impressum' => array("name" => 'Impressum', "id" => 'impressum_link'),
 		'zeitraster' => array("name" => "Zeitraster", "id" => "zeitraster"),
 		'faq' => array("name" => 'FAQ', "id" => 'faq_link'),
 		'front.pdf' => array("name" => 'Dokumentation', "id" => 'doku_link'),
-		#'simpsons' => array("name" => 'Die Simpsons', "id" => 'simpsons'),
+		"change_plan" => array("name" => "Business-Plan ändern", "id" => "change_plan"),
 		'kontakt' => array("name" => 'Kontakt', "id" => 'kontakt_link')
 	);
 ?>

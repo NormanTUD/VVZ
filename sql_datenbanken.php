@@ -2,7 +2,8 @@
 	$GLOBALS['databases'] = array(
 'plan' => "CREATE TABLE plan (
 	id int primary key AUTO_INCREMENT,
-	name varchar(100)
+	name varchar(100),
+	monatliche_zahlung float(2)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ",
 'instance_config' => "CREATE TABLE `instance_config` (
