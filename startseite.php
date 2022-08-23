@@ -10,6 +10,7 @@
 	delete_demo();
 	include("selftest.php");
 
+
 	if(get_kunden_db_name() == "startpage") {
 		$query = "show databases like 'db_vvz_%'";
 		$result = rquery($query);
@@ -33,6 +34,10 @@
 		if($GLOBALS["db_freshly_created"]) {
 			print "<script nonce='".nonce()."'>window.location.reload();</script>";
 			exit(0);
+		}
+
+		if(get_get("initialdatensatz")) {
+			include("initialdatensatz.php");
 		}
 	}
 

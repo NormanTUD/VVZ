@@ -1616,9 +1616,17 @@
 			</div>
 <?php
 		} else {
+			if(get_kunde_plan() == "Demo") {
 ?>
-			<i class="class_red">In diesem Semester existieren noch keine Veranstaltungen.</i><br />
+				Wenn Sie möchten, können Sie diese Installation nun benutzen.<br>
+				Wenn Sie <a href="?initialdatensatz=1"><button>hier</button></a> klicken, können Sie eine Beispiel-Uni eintragen, um alle Funktionen zu testen.
+				Sonst haben Sie nun für 24 Stunden Zeit, diese frische Installation auszuprobieren.
 <?php
+			} else {
+?>
+				<i class="class_red">In diesem Semester existieren noch keine Veranstaltungen.</i><br />
+<?php
+			}
 		}
 
 		$studiengang_counter = 0;
