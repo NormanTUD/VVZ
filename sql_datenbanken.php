@@ -1,5 +1,18 @@
 <?php
 	$GLOBALS['databases'] = array(
+'plan' => "CREATE TABLE plan (
+	id int primary key AUTO_INCREMENT,
+	name varchar(100)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+",
+'instance_config' => "CREATE TABLE `instance_config` (
+	`name` varchar(200) not null,
+	`shortlink` varchar(200) not null,
+	`installation_date` DATETIME NOT NULL DEFAULT current_timestamp(),
+	`plan_id` integer,
+	CONSTRAINT `plan_id` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB Default CHARSET=utf8;
+",
 'apache_restarts' => "CREATE TABLE `apache_restarts` (
   `t` datetime DEFAULT NULL,
   `reason` varchar(200) DEFAULT NULL,

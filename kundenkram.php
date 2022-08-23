@@ -13,6 +13,7 @@
 		$name = preg_replace("/_$/", "", $name);
 		$name = preg_replace("/[^a-z_]/", "", $name);
 		$name = preg_replace("/technische_universitaet_/", "tu_", $name);
+		$name = preg_replace("/^_+/", "", $name);
 		return $name;
 	}
 

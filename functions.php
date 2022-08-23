@@ -9621,4 +9621,42 @@ order by
 		$kunde_db_name = get_kunden_db_name();
 		print '<img alt="TUD-Logo, Link zur Startseite" src="default_logo.gif" />';
 	}
+
+	function database_exists ($name) {
+		$query = "SHOW DATABASES LIKE ".esc($name);
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			return 1;
+		}
+		return 0;
+	}
+
+	function delete_demo() {
+		$query = "show databases like 'db_vvz_%'";
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			$drop = 0;
+			if(!table_exists($row[0], "instance_config")) {
+				// old instances
+				//$drop = 1;
+			} else {
+				$query = "select now() - installation_date from ".$row[0].".instance_config where plan_id = 1";
+				$seconds_diff = get_single_row_from_query($query);
+				if($seconds_diff) {
+					if($seconds_diff > 86400) {
+						$drop = 1;
+					}
+				} else {
+					$drop = 1;
+				}
+			}
+
+			if($drop) {
+				$query = "drop database $row[0];";
+				rquery($query);
+			}
+		}
+	}
+
+	#die(database_exists("asdhallo"));
 ?>

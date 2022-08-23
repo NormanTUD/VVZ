@@ -15,6 +15,20 @@
                 $missing_tables = array();
 
                 rquery('SET foreign_key_checks = 0');
+
+		try {
+			rquery('use `'.$GLOBALS['dbname'].'`');
+		} catch (\Throwable $e) {
+			error_log($e);
+			error_log("Trying to create database...");
+			$sql = "CREATE DATABASE ".$GLOBALS["dbname"];
+			if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+				die("Error creating database: ".$GLOBALS["dbh"]->error);
+			} else {
+				$GLOBALS["db_freshly_created"] = 1;
+			}
+		}
+
                 foreach ($tables as $this_table => $create_query) {
                         if(!table_exists($GLOBALS["dbname"], $this_table)) {
                                 $missing_tables[] = $this_table;
@@ -28,8 +42,6 @@
                                 $GLOBALS['settings_cache'] = array();
                         }
                 }
-                rquery('SET foreign_key_checks = 1');
-		rquery('use `'.$GLOBALS['dbname'].'`');
 
 		$views = $GLOBALS["views"];
 
@@ -53,6 +65,17 @@
 			$errormsg[] = "Fehlende views:\t\n\t".join("\n\t", $missing_views)."\n\n";
 		}
 
+		if(!get_single_row_from_query("select count(*) from plan ")[0]) {
+			rquery("insert into `plan` (name) VALUES ('Demo')");
+			rquery("insert into `plan` (name) VALUES ('Starter')");
+			rquery("insert into `plan` (name) VALUES ('Pro')");
+		}
+
+		if(!get_single_row_from_query("select count(*) from instance_config")[0]) {
+			$name = $_SERVER["REDIRECT_SFURI"] ?? get_kunden_db_name();
+			$shortlink = $name;
+			rquery("insert into `instance_config` (name, shortlink, plan_id) VALUES (".esc($name).", ".esc($shortlink).", 1)");
+		}
 
 		if(!get_single_row_from_query("select count(*) from dozent")[0]) {
 			rquery("insert INTO `dozent` VALUES (1,'Admin','Istrator', null, '0')");
@@ -89,9 +112,7 @@
 		}
 
 		if(!get_single_row_from_query("select count(*) from page")[0]) {
-			rquery("SET FOREIGN_KEY_CHECKS=0");
 			rquery("insert INTO `page` VALUES (1,'Accounts','accounts.php','1',25),(2,'Dozenten','dozenten.php','1',28),(3,'Institute','institute.php','1',28),(4,'Gebäude','gebaeude.php','1',28),(5,'Module','modul.php','1',26),(6,'Prüfungstypen','pruefungstypen.php','1',27),(7,'Raumplanung','raumplanung.php','1',NULL),(8,'Studiengänge','studiengang.php','1',28),(9,'Veranstaltungen','veranstaltungen.php','1',NULL),(10,'Veranstaltungstypen','veranstaltungstypen.php','1',28),(11,'Rollen','roles.php','1',25),(12,'Prüfungsnummern','pruefungsnummern.php','1',27),(13,'Einzelne Veranstaltung','veranstaltung.php','1',28),(15,'Seiteninformationen','edit_page_info.php','1',25),(16,'Rechteprobleme','right_issues.php','0',25),(17,'Query-Analyzer','query_analyzer.php','0',25),(18,'Willkommen!','welcome.php','0',NULL),(19,'API','api.php','1',25),(20,'Modul &rarr; Semester','modul_nach_semester.php','1',26),(21,'Eigene Daten ändern','password.php','1',NULL),(22,'Bereiche','bereiche.php','1',28),(23,'DB-Backup','backup.php','1',25),(24,'DB-Backup-Export','backup_export.php','0',25),(25,'System',NULL,'1',NULL),(26,'Moduldaten',NULL,'1',NULL),(27,'Prüfungsdaten',NULL,'1',NULL),(28,'Stammdaten',NULL,'1',NULL),(30,'Merges','merges.php','1',28),(31,'DB-Diff','dbdiff.php','1',25),(32,'User-Agents','useragents.php','1',25),(33,'Alte Daten löschen','delete_old_data.php','1',28),(34,'Aktuelles Semester setzen','default_semester.php','1',25),(35,'Dozent &rarr; Prüfungsnummern','export_dozent_pruefungsnummern.php','1',27),(36,'Prüfungsämter','pruefungsaemter.php','1',27),(37,'FAQ','faq.php','1',28),(38,'Superdozent','superdozent.php','1',28),(39,'Apache-Neustarts','apache_restarts.php','1',25),(40,'Prüfungsnummer &rarr; Dozent','export_pruefungsnummern_dozent.php','1',27),(41,'Prüfung &rarr; Zeitraum','pruefung_zeitraum.php','1',27),(42,'Titel','titel.php','1',28),(43,'Neue Seite','newpage.php','1',25),(44,'Kontakt','../kontakt.php','1',NULL),(45,'Funktionen','funktionen.php','1',25),(46,'Stundenpläne','stundenplaene.php','1',28),(47,'Semester','semester.php','1',28),(48,'Sprachen','sprachen.php','1',28),(49,'Neuer Dozent','neuerdozent.php','1',28),(51,'Exportiere Prüfungsleistungen','pruefungsleistungen_export.php','1',27),(52,'Exportiere Prüfungsleistungen 2','pruefungsleistungen_export_2.php','1',27),(53,'Module ohne PLs','module_ohne_pls.php','1',26),(54,'PL pro Semester','pl_pro_semester.php','1',26);");
-			rquery("SET FOREIGN_KEY_CHECKS=1");
 		}
 
 		if(!get_single_row_from_query("select count(*) from role_to_page")[0]) {

@@ -17,7 +17,6 @@
 				die("Connection failed: ".$GLOBALS["dbh"]->connect_error);
 			}
 
-
 			try {
 				mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
 			} catch (\Throwable $e) {

@@ -7,11 +7,15 @@
 	include("startseite_functions.php");
 	include_once("functions.php");
 
+	delete_demo();
+	include("selftest.php");
+
 	if(get_kunden_db_name() == "startpage") {
-		print "<h2>VVZ-Startseite</h2>";
-		print "Aktuelle Instanzen:<br>";
 		$query = "show databases like 'db_vvz_%'";
 		$result = rquery($query);
+
+		print "<h2>VVZ-Startseite</h2>";
+		print "Aktuelle Instanzen:<br>";
 		print "<ul>";
 		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
 		print "<li><a href='?new_uni_name=".generate_random_string(30)."'>Zufällige neue Seite</a></li>";
@@ -26,7 +30,6 @@
 
 		exit(0);
 	} else {
-		include("selftest.php");
 		if($GLOBALS["db_freshly_created"]) {
 			print "<script nonce='".nonce()."'>window.location.reload();</script>";
 			exit(0);
