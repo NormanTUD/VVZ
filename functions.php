@@ -9567,9 +9567,9 @@ order by
 
 	function get_anzahl_pl_pro_semester ($pruefungsnummer, $semester_id) {
 		$query = "select count(*) as anzahl from pruefung p left join veranstaltung v on v.id = p.veranstaltung_id left join pruefungsnummer pn on pn.id = p.pruefungsnummer_id where semester_id = ".esc($semester_id)." and pn.pruefungsnummer = ".esc($pruefungsnummer)." group by pn.id";
-		$res = get_single_row_from_query($query)[0];
-		if($res) {
-			return $res;
+		$res = get_single_row_from_query($query);
+		if(!is_null($res)) {
+			return $res[0];
 		} else {
 			return 0;
 		}

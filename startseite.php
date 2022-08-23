@@ -38,6 +38,13 @@
 
 		if(get_get("initialdatensatz")) {
 			include("initialdatensatz.php");
+
+			print "Die Daten werden eingetragen, das kann einige Sekunden dauern. Bitte warten...";
+			flush();
+			print '<meta http-equiv="refresh" content="1; url=startseite" />';
+			flush();
+			exit(0);
+
 		}
 	}
 

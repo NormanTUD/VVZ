@@ -26,7 +26,7 @@
 		}
 
 
-		$dozenten = create_dozenten_array();
+		$dozenten = create_dozenten_array(user_is_admin($GLOBALS['logged_in_user_id']) ? 1 : 0);
 		if($is_superdozent) {
 			$dozenten = create_dozenten_by_ids_array($valid_to_edit_dozenten);
 		}
