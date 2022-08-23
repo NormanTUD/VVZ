@@ -1,30 +1,39 @@
 <?php
 	$GLOBALS['databases'] = array(
-'rechnungen' => "create database rechnungen (
-	id int auto_increment,
-	datum DATETIME,
-	zahlungszyklus_monate int default 1,
-	plan_id int,
-	eingegangen DATETIME,
-	rabatt int,
-	spezialpreis int,
-	CONSTRAINT `plan_id` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-",
-'plan' => "CREATE TABLE plan (
-	id int primary key AUTO_INCREMENT,
+
+'kundendaten' => "CREATE TABLE kundendaten (
+	id int unsigned auto_increment primary key,
+	anrede varchar(100) DEFAULT 'Hallo Testkunde',
+	firma varchar(100) DEFAULT 'Name der Universität',
+	kundename varchar(100) default 'Test',
+	kundestrasse varchar(100) default 'Benutzer',
+	kundeplz varchar(100) default '12345',
+	kundeort varchar(100) default 'Teststadt'
+)",
+
+'plan' => 'CREATE TABLE plan (
+	id int unsigned auto_increment primary key,
 	name varchar(100),
 	monatliche_zahlung float(2)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-",
+) ENGINE=InnoDB DEFAULT CHARSET=utf8',
+
+'rechnungen' => "create table rechnungen (
+	id int unsigned auto_increment primary key,
+	datum date DEFAULT NULL,
+	zahlungszyklus_monate int default 1,
+	eingegangen DATETIME,
+	rabatt int,
+	spezialpreis int
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+
 'instance_config' => "CREATE TABLE `instance_config` (
 	`name` varchar(200) not null,
 	`shortlink` varchar(200) not null,
 	`installation_date` DATETIME NOT NULL DEFAULT current_timestamp(),
-	`plan_id` integer,
-	CONSTRAINT `plan_id` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB Default CHARSET=utf8;
-",
+	`plan_id` int unsigned,
+	CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB Default CHARSET=utf8;",
+
 'apache_restarts' => "CREATE TABLE `apache_restarts` (
   `t` datetime DEFAULT NULL,
   `reason` varchar(200) DEFAULT NULL,
