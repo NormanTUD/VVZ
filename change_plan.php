@@ -40,13 +40,26 @@
 			</style>
 
 <?php
-	if(get_get("product")) {
+	if($product = get_get("product")) {
 		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 		$kunde_ok = kunde_is_personalized($kunde_id);
 
 		if($kunde_ok) {
 			# Zahlungsinfos, DB speichern
-			print("OK");
+?>
+			Ihr Plan wurde geändert. Bitte überweisen Sie innerhalb der nächsten 3 Monate entweder
+			<?php print htmlentities(get_plan_price_by_name($product)[0] ?? ""); ?>€/pro Monat
+			oder 
+			<?php print htmlentities(get_plan_price_by_name($product)[1] ?? ""); ?>€/pro Jahr
+			an das Konto:
+
+			<pre>
+				IBAN: DE123123213123lkfsdf...
+				...
+			</pre>
+
+			Sie können jederzeit die Rechnungen im Administrationsmenü einsehen und als PDF herunterladen.
+<?php
 		} else {
 ?>
 			<h2>Wir haben es echt so lange wie möglich herausgezögert...</h2>
@@ -97,7 +110,7 @@
 
 	Sollten Sie eine besondere Anforderung haben, werden wir das Vorlesungsverzeichnis an Ihre Anforderungen anpassen. So etwas wären Exporte nach Excel
 	oder neue Datenfelder. Dies ist in der Pro-Version bereits beinhaltet. Bei der Basic-Version müssen wir uns über die Kosten im Detail absprechen.
-	In der Pro-Version ist es bereits beinhaltet.
+	In der Pro-Version sind Zusatzwünsche bis ca. 1000€ bereits beinhaltet.
 <?php
 	}
 

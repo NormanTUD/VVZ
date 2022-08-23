@@ -243,7 +243,7 @@
 	}
 
 	function update_kunde ($id, $anrede, $firma, $kundename, $kundestrasse, $kundeplz, $kundeort) {
-		$query = 'update kundendaten set anrede = '.esc($anrede).', firma = '.esc($firma).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1';
+		$query = 'update kundendaten set anrede = '.esc($anrede).', firma = '.esc($firma).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1 where id = '.esc($id);
 		rquery($query);
 	}
 
@@ -266,7 +266,7 @@
 				$plan_id = 5;
 				break;
 			default:
-				die("Unknown plan: ".get_get("product"));
+				die("Unknown plan: >>".get_get("product")."<<");
 				break;
 		}
 
@@ -299,7 +299,4 @@
 		}
 	}
 
-	if(get_get("product")) {
-
-	}
 ?>

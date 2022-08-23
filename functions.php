@@ -9516,13 +9516,6 @@ order by
 
 	}
 
-	#get_longest_function_names();
-
-	#print "<pre>";
-	#print_r($_SERVER);
-	#print "</pre>";
-	#die(1);
-
 	function print_uni_logo() {
 		$kunde_db_name = get_kunden_db_name();
 		print '<img alt="TUD-Logo, Link zur Startseite" src="default_logo.gif" />';
@@ -9565,4 +9558,14 @@ order by
 	}
 
 	#die(database_exists("asdhallo"));
+
+	if(get_get("product")) {
+		if(user_is_admin($GLOBALS["logged_in_user_id"])) {
+			if(!kunde_is_personalized(get_kunde_id_by_db_name(get_kunden_db_name()))) {
+			} else {
+				$update_query = "update instance_config set plan_id = ".esc(get_plan_id(get_get("product")));
+				rquery($update_query);
+			}
+		}
+	}
 ?>
