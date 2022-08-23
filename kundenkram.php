@@ -1,6 +1,11 @@
 <?php
 	$GLOBALS["error_page_shown"] = 0;
 
+	function get_kunde_id_by_db_name ($dbn) {
+		$query = "select kunde_id from instance_config where dbname = ".esc($dbn);
+		return get_single_row_from_query($query);
+	}
+
 	function get_uni_name () {
 		if(array_key_exists("new_uni_name", $_GET)) {
 			return $_GET["new_uni_name"];
@@ -35,7 +40,7 @@
 
 	function get_kunden_db_name() {
 		if(array_key_exists("new_uni_name", $_GET)) {
-			print "Die neue Uni wird erstellt. Bitte warten...";
+			print "Die neue Uni wird erstellt. Bitte warten (B)...";
 			flush();
 			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
 			flush();

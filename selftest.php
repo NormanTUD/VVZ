@@ -17,7 +17,7 @@
                 rquery('SET foreign_key_checks = 0');
 
 		if(!database_exists($GLOBALS["dbname"])) {
-			print "Die neue Uni wird erstellt. Bitte warten";
+			print "Die neue Uni wird erstellt. Bitte warten (selftest)";
 			flush();
 			exit;
 		}
@@ -68,7 +68,11 @@
 		if(!get_single_row_from_query("select count(*) from instance_config")[0]) {
 			$name = $_SERVER["REDIRECT_SFURI"] ?? get_kunden_db_name();
 			$shortlink = $name;
-			rquery("insert into `instance_config` (name, shortlink, plan_id, dbname) VALUES (".esc($name).", ".esc($shortlink).", 1, ".esc($GLOBALS['dbname']).")");
+			rquery("insert into `instance_config` (name, shortlink, plan_id, dbname, kunde_id) VALUES (".esc($name).", ".esc($shortlink).", 1, ".esc($GLOBALS['dbname']).", 1)");
+		}
+
+		if(!get_single_row_from_query("select count(*) from kundendaten")) {
+			rquery('insert into kundendaten (anrede, firma, kundename, kundeort, kundeplz, kundestrasse) values ("Hallo Testkunde", "Testuni", "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1")');
 		}
 
 		if(!get_single_row_from_query("select count(*) from dozent")[0]) {

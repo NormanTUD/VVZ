@@ -8,7 +8,8 @@
 	kundename varchar(100) default 'Test',
 	kundestrasse varchar(100) default 'Benutzer',
 	kundeplz varchar(100) default '12345',
-	kundeort varchar(100) default 'Teststadt'
+	kundeort varchar(100) default 'Teststadt',
+	personalized int default 0
 )",
 
 'plan' => 'CREATE TABLE plan (
@@ -32,7 +33,9 @@
 	`shortlink` varchar(200) not null,
 	`installation_date` DATETIME NOT NULL DEFAULT current_timestamp(),
 	`plan_id` int unsigned,
-	CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE CASCADE
+	`kunde_id` int unsigned,
+	CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE CASCADE,
+	CONSTRAINT `kunde_fk` FOREIGN KEY (`kunde_id`) REFERENCES `kundendaten` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB Default CHARSET=utf8;",
 
 'apache_restarts' => "CREATE TABLE `apache_restarts` (
