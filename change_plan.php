@@ -59,6 +59,8 @@
 				<input type="text" name="kundestrasse" placeholder="Straße" /><br>
 				<input type="text" name="kundeplz" placeholder="Postleitzahl" /><br>
 				<input type="text" name="kundeort" placeholder="Ort" /><br>
+				<input type="text" name="name_vvz" placeholder="Name des Vorlesungsverzeichnisses (z.B. TU Dresden)" /><br>
+				Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen? <input type="checkbox" name="daten_uebernehmen" value=1 /><br>
 				<button>Ja, meine Daten sind korrekt</button>
 			</form>
 <?php

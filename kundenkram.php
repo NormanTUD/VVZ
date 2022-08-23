@@ -1,7 +1,72 @@
 <?php
 	$GLOBALS["error_page_shown"] = 0;
+	$GLOBALS['function_usage'] = array();
+	$GLOBALS['rquery_print'] = 0;
 
 	include_once("mysql.php");
+
+	function get_single_row_from_result ($result, $default = NULL) {
+		$id = $default;
+		while ($row = mysqli_fetch_row($result)) {
+			$id = $row[0];
+		}
+		return $id;
+	}
+
+	function rquery ($internalquery, $die = 1) {
+		$debug_backtrace = debug_backtrace();
+		$caller_file = $debug_backtrace[0]['file'];
+		$caller_line = $debug_backtrace[0]['line'];
+		$caller_function = '';
+		if(array_key_exists(1, $debug_backtrace) && array_key_exists('function', $debug_backtrace[1])) {
+			$caller_function = $debug_backtrace[1]['function'];
+		}
+		$start = microtime(true);
+		$result = mysqli_query($GLOBALS['dbh'], $internalquery);
+		$end = microtime(true);
+		$used_time = $end - $start;
+		$numrows = "&mdash;";
+		if(!is_bool($result)) {
+			$numrows = mysqli_num_rows($result);
+		}
+		$GLOBALS['queries'][] = array('query' => "/* $caller_file, $caller_line".($caller_function ? " ($caller_function)" : '').": */\n$internalquery", 'time' => $used_time, 'numrows' => $numrows);
+
+		if($caller_function) {
+			if(array_key_exists($caller_function, $GLOBALS['function_usage'])) {
+				$GLOBALS['function_usage'][$caller_function]['count']++;
+				$GLOBALS['function_usage'][$caller_function]['time'] += $used_time;
+			} else {
+				$GLOBALS['function_usage'][$caller_function]['count'] = 1;
+				$GLOBALS['function_usage'][$caller_function]['time'] = $used_time;
+				$GLOBALS['function_usage'][$caller_function]['name'] = $caller_function;
+			}
+		}
+
+		if(!$result) {
+			if($die) {
+				if($GLOBALS['dbh']) {
+					dier("Ung&uuml;ltige Anfrage: <p><pre>".$internalquery."</pre></p>".htmlentities(mysqli_error($GLOBALS['dbh'])), 0, 1);
+				} else {
+					dier("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p><p>DBH undefined! This must never happen unless there is something seriously wrong with the database.</p>", 0, 0);
+				}
+			}
+		}
+
+		if($GLOBALS['rquery_print']) {
+			print "<p>".htmlentities($internalquery)."</p>\n";
+		}
+
+		return $result;
+	}
+
+
+
+	function get_single_row_from_query ($query, $default = NULL) {
+		$result = rquery($query);
+		return get_single_row_from_result($result, $default);
+	}
+
+
 
 	function esc ($parameter) { 
 		if(!is_array($parameter)) { // Kein array
@@ -175,8 +240,16 @@
 	if(get_post("update_kunde_data")) {
 		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
-		if($id && get_post("anrede") && get_post("firma") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort")) {
-			update_kunde($id, "anrede", "firma", "kundename", "kundestrasse", "kundeplz", "kundeort");
+		if($kunde_id && get_post("anrede") && get_post("firma") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort")) {
+			update_kunde($kunde_id, "anrede", "firma", "kundename", "kundestrasse", "kundeplz", "kundeort");
+		}
+
+		if(get_post("name_vvz")) {
+
+		}
+
+		if(get_post("daten_uebernehmen")) {
+
 		}
 	}
 ?>

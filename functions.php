@@ -113,10 +113,7 @@ declare(ticks=1);
 
 	$GLOBALS['deletion_page'] = 0;
 
-	$GLOBALS['rquery_print'] = 0;
-
 	$GLOBALS['queries'] = array();
-	$GLOBALS['function_usage'] = array();
 
 	$GLOBALS['dbh'] = '';
 	$GLOBALS['reload_page'] = 0;
@@ -1962,53 +1959,6 @@ declare(ticks=1);
 		return preg_replace('/<(.*?)>/ies', "'<' . preg_replace(array('/javascript:[^\"\']*/i', '/(" . implode('|', $disabledEvents) . ")=[\"\'][^\"\']*[\"\']/i', '/\s+/'), array('', '', ' '), stripslashes('\\1')) . '>'", strip_tags($str, implode('', $allowedTags)));
 	}
 
-	// Idee: über diese Wrapperfunktion kann man einfach Queries mitloggen etc., falls notwendig.
-	function rquery ($internalquery, $die = 1) {
-		$debug_backtrace = debug_backtrace();
-		$caller_file = $debug_backtrace[0]['file'];
-		$caller_line = $debug_backtrace[0]['line'];
-		$caller_function = '';
-		if(array_key_exists(1, $debug_backtrace) && array_key_exists('function', $debug_backtrace[1])) {
-			$caller_function = $debug_backtrace[1]['function'];
-		}
-		$start = microtime(true);
-		$result = mysqli_query($GLOBALS['dbh'], $internalquery);
-		$end = microtime(true);
-		$used_time = $end - $start;
-		$numrows = "&mdash;";
-		if(!is_bool($result)) {
-			$numrows = mysqli_num_rows($result);
-		}
-		$GLOBALS['queries'][] = array('query' => "/* $caller_file, $caller_line".($caller_function ? " ($caller_function)" : '').": */\n$internalquery", 'time' => $used_time, 'numrows' => $numrows);
-
-		if($caller_function) {
-			if(array_key_exists($caller_function, $GLOBALS['function_usage'])) {
-				$GLOBALS['function_usage'][$caller_function]['count']++;
-				$GLOBALS['function_usage'][$caller_function]['time'] += $used_time;
-			} else {
-				$GLOBALS['function_usage'][$caller_function]['count'] = 1;
-				$GLOBALS['function_usage'][$caller_function]['time'] = $used_time;
-				$GLOBALS['function_usage'][$caller_function]['name'] = $caller_function;
-			}
-		}
-
-		if(!$result) {
-			if($die) {
-				if($GLOBALS['dbh']) {
-					dier("Ung&uuml;ltige Anfrage: <p><pre>".$internalquery."</pre></p>".htmlentities(mysqli_error($GLOBALS['dbh'])), 0, 1);
-				} else {
-					dier("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p><p>DBH undefined! This must never happen unless there is something seriously wrong with the database.</p>", 0, 0);
-				}
-			}
-		}
-
-		if($GLOBALS['rquery_print']) {
-			print "<p>".htmlentities($internalquery)."</p>\n";
-		}
-
-		return $result;
-	}
-
 	function my_mysqli_real_escape_string ($arg) {
 		return mysqli_real_escape_string($GLOBALS['dbh'], $arg);
 	}
@@ -3377,20 +3327,6 @@ WHERE 1
 		} else {
 			return htmlentities($id ?? "");
 		}
-	}
-
-	function get_single_row_from_result ($result, $default = NULL) {
-		$id = $default;
-		while ($row = mysqli_fetch_row($result)) {
-			$id = $row[0];
-		}
-		return $id;
-	}
-
-
-	function get_single_row_from_query ($query, $default = NULL) {
-		$result = rquery($query);
-		return get_single_row_from_result($result, $default);
 	}
 
 	function get_institut_name ($id) {
