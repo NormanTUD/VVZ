@@ -16,8 +16,8 @@
 
                 rquery('SET foreign_key_checks = 0');
 
+		rquery('use `'.$GLOBALS['dbname'].'`');
 		try {
-			rquery('use `'.$GLOBALS['dbname'].'`');
 		} catch (\Throwable $e) {
 			error_log($e);
 			error_log("Trying to create database...");
