@@ -1,4 +1,9 @@
 <?php
+	function regex_in_file ($file, $regex, $replace) {
+		$str = file_get_contents($file);
+		$str = preg_replace($regex, $replace, $str);
+		file_put_contents($file, $str);
+	}
 	function deleteDir($dir) {
 		if(preg_match("/^\/tmp\//", $dir)) {
 			system("rm -rf ".escapeshellarg($dir));
@@ -71,6 +76,37 @@
 	$tmp = tempdir();
 	recurseCopy("rechnung_template", $tmp);
 
+	$data_file = $tmp."/_data.tex";
+
+	$rechnungsstellung = "2021-05-03";
+
+	$zahlungsfrist = date('Y-m-d', strtotime("+6 months", strtotime($rechnungsstellung)));
+
+
+	regex_in_file($data_file, "/ANREDE/", "Sehr geehrte Herr Testbenutzer");
+	regex_in_file($data_file, '/DATUMRECHNUNGSSTELLUNG/', $rechnungsstellung);
+	regex_in_file($data_file, '/DATUMZAHLUNGSFRIST/', $zahlungsfrist);
+	regex_in_file($data_file, '/FIRMA/', 'Testuni');
+	regex_in_file($data_file, '/KUNDENAME/', 'Hans Peter Test');
+	regex_in_file($data_file, '/KUNDESTRASSE/', 'Teststraße 1');
+	regex_in_file($data_file, '/KUNDEPLZ/', '123456');
+	regex_in_file($data_file, '/KUNDEORT/', 'Testort');
+
+	$invoice_file = $tmp."/_invoice.tex";
+
+	$fees = array(
+		["Demo", "1", 0],
+		["Pro", 1, 50],
+		["Superduperultrapropremiumplus", 10, 500]
+	);
+
+	$fees_string = "";
+	for ($i = 0; $i < count($fees); $i++) {
+		$fees_string .= "\\Fee{".$fees[$i][0]."}{".$fees[$i][1]."}{".$fees[$i][2]."}\n";
+	}
+
+	regex_in_file($invoice_file, "/FEESHERE/", $fees_string);
+
 	ob_start();
 	system("cd $tmp && latexmk -quiet -pdf _main.tex 2>&1 > /dev/null");
 	ob_clean();
@@ -82,6 +118,7 @@
 	header("Content-disposition: attachment; filename=\"".get_rechnung_name().".pdf\"");
 
 	readfile($filename);
+
 
 	deleteDir($tmp);
 ?>
