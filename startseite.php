@@ -15,8 +15,8 @@
 		$result = rquery($query);
 
 		print "<h2>VVZ-Startseite</h2>";
-		print "Aktuelle Instanzen:<br>";
 		print "<a href='?new_uni_name=".generate_random_string(30)."'><button>Demo ausprobieren</button></a>";
+		print "<br><br>Aktuelle Instanzen:<br>";
 		print "<ul>";
 		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
 		while ($row = mysqli_fetch_row($result)) {
