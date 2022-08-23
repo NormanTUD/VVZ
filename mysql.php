@@ -1,5 +1,5 @@
 <?php
-	include_once("config.php");
+	include("config.php");
 
 	$GLOBALS["db_freshly_created"] = 0;
 

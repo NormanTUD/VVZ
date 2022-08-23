@@ -1,7 +1,6 @@
 <?php
 	$GLOBALS["error_page_shown"] = 0;
 
-	include_once("config.php");
 	include_once("mysql.php");
 
 	function esc ($parameter) { 
