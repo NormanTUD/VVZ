@@ -34,7 +34,7 @@
 		foreach ($sites as $url => $site_data) {
 			$name = $site_data['name'];
 			$id = $site_data['id'];
-			if(!($url == 'faq' && !faq_has_entry())) {
+			if(($id == "change_plan" && user_is_admin($GLOBALS["logged_in_user_id"]) || $id != "change_plan") && !($url == 'faq' && !faq_has_entry())) {
 				if($url == $this_page_file) {
 	?>
 					<b><a id="<?php print $id; ?>" href="<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a></b>
