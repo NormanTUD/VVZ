@@ -17,17 +17,6 @@
                 rquery('SET foreign_key_checks = 0');
 
 		rquery('use `'.$GLOBALS['dbname'].'`');
-		try {
-		} catch (\Throwable $e) {
-			error_log($e);
-			error_log("Trying to create database...");
-			$sql = "CREATE DATABASE ".$GLOBALS["dbname"];
-			if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
-				die("Error creating database: ".$GLOBALS["dbh"]->error);
-			} else {
-				$GLOBALS["db_freshly_created"] = 1;
-			}
-		}
 
                 foreach ($tables as $this_table => $create_query) {
                         if(!table_exists($GLOBALS["dbname"], $this_table)) {
