@@ -28,6 +28,7 @@
 
 'instance_config' => "CREATE TABLE `instance_config` (
 	`name` varchar(200) not null,
+	`dbname` varchar(200) not null,
 	`shortlink` varchar(200) not null,
 	`installation_date` DATETIME NOT NULL DEFAULT current_timestamp(),
 	`plan_id` int unsigned,

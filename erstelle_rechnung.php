@@ -1,4 +1,12 @@
 <?php
+	function deleteDir($dir) {
+		if(preg_match("/^\/tmp\//", $dir)) {
+			system("rm -rf ".escapeshellarg($dir));
+		} else {
+			die("Bist du bekloppt? Ich lass dich doch nix löschen!");
+		}
+	}
+
 	function tempdir() {
 		$tempfile=tempnam(sys_get_temp_dir(),'');
 		// tempnam creates file on disk
@@ -6,8 +14,6 @@
 		mkdir($tempfile);
 		if (is_dir($tempfile)) { return $tempfile; }
 	}
-
-die(tempdir());
 
 	function recurseCopy(
 		string $sourceDirectory,
@@ -58,9 +64,24 @@ die(tempdir());
 		closedir($directory);
 	}
 
+	function get_rechnung_name () {
+		return "abc";
+	}
+
 	$tmp = tempdir();
 	recurseCopy("rechnung_template", $tmp);
-	print $tmp;
-	flush();
-	sleep(300);
+
+	ob_start();
+	system("cd $tmp && latexmk -quiet -pdf _main.tex 2>&1 > /dev/null");
+	ob_clean();
+
+	$filename = $tmp."/_main.pdf";
+
+	header('Content-Type: application/octet-stream');
+	header("Content-Transfer-Encoding: Binary");
+	header("Content-disposition: attachment; filename=\"".get_rechnung_name().".pdf\"");
+
+	readfile($filename);
+
+	deleteDir($tmp);
 ?>
