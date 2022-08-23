@@ -6,11 +6,11 @@
 			return $_GET["new_uni_name"];
 		}
 		if(array_key_exists("REDIRECT_SFURI", $_SERVER)) {
-			print "Die neue Uni wird erstellt. Bitte warten";
+			return "db_vvz_".get_kunden_db_name();
+			print "Die neue Uni wird erstellt. Bitte warten (A)...";
 			flush();
 			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
 			flush();
-			exit;
 		}
 
 		return "db_vvz_" + get_kunden_db_name();
@@ -35,11 +35,11 @@
 
 	function get_kunden_db_name() {
 		if(array_key_exists("new_uni_name", $_GET)) {
-			print "Die neue Uni wird erstellt. Bitte warten";
+			print "Die neue Uni wird erstellt. Bitte warten...";
 			flush();
 			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
 			flush();
-			exit;
+			exit(0);
 		}
 
 		if(array_key_exists("REDIRECT_URL", $_SERVER)) {
