@@ -137,4 +137,9 @@ apt-get install latexmk texlive imagemagick texlive-lang-german -y
 
 touch /etc/hardcore_debugging
 
+# Für Rechnungserstellungs-LaTeX Apache erlauben auf /tmp zuzugreifen
+sed -i 's/PrivateTmp/#PrivateTmp/' /etc/systemd/system/multi-user.target.wants/apache2.service
+sudo systemctl daemon-reload
+sudo systemctl restart apache2
+
 whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS

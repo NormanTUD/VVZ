@@ -7,6 +7,8 @@
 		if (is_dir($tempfile)) { return $tempfile; }
 	}
 
+die(tempdir());
+
 	function recurseCopy(
 		string $sourceDirectory,
 		string $destinationDirectory,
@@ -59,4 +61,6 @@
 	$tmp = tempdir();
 	recurseCopy("rechnung_template", $tmp);
 	print $tmp;
+	flush();
+	sleep(300);
 ?>
