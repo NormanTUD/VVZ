@@ -13,6 +13,7 @@
 			<div id="wrapper" class="text_align_center">
 			<div class="login_admin">
 <?php
+				print get_demo_expiry_time();
 				if($GLOBALS['logged_in_was_tried']) {
 					if(get_post('username') || get_post('password')) {
 						sleep(3);
