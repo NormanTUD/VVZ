@@ -402,11 +402,11 @@
 		if($reload) {
 			print "Die Uni wird umbenannt. Bitte warten (A)...";
 			flush();
-			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($to).'/" />';
+			print '<meta http-equiv="refresh" content="0; url=/v/'.create_uni_name($to).'/" />';
 			flush();
 			exit;
 		}
 	}
 
-	rename_db("db_vvz_wcefv_snwuiao_utsn", "TESTADASDASDA", 1);
+	rename_db("db_vvz_wcefv_snwuiao_utsn", "TESTADASDASDAAAAAAAAAAASDASD", 1);
 ?>
