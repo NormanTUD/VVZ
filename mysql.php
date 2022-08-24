@@ -43,7 +43,7 @@
 							die("Could not use DB");
 						}
 					} catch (\Throwable $e) {
-						die("Could not select DB");
+						die("Could not select DB: $e");
 					}
 				}
 			}

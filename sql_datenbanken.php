@@ -305,6 +305,7 @@
   `file` varchar(50) DEFAULT NULL,
   `show_in_navigation` enum('0','1') NOT NULL DEFAULT '0',
   `parent` int(10) unsigned DEFAULT NULL,
+  `disable_in_demo` int(1) unsigned not null default 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `file` (`file`),
