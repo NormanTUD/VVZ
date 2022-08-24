@@ -1,6 +1,15 @@
 <?php
 	include("config.php");
 
+	if(!function_exists("get_url_uni_name")) {
+		function get_url_uni_name () {
+			if(isset($_SERVER["REDIRECT_URL"]) && preg_match("/^\/v\/(.*?)(?:$|\/.*)/", $_SERVER["REDIRECT_URL"], $matches)) {
+				return $matches[1];
+			}
+			return "";
+		}
+	}
+
 	$GLOBALS["db_freshly_created"] = 0;
 	$GLOBALS["db_password"] = "";
 
@@ -13,6 +22,10 @@
 			$GLOBALS["db_password"] = $vvzdbpw;
 
 			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $GLOBALS["db_password"]);
+
+			#$sql = "SELECT ".$GLOBALS["dbname"];
+			#if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+
 			// Check connection
 			if ($GLOBALS["dbh"]->connect_error) {
 				die("Connection failed: ".$GLOBALS["dbh"]->connect_error);

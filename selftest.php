@@ -132,7 +132,8 @@
 
 		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {
 			if($GLOBALS["dbname"] || ($GLOBALS["dbname"] == "startpage" && get_single_row_from_query("select count(*) from vvz_global.kundendaten where universitaet = 'startpage'") == 0)) {
-				$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname) values ("Hallo Testkunde", '.esc($GLOBALS["dbname"]).', "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1", '.esc($GLOBALS["dbname"]).')';
+				$urlname = get_url_uni_name();
+				$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname, urlname) values ("Hallo Testkunde", '.esc($GLOBALS["dbname"]).', "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1", '.esc($GLOBALS["dbname"]).', '.esc($urlname).')';
 				rquery($query);
 			}
 		}

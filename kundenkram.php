@@ -127,6 +127,7 @@
 	}
 
 	function get_uni_name () {
+		/*
 		if(array_key_exists("new_uni_name", $_GET)) {
 			return $_GET["new_uni_name"];
 		}
@@ -137,8 +138,9 @@
 			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
 			flush();
 		}
+		 */
 
-		return "db_vvz_" + get_kunden_db_name();
+		return "db_vvz_".get_kunden_db_name();
 	}
 
 	function create_uni_name ($name) {
@@ -363,12 +365,6 @@
 		return get_single_row_from_query($query);
 	}
 
-	function get_url_uni_name () {
-		if(isset($_SERVER["REDIRECT_URL"]) && preg_match("/^\/v\/(.*?)(?:$|\/.*)/", $_SERVER["REDIRECT_URL"], $matches)) {
-			return $matches[1];
-		}
-		return "";
-	}
 
 	function get_kunde_id_by_url () {
 		$urlname = get_url_uni_name();
@@ -384,4 +380,14 @@
 		$res = get_single_row_from_query($query);
 		return $res;
 	}
+
+
+	/*
+	$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+	$kunde_db = get_db_name_by_kunde_id($kunde_id);
+	if($kunde_db && database_exists($kunde_db)) {
+		$GLOBALS["dbname"] = $kunde_db;
+		rquery("use ".$GLOBALS["dbname"]);
+	}
+	 */
 ?>

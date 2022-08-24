@@ -3,10 +3,6 @@
 		$setup_mode = 0; // Im setup-Modus werden keine Anfragen ausgeführt. Setupmodus deaktiviert.
 	}
 
-	if(get_kunde_university_name(get_kunde_id_by_db_name($GLOBALS["dbname"]))) {
-		$GLOBALS["dbname"] = get_kunde_university_name(get_kunde_id_by_db_name($GLOBALS["dbname"]));
-	}
-
 	include_once("functions.php");
 
 	if($GLOBALS['reload_page']) {
