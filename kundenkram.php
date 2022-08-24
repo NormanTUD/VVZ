@@ -322,10 +322,6 @@
 		if(!array_key_exists($db, $GLOBALS["is_demo"])) {
 			if(database_exists($db) && table_exists($db, "instance_config") && table_exists($db, "plan")) {
 				$query = "select p.name from ".$db.".instance_config ic left join plan p on ic.plan_id = p.id";
-				#print("dbname: ".$GLOBALS["dbname"]."<br>\n");
-				#print("db: ".$db."<br>\n");
-				#print($query."<br>");
-				#print "<hr>";
 				$GLOBALS["is_demo"][$db] = get_single_row_from_query($query) == "Demo" ? 1 : 0;
 			} else {
 				$GLOBALS["is_demo"][$db] = 1;

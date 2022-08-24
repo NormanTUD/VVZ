@@ -31,6 +31,14 @@
 						if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
 							$GLOBALS["db_freshly_created"] = 1;
 							include_once("selftest.php");
+
+							print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
+							flush();
+							$kn = get_kunden_db_name();
+							print '<meta http-equiv="refresh" content="0; url=./" />';
+							flush();
+
+							exit(0);
 						} else {
 							die("Could not use DB");
 						}

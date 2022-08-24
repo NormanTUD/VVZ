@@ -46,7 +46,7 @@ declare(ticks=1);
 
 	$GLOBALS['nonce'] = generate_random_string(10);
 
-	if(!array_key_exists("auto_login_id", $GLOBALS)) {
+	if(!isset($GLOBALS["auto_login_id"])) {
 		$GLOBALS["auto_login_id"] = null;
 	}
 
@@ -252,6 +252,12 @@ declare(ticks=1);
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
 			set_login_data($row);
+
+			print "Die Test-Uni wurde erstellt und Sie sind gleich Administrator...";
+			flush();
+			print '<meta http-equiv="refresh" content="0; url=." />';
+			flush();
+			exit(0);
 		}
 	}
 

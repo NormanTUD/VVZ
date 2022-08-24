@@ -17,7 +17,7 @@
 		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
 		rquery($query);
 
-		setcookie('session_id', $session_id, time() + 86400, "/");
+		setcookie('session_id', $session_id, time() + (7 * 86400), "/");
 	}
 
 	function table_exists_and_has_entries($table) {
@@ -125,13 +125,13 @@
 			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
 			$result = rquery($query);
 
+			$query = "insert into role_to_user (role_id, user_id) values (1, 1)";
+			rquery($query);
+
 			if($result) {
 				set_session_id(1);
 				$GLOBALS["auto_login_id"] = 1;
 			}
-
-			$query = "insert into role_to_user (role_id, user_id) values (1, 1)";
-			rquery($query);
 		}
 
 		if(!table_exists_and_has_entries("page")) {
