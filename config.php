@@ -149,7 +149,7 @@
 
 	Set the password in the file '/etc/vvzdbpw'
  */
-	$GLOBALS['dbname'] = get_kunden_db_name();
+	$GLOBALS['dbname'] = null;
 	$GLOBALS["db_username"] = 'root';
 
 /*

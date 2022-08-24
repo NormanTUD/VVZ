@@ -22,57 +22,6 @@
 		return 0;
 	}
 
-	function selftest_startpage() {
-		$tables = array(
-			'kundendaten' => "CREATE TABLE kundendaten (
-				id int unsigned auto_increment primary key,
-				anrede varchar(100) DEFAULT 'Hallo Testkunde',
-				universitaet varchar(100) DEFAULT 'Name der Universität' unique,
-				kundename varchar(100) default 'Test',
-				kundestrasse varchar(100) default 'Benutzer',
-				kundeplz varchar(100) default '12345',
-				kundeort varchar(100) default 'Teststadt',
-				dbname varchar(100) not null,
-				urlname varchar(100),
-				personalized int default 0
-			)",
-
-			'plan' => 'CREATE TABLE plan (
-				id int unsigned auto_increment primary key,
-				name varchar(100),
-				monatliche_zahlung float(2),
-				jaehrliche_zahlung float(2)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8',
-
-			'rechnungen' => "create table rechnungen (
-				id int unsigned auto_increment primary key,
-				datum date DEFAULT NULL,
-				zahlungszyklus_monate int default 1,
-				eingegangen DATETIME,
-				rabatt int,
-				spezialpreis int
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
-		);
-
-		rquery("CREATE DATABASE IF NOT EXISTS vvz_global");
-		rquery('use `vvz_global`');
-
-                foreach ($tables as $this_table => $create_query) {
-                        if(!table_exists("vvz_global", $this_table)) {
-                                $missing_tables[] = $this_table;
-                                if(is_array($create_query)) {
-                                        foreach ($create_query as $this_create_query) {
-                                                rquery($this_create_query);
-                                        }
-                                } else {
-                                        rquery($create_query);
-                                }
-                                $GLOBALS['settings_cache'] = array();
-                        }
-                }
-
-		rquery('use `'.$GLOBALS['dbname'].'`');
-	}
 
         function selftest () {
                 $tables = $GLOBALS["databases"];
@@ -303,7 +252,6 @@
 
 
         if(!get_get('noselftest') && !$GLOBALS["no_selftest"] && !$GLOBALS["selftest_already_done"]) {
-		selftest_startpage();
                 selftest();
 		$GLOBALS["selftest_already_done"] = 1;
         }

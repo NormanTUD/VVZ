@@ -1234,15 +1234,6 @@ declare(ticks=1);
 		return false;
 	}
 
-	function table_exists ($db, $table) {
-		$query = "SELECT table_name FROM information_schema.tables WHERE table_schema = ".esc($db)." AND table_name = ".esc($table);
-		$result = mysqli_query($GLOBALS['dbh'], $query);
-		$table_exists = 0;
-		while ($row = mysqli_fetch_row($result)) {
-			$table_exists = 1;
-		}
-		return $table_exists;
-	}
 
 	function show_create_table ($dbname, $table, $noviews = 0) {
 		$data = mysqli_fetch_row(rquery('SHOW CREATE TABLE '.$dbname.'.'.$table));

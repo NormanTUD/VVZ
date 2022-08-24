@@ -44,73 +44,11 @@
 		return $id;
 	}
 
-	function rquery ($internalquery, $die = 1) {
-		$debug_backtrace = debug_backtrace();
-		$caller_file = $debug_backtrace[0]['file'];
-		$caller_line = $debug_backtrace[0]['line'];
-		$caller_function = '';
-		if(array_key_exists(1, $debug_backtrace) && array_key_exists('function', $debug_backtrace[1])) {
-			$caller_function = $debug_backtrace[1]['function'];
-		}
-		$start = microtime(true);
-		$result = mysqli_query($GLOBALS['dbh'], $internalquery);
-		$end = microtime(true);
-		$used_time = $end - $start;
-		$numrows = "&mdash;";
-		if(!is_bool($result)) {
-			$numrows = mysqli_num_rows($result);
-		}
-		$GLOBALS['queries'][] = array('query' => "/* $caller_file, $caller_line".($caller_function ? " ($caller_function)" : '').": */\n$internalquery", 'time' => $used_time, 'numrows' => $numrows);
-
-		if($caller_function) {
-			if(array_key_exists($caller_function, $GLOBALS['function_usage'])) {
-				$GLOBALS['function_usage'][$caller_function]['count']++;
-				$GLOBALS['function_usage'][$caller_function]['time'] += $used_time;
-			} else {
-				$GLOBALS['function_usage'][$caller_function]['count'] = 1;
-				$GLOBALS['function_usage'][$caller_function]['time'] = $used_time;
-				$GLOBALS['function_usage'][$caller_function]['name'] = $caller_function;
-			}
-		}
-
-		if(!$result) {
-			if($die) {
-				if($GLOBALS['dbh']) {
-					dier("Ung&uuml;ltige Anfrage: <p><pre>".$internalquery."</pre></p>".htmlentities(mysqli_error($GLOBALS['dbh'])), 0, 1);
-				} else {
-					dier("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p><p>DBH undefined! This must never happen unless there is something seriously wrong with the database.</p>", 0, 0);
-				}
-			}
-		}
-
-		if($GLOBALS['rquery_print']) {
-			print "<p>".htmlentities($internalquery)."</p>\n";
-		}
-
-		return $result;
-	}
-
-
 
 	function get_single_row_from_query ($query, $default = NULL) {
 		$result = rquery($query);
 		return get_single_row_from_result($result, $default);
 	}
-
-	function esc ($parameter) { 
-		if(!is_array($parameter)) { // Kein array
-			if(isset($parameter) && strlen($parameter)) {
-				return '"'.mysqli_real_escape_string($GLOBALS['dbh'], $parameter).'"';
-			} else {
-				return 'NULL';
-			}
-		} else { // Array
-			$str = join(', ', array_map('esc', array_map('my_mysqli_real_escape_string', $parameter)));
-			return $str;
-		}
-	}
-
-
 
 	function get_post ($name) {
 		if(array_key_exists($name, $_POST)) {
@@ -188,6 +126,7 @@
 			}
 		}
 
+		return $GLOBALS["dbname"] ?? "startpage";
 		return "startpage";
 	}
 
@@ -275,7 +214,8 @@
 	}
 
 	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort, $dbname) {
-		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname)";
+		$urlname = create_uni_name($universitaet);
+		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname, urlname) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($urlname).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname)";
 		rquery($query);
 	}
 
