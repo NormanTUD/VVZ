@@ -28,7 +28,6 @@
 					die("Error creating database: ".$GLOBALS["dbh"]->error);
 				} else {
 					try {
-						mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
 						if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
 							$GLOBALS["db_freshly_created"] = 1;
 							include_once("selftest.php");

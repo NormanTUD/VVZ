@@ -2,7 +2,8 @@
 	if(
 		(check_page_rights(get_page_id_by_filename(basename(__FILE__))) && file_exists('/etc/vvz_debug_query')) ||
 		file_exists('/etc/vvz_debug_query_all') || 
-		(user_is_logged_in() && user_is_admin($GLOBALS['logged_in_user_id']))
+		(user_is_logged_in() && user_is_admin($GLOBALS['logged_in_user_id'])) &&
+		(!is_demo() || file_exists("/etc/hardcore_debugging"))
 	) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 		include_once('scripts/SqlFormatter.php');
 		print "<div class='clear_both' />\n";
