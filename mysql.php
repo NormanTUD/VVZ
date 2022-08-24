@@ -26,7 +26,12 @@
 				if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
 					die("Error creating database: ".$GLOBALS["dbh"]->error);
 				} else {
-					$GLOBALS["db_freshly_created"] = 1;
+					$sql = "use ".$GLOBALS["dbname"];
+					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+						$GLOBALS["db_freshly_created"] = 1;
+					} else {
+						die("Could not select DB");
+					}
 				}
 			}
 			if (!$GLOBALS['dbh']) {

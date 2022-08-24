@@ -65,15 +65,35 @@
 			<h2>Wir haben es echt so lange wie möglich herausgezögert...</h2>
 			<p>Aber ab diesem Punkt brauchen wir Ihre realen Daten</p>
 			<form method="post" enctype="multipart/form-data" action="change_plan?product=<?php print htmlentities(get_get("product") ?? ""); ?>">
-				<input type="hidden" name="update_kunde_data" value=1 /><br>
-				<input type="text" name="anrede" placeholder="Anrede" /><br>
-				<input type="text" name="firma" placeholder="Universität" /><br>
-				<input type="text" name="kundename" placeholder="Ihr Name" /><br>
-				<input type="text" name="kundestrasse" placeholder="Straße" /><br>
-				<input type="text" name="kundeplz" placeholder="Postleitzahl" /><br>
-				<input type="text" name="kundeort" placeholder="Ort" /><br>
-				<input type="text" name="name_vvz" placeholder="Name des Vorlesungsverzeichnisses (z.B. TU Dresden)" /><br>
-				Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen? <input type="checkbox" name="daten_uebernehmen" value=1 /><br>
+				<input type="hidden" name="update_kunde_data" value=1 />
+				<table>
+					</tr>
+					<tr>
+						<td>Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" /></td>
+					</tr>
+					<tr>
+						<td>Universität</td><td><input type="text" name="firma" placeholder="Universität" /></td>
+					</tr>
+					<tr>
+						<td>Ihr Name</td><td><input type="text" name="kundename" placeholder="Ihr Name" /></td>
+					</tr>
+					<tr>
+						<td>Straße, Hausnummer</td><td><input type="text" name="kundestrasse" placeholder="Straße" /></td>
+					</tr>
+					<tr>
+						<td>Postleitzahl</td><td><input type="text" name="kundeplz" placeholder="Postleitzahl" /></td>
+					</tr>
+					<tr>
+						<td>Ort</td><td><input type="text" name="kundeort" placeholder="Ort" /></td>
+					</tr>
+					<tr>
+						<td>Name des Vorlesungsverzeichnisses</td><td><input type="text" name="name_vvz" placeholder="Name des Vorlesungsverzeichnisses (z.B. TU Dresden)" /></td>
+					</tr>
+					<tr>
+						<td>Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen?</td>
+						<td><input type="checkbox" name="daten_uebernehmen" value=1 /><td>
+					</tr>
+				</table>
 				<button>Ja, meine Daten sind korrekt</button>
 			</form>
 <?php

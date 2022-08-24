@@ -87,8 +87,6 @@
 		return get_single_row_from_result($result, $default);
 	}
 
-
-
 	function esc ($parameter) { 
 		if(!is_array($parameter)) { // Kein array
 			if(isset($parameter) && strlen($parameter)) {
@@ -316,5 +314,13 @@
 			return true;
 		}
 		return false;
+	}
+
+	function db_is_demo ($db) {
+		if(database_exists($db) && table_exists($db, "instance_config") && table_exists($db, "plan")) {
+			$query = "select p.name from ".$db.".instance_config ic left join plan p on ic.plan_id = p.id";
+			return get_single_row_from_query($query) == "Demo" ? 1 : 0;
+		}
+		return 0;
 	}
 ?>

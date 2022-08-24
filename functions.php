@@ -9525,10 +9525,8 @@ order by
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
 			$drop = 0;
-			if(!table_exists($row[0], "instance_config")) {
-				// old instances
-				//$drop = 1;
-			} else {
+
+			if(db_is_demo($row[0])) {
 				$query = "select now() - installation_date from ".$row[0].".instance_config where plan_id = 1";
 				$seconds_diff = get_single_row_from_query($query);
 				if($seconds_diff) {
@@ -9538,11 +9536,11 @@ order by
 				} else {
 					$drop = 1;
 				}
-			}
 
-			if($drop) {
-				$query = "drop database $row[0];";
-				rquery($query);
+				if($drop) {
+					$query = "drop database $row[0];";
+					rquery($query);
+				}
 			}
 		}
 	}

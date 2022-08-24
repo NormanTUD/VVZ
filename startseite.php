@@ -7,7 +7,6 @@
 	include("startseite_functions.php");
 	include_once("functions.php");
 
-	delete_demo();
 	include("selftest.php");
 
 
@@ -178,4 +177,5 @@
 		}
 
 		include("footer.php");
+		delete_demo();
 ?>
