@@ -36,7 +36,7 @@
 			exit(0);
 		}
 
-		if(get_get("initialdatensatz")) {
+		if(get_get("initialdatensatz") && is_demo()) {
 			include("initialdatensatz.php");
 
 			print "Die Daten werden eingetragen, das kann einige Sekunden dauern. Bitte warten...";
