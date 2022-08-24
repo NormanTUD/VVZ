@@ -1,4 +1,5 @@
 <?php
+if(is_demo()) {
 	$dozenten_query = "INSERT ignore INTO `dozent` VALUES (2,'Donald','Duck',3,'0'),(3,'Dagobert','Duck',3,'0')";
 	rquery($dozenten_query);
 
@@ -53,4 +54,5 @@ $bereiche_query = "INSERT IGNORE INTO `bereich` VALUES (111,'(BBS)'),(115,'(BS)'
 	rquery('INSERT IGNORE INTO `pruefung` VALUES("12", "1", "232", NULL, NULL, "2022-08-23 13:26:28")');
 	rquery('INSERT IGNORE INTO `pruefung` VALUES("13", "1", "233", NULL, NULL, "2022-08-23 13:26:28")');
 	rquery('INSERT IGNORE INTO `pruefung` VALUES("14", "1", "234", NULL, NULL, "2022-08-23 13:26:28")');
+}
 ?>

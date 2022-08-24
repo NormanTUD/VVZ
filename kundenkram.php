@@ -6,6 +6,15 @@
 
 	include_once("mysql.php");
 
+	function set_session_id ($user_id) {
+		//delete_old_session_ids($GLOBALS['logged_in_user_id']);
+		$session_id = generate_random_string(1024);
+		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
+		rquery($query);
+
+		setcookie('session_id', $session_id, time() + (7 * 86400), "/");
+	}
+
 	function generate_random_string ($length = 50) {
 		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		$charactersLength = strlen($characters);
