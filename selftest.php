@@ -32,6 +32,7 @@
 				kundestrasse varchar(100) default 'Benutzer',
 				kundeplz varchar(100) default '12345',
 				kundeort varchar(100) default 'Teststadt',
+				dbname varchar(100) not null,
 				personalized int default 0
 			)",
 
@@ -135,7 +136,7 @@
 		}
 
 		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {
-			rquery('insert into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse) values ("Hallo Testkunde", "Testuni", "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1")');
+			rquery('insert into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname) values ("Hallo Testkunde", "Testuni", "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1", '.esc($GLOBALS["dbname"]).')');
 		}
 
 		if(!table_exists_and_has_entries("dozent")) {

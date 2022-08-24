@@ -263,8 +263,8 @@
 		return get_single_row_from_query($query);
 	}
 
-	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort) {
-		$query = 'update vvz_global.kundendaten set anrede = '.esc($anrede).', universitaet = '.esc($universitaet).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1 where id = '.esc($id);
+	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort, $dbname) {
+		$query = 'update vvz_global.kundendaten set anrede = '.esc($anrede).', universitaet = '.esc($universitaet).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1, dbname = '.esc($dbname).' where id = '.esc($id);
 		rquery($query);
 	}
 
@@ -287,7 +287,7 @@
 				$plan_id = 5;
 				break;
 			default:
-				die("Unknown plan: >>".get_get("product")."<<");
+				die("Unknown plan: >>".htmlentities(get_get("product"))."<<");
 				break;
 		}
 
@@ -308,7 +308,7 @@
 		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
 		if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort")) {
-			update_kunde($kunde_id, "anrede", "universitaet", "kundename", "kundestrasse", "kundeplz", "kundeort");
+			update_kunde($kunde_id, "anrede", "universitaet", "kundename", "kundestrasse", "kundeplz", "kundeort", $GLOBALS["dbname"]);
 		}
 
 		if(get_post("name_vvz")) {
@@ -353,5 +353,4 @@
 		$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name(get_kunden_db_name()));
 		return get_single_row_from_query($query);
 	}
-
 ?>

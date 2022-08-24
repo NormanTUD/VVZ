@@ -57,10 +57,8 @@
 				Ihr Plan wurde geändert. Sie werden nun auf die neue Seite umgeleitet.
 <?php
 				$new_uni_name = create_uni_name(get_kunde_university_name());
-				$new_db_name = "db_vvz_".$new_uni_name;
-				print($new_db_name);
 
-				print '<meta http-equiv="refresh" content="0; url=/v/'.$new_uni_name.'/" />';
+				print '<meta http-equiv="refresh" content="0; url=/v/'.$new_uni_name.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
 				flush();
 				exit(0);
 			}
