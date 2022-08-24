@@ -15,16 +15,16 @@
 	$this_page_file = preg_replace('/\?.*/', '', $this_page_file);
 
 	$sites = array(
-		'startseite' => array("name" => 'Startseite', "id" => 'startseite_link'),
-		'api' => array("name" => 'API', "id" => 'api_link'),
-		'admin' => array("name" => 'Administration', "id" => 'admin_link'),
-		'dokumente' => array("name" => 'Dokumente', "id" => 'dokumente_link'),
-		'impressum' => array("name" => 'Impressum', "id" => 'impressum_link'),
-		'zeitraster' => array("name" => "Zeitraster", "id" => "zeitraster"),
-		'faq' => array("name" => 'FAQ', "id" => 'faq_link'),
-		'front.pdf' => array("name" => 'Dokumentation', "id" => 'doku_link'),
-		"change_plan" => array("name" => "Business-Plan ändern", "id" => "change_plan"),
-		'kontakt' => array("name" => 'Kontakt', "id" => 'kontakt_link')
+		'startseite' => array("name" => 'Startseite', "id" => 'startseite_link', 'admin_only' => 0),
+		'api' => array("name" => 'API', "id" => 'api_link', 'admin_only' => 0),
+		'admin' => array("name" => 'Administration', "id" => 'admin_link', 'admin_only' => 0),
+		'dokumente' => array("name" => 'Dokumente', "id" => 'dokumente_link', 'admin_only' => 0),
+		'impressum' => array("name" => 'Impressum', "id" => 'impressum_link', 'admin_only' => 0),
+		'zeitraster' => array("name" => "Zeitraster", "id" => "zeitraster", 'admin_only' => 0),
+		'faq' => array("name" => 'FAQ', "id" => 'faq_link', 'admin_only' => 0),
+		'front.pdf' => array("name" => 'Dokumentation', "id" => 'doku_link', 'admin_only' => 0),
+		"change_plan" => array("name" => "Business-Plan ändern", "id" => "change_plan", 'admin_only' => 1),
+		'kontakt' => array("name" => 'Kontakt', "id" => 'kontakt_link', 'admin_only' => 0)
 	);
 ?>
 	<i>
@@ -34,7 +34,11 @@
 		foreach ($sites as $url => $site_data) {
 			$name = $site_data['name'];
 			$id = $site_data['id'];
-			if(($id == "change_plan" && user_is_admin($GLOBALS["logged_in_user_id"]) || $id != "change_plan") && !($url == 'faq' && !faq_has_entry())) {
+			$admin_only = $site_data['admin_only'];
+			if(
+				!($url == 'faq' && !faq_has_entry()) &&
+				(!$admin_only || $admin_only && user_is_admin($GLOBALS["logged_in_user_id"]))
+			) {
 				if($url == $this_page_file) {
 	?>
 					<b><a id="<?php print $id; ?>" href="<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a></b>

@@ -63,7 +63,7 @@
 			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Demo', 0, 0)");
 			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic Faculty', 50, 500)");
 			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic University', 80, 800)");
-			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 80, 800)");
+			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 90, 1000)");
 			rquery("insert into `plan` (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 120, 1100)");
 		}
 
