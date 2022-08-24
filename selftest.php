@@ -96,7 +96,7 @@
 			rquery("insert into role values ('7', 'Raumplanungsverwalter', 'Darf alles was der Verwalter darf + Raumplanung');");
 		}
 
-		if(!get_single_row_from_query("select count(*) from users")[0]) {
+		if(!get_single_row_from_query("select count(*) from users")[0] || $GLOBALS["db_freshly_created"]) {
 			$salt = generate_random_string(100);
 			$default_username = "Admin";
 			$default_password = "test";

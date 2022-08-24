@@ -7,7 +7,7 @@
 	include("startseite_functions.php");
 	include_once("functions.php");
 
-	include("selftest.php");
+	include_once("selftest.php");
 
 
 	if(get_kunden_db_name() == "startpage") {

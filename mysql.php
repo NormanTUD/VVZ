@@ -29,6 +29,8 @@
 				} else {
 					try {
 						mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
+						$GLOBALS["db_freshly_created"] = 1;
+						include_once("selftest.php");
 					} catch (\Throwable $e) {
 						die("Could not select DB");
 					}
