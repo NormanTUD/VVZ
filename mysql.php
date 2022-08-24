@@ -26,10 +26,9 @@
 				if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
 					die("Error creating database: ".$GLOBALS["dbh"]->error);
 				} else {
-					$sql = "use ".$GLOBALS["dbname"];
-					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
-						$GLOBALS["db_freshly_created"] = 1;
-					} else {
+					try {
+						mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
+					} catch (\Throwable $e) {
 						die("Could not select DB");
 					}
 				}
