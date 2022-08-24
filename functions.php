@@ -46,6 +46,10 @@ declare(ticks=1);
 
 	$GLOBALS['nonce'] = generate_random_string(10);
 
+	if(!array_key_exists("auto_login_id", $GLOBALS)) {
+		$GLOBALS["auto_login_id"] = null;
+	}
+
 	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' 'unsafe-inline'; ";
 	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' blob: 'unsafe-inline' https://www.gstatic.com/charts; ";
 	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."' data: 'unsafe-inline'; ";
@@ -185,15 +189,6 @@ declare(ticks=1);
 		}
 	}
 
-	function set_session_id ($user_id) {
-		//delete_old_session_ids($GLOBALS['logged_in_user_id']);
-		$session_id = generate_random_string(1024);
-		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
-		rquery($query);
-
-		setcookie('session_id', $session_id, time() + 86400, "/");
-	}
-
 	if(!$GLOBALS['setup_mode'] && get_kunden_db_name() != "startpage") {
 		if(get_post('try_login')) {
 			$GLOBALS['logged_in_was_tried'] = 1;
@@ -249,6 +244,14 @@ declare(ticks=1);
 			} else {
 				die("Die internen Seiten dürfen nicht direkt aufgerufen werden. Die gesuchte Seite konnte nicht gefunden werden. Nehmen Sie &mdash; statt der direkten Datei-URL &mdash; den Weg über das Administrationsmenü.");
 			}
+		}
+	}
+
+	if(!is_null($GLOBALS["auto_login_id"])) {
+		$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `id` = '.esc($GLOBALS["auto_login_id"]).' AND `enabled` = "1"';
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			set_login_data($row);
 		}
 	}
 
