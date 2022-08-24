@@ -232,7 +232,11 @@
 				}
 
 				if(get_get('show_items')) {
-					$query = 'SELECT `id`, `name` FROM `page` WHERE `parent` = '.esc(get_get('show_items')).' AND `show_in_navigation` = "1" AND `id` IN (SELECT `page_id` FROM `role_to_page` WHERE `role_id` = '.esc($GLOBALS['user_role_id'][0]).') ORDER BY `name`';
+					$query = 'SELECT `id`, `name` FROM `page` WHERE `parent` = '.esc(get_get('show_items')).' AND `show_in_navigation` = "1" AND `id` IN (SELECT `page_id` FROM `role_to_page` WHERE `role_id` = '.esc($GLOBALS['user_role_id'][0]).') ';
+					if(is_demo()) {
+						$query .= " and disable_in_demo = 0 ";
+					}
+					$query .= ' ORDER BY `name`';
 					$result = rquery($query);
 
 					if(mysqli_num_rows($result)) {
