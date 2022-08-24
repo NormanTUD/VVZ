@@ -123,7 +123,7 @@
 		}
 		if(array_key_exists("REDIRECT_SFURI", $_SERVER)) {
 			return "db_vvz_".get_kunden_db_name();
-			print "Die neue Uni wird erstellt. Bitte warten (A)...";
+			print "Die neue Uni wird erstellt. Bitte warten...";
 			flush();
 			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
 			flush();
@@ -152,7 +152,7 @@
 
 	function get_kunden_db_name() {
 		if(array_key_exists("new_demo_uni", $_GET)) {
-			print "Die neue Uni wird erstellt. Bitte warten (B)...";
+			print "Die neue Uni wird erstellt. Bitte warten...";
 			flush();
 			$randname = generate_random_string(20);
 			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($randname).'/" />';
