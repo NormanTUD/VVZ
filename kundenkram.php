@@ -154,7 +154,7 @@
 		if(array_key_exists("new_demo_uni", $_GET)) {
 			print "Die neue Uni wird erstellt. Bitte warten (B)...";
 			flush();
-			$randname = generate_random_string(10);
+			$randname = generate_random_string(20);
 			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($randname).'/" />';
 			flush();
 			exit(0);
