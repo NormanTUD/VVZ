@@ -233,9 +233,6 @@
 
 				if(get_get('show_items')) {
 					$query = 'SELECT `id`, `name` FROM `page` WHERE `parent` = '.esc(get_get('show_items')).' AND `show_in_navigation` = "1" AND `id` IN (SELECT `page_id` FROM `role_to_page` WHERE `role_id` = '.esc($GLOBALS['user_role_id'][0]).') ';
-					if(is_demo()) {
-						$query .= " and disable_in_demo = 0 ";
-					}
 					$query .= ' ORDER BY `name`';
 					$result = rquery($query);
 
@@ -331,7 +328,11 @@
 									$GLOBALS['this_page_number'] = $pagenr;
 									$GLOBALS['this_page_file'] = $page_file;
 									include('hinweise.php');
-									include($page_file);
+									if(page_disabled_in_demo($pagenr) && is_demo()) {
+										print "Diese Seite ist im Demo-Modus deaktiviert.";
+									} else {
+										include($page_file);
+									}
 								}
 							} else {
 								print "<i class='class_red'>Sie haben kein Recht, auf diese Seite zuzugreifen.</i>";

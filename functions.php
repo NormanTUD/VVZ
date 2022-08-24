@@ -1757,9 +1757,6 @@ declare(ticks=1);
 	}
 
 	function check_page_rights_role_id ($page_id, $role_id, $log = 1) {
-		if(is_demo() && page_disabled_in_demo($page_id)) {
-			return 0;
-		}
 		if( (isset($role_id) || is_null($role_id) ) && (array_key_exists('user_role_id', $GLOBALS) && isset($GLOBALS['user_role_id'])) ) {
 			$role_id = $GLOBALS['user_role_id'];
 		}
