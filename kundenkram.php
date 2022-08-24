@@ -5,6 +5,17 @@
 
 	include_once("mysql.php");
 
+	function generate_random_string ($length = 50) {
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$charactersLength = strlen($characters);
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[mt_rand(0, $charactersLength - 1)];
+		}
+		return $randomString;
+	}
+
+
 	function get_get ($name) {
 		if(array_key_exists($name, $_GET)) {
 			return $_GET[$name];
@@ -140,10 +151,11 @@
 	}
 
 	function get_kunden_db_name() {
-		if(array_key_exists("new_uni_name", $_GET)) {
+		if(array_key_exists("new_demo_uni", $_GET)) {
 			print "Die neue Uni wird erstellt. Bitte warten (B)...";
 			flush();
-			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
+			$randname = generate_random_string(10);
+			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($randname).'/" />';
 			flush();
 			exit(0);
 		}

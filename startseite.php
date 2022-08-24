@@ -16,7 +16,7 @@
 		$result = rquery($query);
 
 		print "<h2>VVZ-Startseite</h2>";
-		print "<a href='?new_uni_name=".generate_random_string(30)."'><button>Sofort eine kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>";
+		print "<a href='?new_demo_uni=1'><button>Sofort eine kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>";
 		print "<br><br>Aktuelle Instanzen:<br>";
 		print "<ul>";
 		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
