@@ -60,7 +60,7 @@
 				$new_db_name = "db_vvz_".$new_uni_name;
 				print($new_db_name);
 
-				print '<meta http-equiv="refresh" content="0; url=v/'.$new_uni_name.'/" />';
+				print '<meta http-equiv="refresh" content="0; url=/v/'.$new_uni_name.'/" />';
 				flush();
 				exit(0);
 			}
@@ -73,25 +73,25 @@
 				<table>
 					</tr>
 					<tr>
-						<td>Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" /></td>
+						<td>Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="A" /></td>
 					</tr>
 					<tr>
-						<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" /></td>
+						<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" value="B" /></td>
 					</tr>
 					<tr>
-						<td>Ihr Name</td><td><input type="text" name="kundename" placeholder="Ihr Name" /></td>
+						<td>Ihr Name</td><td><input type="text" name="kundename" placeholder="Ihr Name" value="A" /></td>
 					</tr>
 					<tr>
-						<td>Straße, Hausnummer</td><td><input type="text" name="kundestrasse" placeholder="Straße" /></td>
+						<td>Straße, Hausnummer</td><td><input type="text" name="kundestrasse" placeholder="Straße" value="A" /></td>
 					</tr>
 					<tr>
-						<td>Postleitzahl</td><td><input type="text" name="kundeplz" placeholder="Postleitzahl" /></td>
+						<td>Postleitzahl</td><td><input type="text" name="kundeplz" placeholder="Postleitzahl" value="A" /></td>
 					</tr>
 					<tr>
-						<td>Ort</td><td><input type="text" name="kundeort" placeholder="Ort" /></td>
+						<td>Ort</td><td><input type="text" name="kundeort" placeholder="Ort" value="A" /></td>
 					</tr>
 					<tr>
-						<td>Name des Vorlesungsverzeichnisses</td><td><input type="text" name="name_vvz" placeholder="Name des Vorlesungsverzeichnisses (z.B. TU Dresden)" /></td>
+						<td>Name des Vorlesungsverzeichnisses</td><td><input type="text" name="name_vvz" placeholder="Name des Vorlesungsverzeichnisses (z.B. TU Dresden)" value="A" /></td>
 					</tr>
 					<tr>
 						<td>Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen?</td>
