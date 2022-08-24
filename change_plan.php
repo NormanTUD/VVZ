@@ -45,21 +45,25 @@
 		$kunde_ok = kunde_is_personalized($kunde_id);
 
 		if($kunde_ok) {
-			# Zahlungsinfos, DB speichern
+			if(get_get("done_migration")) {
+				# Zahlungsinfos, DB speichern
 ?>
-			Ihr Plan wurde geändert. Bitte überweisen Sie innerhalb der nächsten 3 Monate entweder
-			<?php print htmlentities(get_plan_price_by_name($product)[0] ?? ""); ?>€/pro Monat
-			oder 
-			<?php print htmlentities(get_plan_price_by_name($product)[1] ?? ""); ?>€/pro Jahr
-			an das Konto:
+				Ihr Plan wurde geändert. Sie können die Software nun als Vorlesungsverzeichnis für Ihre Universität benutzen.<br>
 
-			<pre>
-				IBAN: DE123123213123lkfsdf...
-				...
-			</pre>
-
-			Sie können jederzeit die Rechnungen im Administrationsmenü einsehen und als PDF herunterladen.
+				Sie können jederzeit die Rechnungen im Administrationsmenü einsehen und als PDF herunterladen.
 <?php
+			} else {
+?>
+				Ihr Plan wurde geändert. Sie werden nun auf die neue Seite umgeleitet.
+<?php
+				$new_uni_name = create_uni_name(get_kunde_university_name());
+				$new_db_name = "db_vvz_".$new_uni_name;
+				print($new_db_name);
+
+				print '<meta http-equiv="refresh" content="0; url=v/'.$new_uni_name.'/" />';
+				flush();
+				exit(0);
+			}
 		} else {
 ?>
 			<h2>Wir haben es echt so lange wie möglich herausgezögert...</h2>
@@ -72,7 +76,7 @@
 						<td>Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" /></td>
 					</tr>
 					<tr>
-						<td>Universität</td><td><input type="text" name="firma" placeholder="Universität" /></td>
+						<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" /></td>
 					</tr>
 					<tr>
 						<td>Ihr Name</td><td><input type="text" name="kundename" placeholder="Ihr Name" /></td>

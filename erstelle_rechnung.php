@@ -3,7 +3,7 @@
 	include_once("functions.php");
 
 	function get_kunde_X($id, $prop) {
-		return get_single_row_from_query("select $prop from kundendaten where id = ".esc($id));
+		return get_single_row_from_query("select $prop from vvz_global.kundendaten where id = ".esc($id));
 	}
 
 	function get_rechnung_name () {
@@ -97,7 +97,7 @@
 		regex_in_file($data_file, "/ANREDE/", get_kunde_X($kunde_id, "anrede"));
 		regex_in_file($data_file, '/DATUMRECHNUNGSSTELLUNG/', $rechnungsstellung);
 		regex_in_file($data_file, '/DATUMZAHLUNGSFRIST/', $zahlungsfrist);
-		regex_in_file($data_file, '/FIRMA/', get_kunde_X($kunde_id, "firma"));
+		regex_in_file($data_file, '/UNIVERSITAET/', get_kunde_X($kunde_id, "universitaet"));
 		regex_in_file($data_file, '/KUNDENAME/', get_kunde_X($kunde_id, "kundename"));
 		regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "kundestrasse"));
 		regex_in_file($data_file, '/KUNDEPLZ/', get_kunde_X($kunde_id, "kundeplz"));

@@ -245,7 +245,7 @@
 	}
 	
 	function get_kunde_plan () {
-		$query = "select p.name from ".get_kunden_db_name().".instance_config ic left join plan p on ic.plan_id = p.id";
+		$query = "select p.name from ".get_kunden_db_name().".instance_config ic left join vvz_global.plan p on ic.plan_id = p.id";
 		return get_single_row_from_query($query);
 	}
 
@@ -259,12 +259,12 @@
 	}
 
 	function kunde_is_personalized ($id) {
-		$query = "select personalized from kundendaten where id = ".esc($id);
+		$query = "select personalized from vvz_global.kundendaten where id = ".esc($id);
 		return get_single_row_from_query($query);
 	}
 
-	function update_kunde ($id, $anrede, $firma, $kundename, $kundestrasse, $kundeplz, $kundeort) {
-		$query = 'update kundendaten set anrede = '.esc($anrede).', firma = '.esc($firma).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1 where id = '.esc($id);
+	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort) {
+		$query = 'update vvz_global.kundendaten set anrede = '.esc($anrede).', universitaet = '.esc($universitaet).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1 where id = '.esc($id);
 		rquery($query);
 	}
 
@@ -297,9 +297,9 @@
 	function get_plan_price_by_name($name) {
 		$plan_id = get_plan_id($name);
 
-		$monatlich_query = "select monatliche_zahlung from plan where id = ".esc($plan_id);
+		$monatlich_query = "select monatliche_zahlung from vvz_global.plan where id = ".esc($plan_id);
 		$monatlich = get_single_row_from_query($monatlich_query);
-		$jaehrlich = get_single_row_from_query("select jaehrliche_zahlung from plan where id = ".esc($plan_id));
+		$jaehrlich = get_single_row_from_query("select jaehrliche_zahlung from vvz_global.plan where id = ".esc($plan_id));
 
 		return [$monatlich, $jaehrlich];
 	}
@@ -307,8 +307,8 @@
 	if(get_post("update_kunde_data")) {
 		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
-		if($kunde_id && get_post("anrede") && get_post("firma") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort")) {
-			update_kunde($kunde_id, "anrede", "firma", "kundename", "kundestrasse", "kundeplz", "kundeort");
+		if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort")) {
+			update_kunde($kunde_id, "anrede", "universitaet", "kundename", "kundestrasse", "kundeplz", "kundeort");
 		}
 
 		if(get_post("name_vvz")) {
@@ -330,7 +330,7 @@
 	function db_is_demo ($db) {
 		if(!array_key_exists($db, $GLOBALS["is_demo"])) {
 			if(database_exists($db) && table_exists($db, "instance_config") && table_exists($db, "plan")) {
-				$query = "select p.name from ".$db.".instance_config ic left join plan p on ic.plan_id = p.id";
+				$query = "select p.name from ".$db.".instance_config ic left join vvz_global.plan p on ic.plan_id = p.id";
 				$GLOBALS["is_demo"][$db] = get_single_row_from_query($query) == "Demo" ? 1 : 0;
 			} else {
 				$GLOBALS["is_demo"][$db] = 1;
@@ -349,80 +349,9 @@
 		return 0;
 	}
 
-
-
-	/*
-	 * @Name: Mysql Mariadb Rename Database PHP
-	 * @Author: Max Base
-	 * @Date: 2020-12-26
-	 * @Repository: https://github.com/basemax/mysql-mariadb-rename-database-php
-	 */
-
-	function rename_db ($from, $to, $reload) {
-		if(database_exists($to)) {
-			return;
-		}
-		// Limit
-		ini_set('max_execution_time', 0);
-		set_time_limit(0);
-
-
-		// Config
-		$tables = [];
-
-		// Open
-		$mysqli = new mysqli("localhost", $GLOBALS["db_username"], $GLOBALS["db_password"], $from);
-		if($mysqli->connect_error) {
-			die("Connection failed: " . $mysqli->connect_error);
-		}
-
-		
-		$sql = "CREATE DATABASE ".$to.";";
-		$result = mysqli_query($mysqli, $sql);;
-
-		$mysqli->autocommit(FALSE);
-
-		$sql = "SHOW tables;";
-		$result = mysqli_query($mysqli, $sql);
-		if(mysqli_num_rows($result) > 0) {
-			while($row = mysqli_fetch_assoc($result)) {
-				if(isset($row["Tables_in_".$from])) {
-					$tables[] = $row["Tables_in_".$from];
-				}
-			}
-		}
-
-		// Print tables
-		#print_r($tables);
-
-		// Move tables
-		$mysqli->query("SET FOREIGN_KEY_CHECKS = 0;");
-		foreach($tables as $table) {
-			$newTable = $to. ".".$table;
-			$table = $from.".".$table;
-			$query = "ALTER TABLE $table RENAME $newTable;";
-			$mysqli->query($query);
-		}
-		$mysqli->query("SET FOREIGN_KEY_CHECKS = 1;");
-
-		// Close transactions
-		$mysqli->commit();
-
-		foreach($tables as $table) {
-			$mysqli->query("DROP TABLE ".$table);
-		}
-
-		// Close
-		mysqli_close($mysqli);
-
-		if($reload) {
-			print "Die Uni wird umbenannt. Bitte warten (A)...";
-			flush();
-			print '<meta http-equiv="refresh" content="0; url=/v/'.create_uni_name($to).'/" />';
-			flush();
-			exit;
-		}
+	function get_kunde_university_name() {
+		$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name(get_kunden_db_name()));
+		return get_single_row_from_query($query);
 	}
 
-	#rename_db("db_vvz_wcefv_snwuiao_utsn", "TESTADASDASDAAAAAAAAAAASDASD", 1);
 ?>

@@ -1,33 +1,5 @@
 <?php
 	$GLOBALS['databases'] = array(
-
-'kundendaten' => "CREATE TABLE kundendaten (
-	id int unsigned auto_increment primary key,
-	anrede varchar(100) DEFAULT 'Hallo Testkunde',
-	firma varchar(100) DEFAULT 'Name der Universität',
-	kundename varchar(100) default 'Test',
-	kundestrasse varchar(100) default 'Benutzer',
-	kundeplz varchar(100) default '12345',
-	kundeort varchar(100) default 'Teststadt',
-	personalized int default 0
-)",
-
-'plan' => 'CREATE TABLE plan (
-	id int unsigned auto_increment primary key,
-	name varchar(100),
-	monatliche_zahlung float(2),
-	jaehrliche_zahlung float(2)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8',
-
-'rechnungen' => "create table rechnungen (
-	id int unsigned auto_increment primary key,
-	datum date DEFAULT NULL,
-	zahlungszyklus_monate int default 1,
-	eingegangen DATETIME,
-	rabatt int,
-	spezialpreis int
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
-
 'instance_config' => "CREATE TABLE `instance_config` (
 	`name` varchar(200) not null,
 	`dbname` varchar(200) not null,
@@ -36,7 +8,7 @@
 	`plan_id` int unsigned,
 	`kunde_id` int unsigned,
 	CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `plan` (`id`) ON DELETE CASCADE,
-	CONSTRAINT `kunde_fk` FOREIGN KEY (`kunde_id`) REFERENCES `kundendaten` (`id`) ON DELETE CASCADE
+	CONSTRAINT `kunde_fk` FOREIGN KEY (`kunde_id`) REFERENCES `vvz_global`.`kundendaten` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB Default CHARSET=utf8;",
 
 'apache_restarts' => "CREATE TABLE `apache_restarts` (
