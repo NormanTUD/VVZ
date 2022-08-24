@@ -7,6 +7,8 @@ AddDefaultCharset UTF-8
 	DirectoryIndex startseite.php
 	RewriteEngine On
 
+	Redirect 301 /v/startseite.php /
+
 	RewriteRule ^v/(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4/$5 [NE,E=SFURI:$1]
 	RewriteRule ^v/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4 [NE,E=SFURI:$1]
 	RewriteRule ^v/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
@@ -14,5 +16,4 @@ AddDefaultCharset UTF-8
 	RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
 
 	RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
-	RewriteRule v$ %{ENV:BASE}/ [NE,E=SFURI:$1]
 </IfModule>
