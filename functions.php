@@ -9545,8 +9545,6 @@ order by
 		}
 	}
 
-	#die(database_exists("asdhallo"));
-
 	if(get_get("product")) {
 		if(user_is_admin($GLOBALS["logged_in_user_id"])) {
 			if(!kunde_is_personalized(get_kunde_id_by_db_name(get_kunden_db_name()))) {
