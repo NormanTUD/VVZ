@@ -27,12 +27,13 @@
 			'kundendaten' => "CREATE TABLE kundendaten (
 				id int unsigned auto_increment primary key,
 				anrede varchar(100) DEFAULT 'Hallo Testkunde',
-				universitaet varchar(100) DEFAULT 'Name der Universität',
+				universitaet varchar(100) DEFAULT 'Name der Universität' unique,
 				kundename varchar(100) default 'Test',
 				kundestrasse varchar(100) default 'Benutzer',
 				kundeplz varchar(100) default '12345',
 				kundeort varchar(100) default 'Teststadt',
 				dbname varchar(100) not null,
+				urlname varchar(100),
 				personalized int default 0
 			)",
 
@@ -129,14 +130,18 @@
 			rquery("insert into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 120, 1100)");
 		}
 
+		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {
+			if($GLOBALS["dbname"] || ($GLOBALS["dbname"] == "startpage" && get_single_row_from_query("select count(*) from vvz_global.kundendaten where universitaet = 'startpage'") == 0)) {
+				$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname) values ("Hallo Testkunde", '.esc($GLOBALS["dbname"]).', "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1", '.esc($GLOBALS["dbname"]).')';
+				rquery($query);
+			}
+		}
+
 		if(!table_exists_and_has_entries("instance_config")) {
 			$name = $_SERVER["REDIRECT_SFURI"] ?? get_kunden_db_name();
 			$shortlink = $name;
-			rquery("insert into `instance_config` (name, shortlink, plan_id, dbname, kunde_id) VALUES (".esc($name).", ".esc($shortlink).", 1, ".esc($GLOBALS['dbname']).", 1)");
-		}
-
-		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {
-			rquery('insert into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname) values ("Hallo Testkunde", "Testuni", "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1", '.esc($GLOBALS["dbname"]).')');
+			$query = "insert into `instance_config` (name, shortlink, plan_id, dbname, kunde_id) VALUES (".esc($name).", ".esc($shortlink).", 1, ".esc($GLOBALS['dbname']).", ".get_kunde_id_by_db_name($GLOBALS["dbname"]).")";
+			rquery($query);
 		}
 
 		if(!table_exists_and_has_entries("dozent")) {
@@ -296,9 +301,10 @@
 	}
 
 
-        if(!get_get('noselftest') && !$GLOBALS["no_selftest"]) {
+        if(!get_get('noselftest') && !$GLOBALS["no_selftest"] && !$GLOBALS["selftest_already_done"]) {
 		selftest_startpage();
                 selftest();
+		$GLOBALS["selftest_already_done"] = 1;
         }
 
 ?>

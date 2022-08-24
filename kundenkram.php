@@ -122,7 +122,7 @@
 
 
 	function get_kunde_id_by_db_name ($dbn) {
-		$query = "select kunde_id from instance_config where dbname = ".esc($dbn);
+		$query = "select id from vvz_global.kundendaten where dbname = ".esc($dbn);
 		return get_single_row_from_query($query);
 	}
 
@@ -157,6 +157,15 @@
 		$name = preg_replace("/technische_universitaet_/", "tu_", $name);
 		$name = preg_replace("/^_+/", "", $name);
 		return $name;
+	}
+
+	function get_kunde_db_name_by_id($id) {
+		if(!$id) {
+			return get_kunden_db_name();
+		} else {
+			$query = "select dbname from vvz_global.kundendaten where id = ".esc($id);
+			return get_single_row_from_query($query);
+		}
 	}
 
 	function get_kunden_db_name() {
@@ -264,7 +273,7 @@
 	}
 
 	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort, $dbname) {
-		$query = 'update vvz_global.kundendaten set anrede = '.esc($anrede).', universitaet = '.esc($universitaet).', kundename = '.esc($kundename).', kundestrasse = '.esc($kundestrasse).', kundeplz = '.esc($kundeplz).', kundeort = '.esc($kundeort).', personalized = 1, dbname = '.esc($dbname).' where id = '.esc($id);
+		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname)";
 		rquery($query);
 	}
 
@@ -308,15 +317,15 @@
 		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
 		if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort")) {
-			update_kunde($kunde_id, "anrede", "universitaet", "kundename", "kundestrasse", "kundeplz", "kundeort", $GLOBALS["dbname"]);
+			update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"]);
 		}
 
 		if(get_post("name_vvz")) {
-
+			// TODO
 		}
 
 		if(get_post("daten_uebernehmen")) {
-
+			// TODO
 		}
 	}
 
@@ -352,5 +361,27 @@
 	function get_kunde_university_name() {
 		$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name(get_kunden_db_name()));
 		return get_single_row_from_query($query);
+	}
+
+	function get_url_uni_name () {
+		if(isset($_SERVER["REDIRECT_URL"]) && preg_match("/^\/v\/(.*?)(?:$|\/.*)/", $_SERVER["REDIRECT_URL"], $matches)) {
+			return $matches[1];
+		}
+		return "";
+	}
+
+	function get_kunde_id_by_url () {
+		$urlname = get_url_uni_name();
+
+		$query = "select id from vvz_global.kundendaten where urlname = ".esc($urlname);
+		$res = get_single_row_from_query($query);
+		return $res ? $res : get_kunde_id_by_db_name($GLOBALS["dbname"]);
+
+	}
+
+	function get_db_name_by_kunde_id ($kunde_id) {
+		$query = "select dbname from vvz_global.kundendaten where id = ".esc($kunde_id);
+		$res = get_single_row_from_query($query);
+		return $res;
 	}
 ?>

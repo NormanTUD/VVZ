@@ -9,7 +9,6 @@
 
 	include_once("selftest.php");
 
-
 	if(get_kunden_db_name() == "startpage") {
 		$query = "show databases like 'db_vvz_%'";
 		$result = rquery($query);
@@ -30,6 +29,12 @@
 
 		exit(0);
 	} else {
+		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+		$kunde_db = get_db_name_by_kunde_id($kunde_id);
+		if($kunde_db) {
+			$GLOBALS["dbname"] = $kunde_db;
+			rquery("use ".$GLOBALS["dbname"]);
+		}
 		if($GLOBALS["db_freshly_created"]) {
 			print "<script nonce='".nonce()."'>window.location.reload();</script>";
 			exit(0);
