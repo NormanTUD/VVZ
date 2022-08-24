@@ -408,5 +408,5 @@
 		}
 	}
 
-	rename_db("db_vvz_wcefv_snwuiao_utsn", "TESTADASDASDAAAAAAAAAAASDASD", 1);
+	#rename_db("db_vvz_wcefv_snwuiao_utsn", "TESTADASDASDAAAAAAAAAAASDASD", 1);
 ?>
