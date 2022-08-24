@@ -29,8 +29,12 @@
 				} else {
 					try {
 						mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
-						$GLOBALS["db_freshly_created"] = 1;
-						include_once("selftest.php");
+						if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
+							$GLOBALS["db_freshly_created"] = 1;
+							include_once("selftest.php");
+						} else {
+							die("Could not use DB");
+						}
 					} catch (\Throwable $e) {
 						die("Could not select DB");
 					}
