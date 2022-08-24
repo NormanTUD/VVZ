@@ -5,9 +5,7 @@
 	`dbname` varchar(200) not null,
 	`shortlink` varchar(200) not null,
 	`installation_date` DATETIME NOT NULL DEFAULT current_timestamp(),
-	`plan_id` int unsigned,
 	`kunde_id` int unsigned,
-	CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `vvz_global`.`plan` (`id`) ON DELETE CASCADE,
 	CONSTRAINT `kunde_fk` FOREIGN KEY (`kunde_id`) REFERENCES `vvz_global`.`kundendaten` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB Default CHARSET=utf8;",
 

@@ -6874,7 +6874,7 @@ $ret_string .= '</table>';
 		return $objPHPExcel;
 	}
 
-	function raumplanung_crazy ($institut = null, $semester, $show_html) {
+	function raumplanung_crazy ($institut, $semester, $show_html) {
 		$institut = get_valid_institut($institut);
 		if(is_null($semester) || !$semester) {
 			$semester = get_and_create_this_semester();
@@ -7212,7 +7212,7 @@ SE 1/2 oder BZW
 		return $nr;
 	}
 
-	function raumplanung ($institut = null, $semester, $show_html) {
+	function raumplanung ($institut, $semester, $show_html) {
 		if(is_null($semester) || !$semester) {
 			$semester = get_and_create_this_semester();
 		}
@@ -9422,7 +9422,7 @@ order by
 
 			if(table_exists($row[0], "instance_config")) {
 				if(db_is_demo($row[0])) {
-					$query = "select now() - installation_date from ".$row[0].".instance_config where plan_id = 1";
+					$query = "select now() - installation_date from ".$row[0].".instance_config";
 					$seconds_diff = get_single_row_from_query($query);
 					if($seconds_diff) {
 						if($seconds_diff > 7 * 86400) {
@@ -9447,8 +9447,8 @@ order by
 		if(user_is_admin($GLOBALS["logged_in_user_id"])) {
 			if(!kunde_is_personalized(get_kunde_id_by_db_name(get_kunden_db_name()))) {
 			} else {
-				$update_query = "update instance_config set plan_id = ".esc(get_plan_id(get_get("product")));
-				rquery($update_query);
+				$query = "update vvz_global.kundendaten set plan_id = ".esc(get_plan_id(get_get("product")))." where id = ".get_kunde_id_by_db_name($GLOBALS["dbname"]);
+				rquery($query);
 			}
 		}
 	}

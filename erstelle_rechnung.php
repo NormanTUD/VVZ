@@ -17,7 +17,7 @@
 	}
 
 	function deleteDir($dir) {
-		if(preg_match("/^\/tmp\//", $dir)) {
+		if(preg_match("/^\/tmp\//", $dir) && !preg_match("/\.\./", $dir)) {
 			system("rm -rf ".escapeshellarg($dir));
 		} else {
 			die("Bist du bekloppt? Ich lass dich doch nix löschen!");

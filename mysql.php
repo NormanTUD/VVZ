@@ -53,6 +53,13 @@
 	if(!function_exists("selftest_startpage")) {
 		function selftest_startpage() {
 			$tables = array(
+				'plan' => 'CREATE TABLE plan (
+					id int unsigned auto_increment primary key,
+					name varchar(100),
+					monatliche_zahlung float(2),
+					jaehrliche_zahlung float(2)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8',
+
 				'kundendaten' => "CREATE TABLE kundendaten (
 					id int unsigned auto_increment primary key,
 					anrede varchar(100) DEFAULT 'Hallo Testkunde',
@@ -63,15 +70,10 @@
 					kundeort varchar(100) default 'Teststadt',
 					dbname varchar(100) not null,
 					urlname varchar(100) unique,
+					`plan_id` int unsigned,
+					CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `vvz_global`.`plan` (`id`) ON DELETE CASCADE,
 					personalized int default 0
 				)",
-
-				'plan' => 'CREATE TABLE plan (
-					id int unsigned auto_increment primary key,
-					name varchar(100),
-					monatliche_zahlung float(2),
-					jaehrliche_zahlung float(2)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8',
 
 				'rechnungen' => "create table rechnungen (
 					id int unsigned auto_increment primary key,
@@ -117,7 +119,7 @@
 
 	if(!function_exists("get_url_uni_name")) {
 		function get_url_uni_name () {
-			if(isset($_SERVER["REDIRECT_URL"]) && preg_match("/^\/v\/(.*?)(?:$|\/.*)/", $_SERVER["REDIRECT_URL"], $matches)) {
+			if(isset($_SERVER["REDIRECT_URL"]) && preg_match("/^\/v\/(.*?)($|\/.*$)?$/", $_SERVER["REDIRECT_URL"], $matches)) {
 				return $matches[1];
 			}
 			return "";

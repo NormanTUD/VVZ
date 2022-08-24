@@ -90,7 +90,7 @@
 		if(!table_exists_and_has_entries("instance_config")) {
 			$name = $_SERVER["REDIRECT_SFURI"] ?? get_kunden_db_name();
 			$shortlink = $name;
-			$query = "insert into `instance_config` (name, shortlink, plan_id, dbname, kunde_id) VALUES (".esc($name).", ".esc($shortlink).", 1, ".esc($GLOBALS['dbname']).", ".get_kunde_id_by_db_name($GLOBALS["dbname"]).")";
+			$query = "insert into `instance_config` (name, shortlink, dbname, kunde_id) VALUES (".esc($name).", ".esc($shortlink).", ".esc($GLOBALS['dbname']).", ".get_kunde_id_by_db_name($GLOBALS["dbname"]).")";
 			rquery($query);
 		}
 

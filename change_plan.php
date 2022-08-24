@@ -41,7 +41,7 @@
 
 <?php
 	if($product = get_get("product")) {
-		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+		$kunde_id = get_kunde_id_by_url(get_url_uni_name());
 		$kunde_ok = kunde_is_personalized($kunde_id);
 
 		if($kunde_ok) {
@@ -56,9 +56,10 @@
 ?>
 				Ihr Plan wurde geändert. Sie werden nun auf die neue Seite umgeleitet.
 <?php
-				$new_uni_name = create_uni_name(get_kunde_university_name());
+				$kunde_id = get_kunde_id_by_url();
+				$new_url = get_kunde_url_name_by_id($kunde_id);
 
-				print '<meta http-equiv="refresh" content="0; url=/v/'.$new_uni_name.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
+				print '<meta http-equiv="refresh" content="0; url=/v/'.$new_url.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
 				flush();
 				exit(0);
 			}

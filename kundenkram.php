@@ -130,14 +130,22 @@
 		return "startpage";
 	}
 
-	function get_kunde_name() {
-		$dbn = get_kunden_db_name();
-		$n = preg_replace("/^db_vvz_/", "", $dbn);
-		return $n;
+	function get_kunde_db_name() {
+		$url_uni_name = get_url_uni_name();
+		$query = 'select dbname from vvz_global.kundendaten where urlname = '.esc($url_uni_name);
+		$res = get_single_row_from_query($query);
+
+		if($res) {
+			return $res;
+		} else {
+			$dbn = get_kunden_db_name();
+			$n = preg_replace("/^db_vvz_/", "", $dbn);
+			return $n;
+		}
 	}
 
 	function get_kunde_url() {
-		$n = get_kunde_name();
+		$n = get_kunde_db_name();
 		#if(array_key_exists('REQUEST_URI', $_SERVER) && preg_match("/^\Q".$n."\E/", $_SERVER['REQUEST_URI']) || preg_match("/^v\/".$n."/", $_SERVER["REQUEST_URI"])) {
 			return "";
 		#} else {
@@ -195,7 +203,8 @@
 	}
 	
 	function get_kunde_plan () {
-		$query = "select p.name from ".get_kunden_db_name().".instance_config ic left join vvz_global.plan p on ic.plan_id = p.id";
+		$id = get_kunde_id_by_db_name(get_kunde_db_name());
+		$query = "select p.name from vvz_global.kundendaten k left join vvz_global.plan p on k.plan_id = p.id where k.id = ".esc($id);
 		return get_single_row_from_query($query);
 	}
 
@@ -281,7 +290,7 @@
 	function db_is_demo ($db) {
 		if(!array_key_exists($db, $GLOBALS["is_demo"])) {
 			if(database_exists($db) && table_exists($db, "instance_config") && table_exists($db, "plan")) {
-				$query = "select p.name from ".$db.".instance_config ic left join vvz_global.plan p on ic.plan_id = p.id";
+				$query = "select p.name from vvz_global.kundendaten k left join vvz_global.plan p on k.plan_id = p.id";
 				$GLOBALS["is_demo"][$db] = get_single_row_from_query($query) == "Demo" ? 1 : 0;
 			} else {
 				$GLOBALS["is_demo"][$db] = 1;
@@ -300,9 +309,18 @@
 		return 0;
 	}
 
-	function get_kunde_university_name() {
-		$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name(get_kunden_db_name()));
+	function get_kunde_url_name_by_id($id) {
+		$query = "select urlname from vvz_global.kundendaten where id = ".esc($id);
 		return get_single_row_from_query($query);
+	}
+
+	function get_kunde_university_name_by_id() {
+		$query = "select universitaet from vvz_global.kundendaten where id = ".esc($id);
+		return get_single_row_from_query($query);
+	}
+
+	function get_kunde_university_name() {
+		return get_kunde_university_name_by_id(get_kunde_id_by_db_name(get_kunden_db_name()));
 	}
 
 
