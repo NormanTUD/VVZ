@@ -323,4 +323,90 @@
 		}
 		return 0;
 	}
+
+	function database_exists ($name) {
+		$query = "SHOW DATABASES LIKE ".esc($name);
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			return 1;
+		}
+		return 0;
+	}
+
+
+
+	/*
+	 * @Name: Mysql Mariadb Rename Database PHP
+	 * @Author: Max Base
+	 * @Date: 2020-12-26
+	 * @Repository: https://github.com/basemax/mysql-mariadb-rename-database-php
+	 */
+
+	function rename_db ($from, $to, $reload) {
+		if(database_exists($to)) {
+			return;
+		}
+		// Limit
+		ini_set('max_execution_time', 0);
+		set_time_limit(0);
+
+
+		// Config
+		$tables = [];
+
+		// Open
+		$mysqli = new mysqli("localhost", $GLOBALS["db_username"], $GLOBALS["db_password"], $from);
+		if($mysqli->connect_error) {
+			die("Connection failed: " . $mysqli->connect_error);
+		}
+
+		
+		$sql = "CREATE DATABASE ".$to.";";
+		$result = mysqli_query($mysqli, $sql);;
+
+		$mysqli->autocommit(FALSE);
+
+		$sql = "SHOW tables;";
+		$result = mysqli_query($mysqli, $sql);
+		if(mysqli_num_rows($result) > 0) {
+			while($row = mysqli_fetch_assoc($result)) {
+				if(isset($row["Tables_in_".$from])) {
+					$tables[] = $row["Tables_in_".$from];
+				}
+			}
+		}
+
+		// Print tables
+		#print_r($tables);
+
+		// Move tables
+		$mysqli->query("SET FOREIGN_KEY_CHECKS = 0;");
+		foreach($tables as $table) {
+			$newTable = $to. ".".$table;
+			$table = $from.".".$table;
+			$query = "ALTER TABLE $table RENAME $newTable;";
+			$mysqli->query($query);
+		}
+		$mysqli->query("SET FOREIGN_KEY_CHECKS = 1;");
+
+		// Close transactions
+		$mysqli->commit();
+
+		foreach($tables as $table) {
+			$mysqli->query("DROP TABLE ".$table);
+		}
+
+		// Close
+		mysqli_close($mysqli);
+
+		if($reload) {
+			print "Die Uni wird umbenannt. Bitte warten (A)...";
+			flush();
+			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($to).'/" />';
+			flush();
+			exit;
+		}
+	}
+
+	rename_db("db_vvz_wcefv_snwuiao_utsn", "TESTADASDASDA", 1);
 ?>

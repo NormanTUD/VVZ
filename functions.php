@@ -9511,15 +9511,6 @@ order by
 		print '<img alt="TUD-Logo, Link zur Startseite" src="default_logo.gif" />';
 	}
 
-	function database_exists ($name) {
-		$query = "SHOW DATABASES LIKE ".esc($name);
-		$result = rquery($query);
-		while ($row = mysqli_fetch_row($result)) {
-			return 1;
-		}
-		return 0;
-	}
-
 	function delete_demo() {
 		$query = "show databases like 'db_vvz_%'";
 		$result = rquery($query);

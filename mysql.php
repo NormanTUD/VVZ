@@ -2,6 +2,7 @@
 	include("config.php");
 
 	$GLOBALS["db_freshly_created"] = 0;
+	$GLOBALS["db_password"] = "";
 
 	$dbfile = '/etc/vvzdbpw';
 
@@ -9,9 +10,9 @@
 		$vvzdbpw = explode("\n", file_get_contents($dbfile))[0];
 
 		if($vvzdbpw) {
-			$password = $vvzdbpw;
+			$GLOBALS["db_password"] = $vvzdbpw;
 
-			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $password);
+			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $GLOBALS["db_password"]);
 			// Check connection
 			if ($GLOBALS["dbh"]->connect_error) {
 				die("Connection failed: ".$GLOBALS["dbh"]->connect_error);
