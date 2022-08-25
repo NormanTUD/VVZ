@@ -87,6 +87,10 @@
 			}
 		}
 
+		if(!get_single_row_from_query("select count(*) from kundendaten where external_url = 'https://vvz.phil.tu-dresden.de/'")) {
+				$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname, urlname, plan_id, external_url) values ("Hallo Norbert,", "Technische Universität Dresden", "Norbert Engemaier", "Dresden", "01069", "Helmholtzstr. 10", "vvz_phil", 4, "https://vvz.phil.tu-dresden.de")';
+		}
+
 		if(!table_exists_and_has_entries("instance_config")) {
 			$name = $_SERVER["REDIRECT_SFURI"] ?? get_kunden_db_name();
 			$shortlink = $name;

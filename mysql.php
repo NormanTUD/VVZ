@@ -70,6 +70,7 @@
 					kundeort varchar(100) default 'Teststadt',
 					dbname varchar(100) not null,
 					urlname varchar(100) unique,
+					external_url varchar(200),
 					iban varchar(100),
 					`plan_id` int unsigned,
 					number_of_faculties int unsigned default 1,

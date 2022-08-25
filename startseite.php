@@ -103,7 +103,7 @@
 		<!-- Container element -->
 		<div class="parallax">
 <?php
-			$query = "select urlname, universitaet, plan_id from vvz_global.kundendaten where urlname is not null";
+			$query = "select ifnull(urlname, external_url), universitaet, plan_id from vvz_global.kundendaten where urlname is not null";
 			$result = rquery($query);
 ?>
 			<div class="bgimg-1">
