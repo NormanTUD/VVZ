@@ -1221,8 +1221,8 @@
 		$strafter = '';
 		if(!is_null($this_pruefungsnummer[6])) {
 			$strafter .= ' &mdash; Absolviert? <input type="checkbox" id="pruefung_already_done_'.
-				htmlentities($this_pruefungsnummer[6]).'" class="pruefung_already_done" value="'.
-				htmlentities($this_pruefungsnummer[6]).'" ';
+				htmlentities($this_pruefungsnummer[6] ?? "").'" class="pruefung_already_done" value="'.
+				htmlentities($this_pruefungsnummer[6] ?? "").'" ';
 
 			if(pruefung_already_done($this_pruefungsnummer[6])) {
 				$strafter .= 'checked ';
@@ -1230,8 +1230,8 @@
 			$strafter .= '/>';
 
 			$strafter .= ' Geplant? <input type="checkbox" id="pruefung_already_chosen_'.
-				htmlentities($this_pruefungsnummer[6]).'" class="pruefung_already_chosen" value="'.
-				htmlentities($this_pruefungsnummer[6]).'" ';
+				htmlentities($this_pruefungsnummer[6] ?? "").'" class="pruefung_already_chosen" value="'.
+				htmlentities($this_pruefungsnummer[6] ?? "").'" ';
 
 			if(pruefung_already_chosen($this_pruefungsnummer[6])) {
 				$strafter .= 'checked ';
@@ -1293,20 +1293,20 @@
 			<td>Anzahl Prüfungen (Summe)</td>
 			<td>
 				<?php print $modul_infos[$this_modul[0]][6]; ?>
-				<span class="display_none" id="summe_benoetigte_pruefungen_modul_<?php print htmlentities($this_modul[0]); ?>"><?php print $modul_infos[$this_modul[0]][6]; ?></span>
+				<span class="display_none" id="summe_benoetigte_pruefungen_modul_<?php print htmlentities($this_modul[0] ?? ""); ?>"><?php print $modul_infos[$this_modul[0]][6]; ?></span>
 			</td>
 		</tr>
 		<tr>
 			<td>Anzahl Prüfungen (bereits absolviert)</td>
-			<td><div id="absolvierte_pruefungen_modul_<?php print htmlentities($this_modul[0]); ?>">&mdash;</div></td>
+			<td><div id="absolvierte_pruefungen_modul_<?php print htmlentities($this_modul[0] ?? ""); ?>">&mdash;</div></td>
 		</tr>
 		<tr>
 			<td>Anzahl Prüfungen (geplant)</td>
-			<td><div id="geplante_pruefungen_modul_<?php print htmlentities($this_modul[0]); ?>">&mdash;</div></td>
+			<td><div id="geplante_pruefungen_modul_<?php print htmlentities($this_modul[0] ?? ""); ?>">&mdash;</div></td>
 		</tr>
 		<tr>
 			<td>Geplante + Absolvierte Prüfungen (Gesamtfortschritt)</td>
-			<td><div id="geplante_absolvierte_pruefungen_modul_<?php print htmlentities($this_modul[0]); ?>">&mdash; (&mdash;%)</div></td>
+			<td><div id="geplante_absolvierte_pruefungen_modul_<?php print htmlentities($this_modul[0] ?? ""); ?>">&mdash; (&mdash;%)</div></td>
 		</tr>
 <?php
 
