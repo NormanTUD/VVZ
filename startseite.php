@@ -115,7 +115,7 @@
 				</div>
 			</div>
 <?php
-			$page_str = "<br><br>Aktuelle Instanzen:<br>";
+			$page_str = "<h2>Aktuelle Kunden:</h2>";
 			$page_str .= "<ul>";
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
@@ -130,11 +130,20 @@
 			}
 
 			if($str_contents) {
+				print '<div style="position:relative;"><div style="color:#ddd;background-color:#282E34;text-align:center;padding:50px 80px;text-align: justify;">';
 				print $page_str;
 				print $str_contents;
 				print "</ul>";
+				print "</div></div>";
 			}
 ?>
+
+<div class="bgimg-2">
+  <div class="caption">
+  <span class="border">COOL!</span>
+  </div>
+</div>
+
 		</div> 
 <?php
 
