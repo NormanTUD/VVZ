@@ -11,7 +11,9 @@
 
 	if(get_kunden_db_name() == "startpage") {
 ?>
-		 <style>
+		<title>Vorlesungsverzeichnisse</title>
+		<meta name="description" content="Online-Vorlesungsverzeichnisse als Service" />
+		<style>
 			.parallax {
 				/* The image used */
 				background-image: url("img_parallax.jpg");
