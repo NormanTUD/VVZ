@@ -63,14 +63,16 @@
 				'kundendaten' => "CREATE TABLE kundendaten (
 					id int unsigned auto_increment primary key,
 					anrede varchar(100) DEFAULT 'Hallo Testkunde',
-					universitaet varchar(100) DEFAULT 'Name der Universität' unique,
+					universitaet varchar(100) DEFAULT 'Name der Universität',
 					kundename varchar(100) default 'Test',
 					kundestrasse varchar(100) default 'Benutzer',
 					kundeplz varchar(100) default '12345',
 					kundeort varchar(100) default 'Teststadt',
 					dbname varchar(100) not null,
 					urlname varchar(100) unique,
+					iban varchar(100),
 					`plan_id` int unsigned,
+					number_of_faculties int unsigned default 1,
 					CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `vvz_global`.`plan` (`id`) ON DELETE CASCADE,
 					personalized int default 0
 				)",

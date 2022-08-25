@@ -229,9 +229,21 @@
 		return get_single_row_from_query($query);
 	}
 
+	function urlname_already_exists ($urlname) {
+		if(!$urlname) {
+			return 0;
+		}
+		$query = "select count(*) from vvz_global.kundendaten where urlname = ".esc($urlname);
+		return get_single_row_from_query($query);
+	}
+
 	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort, $dbname) {
 		$urlname = create_uni_name($universitaet);
 		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname, urlname) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($urlname).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname)";
+		if(urlname_already_exists($urlname)) {
+			$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname)";
+			die($query);
+		}
 		rquery($query);
 	}
 

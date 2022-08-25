@@ -42,9 +42,14 @@
 <?php
 	if($product = get_get("product")) {
 		$kunde_id = get_kunde_id_by_url(get_url_uni_name());
-		$kunde_ok = kunde_is_personalized($kunde_id);
+		$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+		$urlname_exists = 0;
+		if(get_post("universitaet")) {
+			$urlname = create_uni_name(get_post("universitaet"));
+			$urlname_exists = urlname_already_exists($urlname) ? 1 : 0;
+		}
 
-		if($kunde_ok) {
+		if(!$urlname_exists && $kunde_ok) {
 			if(get_get("done_migration")) {
 				# Zahlungsinfos, DB speichern
 ?>
@@ -67,6 +72,9 @@
 ?>
 			<h2>Wir haben es echt so lange wie möglich herausgezögert...</h2>
 			<p>Aber ab diesem Punkt brauchen wir Ihre realen Daten</p>
+<?php
+			$uni_name = get_post("universitaet");
+?>
 			<form method="post" enctype="multipart/form-data" action="change_plan?product=<?php print htmlentities(get_get("product") ?? ""); ?>">
 				<input type="hidden" name="update_kunde_data" value=1 />
 				<table>
@@ -75,7 +83,11 @@
 						<td>Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="A" /></td>
 					</tr>
 					<tr>
-						<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" value="B" /></td>
+					<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities($uni_name ?? ""); ?>" /><?php
+						if($urlname_exists) {
+							print "<br>Diese Uni hat bereits eine URL";
+						}
+					?></td>
 					</tr>
 					<tr>
 						<td>Ihr Name</td><td><input type="text" name="kundename" placeholder="Ihr Name" value="A" /></td>
