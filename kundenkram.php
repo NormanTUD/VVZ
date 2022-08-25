@@ -372,4 +372,9 @@
 		}
 		return false;
 	}
+
+	function kunde_owns_url ($kunde, $url) {
+		$query = "select count(*) from kundendaten where urlname = ".esc($url)." and id = ".esc($kunde);
+		return get_single_row_from_query($query);
+	}
 ?>

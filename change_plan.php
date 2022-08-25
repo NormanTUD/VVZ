@@ -6,6 +6,10 @@
 	include("header.php");
 	include_once("startseite_functions.php");
 	include_once("kundenkram.php");
+
+	if(!user_is_admin($GLOBALS["logged_in_user_id"])) {
+		die("Nur Admins dürfen hier drauf");
+	}
 ?>
 	<div id="mainindex">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
@@ -49,19 +53,22 @@
 			$urlname_exists = urlname_already_exists($urlname) ? 1 : 0;
 		}
 
+		if(get_post("update_kunde_data")) {
+			if(!$urlname_exists) {
+				$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
-		if(get_post("update_kunde_data") && !$urlname_exists) {
-			$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
+					update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+				}
 
-			if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
-				update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+				if(get_post("daten_uebernehmen")) {
+					// TODO
+				}
+
+				$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+			} else {
+				die("URL ALREADY EXISTS");
 			}
-
-			if(get_post("daten_uebernehmen")) {
-				// TODO
-			}
-
-			$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
 		}
 
 		if(!$urlname_exists && $kunde_ok) {
