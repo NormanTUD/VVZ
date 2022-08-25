@@ -194,7 +194,7 @@
   </div>
 </div>
 -->
-			<div class="footer_link"><a href="">Impressum</a> | <a href="">Datenschutzerklärung</a></div>
+			<div class="footer_link"><a href="main_impressum.php">Impressum</a> | <a href="">Datenschutzerklärung</a></div>
 		</div> 
 
 <?php
