@@ -27,6 +27,7 @@
 			}
 			 body, html {
 				height: 100%;
+				font: 400 15px/1.8 "Lato", sans-serif
 			}
 
 			.parallax {
@@ -145,12 +146,13 @@
 			}
 ?>
 
+<!--
 <div class="bgimg-2">
   <div class="caption">
   <span class="border">COOL!</span>
   </div>
 </div>
-
+-->
 		</div> 
 <?php
 
