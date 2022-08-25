@@ -81,6 +81,12 @@
 		closedir($directory);
 	}
 
+	function get_kunde_rechnungsnummer($kunde_id, $datum) {
+		$datum = preg_replace("/-/", "", $datum);
+		$rechnungsnummer = $kunde_id.$datum;
+		return $rechnungsnummer;
+	}
+
 	$kunde_id = get_kunde_id_by_url(get_url_uni_name());
 
 	if($kunde_id) {
@@ -102,6 +108,7 @@
 		regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "kundestrasse"));
 		regex_in_file($data_file, '/KUNDEPLZ/', get_kunde_X($kunde_id, "kundeplz"));
 		regex_in_file($data_file, '/KUNDEORT/', get_kunde_X($kunde_id, "kundeort"));
+		regex_in_file($data_file, '/RECHNUNGSNUMMER/', get_kunde_rechnungsnummer($kunde_id, $rechnungsstellung));
 
 		$invoice_file = $tmp."/_invoice.tex";
 
