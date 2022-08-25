@@ -42,6 +42,7 @@
 				background-position: center;
 				background-repeat: no-repeat;
 				background-size: cover;
+				margin: -8px;
 			}
 
 
