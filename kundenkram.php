@@ -237,36 +237,36 @@
 		return get_single_row_from_query($query);
 	}
 
-	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort, $dbname, $plan_id) {
+	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort, $dbname, $plan_id, $iban, $email) {
 		$urlname = create_uni_name($universitaet);
 		if(urlname_already_exists($urlname)) {
 			return 1;
 		}
-		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname, urlname, plan_id) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id)";
+		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname, urlname, plan_id, iban, email) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).", ".esc($iban).", ".esc($email).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id), iban=values(iban), email=values(email)";
 		rquery($query);
 	}
 
 	function get_plan_id($name) {
 		$plan_id = null;
 		switch($name) {
-			case 'demo':
-				$plan_id = 1;
-				break;
-			case 'basic_faculty':
-				$plan_id = 2;
-				break;
-			case 'basic_university':
-				$plan_id = 3;
-				break;
-			case 'pro_faculty':
-				$plan_id = 4;
-				break;
-			case 'pro_university':
-				$plan_id = 5;
-				break;
-			default:
-				die("Unknown plan: >>".htmlentities(get_get("product"))."<<");
-				break;
+		case 'demo':
+			$plan_id = 1;
+			break;
+		case 'basic_faculty':
+			$plan_id = 2;
+			break;
+		case 'basic_university':
+			$plan_id = 3;
+			break;
+		case 'pro_faculty':
+			$plan_id = 4;
+			break;
+		case 'pro_university':
+			$plan_id = 5;
+			break;
+		default:
+			die("Unknown plan: >>".htmlentities(get_get("product"))."<<");
+			break;
 		}
 
 		return $plan_id;
