@@ -16,4 +16,5 @@ AddDefaultCharset UTF-8
 	RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
 
 	RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
+	Redirect 301 ^/v/$ /
 </IfModule>
