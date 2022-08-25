@@ -4,6 +4,9 @@
 		exit(0);
 	}
 	$this_page_file = ($_SERVER['REQUEST_URI']);
+	if(preg_match("/^\/v\/[a-z-_0-9]+\/$/", $this_page_file)) {
+		$this_page_file = "startseite";
+	}
 
 	$redirect_status = array_key_exists("REDIRECT_STATUS", $_SERVER) ? $_SERVER['REDIRECT_STATUS'] : null;
 
