@@ -9337,7 +9337,7 @@ order by
 		$query = 'select videolink from veranstaltung_metadaten where veranstaltung_id = '.esc($v_id);
 		$row = get_single_row_from_query($query);
 		if($row) {
-			return "<a href='".htmlentities($row)."'>&#128249;</a>";
+			return "<a target='_blank' href='".htmlentities($row)."'>&#128249;</a>";
 		}
 		return "";
 	}

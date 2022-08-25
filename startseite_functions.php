@@ -1394,7 +1394,7 @@
 
 					$pruefung_already_done_string = pruefung_already_done_string($this_pruefungsnummer);
 ?>
-					<span class="display_none" id="pn_modul_<?php print htmlentities($this_pruefungsnummer[6]); ?>"><?php print htmlentities($this_modul[0]); ?></span>
+					<span class="display_none" id="pn_modul_<?php print htmlentities($this_pruefungsnummer[6] ?? ""); ?>"><?php print htmlentities($this_modul[0] ?? ""); ?></span>
 <?php
 					print "<a href='startseite?semester=".$GLOBALS['this_semester'][0]."&institut=".$GLOBALS['this_institut']."&studiengang=alle&pruefungsnummer_id=$this_pruefungsnummer[0]'>$str_pruefungen</a>$pruefung_already_done_string\n";
 ?><br />
