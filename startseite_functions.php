@@ -1105,10 +1105,10 @@
 	function show_form_planung ($metadaten, $module) {
 ?>
 		<form>
-			<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang')); ?>" />
-			<input type="hidden" name="chosen_semester" value="<?php print htmlentities(get_get('chosen_semester')); ?>" />
-			<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester')); ?>" />
-			<input type="hidden" name="bereich" value="<?php print htmlentities(get_get('bereich')); ?>" />
+			<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang') ?? ""); ?>" />
+			<input type="hidden" name="chosen_semester" value="<?php print htmlentities(get_get('chosen_semester') ?? ""); ?>" />
+			<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
+			<input type="hidden" name="bereich" value="<?php print htmlentities(get_get('bereich') ?? ""); ?>" />
 			<input type="hidden" name="erstelle_stundenplan" value="1" />
 <?php
 			$metastring = '';
@@ -1117,16 +1117,16 @@
 					if($metastring) {
 						$metastring = "$metastring,";
 					}
-					$metastring .= "modul_".htmlentities($this_modul_id).'_';
-					$metastring .= 'veranstaltungstyp_'.htmlentities($this_vt_id)."_anzahl_".htmlentities($this_vt_anzahl);
+					$metastring .= "modul_".htmlentities($this_modul_id ?? "").'_';
+					$metastring .= 'veranstaltungstyp_'.htmlentities($this_vt_id ?? "")."_anzahl_".htmlentities($this_vt_anzahl ?? "");
 				}
 			}
 ?>
-			<input type="hidden" name="metastring" value="<?php print htmlentities($metastring); ?>" />
+			<input type="hidden" name="metastring" value="<?php print htmlentities($metastring ?? ""); ?>" />
 <?php
 			foreach ($module as $this_modul) {
 ?>
-				<input type="hidden" name="modul[]" value="<?php print htmlentities($this_modul); ?>" />
+				<input type="hidden" name="modul[]" value="<?php print htmlentities($this_modul ?? ""); ?>" />
 <?php
 			}
 ?>
@@ -1211,7 +1211,7 @@
 ?>
 		<tr>
 			<td colspan="2">
-				<i>Leider keine eingetragenen Prüfungsnummern für das Modul &raquo;<?php print htmlentities($this_modul[1]); ?>&laquo; (<?php print $this_studiengang[1]; ?>)</i>
+				<i>Leider keine eingetragenen Prüfungsnummern für das Modul &raquo;<?php print htmlentities($this_modul[1] ?? ""); ?>&laquo; (<?php print $this_studiengang[1]; ?>)</i>
 			</td>
 		</tr>
 <?php
