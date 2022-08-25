@@ -17,7 +17,6 @@
 		print "<a href='?new_demo_uni=1'><button>Sofort eine kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>";
 		print "<br><br>Aktuelle Instanzen:<br>";
 		print "<ul>";
-		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
 		while ($row = mysqli_fetch_row($result)) {
 			$urlname = $row[0];
 			$uniname = $row[1];
