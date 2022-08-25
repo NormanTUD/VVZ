@@ -164,8 +164,8 @@
 			<div class="bgimg-1">
 				<div class="caption">
 					<span class="border">
-						Vorlesungsverzeichnis
-						<a href='?new_demo_uni=1'><button>Kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>
+						Vorlesungsverzeichnis<br>
+						&nbsp;<a target="_blank" href='?new_demo_uni=1'><button>Kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>
 					</span>
 				</div>
 			</div>
