@@ -209,7 +209,7 @@
   </div>
 </div>
 -->
-			<div class="footer_link"><a href="main_impressum.php">Impressum</a> | <a href="">Datenschutzerklärung</a></div>
+			<div class="footer_link"><a target="_blank" href="http://www.omni-concept.com/v1024/Pages/impressum.htm">Impressum</a> | <a target="_blank" href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm">Datenschutzerklärung</a></div>
 		</div> 
 
 <?php
