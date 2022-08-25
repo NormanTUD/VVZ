@@ -15,8 +15,10 @@
 
 		print "<h2>VVZ-Startseite</h2>";
 		print "<a href='?new_demo_uni=1'><button>Sofort eine kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>";
-		print "<br><br>Aktuelle Instanzen:<br>";
-		print "<ul>";
+
+		$page_str = "<br><br>Aktuelle Instanzen:<br>";
+		$page_str .= "<ul>";
+		$str_contents = "";
 		while ($row = mysqli_fetch_row($result)) {
 			$urlname = $row[0];
 			$uniname = $row[1];
@@ -25,9 +27,14 @@
 
 			$desc = "$uniname ($plan_name)";
 
-			print "<li><a href='/v/$urlname/'>$desc</a></li>";
+			$str_contents = "<li><a href='/v/$urlname/'>$desc</a></li>";
 		}
-		print "</ul>";
+
+		if($str_contents) {
+			print $page_str;
+			print $str_contents;
+			print "</ul>";
+		}
 
 		exit(0);
 	} else {
