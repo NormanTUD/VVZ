@@ -43,7 +43,11 @@
                                                 rquery($this_create_query);
                                         }
                                 } else {
-                                        rquery($create_query);
+					try {
+						rquery($create_query);
+					} catch (\Throwable $e) {
+						//
+					}
                                 }
                                 $GLOBALS['settings_cache'] = array();
                         }
