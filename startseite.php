@@ -119,6 +119,27 @@
 			a:active {
 				color: blue;
 			}
+
+
+			.footer_link a:link {
+				color: black;
+			}
+
+			/* visited link */
+			.footer_link a:visited {
+				color: black;
+			}
+
+			/* mouse over link */
+			.footer_link a:hover {
+				color: gray;
+			}
+
+			/* selected link */
+			.footer_link a:active {
+				color: blue;
+			}
+
 		</style>
 
 		<!-- Container element -->
@@ -173,7 +194,9 @@
   </div>
 </div>
 -->
+			<div class="footer_link"><a href="">Impressum</a> | <a href="">Datenschutzerklärung</a></div>
 		</div> 
+
 <?php
 
 		exit(0);
