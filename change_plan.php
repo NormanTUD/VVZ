@@ -50,7 +50,7 @@
 		}
 
 
-		if(get_post("update_kunde_data") && $urlname_exists) {
+		if(get_post("update_kunde_data") && !$urlname_exists) {
 			$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
 			if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product")) {
@@ -100,7 +100,7 @@
 					<tr>
 					<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_post("universitaet") ?? ""); ?>" /><?php
 						if($urlname_exists) {
-							print "<br>Diese Uni hat bereits eine URL";
+							print "<br>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.";
 						}
 					?></td>
 					</tr>
