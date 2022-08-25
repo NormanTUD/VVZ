@@ -11,7 +11,6 @@
 
 \usepackage[german]{invoice}
 
-
 \renewcommand{\familydefault}{\sfdefault}
 
 % include meta data
@@ -56,7 +55,6 @@
    }%
 }
 
-
 \begin{document}
 	\begin{letter}{\customerCompany \\ \customerName \\ 
 	\customerStreet \\ \customerZIP \ \customerCity}
@@ -67,14 +65,9 @@
 		    \begin{invoice}{Euro}{0}
 			    \input{_invoice}
 		    \end{invoice}
-		\ps Im ausgewiesenen Betrag ist gemäß § 19 UStG keine Umsatzsteuer 
-		enthalten.
+		\ps Im ausgewiesenen Betrag ist gemäß § 19 UStG keine Umsatzsteuer enthalten.
 
 		\closing{\invoiceClosing}
 		\invoiceEnclosures
-
-
-
 	\end{letter}
 \end{document}
-
