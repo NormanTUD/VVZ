@@ -374,7 +374,12 @@
 	}
 
 	function kunde_owns_url ($kunde, $url) {
-		$query = "select count(*) from kundendaten where urlname = ".esc($url)." and id = ".esc($kunde);
+		$query = "select count(*) from vvz_global.kundendaten where urlname = ".esc($url)." and id = ".esc($kunde);
 		return get_single_row_from_query($query);
+	}
+
+	function update_kunde_plan($kunde_id, $plan_id) {
+		$query = "update vvz_global.kundendaten set plan_id = ".esc($plan_id)." where id = ".esc($kunde_id);
+		rquery($query);
 	}
 ?>

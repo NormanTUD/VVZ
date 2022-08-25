@@ -71,6 +71,10 @@
 			}
 		}
 
+		if(kunde_owns_url($kunde_id, get_url_uni_name())) {
+			update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
+		}
+
 		if(!$urlname_exists && $kunde_ok) {
 			if(get_get("done_migration")) {
 				# Zahlungsinfos, DB speichern
