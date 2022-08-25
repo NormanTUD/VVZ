@@ -95,7 +95,7 @@
 				<table>
 					</tr>
 					<tr>
-						<td>Ihre Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="<?php print htmlentities(get_post("anrede") ?? ""); ?>" /></td>
+						<td>Ihre Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="<?php print htmlentities(get_post("anrede") ?? "Sehr geehrte(r) Kunde"); ?>" /></td>
 					</tr>
 					<tr>
 					<td>Universität:</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_post("universitaet") ?? ""); ?>" /><?php

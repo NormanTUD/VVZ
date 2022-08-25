@@ -102,7 +102,6 @@
 
 		regex_in_file($data_file, "/ANREDE/", get_kunde_X($kunde_id, "anrede"));
 		regex_in_file($data_file, '/DATUMRECHNUNGSSTELLUNG/', $rechnungsstellung);
-		regex_in_file($data_file, '/DATUMZAHLUNGSFRIST/', $zahlungsfrist);
 		regex_in_file($data_file, '/UNIVERSITAET/', get_kunde_X($kunde_id, "universitaet"));
 		regex_in_file($data_file, '/KUNDENAME/', get_kunde_X($kunde_id, "kundename"));
 		regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "kundestrasse"));
