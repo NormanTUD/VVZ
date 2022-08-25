@@ -55,7 +55,7 @@
 			$tables = array(
 				'plan' => 'CREATE TABLE plan (
 					id int unsigned auto_increment primary key,
-					name varchar(100),
+					name varchar(100) unique,
 					monatliche_zahlung float(2),
 					jaehrliche_zahlung float(2)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8',
