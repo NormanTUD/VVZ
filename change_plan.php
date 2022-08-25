@@ -100,7 +100,7 @@
 					<tr>
 					<td>Universität:</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_post("universitaet") ?? ""); ?>" /><?php
 						if($urlname_exists) {
-							print "<br>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.";
+							print "<br><span style='color: red'>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.</span>";
 						}
 					?></td>
 					</tr>
