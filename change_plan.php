@@ -49,6 +49,21 @@
 			$urlname_exists = urlname_already_exists($urlname) ? 1 : 0;
 		}
 
+
+		if(get_post("update_kunde_data") && $urlname_exists) {
+			$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+
+			if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product")) {
+				update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"));
+			}
+
+			if(get_post("daten_uebernehmen")) {
+				// TODO
+			}
+
+			$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+		}
+
 		if(!$urlname_exists && $kunde_ok) {
 			if(get_get("done_migration")) {
 				# Zahlungsinfos, DB speichern
@@ -80,29 +95,26 @@
 				<table>
 					</tr>
 					<tr>
-						<td>Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="A" /></td>
+						<td>Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="<?php print htmlentities(get_post("anrede") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-					<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities($uni_name ?? ""); ?>" /><?php
+					<td>Universität</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_post("universitaet") ?? ""); ?>" /><?php
 						if($urlname_exists) {
 							print "<br>Diese Uni hat bereits eine URL";
 						}
 					?></td>
 					</tr>
 					<tr>
-						<td>Ihr Name</td><td><input type="text" name="kundename" placeholder="Ihr Name" value="A" /></td>
+						<td>Ihr Name</td><td><input type="text" name="kundename" placeholder="Ihr Name" value="<?php print htmlentities(get_post("kundename") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Straße, Hausnummer</td><td><input type="text" name="kundestrasse" placeholder="Straße" value="A" /></td>
+						<td>Straße, Hausnummer</td><td><input type="text" name="kundestrasse" placeholder="Straße" value="<?php print htmlentities(get_post("kundestrasse") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Postleitzahl</td><td><input type="text" name="kundeplz" placeholder="Postleitzahl" value="A" /></td>
+						<td>Postleitzahl</td><td><input type="text" name="kundeplz" placeholder="Postleitzahl" value="<?php print htmlentities(get_post("kundeplz") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Ort</td><td><input type="text" name="kundeort" placeholder="Ort" value="A" /></td>
-					</tr>
-					<tr>
-						<td>Name des Vorlesungsverzeichnisses</td><td><input type="text" name="name_vvz" placeholder="Name des Vorlesungsverzeichnisses (z.B. TU Dresden)" value="A" /></td>
+						<td>Ort</td><td><input type="text" name="kundeort" placeholder="Ort" value="<?php print htmlentities(get_post("kundeort") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
 						<td>Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen?</td>

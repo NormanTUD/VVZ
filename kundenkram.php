@@ -239,10 +239,10 @@
 
 	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $kundeplz, $kundeort, $dbname, $plan_id) {
 		$urlname = create_uni_name($universitaet);
-		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname, urlname, plan_id) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id)";
 		if(urlname_already_exists($urlname)) {
-			$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname, plan_id) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($plan_id).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), plan_id=values(plan_id)";
+			return 1;
 		}
+		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, kundeplz, kundeort, personalized, dbname, urlname, plan_id) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($kundeplz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), kundeplz=values(kundeplz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id)";
 		rquery($query);
 	}
 
@@ -282,17 +282,6 @@
 		return [$monatlich, $jaehrlich];
 	}
 
-	if(get_post("update_kunde_data")) {
-		$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
-
-		if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product")) {
-			update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"));
-		}
-
-		if(get_post("daten_uebernehmen")) {
-			// TODO
-		}
-	}
 
 	function is_demo () {
 		if(get_kunde_plan() == "Demo") {
