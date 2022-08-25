@@ -103,7 +103,7 @@
 		<!-- Container element -->
 		<div class="parallax">
 <?php
-			$query = "select ifnull(urlname, external_url), universitaet, plan_id from vvz_global.kundendaten where urlname is not null";
+			$query = "select urlname, universitaet, plan_id, external_url from vvz_global.kundendaten where urlname is not null";
 			$result = rquery($query);
 ?>
 			<div class="bgimg-1">
@@ -122,11 +122,18 @@
 				$urlname = $row[0];
 				$uniname = $row[1];
 				$plan_id = $row[2];
+				$external_url = $row[3];
 				$plan_name = get_plan_name_by_id($plan_id);
+
+				if($external_url) {
+					$urlname = $external_url;
+				} else {
+					$urlname = "/v/$urlname";
+				}
 
 				$desc = "$uniname ($plan_name)";
 
-				$str_contents .= "<li><a href='/v/$urlname/'>$desc</a></li>";
+				$str_contents .= "<li><a target='_blank' href='$urlname/'>$desc</a></li>";
 			}
 
 			if($str_contents) {
