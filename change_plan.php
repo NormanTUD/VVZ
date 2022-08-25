@@ -149,14 +149,14 @@
 		<div class="plan_div <?php print preg_match("/Basic/", get_kunde_plan()) ? "chosen_plan" : 'possible_plan'; ?>">
 			<p>Basic</p>
 			<p>Erlaubt die Verwaltung von Stundenplänen, Dozenten und Veranstaltung für eine gesamte Fakultät oder Universität</p>
-			<p>Nur eine Fakultät: <a href="?product=basic_faculty"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("basic_faculty")[0]); ?>€/Monat -- oder -- <?php print htmlentities(get_plan_price_by_name("basic_faculty")[1]); ?>€/Jahr</i></button></a></p>
-			<p>Eine ganze Universität: <a href="?product=basic_university"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("basic_university")[0]); ?>€/Monat -- oder -- <?php print htmlentities(get_plan_price_by_name("basic_university")[1]); ?>€/Jahr</i></button></a></p>
+			<p>Eine Fakultät: <a href="?product=basic_faculty"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("basic_faculty")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("basic_faculty")[1]); ?>€/Jahr</i></button></a></p>
+			<p>Ganze Universität: <a href="?product=basic_university"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("basic_university")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("basic_university")[1]); ?>€/Jahr</i></button></a></p>
 		</div>
 		<div class="plan_div <?php print preg_match("/Pro/", get_kunde_plan()) ? "chosen_plan" : 'possible_plan'; ?>">
 			<p>Pro</p>
 			<p>Alles der Basis-Variante, dazu ein halbautomatischer Stundenplanersteller, um die Anzahl der Anfragen im Erstsemester zur Stundenplanung zu reduzieren und Zusatzwünsche</p>
-			<p>Nur eine Fakultät: <a href="?product=pro_faculty"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("pro_faculty")[0]); ?>€/Monat -- oder -- <?php print htmlentities(get_plan_price_by_name("pro_faculty")[0]); ?>€/Jahr</i></button></a></p>
-			<p>Eine gesamte Universität: <a href="?product=pro_university"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("pro_university")[0]); ?>€/Monat -- oder -- <?php print htmlentities(get_plan_price_by_name("pro_university")[1]); ?>€/Jahr</i></button></a></p>
+			<p>Eine Fakultät: <a href="?product=pro_faculty"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("pro_faculty")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("pro_faculty")[0]); ?>€/Jahr</i></button></a></p>
+			<p>Ganze Universität: <a href="?product=pro_university"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("pro_university")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("pro_university")[1]); ?>€/Jahr</i></button></a></p>
 		</div>
 	</div>
 
