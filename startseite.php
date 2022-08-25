@@ -27,7 +27,7 @@
 
 			$desc = "$uniname ($plan_name)";
 
-			$str_contents = "<li><a href='/v/$urlname/'>$desc</a></li>";
+			$str_contents .= "<li><a href='/v/$urlname/'>$desc</a></li>";
 		}
 
 		if($str_contents) {
