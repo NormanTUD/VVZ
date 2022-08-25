@@ -346,13 +346,4 @@
 		$query = "select name from vvz_global.plan where id = ".esc($id);
 		return get_single_row_from_query($query);
 	}
-
-	/*
-	$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
-	$kunde_db = get_db_name_by_kunde_id($kunde_id);
-	if($kunde_db && database_exists($kunde_db)) {
-		$GLOBALS["dbname"] = $kunde_db;
-		rquery("use ".$GLOBALS["dbname"]);
-	}
-	 */
 ?>
