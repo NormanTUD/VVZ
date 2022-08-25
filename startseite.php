@@ -10,7 +10,7 @@
 	include_once("selftest.php");
 
 	if(get_kunden_db_name() == "startpage") {
-		$query = "show databases like 'db_vvz_%'";
+		$query = "select urlname, universitaet, plan_id from vvz_global.kundendaten where urlname is not null";
 		$result = rquery($query);
 
 		print "<h2>VVZ-Startseite</h2>";
@@ -19,11 +19,14 @@
 		print "<ul>";
 		print "<li><form method=get><input name='new_uni_name' placeholder='Name der Uni'><input type='submit'><form></li>";
 		while ($row = mysqli_fetch_row($result)) {
-			$db_name = $row[0];
-			$kunde_name = $db_name;
-			$kunde_name = preg_replace("/^db_vvz_/", "", $kunde_name);
+			$urlname = $row[0];
+			$uniname = $row[1];
+			$plan_id = $row[2];
+			$plan_name = get_plan_name_by_id($plan_id);
 
-			print "<li><a href='/v/$kunde_name/'>$kunde_name</a></li>";
+			$desc = "$uniname ($plan_name)";
+
+			print "<li><a href='/v/$urlname/'>$desc</a></li>";
 		}
 		print "</ul>";
 

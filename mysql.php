@@ -73,6 +73,7 @@
 					iban varchar(100),
 					`plan_id` int unsigned,
 					number_of_faculties int unsigned default 1,
+					email varchar(100),
 					CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `vvz_global`.`plan` (`id`) ON DELETE CASCADE,
 					personalized int default 0
 				)",

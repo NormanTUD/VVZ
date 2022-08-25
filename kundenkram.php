@@ -358,6 +358,10 @@
 		return $res;
 	}
 
+	function get_plan_name_by_id($id) {
+		$query = "select name from vvz_global.plan where id = ".esc($id);
+		return get_single_row_from_query($query);
+	}
 
 	/*
 	$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
