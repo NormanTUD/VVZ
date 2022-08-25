@@ -81,7 +81,7 @@
 		closedir($directory);
 	}
 
-	$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+	$kunde_id = get_kunde_id_by_url(get_url_uni_name());
 
 	if($kunde_id) {
 		$tmp = tempdir();
