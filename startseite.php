@@ -48,7 +48,7 @@
 
 			.bgimg-1, .bgimg-2, .bgimg-3 {
 				position: relative;
-				opacity: 0.65;
+				opacity: 0.9;
 				background-attachment: fixed;
 				background-position: center;
 				background-repeat: no-repeat;
@@ -170,7 +170,7 @@
 				</div>
 			</div>
 <?php
-			$page_str = "<h2>Aktuelle Kunden:</h2>";
+			$page_str = "<center><h2>Aktuelle Kunden:</h2>";
 			$page_str .= "<ul class='side_by_side'>";
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
@@ -198,7 +198,7 @@
 				print $page_str;
 				print $str_contents;
 				print "</ul>";
-				print "</div></div>";
+				print "</div></div></center>";
 			}
 ?>
 
