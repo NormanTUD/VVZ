@@ -142,6 +142,7 @@
 				color: blue;
 			}
 
+/*
 			.side_by_side {
 				display: inline;
 			}
@@ -155,6 +156,7 @@
 				background-repeat: no-repeat;
 				background-position: center 30px;
 			}
+*/
 		</style>
 
 		<!-- Container element -->
@@ -196,7 +198,7 @@
 			}
 
 			if($str_contents) {
-				print '<div style="position:relative;height:inherit;"><div style="color:#ddd;background-color:#282E34;text-align:center;padding:50px 80px;text-align: justify;">';
+				print '<div style="position:relative;"><div style="color:#ddd;background-color:#282E34;text-align:center;padding:50px 80px;text-align: justify;">';
 				print $page_str;
 				print $str_contents;
 				print "</ul>";
