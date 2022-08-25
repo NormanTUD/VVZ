@@ -99,6 +99,25 @@
 					background-attachment: scroll;
 				}
 			}
+
+			a:link {
+				color: white;
+			}
+
+			/* visited link */
+			a:visited {
+				color: white;
+			}
+
+			/* mouse over link */
+			a:hover {
+				color: gray;
+			}
+
+			/* selected link */
+			a:active {
+				color: blue;
+			}
 		</style>
 
 		<!-- Container element -->
