@@ -203,14 +203,6 @@
 				print "</div></div>";
 			}
 ?>
-
-<!--
-<div class="bgimg-2">
-  <div class="caption">
-  <span class="border">COOL!</span>
-  </div>
-</div>
--->
 			<div class="footer_link"><a target="_blank" href="http://www.omni-concept.com/v1024/Pages/impressum.htm">Impressum</a> | <a target="_blank" href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm">Datenschutzerklärung</a></div>
 		</div> 
 
