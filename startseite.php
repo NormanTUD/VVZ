@@ -140,12 +140,25 @@
 				color: blue;
 			}
 
+			.side_by_side {
+				display: inline;
+			}
+
+			.side_by_side li {
+				float: left;
+				list-style-type: none;
+				padding:10px;
+				border: 1px solid #3687AF;
+				background-color: #006092;
+				background-repeat: no-repeat;
+				background-position: center 30px;
+			}
 		</style>
 
 		<!-- Container element -->
 		<div class="parallax">
 <?php
-			$query = "select urlname, universitaet, plan_id, external_url from vvz_global.kundendaten where urlname is not null";
+			$query = "select urlname, universitaet, plan_id, external_url from vvz_global.kundendaten where urlname is not null order by external_url desc, urlname asc";
 			$result = rquery($query);
 ?>
 			<div class="bgimg-1">
@@ -158,7 +171,7 @@
 			</div>
 <?php
 			$page_str = "<h2>Aktuelle Kunden:</h2>";
-			$page_str .= "<ul>";
+			$page_str .= "<ul class='side_by_side'>";
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
 				$urlname = $row[0];
@@ -173,9 +186,11 @@
 					$urlname = "/v/$urlname";
 				}
 
-				$desc = "$uniname ($plan_name)";
+				if($plan_name != "Demo") {
+					$desc = "$uniname ($plan_name)";
 
-				$str_contents .= "<li><a target='_blank' href='$urlname/'>$desc</a></li>";
+					$str_contents .= "<li><a target='_blank' href='$urlname/'>$desc</a></li>";
+				}
 			}
 
 			if($str_contents) {
