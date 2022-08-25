@@ -1,3 +1,5 @@
+"use strict";
+
 <?php
 	header('Content-Type: application/javascript');
 	include_once("../config.php");
