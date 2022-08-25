@@ -10,31 +10,133 @@
 	include_once("selftest.php");
 
 	if(get_kunden_db_name() == "startpage") {
-		$query = "select urlname, universitaet, plan_id from vvz_global.kundendaten where urlname is not null";
-		$result = rquery($query);
+?>
+		 <style>
+			.parallax {
+				/* The image used */
+				background-image: url("img_parallax.jpg");
 
-		print "<h2>VVZ-Startseite</h2>";
-		print "<a href='?new_demo_uni=1'><button>Sofort eine kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>";
+				/* Set a specific height */
+				min-height: 500px;
 
-		$page_str = "<br><br>Aktuelle Instanzen:<br>";
-		$page_str .= "<ul>";
-		$str_contents = "";
-		while ($row = mysqli_fetch_row($result)) {
-			$urlname = $row[0];
-			$uniname = $row[1];
-			$plan_id = $row[2];
-			$plan_name = get_plan_name_by_id($plan_id);
+				/* Create the parallax scrolling effect */
+				background-attachment: fixed;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+			}
+			 body, html {
+				height: 100%;
+			}
 
-			$desc = "$uniname ($plan_name)";
+			.parallax {
+				/* The image used */
+				background-image: url("img_parallax.jpg");
 
-			$str_contents .= "<li><a href='/v/$urlname/'>$desc</a></li>";
-		}
+				/* Full height */
+				height: 100%;
 
-		if($str_contents) {
-			print $page_str;
-			print $str_contents;
-			print "</ul>";
-		}
+				/* Create the parallax scrolling effect */
+				background-attachment: fixed;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+			}
+
+
+			.bgimg-1, .bgimg-2, .bgimg-3 {
+				position: relative;
+				opacity: 0.65;
+				background-attachment: fixed;
+				background-position: center;
+				background-repeat: no-repeat;
+				background-size: cover;
+			}
+
+			.bgimg-1 {
+				background-image: url("img_parallax.jpg");
+				min-height: 100%;
+			}
+
+			.bgimg-2 {
+				background-image: url("img_parallax2.jpg");
+				min-height: 400px;
+			}
+
+			.bgimg-3 {
+				background-image: url("img_parallax3.jpg");
+				min-height: 400px;
+			}
+
+			.caption {
+				position: absolute;
+				left: 0;
+				top: 50%;
+				width: 100%;
+				text-align: center;
+				color: #000;
+			}
+
+			.caption span.border {
+				background-color: #111;
+				color: #fff;
+				padding: 18px;
+				font-size: 25px;
+				letter-spacing: 10px;
+			}
+
+			h3 {
+				letter-spacing: 5px;
+				text-transform: uppercase;
+				font: 20px "Lato", sans-serif;
+				color: #111;
+			}
+
+			/* Turn off parallax scrolling for tablets and phones */
+			@media only screen and (max-device-width: 1024px) {
+				.bgimg-1, .bgimg-2, .bgimg-3 {
+					background-attachment: scroll;
+				}
+			}
+		</style>
+
+		<!-- Container element -->
+		<div class="parallax">
+<?php
+			$query = "select urlname, universitaet, plan_id from vvz_global.kundendaten where urlname is not null";
+			$result = rquery($query);
+?>
+			<div class="bgimg-1">
+				<div class="caption">
+					<span class="border">
+						Vorlesungsverzeichnis
+						<a href='?new_demo_uni=1'><button>Kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>
+					</span>
+				</div>
+			</div>
+<?php
+			$page_str = "<br><br>Aktuelle Instanzen:<br>";
+			$page_str .= "<ul>";
+			$str_contents = "";
+			while ($row = mysqli_fetch_row($result)) {
+				$urlname = $row[0];
+				$uniname = $row[1];
+				$plan_id = $row[2];
+				$plan_name = get_plan_name_by_id($plan_id);
+
+				$desc = "$uniname ($plan_name)";
+
+				$str_contents .= "<li><a href='/v/$urlname/'>$desc</a></li>";
+			}
+
+			if($str_contents) {
+				print $page_str;
+				print $str_contents;
+				print "</ul>";
+			}
+?>
+		</div> 
+<?php
 
 		exit(0);
 	} else {
