@@ -7488,6 +7488,9 @@ SE 1/2 oder BZW
 				if(is_array($this_reihe)) {
 					// Zeilen, die mehr beinhalten als nur die Institutsnamen
 					foreach ($this_reihe as $this_cell) {
+						if(is_null($this_cell)) {
+							$this_cell = "";
+						}
 						$has_printed_rows = 1;
 						$cell_id = $letter.$number;
 						if($letter == 'L') { // Gebäude
