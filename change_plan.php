@@ -67,7 +67,7 @@
 
 
 		if(get_post("update_kunde_data")) {
-			if(!$urlname_exists) {
+			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname)) {
 				$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
 				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
@@ -130,7 +130,7 @@
 						if($urlname_exists) {
 							print "<br><span style='color: red'>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.</span>";
 						}
-					?></td>
+?></td>
 					</tr>
 					<tr>
 						<td>Ihr Name:</td><td><input type="text" name="kundename" placeholder="Ihr Name" value="<?php print htmlentities(get_post("kundename") ?? ""); ?>" /></td>
@@ -145,15 +145,15 @@
 						<td>Ort:</td><td><input type="text" name="kundeort" placeholder="Ort" value="<?php print htmlentities(get_post("kundeort") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_post("iban") ?? ""); ?>" /><?php
-							if(!$iban_ok) {
+					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_post("iban") ?? ""); ?>" /><?php
+					if(!$iban_ok && get_post("iban")) {
 								print "<br><span style='color: red'>Die IBAN ist nicht richtig. Bitte eine korrekte IBAN eingeben.</span>";
 							}
 						?></td>
 					</tr>
 					<tr>
 						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_post("email") ?? ""); ?>" /><?php
-							if(!$email_ok) {
+							if(!$email_ok && get_post("email")) {
 								print "<br><span style='color: red'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
 							}
 						?></td>
