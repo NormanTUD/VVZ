@@ -53,29 +53,44 @@
 			$urlname_exists = urlname_already_exists($urlname) ? 1 : 0;
 		}
 
-		if(get_post("update_kunde_data")) {
-			if(!$urlname_exists) {
-				$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+		$iban_ok = 0;
+		$email_ok = 0;
 
-				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
-					update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
-				}
+		if(get_post("iban")) {
+			$iban_ok = checkIBAN(get_post("iban"));
+		}
 
-				if(get_post("daten_uebernehmen")) {
-					// TODO
-				}
 
-				$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
-			} else {
-				die("URL ALREADY EXISTS");
+		if (filter_var(get_post("email"), FILTER_VALIDATE_EMAIL)) {
+			$email_ok = 1;
+		}
+
+
+
+		if(!$urlname_exists && $kunde_ok && $iban_ok && $email_ok) {
+			if(kunde_owns_url($kunde_id, get_url_uni_name())) {
+				update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
 			}
-		}
 
-		if(kunde_owns_url($kunde_id, get_url_uni_name())) {
-			update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
-		}
 
-		if(!$urlname_exists && $kunde_ok) {
+			if(get_post("update_kunde_data")) {
+				if(!$urlname_exists) {
+					$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+
+					if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
+						update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+					}
+
+					if(get_post("daten_uebernehmen")) {
+						// TODO
+					}
+
+					$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+				} else {
+					die("URL ALREADY EXISTS");
+				}
+			}
+
 			if(get_get("done_migration")) {
 				# Zahlungsinfos, DB speichern
 ?>
@@ -128,10 +143,18 @@
 						<td>Ort:</td><td><input type="text" name="kundeort" placeholder="Ort" value="<?php print htmlentities(get_post("kundeort") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_post("iban") ?? ""); ?>" /></td>
+						<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_post("iban") ?? ""); ?>" /><?php
+							if(!$iban_ok) {
+								print "<br><span style='color: red'>Die IBAN ist nicht richtig. Bitte eine korrekte IBAN eingeben.</span>";
+							}
+						?></td>
 					</tr>
 					<tr>
-						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_post("email") ?? ""); ?>" /></td>
+						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_post("email") ?? ""); ?>" /><?php
+							if(!$iban_ok) {
+								print "<br><span style='color: red'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
+							}
+						?></td>
 					</tr>
 					<tr>
 						<td>Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen?</td>
