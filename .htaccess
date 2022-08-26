@@ -17,4 +17,6 @@ AddDefaultCharset UTF-8
 
 	RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
 	Redirect 301 ^/v/$ /
+
+	RedirectMatch 404 /\.git
 </IfModule>
