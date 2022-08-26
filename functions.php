@@ -7090,7 +7090,7 @@ SE 1/2 oder BZW
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $lehrend);
 			$letter++;
 
-			$veranstaltungname = preg_replace("/[\n\r]/", " ", $veranstaltungname);
+			$veranstaltungname = preg_replace("/[\n\r]/", " ", $veranstaltungname ?? "");
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $veranstaltungname);
 			$letter++;
 
