@@ -41,8 +41,11 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Value in pixels
      * @return     int            Value in EMU
      */
-    public static function pixelsToEMU($pValue = 0)
+    public static function pixelsToEMU($pValue)
     {
+	if(is_null($pValue)) {
+	    $pValue=0;
+	}
         return round($pValue * 9525);
     }
 
@@ -52,8 +55,12 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Value in EMU
      * @return     int            Value in pixels
      */
-    public static function EMUToPixels($pValue = 0)
+    public static function EMUToPixels($pValue)
     {
+	if(is_null($pValue)) {
+	    $pValue=0;
+	}
+
         if ($pValue != 0) {
             return round($pValue / 9525);
         } else {
@@ -70,8 +77,11 @@ class PHPExcel_Shared_Drawing
      * @param     PHPExcel_Style_Font $pDefaultFont    Default font of the workbook
      * @return     int            Value in cell dimension
      */
-    public static function pixelsToCellDimension($pValue = 0, PHPExcel_Style_Font $pDefaultFont)
+    public static function pixelsToCellDimension($pValue, PHPExcel_Style_Font $pDefaultFont)
     {
+	if(is_null($pValue)) {
+	    $pValue=0;
+	}
         // Font name and size
         $name = $pDefaultFont->getName();
         $size = $pDefaultFont->getSize();
@@ -95,8 +105,11 @@ class PHPExcel_Shared_Drawing
      * @param     PHPExcel_Style_Font $pDefaultFont    Default font of the workbook
      * @return     int        Value in pixels
      */
-    public static function cellDimensionToPixels($pValue = 0, PHPExcel_Style_Font $pDefaultFont)
+    public static function cellDimensionToPixels($pValue, PHPExcel_Style_Font $pDefaultFont)
     {
+	if(is_null($pValue)) {
+	    $pValue=0;
+	}
         // Font name and size
         $name = $pDefaultFont->getName();
         $size = $pDefaultFont->getSize();
@@ -148,8 +161,11 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Degrees
      * @return     int            Angle
      */
-    public static function degreesToAngle($pValue = 0)
+    public static function degreesToAngle($pValue)
     {
+	if(is_null($pValue)) {
+	    $pValue=0;
+	}
         return (int)round($pValue * 60000);
     }
 
@@ -159,8 +175,11 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Angle
      * @return     int            Degrees
      */
-    public static function angleToDegrees($pValue = 0)
+    public static function angleToDegrees($pValue)
     {
+	if(is_null($pValue)) {
+	    $pValue=0;
+	}
         if ($pValue != 0) {
             return round($pValue / 60000);
         } else {
