@@ -7137,7 +7137,7 @@ SE 1/2 oder BZW
 			// UR/HS (leer)
 			$letter++;
 
-			$raumausstattungsvorschlag = preg_replace("/[\n\r]/", " ", $raumausstattungsvorschlag);
+			$raumausstattungsvorschlag = preg_replace("/[\n\r]/", " ", $raumausstattungsvorschlag ?? "");
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$zeile, $raumausstattungsvorschlag);
 			$letter++;
 
