@@ -66,28 +66,29 @@
 		}
 
 
+		if((!$urlname_exists && $kunde_ok && $iban_ok && $email_ok) || get_get("done_migration")) {
+			if(!get_get("done_migration")) {
+				if(kunde_owns_url($kunde_id, get_url_uni_name())) {
+					update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
+				}
 
-		if(!$urlname_exists && $kunde_ok && $iban_ok && $email_ok) {
-			if(kunde_owns_url($kunde_id, get_url_uni_name())) {
-				update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
-			}
 
+				if(get_post("update_kunde_data")) {
+					if(!$urlname_exists) {
+						$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
-			if(get_post("update_kunde_data")) {
-				if(!$urlname_exists) {
-					$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+						if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
+							update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+						}
 
-					if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
-						update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+						if(get_post("daten_uebernehmen")) {
+							// TODO
+						}
+
+						$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+					} else {
+						die("URL ALREADY EXISTS");
 					}
-
-					if(get_post("daten_uebernehmen")) {
-						// TODO
-					}
-
-					$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
-				} else {
-					die("URL ALREADY EXISTS");
 				}
 			}
 
@@ -151,7 +152,7 @@
 					</tr>
 					<tr>
 						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_post("email") ?? ""); ?>" /><?php
-							if(!$iban_ok) {
+							if(!$email_ok) {
 								print "<br><span style='color: red'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
 							}
 						?></td>
