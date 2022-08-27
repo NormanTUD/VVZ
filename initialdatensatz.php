@@ -31,7 +31,8 @@ $bereiche_query = "INSERT IGNORE INTO `bereich` VALUES (111,'(BBS)'),(115,'(BS)'
 
 	rquery('INSERT IGNORE INTO `veranstaltung` VALUES("1", "1", "Wie man viel Geld in vollen Speichern philosophisch rechtfertigen kann", "3", "122", NULL, NULL, "292", "1", NULL, "1", "2022-08-23 13:26:28", "0");');
 
-	rquery('INSERT IGNORE INTO `veranstaltung_metadaten` VALUES("1", "Bitte für Personenschutz sorgen", "Kosten für den Kurs: 1000000€.", "https://elearning-seite.de/dagobert-duck", "10", "2022-08-23", "Mo", "1-4", "gerade Woche", "2022-08-23", "1", NULL, NULL, "https://us02web.zoom.us/j/2984850923482?pwd=AKUDSRFHw4uthwnsdkjfsdnfwuetwedf");');
+	$first_date = date("Y-m-d");
+	rquery('INSERT IGNORE INTO `veranstaltung_metadaten` VALUES("1", "Bitte für Personenschutz sorgen", "Kosten für den Kurs: 1000000€.", "https://elearning-seite.de/dagobert-duck", "10", "2022-08-23", "Mo", "1-4", "gerade Woche", "'.$first_date.'", "1", NULL, NULL, "https://us02web.zoom.us/j/2984850923482?pwd=AKUDSRFHw4uthwnsdkjfsdnfwuetwedf");');
 
 	rquery('INSERT IGNORE INTO `veranstaltung_to_praesenztyp` VALUES("1", "3");');
 
