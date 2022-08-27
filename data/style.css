@@ -1004,3 +1004,8 @@ a, a:visited, a:hover, a:active {
 .mainindex_faq {
 	text-align: left!important
 }
+
+.sticky_save {
+	position: sticky;
+	top: 10px;
+}

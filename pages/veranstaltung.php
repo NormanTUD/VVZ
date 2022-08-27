@@ -76,7 +76,7 @@
 				include_once('hinweise.php');
 ?>
 				<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
-					<input type="submit" class="text_30px" value="Speichern" style="position: sticky; top: 10px;" />
+					<input type="submit" class="text_30px sticky_save" value="Speichern" />
 
 					<table>
 						<tr>
