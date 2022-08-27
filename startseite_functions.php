@@ -630,7 +630,7 @@
 	function show_opal ($opal) {
 		if($opal) {
 ?>
-			<p><?php print "<a href='".htmlentities($opal)."'>Link zu Opal</a>"; ?></p>
+			<p><?php print "<a href='".htmlentities($opal)."'>Link zum eLearning-Portal</a>"; ?></p>
 <?php
 		}
 	}
