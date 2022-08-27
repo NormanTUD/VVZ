@@ -1036,3 +1036,11 @@ a, a:visited, a:hover, a:active {
 .neuerdozent_input {
 	width: 200px;
 }
+
+.pn_th {
+	min-width: 100px;
+}
+
+.ua_input {
+	width: 100px;
+}

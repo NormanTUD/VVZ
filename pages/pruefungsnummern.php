@@ -64,7 +64,7 @@
 							<th>Bereich</th>
 							<th>Prüfungstyp</th>
 							<th>Modulbezeichnung</th>
-							<th style="min-width: 100px">PN</th>
+							<th class="pn_th">PN</th>
 							<th>Zeitraum</th>
 							<th>PN Deaktiviert?</th>
 							<th>Löschen?</th>
