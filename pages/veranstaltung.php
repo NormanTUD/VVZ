@@ -319,7 +319,7 @@
 														$is_checked = 1;
 													}
 ?>
-													<div style="background-color: #<?php print (($counter % 2 == 1) ? 'DCDCDC' : 'A9A9A9'); ?>">
+													<div class="bg_<?php print (($counter % 2 == 1) ? 'DCDCDC' : 'A9A9A9'); ?>">
 														<input type="checkbox" name="pruefungsnummer[]" value="<?php
 														print htmlentities($this_pruefungsnummer[0]);
 													?>" <?php
