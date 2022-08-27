@@ -236,12 +236,12 @@
 		return get_single_row_from_query($query);
 	}
 
-	function update_kunde ($id, $anrede, $universitaet, $kundename, $kundestrasse, $plz, $kundeort, $dbname, $plan_id, $iban, $email) {
+	function update_kunde ($id, $anrede, $universitaet, $name, $strasse, $plz, $ort, $dbname, $plan_id, $iban, $email) {
 		$urlname = create_uni_name($universitaet);
 		if(urlname_already_exists($urlname)) {
 			return 1;
 		}
-		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, kundename, kundestrasse, plz, kundeort, personalized, dbname, urlname, plan_id, iban, email) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($kundename).', '.esc($kundestrasse).', '.esc($plz).', '.esc($kundeort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).", ".esc($iban).", ".esc($email).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), kundename=values(kundename), kundestrasse=values(kundestrasse), plz=values(plz), kundeort=values(kundeort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id), iban=values(iban), email=values(email)";
+		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, name, strasse, plz, ort, personalized, dbname, urlname, plan_id, iban, email) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($name).', '.esc($strasse).', '.esc($plz).', '.esc($ort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).", ".esc($iban).", ".esc($email).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), name=values(name), strasse=values(strasse), plz=values(plz), ort=values(ort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id), iban=values(iban), email=values(email)";
 		rquery($query);
 	}
 
@@ -388,7 +388,7 @@
 	function get_kunde_name () {
 		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 
-		$query = "select kundename from vvz_global.kundendaten where id = ".esc($kunde_id);
+		$query = "select name from vvz_global.kundendaten where id = ".esc($kunde_id);
 
 		$res = get_single_row_from_query($query);
 		if($res == $GLOBALS["dbname"]) {
@@ -424,7 +424,7 @@
 	function get_kunde_ort () {
 		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 
-		$query = "select kundeort from vvz_global.kundendaten where id = ".esc($kunde_id);
+		$query = "select ort from vvz_global.kundendaten where id = ".esc($kunde_id);
 
 		$res = get_single_row_from_query($query);
 		if($res == $GLOBALS["dbname"]) {

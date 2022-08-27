@@ -11,7 +11,11 @@
 			rquery("drop database $row[0];");
 		}
 
-		rquery("drop database startpage;");
+		try {
+			rquery("drop database startpage;");
+		} catch (\Throwable $e) {
+			print $e;
+		}
 		rquery("drop database vvz_global;");
 	} else {
 		die("Can only be called from the CLI.");

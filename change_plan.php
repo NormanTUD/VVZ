@@ -70,8 +70,8 @@
 			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname)) {
 				$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
-				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("plz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
-					update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("plz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
+					update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
 				}
 
 				if(get_post("daten_uebernehmen")) {
@@ -133,16 +133,16 @@
 ?></td>
 					</tr>
 					<tr>
-						<td>Ihr Name:</td><td><input type="text" name="kundename" placeholder="Ihr Name" value="<?php print htmlentities(get_post("kundename") ?? ""); ?>" /></td>
+						<td>Ihr Name:</td><td><input type="text" name="name" placeholder="Ihr Name" value="<?php print htmlentities(get_post("name") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Straße, Hausnummer:</td><td><input type="text" name="kundestrasse" placeholder="Straße" value="<?php print htmlentities(get_post("kundestrasse") ?? ""); ?>" /></td>
+						<td>Straße, Hausnummer:</td><td><input type="text" name="strasse" placeholder="Straße" value="<?php print htmlentities(get_post("strasse") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
 						<td>Postleitzahl:</td><td><input type="text" name="plz" placeholder="Postleitzahl" value="<?php print htmlentities(get_post("plz") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Ort:</td><td><input type="text" name="kundeort" placeholder="Ort" value="<?php print htmlentities(get_post("kundeort") ?? ""); ?>" /></td>
+						<td>Ort:</td><td><input type="text" name="ort" placeholder="Ort" value="<?php print htmlentities(get_post("ort") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
 					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_post("iban") ?? ""); ?>" /><?php

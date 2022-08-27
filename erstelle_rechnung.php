@@ -103,10 +103,10 @@
 		regex_in_file($data_file, "/ANREDE/", get_kunde_X($kunde_id, "anrede"));
 		regex_in_file($data_file, '/DATUMRECHNUNGSSTELLUNG/', $rechnungsstellung);
 		regex_in_file($data_file, '/UNIVERSITAET/', get_kunde_X($kunde_id, "universitaet"));
-		regex_in_file($data_file, '/KUNDENAME/', get_kunde_X($kunde_id, "kundename"));
-		regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "kundestrasse"));
+		regex_in_file($data_file, '/KUNDENAME/', get_kunde_X($kunde_id, "name"));
+		regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "strasse"));
 		regex_in_file($data_file, '/KUNDEPLZ/', get_kunde_X($kunde_id, "plz"));
-		regex_in_file($data_file, '/KUNDEORT/', get_kunde_X($kunde_id, "kundeort"));
+		regex_in_file($data_file, '/KUNDEORT/', get_kunde_X($kunde_id, "ort"));
 		regex_in_file($data_file, '/RECHNUNGSNUMMER/', get_kunde_rechnungsnummer($kunde_id, $rechnungsstellung));
 
 		$invoice_file = $tmp."/_invoice.tex";
