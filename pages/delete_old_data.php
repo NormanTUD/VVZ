@@ -9,9 +9,9 @@
 	if(!file_exists('/etc/x11test') && check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 ?>
 		<div id="accounts">
-		<?php print get_seitentext(); ?>
+			<?php print get_seitentext(); ?>
 <?php
-		include_once('hinweise.php');
+			include_once('hinweise.php');
 			$query = 'select semester_id from veranstaltung group by semester_id order by semester_id';
 			$result = rquery($query);
 
