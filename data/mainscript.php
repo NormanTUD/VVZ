@@ -505,10 +505,6 @@ function safariIFrameWarning () {
 	}
 }
 
-function start_tour() {
-	alert("Tour");
-}
-
 $(document).ready(function() {
     $('.accordion-title').on('keydown', function(e) {
         if(e.keyCode === 13){
