@@ -85,10 +85,6 @@
 	}
 
 	$php_start = microtime(true);
-	if(file_exists('new_setup')) {
-		include('setup.php');
-		exit(0);
-	}
 	include_once("config.php");
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | FAQ";
 	$filename = 'startseite';
