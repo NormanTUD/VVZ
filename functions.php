@@ -41,10 +41,10 @@ declare(ticks=1);
 		$GLOBALS["auto_login_id"] = null;
 	}
 
-	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' 'unsafe-inline'; ";
+	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."'  ";
-	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."' data: 'unsafe-inline'; ";
-	$GLOBALS['csp_string'] .= "style-src 'self' 'unsafe-inline'; ";
+	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."'; ";
+	$GLOBALS['csp_string'] .= "style-src 'self'; ";
 	header("Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("X-Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("WebKit-CSP: \"default-src 'self'\"");
