@@ -31,8 +31,6 @@ curl -H "Authorization: token $PRIVATE_ACCESS_TOKEN" -H 'Accept: application/vnd
 
 Open the URL in the browser after doing this and follow the instructions.
 
-After deleting `new_setup`, log in and follow the further instructions. Then, edit the `data.php` appropriately.
-
 Then edit the `config.php` according to your institution.
 
 Once done, the software is ready.
