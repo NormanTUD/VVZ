@@ -27,7 +27,7 @@ E-Mail: <?php print $GLOBALS['ansprechpartner_email']; ?><br>
 </p>
 
 <p>
-Konzeption, techn. Realisierung :<br>
+Konzeption, techn. Realisierung:<br>
 Norman Koch, omni-concept<br>
 E-Mail: <i><a href="kontakt.php">über das Kontaktformular</a></i><br>
 </p>
