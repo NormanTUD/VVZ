@@ -79,8 +79,8 @@
 				"style.css",
 				"bootstrap-tour-standalone.css",
 				"jquery-ui-timepicker-addon.css"
-			)); ?>
-		<?php 
+			));
+
 			js(array(
 				"jquery-1.12.4.js",
 				"jquery-ui.js",
