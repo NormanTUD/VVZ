@@ -129,6 +129,9 @@
 ?>
 	<div id="main">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
+<?php
+		print get_demo_expiry_time();
+?>
 		<h1>Vorlesungsverzeichnis <?php print $GLOBALS['university_name']; ?></h1>
 		<h2>Was ist das hier?</h2>
 		Diese API erlaubt automatisierte Zugriffe auf die öffentlichen Daten des Vorlesungsverzeichnis der <?php print $GLOBALS['university_name']; ?>. Über diese Schnittstelle

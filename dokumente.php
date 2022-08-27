@@ -96,6 +96,9 @@
 ?>
 	<div id="mainindex">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?></a>
+<?php
+		print get_demo_expiry_time();
+?>
 		<h1>Dokumente</h1>
 <?php
 		$id = get_get('id');

@@ -8,9 +8,13 @@
 	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | Impressum";
 	$filename = 'startseite';
 	include("header.php");
+
 ?>
 	<div id="mainindex">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?></a>
+<?php
+		print get_demo_expiry_time();
+?>
 		<h2>Impressum</h2>
 <p>
 Es gilt das <a href="<?php print $GLOBALS['impressum_university_page']; ?>" target="_blank">Impressum der <?php print $GLOBALS['university_name']; ?></a> 

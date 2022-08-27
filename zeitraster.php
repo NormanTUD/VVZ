@@ -22,6 +22,9 @@
 ?>
 	<div id="mainindex">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?></a>
+<?php
+		print get_demo_expiry_time();
+?>
 		<h2>Zeitraster der <?php print $GLOBALS['university_name']; ?></h2>
 		<table>
 			<tr>

@@ -28,6 +28,9 @@
 ?>
 		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
 <?php
+		print get_demo_expiry_time();
+?>
+<?php
 	}
 ?>
 		<h2>Kontakt</h2>
