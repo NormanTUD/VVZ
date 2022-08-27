@@ -1008,7 +1008,7 @@ a, a:visited, a:hover, a:active {
 
 .sticky_save {
 	position: sticky;
-	top: 10px;
+	top: 35px;
 }
 
 .merge_warning {
