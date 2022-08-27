@@ -20,7 +20,7 @@ mit folgenden Änderungen:
 <p>
 Ansprechpartner: <br><?php print $GLOBALS['ansprechpartner']; ?><br>
 Betreiber:<br>
-<?php print htmlentities(get_university_name() ?? ""); ?><br>
+<?php print get_university_name(); ?><br>
 <?php print $GLOBALS['university_plz_city']; ?><br>
 Tel.: <?php print $GLOBALS['ansprechpartner_tel_nr']; ?><br>
 E-Mail: <?php print $GLOBALS['ansprechpartner_email']; ?><br>

@@ -390,6 +390,10 @@
 
 		$query = "select universitaet from vvz_global.kundendaten where id = ".esc($kunde_id);
 
-		return get_single_row_from_query($query);
+		$res = get_single_row_from_query($query);
+		if($res == $GLOBALS["dbname"]) {
+			return "<i>Bisher nicht eingetragen</i>";
+		}
+		return htmlentities($res ?? "");
 	}
 ?>
