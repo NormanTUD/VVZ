@@ -76,7 +76,7 @@
 				include_once('hinweise.php');
 ?>
 				<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
-					<input type="submit" class="text_30px" value="Speichern" />
+					<input type="submit" class="text_30px" value="Speichern" style="position: sticky; top: 10px;" />
 
 					<table>
 						<tr>
@@ -386,7 +386,6 @@
 ?>
 
 							<br />
-							<input type="submit" class="text_30px" value="Speichern" />
 						</form>
 					<form method="get">
 						<input type="hidden" value="1" name="all_semesters_copy" />

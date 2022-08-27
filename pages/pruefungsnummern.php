@@ -168,6 +168,8 @@ JOIN
 					<h2 class="class_red">Für dieses Institut sind noch keine Module vorhanden. Bitten Sie einen Administrator, Module hinzuzufügen.</h2>
 <?php
 				}
+			} else {
+				print("Bisher existieren keine Studiengänge. <a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Bitte fügen Sie hier welche hinzu.</a>");
 			}
 		} else {
 ?>
