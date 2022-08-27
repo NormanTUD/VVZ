@@ -5629,7 +5629,7 @@ INSERT INTO
 
 	function create_zeitraum_array () {
 		$studiengaenge = array();
-		$query = 'SELECT `id`, `name` FROM `pruefung_zeitraum`';
+		$query = 'SELECT `id`, `name` FROM `pruefung_zeitraum` order by id';
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
 			$studiengaenge[$row[0]] = array($row[0], "$row[1]");
