@@ -188,7 +188,7 @@
 		}
 
 		if(!table_exists_and_has_entries("seitentext")) {
-			rquery("insert ignore into `seitentext` VALUES (18,'<h2>Willkommen auf der Administrationsseite des VVZ</h2>');");
+			rquery("insert ignore into `seitentext` VALUES (18,'<h2>Willkommen auf der Administrationsseite des Vorlesungsverzeichnisses</h2>');");
 		}
 
 		if(!table_exists_and_has_entries("titel")) {
