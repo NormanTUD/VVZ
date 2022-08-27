@@ -22,7 +22,7 @@ Gerberbau, GER
 Falkenbrunnen, FAL
 			</pre>
 			<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
-				<textarea style="width: 50%; min-height: 200px;" name="csv"><?php print htmlentities(get_post("csv") ?? ""); ?></textarea>
+				<textarea class="csv_textarea" name="csv"><?php print htmlentities(get_post("csv") ?? ""); ?></textarea>
 				<input type="hidden" name="import_gebaeude_from_csv" value="1">
 				<input type="submit" value="Importieren">
 			</form>

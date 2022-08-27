@@ -1019,3 +1019,8 @@ a, a:visited, a:hover, a:active {
 	width: 400px;
 	height: 200px;
 }
+
+.csv_textarea {
+	width: 50%;
+	min-height: 200px;
+}
