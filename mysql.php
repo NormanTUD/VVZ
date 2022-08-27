@@ -66,7 +66,7 @@
 					universitaet varchar(100) DEFAULT 'Name der Universität',
 					kundename varchar(100) default 'Test',
 					kundestrasse varchar(100) default 'Benutzer',
-					kundeplz varchar(100) default '12345',
+					plz varchar(100) default '12345',
 					kundeort varchar(100) default 'Teststadt',
 					dbname varchar(100) not null,
 					urlname varchar(100) unique,

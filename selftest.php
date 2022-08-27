@@ -86,13 +86,13 @@
 		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {
 			if($GLOBALS["dbname"] && ($GLOBALS["dbname"] != "startpage" || ($GLOBALS["dbname"] == "startpage" && get_single_row_from_query("select count(*) from vvz_global.kundendaten where universitaet = 'startpage'") == 0))) {
 				$urlname = get_url_uni_name();
-				$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname, urlname, plan_id) values ("Hallo Testkunde", '.esc($GLOBALS["dbname"]).', "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 1)';
+				$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, plz, kundestrasse, dbname, urlname, plan_id) values ("Hallo Testkunde", '.esc($GLOBALS["dbname"]).', "Irgendein V. Erwalter", "Teststadt", "12345", "Teststraße 1", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 1)';
 				rquery($query);
 			}
 		}
 
 		if(!get_single_row_from_query("select count(*) from vvz_global.kundendaten where external_url = 'https://vvz.phil.tu-dresden.de/'")) {
-			$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, kundeplz, kundestrasse, dbname, urlname, plan_id, external_url) values ("Hallo Norbert,", "Technische Universität Dresden", "Norbert Engemaier", "Dresden", "01069", "Helmholtzstr. 10", "vvz_phil", "", 4, "https://vvz.phil.tu-dresden.de")';
+			$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, kundename, kundeort, plz, kundestrasse, dbname, urlname, plan_id, external_url) values ("Hallo Norbert,", "Technische Universität Dresden", "Norbert Engemaier", "Dresden", "01069", "Helmholtzstr. 10", "vvz_phil", "", 4, "https://vvz.phil.tu-dresden.de")';
 			rquery($query);
 		}
 

@@ -70,8 +70,8 @@
 			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname)) {
 				$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
-				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("kundeplz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
-					update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("kundeplz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("kundename") && get_post("kundestrasse") && get_post("plz") && get_post("kundeort") && get_get("product") && get_post("iban") && get_post("email")) {
+					update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("kundename"), get_post("kundestrasse"), get_post("plz"), get_post("kundeort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
 				}
 
 				if(get_post("daten_uebernehmen")) {
@@ -139,7 +139,7 @@
 						<td>Straße, Hausnummer:</td><td><input type="text" name="kundestrasse" placeholder="Straße" value="<?php print htmlentities(get_post("kundestrasse") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Postleitzahl:</td><td><input type="text" name="kundeplz" placeholder="Postleitzahl" value="<?php print htmlentities(get_post("kundeplz") ?? ""); ?>" /></td>
+						<td>Postleitzahl:</td><td><input type="text" name="plz" placeholder="Postleitzahl" value="<?php print htmlentities(get_post("plz") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
 						<td>Ort:</td><td><input type="text" name="kundeort" placeholder="Ort" value="<?php print htmlentities(get_post("kundeort") ?? ""); ?>" /></td>
