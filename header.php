@@ -24,6 +24,7 @@
 <!DOCTYPE html>
 <html lang="de">
 	<head>
+		<meta http-equiv="Content-Security-Policy" content="<?php print $GLOBALS["csp_string"]; ?>">
 		<meta charset="UTF-8" />
 		<!-- Hey, wenn du die Daten dieser Seite brauchst, dann guck doch einfach in die API! Dann brauchst du hier nicht versuchen, HTML mit Regexen zu parsen... -->
 		<meta name="viewport" content="width=device-width, initial-scale=1">

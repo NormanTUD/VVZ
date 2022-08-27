@@ -42,7 +42,7 @@ declare(ticks=1);
 	}
 
 	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' 'unsafe-inline'; ";
-	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' blob: 'unsafe-inline' https://www.gstatic.com/charts; ";
+	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' ";
 	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."' data: 'unsafe-inline'; ";
 	$GLOBALS['csp_string'] .= "style-src 'self' 'unsafe-inline'; ";
 	header("Content-Security-Policy: ".$GLOBALS['csp_string']);
