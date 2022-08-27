@@ -1014,3 +1014,8 @@ a, a:visited, a:hover, a:active {
 	color: red !important;
 	font-size: 2em;
 }
+
+.faq_textarea {
+	width: 400px;
+	height: 200px;
+}
