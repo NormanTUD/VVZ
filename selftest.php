@@ -180,7 +180,7 @@
 		}
 
 		if(!table_exists_and_has_entries("pruefung_zeitraum")) {
-			rquery("insert ignore into `pruefung_zeitraum` VALUES (1,'Erster Zeitraum'),(2,'Zweiter Zeitraum');");
+			rquery("insert ignore into `pruefung_zeitraum` VALUES (1,'Kein spezifischer Zeitraum'),(2,'Erster Zeitraum'), (3, 'Zweiter Zeitraum');");
 		}
 
 		if(!table_exists_and_has_entries("pruefungstyp")) {
