@@ -984,3 +984,15 @@ a, a:visited, a:hover, a:active {
 #main {
 	border-radius: 5px 5px 5px 5px
 }
+
+.startseite_div {
+	color:#ddd;
+	background-color:#282E34;
+	text-align:center;
+	padding:50px 80px;
+	text-align: justify;
+}
+
+.startseite_div_content {
+	position:relative;
+}

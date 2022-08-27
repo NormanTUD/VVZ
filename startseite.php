@@ -13,151 +13,15 @@
 ?>
 		<title>Vorlesungsverzeichnisse</title>
 		<meta name="description" content="Online-Vorlesungsverzeichnisse als Service" />
-		<style>
-			.parallax {
-				/* The image used */
-				background-image: url("img_parallax.jpg");
-
-				/* Set a specific height */
-				min-height: 500px;
-
-				/* Create the parallax scrolling effect */
-				background-attachment: fixed;
-				background-position: center;
-				background-repeat: no-repeat;
-				background-size: cover;
-			}
-			 body, html {
-				height: 100%;
-				font: 400 15px/1.8 "Lato", sans-serif
-			}
-
-			.parallax {
-				/* The image used */
-				background-image: url("img_parallax.jpg");
-
-				/* Full height */
-				height: 100%;
-
-				/* Create the parallax scrolling effect */
-				background-attachment: fixed;
-				background-position: center;
-				background-repeat: no-repeat;
-				background-size: cover;
-				margin: -8px;
-			}
-
-
-			.bgimg-1, .bgimg-2, .bgimg-3 {
-				position: relative;
-				opacity: 0.9;
-				background-attachment: fixed;
-				background-position: center;
-				background-repeat: no-repeat;
-				background-size: cover;
-			}
-
-			.bgimg-1 {
-				background-image: url("img_parallax.jpg");
-				min-height: 100%;
-			}
-
-			.bgimg-2 {
-				background-image: url("img_parallax2.jpg");
-				min-height: 400px;
-			}
-
-			.bgimg-3 {
-				background-image: url("img_parallax3.jpg");
-				min-height: 400px;
-			}
-
-			.caption {
-				position: absolute;
-				left: 0;
-				top: 50%;
-				width: 100%;
-				text-align: center;
-				color: #000;
-			}
-
-			.caption span.border {
-				background-color: #111;
-				color: #fff;
-				padding: 18px;
-				font-size: 25px;
-				letter-spacing: 10px;
-			}
-
-			h3 {
-				letter-spacing: 5px;
-				text-transform: uppercase;
-				font: 20px "Lato", sans-serif;
-				color: #111;
-			}
-
-			/* Turn off parallax scrolling for tablets and phones */
-			@media only screen and (max-device-width: 1024px) {
-				.bgimg-1, .bgimg-2, .bgimg-3 {
-					background-attachment: scroll;
-				}
-			}
-
-			a:link {
-				color: white;
-			}
-
-			/* visited link */
-			a:visited {
-				color: white;
-			}
-
-			/* mouse over link */
-			a:hover {
-				color: gray;
-			}
-
-			/* selected link */
-			a:active {
-				color: blue;
-			}
-
-
-			.footer_link a:link {
-				color: black;
-			}
-
-			/* visited link */
-			.footer_link a:visited {
-				color: black;
-			}
-
-			/* mouse over link */
-			.footer_link a:hover {
-				color: gray;
-			}
-
-			/* selected link */
-			.footer_link a:active {
-				color: blue;
-			}
-
-/*
-			.side_by_side {
-				display: inline;
-			}
-
-			.side_by_side li {
-				float: left;
-				list-style-type: none;
-				padding:10px;
-				border: 1px solid #3687AF;
-				background-color: #006092;
-				background-repeat: no-repeat;
-				background-position: center 30px;
-			}
-*/
-		</style>
+<?php
+		css(array(
+			"jquery-ui.css",
+			"startseite.css",
+			"style.css",
+			"bootstrap-tour-standalone.css",
+			"jquery-ui-timepicker-addon.css"
+		));
+?>
 
 		<!-- Container element -->
 		<div class="parallax">
@@ -198,7 +62,7 @@
 			}
 
 			if($str_contents) {
-				print '<div style="position:relative;"><div style="color:#ddd;background-color:#282E34;text-align:center;padding:50px 80px;text-align: justify;">';
+				print '<div class="startseite_div_content"><div class="startseite_div">';
 				print $page_str;
 				print $str_contents;
 				print "</ul>";
