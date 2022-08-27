@@ -255,8 +255,13 @@
 		#$query = 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "'.$GLOBALS['dbname'].'"';
 		#$result = rquery($query);
 
-		rquery('set FOREIGN_KEY_CHECKS=1');
+		if(!table_exists_and_has_entries("bereiche")) {
+			$bereiche_query = "INSERT IGNORE INTO `bereich` VALUES (1, '-');";
+			rquery($bereiche_query);
+		}
 
+
+		rquery('set FOREIGN_KEY_CHECKS=1');
 	}
 
 
