@@ -14,7 +14,7 @@
 		include_once('hinweise.php');
 ?>
 
-			<h3 style="color: red !important; font-size: 2em;">Der Merge-Bereich ist hochgradig experimentell! Unbedingt vorher ein Datenbank-Backup machen und die Unterschiede manuell betrachten!</h3>
+			<h3 class="merge_warning">Der Merge-Bereich ist hochgradig experimentell! Unbedingt vorher ein Datenbank-Backup machen und die Unterschiede manuell betrachten!</h3>
 <?php
 			if(!get_get('table')) {
 				$tables = array();

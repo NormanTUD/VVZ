@@ -1009,3 +1009,8 @@ a, a:visited, a:hover, a:active {
 	position: sticky;
 	top: 10px;
 }
+
+.merge_warning {
+	color: red !important;
+	font-size: 2em;
+}
