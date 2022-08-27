@@ -1044,3 +1044,7 @@ a, a:visited, a:hover, a:active {
 .ua_input {
 	width: 100px;
 }
+
+.nowrap {
+	white-space: no-wrap;
+}

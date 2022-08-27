@@ -8958,7 +8958,7 @@ order by
 					$ret_string .= "<td>".htmle($uhrzeit)."</td>\n";
 					$ret_string .= "<td>".htmle($dozent_name)."</td>\n";
 					$ret_string .= "<td>".htmle($bemerkungen)."</td>\n";
-					$ret_string .= "<td style='white-space: no-wrap'>".htmle($last_update)."</td></tr>\n";
+					$ret_string .= "<td class='nowrap'>".htmle($last_update)."</td></tr>\n";
 				}
 				$ret_string .= '</table>';
 			} else {
@@ -9182,7 +9182,7 @@ order by
 					$ret_string .= "<td>".htmle($pruefungsnummer)."</td>\n";
 					$ret_string .= "<td>".htmle($pruefungsleistung)."</td>\n";
 					$ret_string .= "<td>".htmle($pruefer)."</td>\n";
-					$ret_string .= "<td style='white-space: no-wrap'>".htmle($last_update)."</td></tr>\n";
+					$ret_string .= "<td class='nowrap'>".htmle($last_update)."</td></tr>\n";
 				}
 				$ret_string .= '</table>';
 			} else {
