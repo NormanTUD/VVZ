@@ -101,7 +101,7 @@
 				}
 			} else {
 ?>
-				Bitte geben Sie eine vollständige Nachricht ein.
+				<p>Bitte geben Sie eine vollständige Nachricht ein.</p>
 <?php
 			}
 		} else {
@@ -158,7 +158,7 @@
 						if(!isset($GLOBALS['logged_in']) || $GLOBALS['logged_in'] == 0) {
 ?>
 							<tr>
-								<td><label for="sicherheitsfrage">Sicherheitsfrage:<i><?php print $sicherheitsfragen[$frage]['question']; ?></i></label></td><td><input type="text" name="sicherheitsfrage" /></td>
+								<td><label for="sicherheitsfrage">Sicherheitsfrage:<i> <?php print $sicherheitsfragen[$frage]['question']; ?></i></label></td><td><input type="text" name="sicherheitsfrage" /></td>
 							</tr>
 <?php
 						}
