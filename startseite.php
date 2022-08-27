@@ -16,8 +16,8 @@
 <?php
 		css(array(
 			"jquery-ui.css",
-			"startseite.css",
 			"style.css",
+			"startseite.css",
 			"bootstrap-tour-standalone.css",
 			"jquery-ui-timepicker-addon.css"
 		));
