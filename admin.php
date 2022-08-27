@@ -359,9 +359,8 @@
 				<?php $GLOBALS['institut']; ?><br />
 				<?php print $GLOBALS['university_plz_city']; ?><br /></p>
 
-				<p>Kontakt: <?php print $GLOBALS['ansprechpartner']; ?><br />
-				Mail: <?php print $GLOBALS['ansprechpartner_email'] ?><br />
-				Telefon: <?php print $GLOBALS['ansprechpartner_tel_nr'] ?><br />
+				<p>Kontakt: <?php print get_kunde_name(); ?><br />
+				Mail: <?php print get_kunde_email(); ?><br />
 <?php
 				if(get_get('page') || get_get('show_items')) {
 					$id = get_get('page');
