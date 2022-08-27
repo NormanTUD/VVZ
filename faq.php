@@ -5,7 +5,7 @@
 	$filename = 'startseite';
 	include("header.php");
 ?>
-	<div id="mainindex" style="text-align: left!important">
+	<div id="mainindex" class="mainindex_faq">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
 		<h1>FAQ</h1>
 		<p>FAQ steht für &raquo;frequently asked questions&laquo;, d.h. häufig-gestellte-Fragen. Über das Kontaktformular

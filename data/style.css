@@ -1000,3 +1000,7 @@ a, a:visited, a:hover, a:active {
 .warning_studienordnung_div {
 	width: 500px;
 }
+
+.mainindex_faq {
+	text-align: left!important
+}

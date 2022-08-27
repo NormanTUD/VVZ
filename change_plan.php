@@ -126,7 +126,7 @@
 					<tr>
 					<td>Universität:</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_post("universitaet") ?? ""); ?>" /><?php
 						if($urlname_exists) {
-							print "<br><span style='color: red'>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.</span>";
+							print "<br><span class='red_text'>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.</span>";
 						}
 ?></td>
 					</tr>
@@ -145,14 +145,14 @@
 					<tr>
 					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_post("iban") ?? ""); ?>" /><?php
 					if(!$iban_ok && get_post("iban")) {
-								print "<br><span style='color: red'>Die IBAN ist nicht richtig. Bitte eine korrekte IBAN eingeben.</span>";
+								print "<br><span class='red_text'>Die IBAN ist nicht richtig. Bitte eine korrekte IBAN eingeben.</span>";
 							}
 						?></td>
 					</tr>
 					<tr>
 						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_post("email") ?? ""); ?>" /><?php
 							if(!$email_ok && get_post("email")) {
-								print "<br><span style='color: red'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
+								print "<br><span class='red_text'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
 							}
 						?></td>
 					</tr>
