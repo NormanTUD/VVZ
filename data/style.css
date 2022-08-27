@@ -148,6 +148,7 @@ div#menu li a:hover {
 .topnav {
 	background-color: #006092;
 	overflow: hidden;
+	padding-left: 0px;
 }
 
 .topnav ul {
