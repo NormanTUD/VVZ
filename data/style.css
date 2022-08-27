@@ -996,3 +996,7 @@ a, a:visited, a:hover, a:active {
 .startseite_div_content {
 	position:relative;
 }
+
+.warning_studienordnung_div {
+	width: 500px;
+}

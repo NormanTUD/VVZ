@@ -928,7 +928,7 @@
 		if($GLOBALS['auswaehlbare_veranstaltungen_counter']) {
 ?>
 			<input type="hidden" value="<?php print htmlentities(get_get('studiengang')); ?>" name="studiengang">
-			<center><div style="width: 500px"><i class="red_text">Trotz aller Sorgfaltsmaßnahmen übernehmen wir keine Gewähr dafür, dass der Stundenplan korrekt ist. <b>Bitte konsultieren Sie immer die Prüfungsordnung Ihres Studienganges und überprüfen Sie die Angaben manuell!</b> Benutzen Sie diese Software nicht, wenn Sie nicht damit einverstanden sind!</i></div></center>
+			<center><div class="warning_studienordnung_div"><i class="red_text">Trotz aller Sorgfaltsmaßnahmen übernehmen wir keine Gewähr dafür, dass der Stundenplan korrekt ist. <b>Bitte konsultieren Sie immer die Prüfungsordnung Ihres Studienganges und überprüfen Sie die Angaben manuell!</b> Benutzen Sie diese Software nicht, wenn Sie nicht damit einverstanden sind!</i></div></center>
 			<input type="submit" value="Aus markierten Veranstaltungen einen Stundenplan erstellen" /><br />
 			<br />
 			<input name="generate_cookie_stundenplan" type="submit" value="Aus Veranstaltungen und Cookies einen Stundenplan erstellen" /><br />
