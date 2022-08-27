@@ -127,7 +127,7 @@
 							$name = $GLOBALS['logged_in_data'][1];
 						}
 
-						if(strlen($name)) {
+						if(strlen($name ?? "")) {
 ?>
 							<input type="hidden" value="<?php print htmlentities($name); ?>" name="name" />
 <?php
