@@ -384,4 +384,12 @@
 		$query = "update vvz_global.kundendaten set plan_id = ".esc($plan_id)." where id = ".esc($kunde_id);
 		rquery($query);
 	}
+
+	function get_university_name () {
+		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+
+		$query = "select universitaet from vvz_global.kundendaten where id = ".esc($kunde_id);
+
+		return get_single_row_from_query($query);
+	}
 ?>

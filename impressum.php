@@ -20,9 +20,7 @@ mit folgenden Änderungen:
 <p>
 Ansprechpartner: <br><?php print $GLOBALS['ansprechpartner']; ?><br>
 Betreiber:<br>
-<?php print $GLOBALS['university_full_name']; ?><br>
-<?php print $GLOBALS['institut']; ?><br>
-<?php print $GLOBALS['ansprechpartner']; ?><br>
+<?php print htmlentities(get_university_name() ?? ""); ?><br>
 <?php print $GLOBALS['university_plz_city']; ?><br>
 Tel.: <?php print $GLOBALS['ansprechpartner_tel_nr']; ?><br>
 E-Mail: <?php print $GLOBALS['ansprechpartner_email']; ?><br>
@@ -30,7 +28,7 @@ E-Mail: <?php print $GLOBALS['ansprechpartner_email']; ?><br>
 
 <p>
 Konzeption, techn. Realisierung :<br>
-Norman Koch<br>
+Norman Koch, omni-concept<br>
 E-Mail: <i><a href="kontakt.php">über das Kontaktformular</a></i><br>
 </p>
 <?php

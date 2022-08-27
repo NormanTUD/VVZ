@@ -122,7 +122,6 @@
  */
 	$GLOBALS["selftest_already_done"] = 0;
 	$GLOBALS['university_name'] = "TU Dresden";
-	$GLOBALS['university_full_name'] = "Technische Universität Dresden";
 	$GLOBALS['impressum_university_page'] = "https://tu-dresden.de/impressum";
 	$GLOBALS['university_plz_city'] = "01062 Dresden";
 	$GLOBALS['institut'] = "Institut für Philosophie";
