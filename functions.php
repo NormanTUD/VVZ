@@ -1755,7 +1755,7 @@ declare(ticks=1);
 				$flag = '&#127468;&#127463; ';
 				break;
 			case 'klingonisch':
-				$flag = '<img src="i/klingon.svg" style="height: 15px" /> ';
+				$flag = '<img src="i/klingon.svg" class="klingon" /> ';
 				break;
 		}
 
