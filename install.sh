@@ -5,6 +5,11 @@ if [ "$EUID" -ne 0 ]; then
 	exit
 fi
 
+if ! command -v apt 2>&1 > /dev/null; then
+	echo "Installer can only be run on Debian based system"
+	exit
+fi
+
 INSTALL_PATH=/var/www/html
 
 apt-get update
