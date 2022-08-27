@@ -123,12 +123,8 @@
 	$GLOBALS["selftest_already_done"] = 0;
 	$GLOBALS['university_name'] = "TU Dresden";
 	$GLOBALS['impressum_university_page'] = "https://tu-dresden.de/impressum";
-	$GLOBALS['university_plz_city'] = "01062 Dresden";
 	$GLOBALS['institut'] = "Institut für Philosophie";
 	$GLOBALS['faculty'] = "Fakultät für Philosophie";
-	$GLOBALS['ansprechpartner'] = "Norbert Engemaier";
-	$GLOBALS['ansprechpartner_tel_nr'] = "+49 351 463-32890";
-	$GLOBALS['ansprechpartner_email'] = "norbert.engemaier@tu-dresden.de";
 	$GLOBALS['vvz_base_url'] = "vvz.phil.tu-dresden.de";
 	$GLOBALS['university_page_url'] = "https://tu-dresden.de/";
 	$GLOBALS["calname"] = "Philosophie";

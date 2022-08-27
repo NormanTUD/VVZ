@@ -25,8 +25,7 @@ mit folgenden Änderungen:
 Ansprechpartner: <br><?php print get_kunde_name(); ?><br>
 Betreiber:<br>
 <?php print get_university_name(); ?><br>
-<?php print $GLOBALS['university_plz_city']; ?><br>
-Tel.: <?php print $GLOBALS['ansprechpartner_tel_nr']; ?><br>
+<?php print get_kunde_plz(); ?> <?php print get_kunde_ort(); ?><br />
 <?php
 	$email = get_kunde_email();
 	if($email) {

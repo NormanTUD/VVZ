@@ -354,10 +354,8 @@
 				Im Falle der Verweigerung der Einwilligung oder eines Widerrufes kann das online-Vorlesungsverzeichnis nicht oder nicht mehr genutzt werden.<br /></p>
 
 				<p>Datenverarbeitende Stelle<br />
-				<?php $GLOBALS['university_name']; ?><br />
-				<?php $GLOBALS['faculty']; ?><br />
-				<?php $GLOBALS['institut']; ?><br />
-				<?php print $GLOBALS['university_plz_city']; ?><br /></p>
+				<?php print get_university_name(); ?><br />
+				<?php print get_kunde_plz(); ?> <?php print get_kunde_ort(); ?><br /></p>
 
 				<p>Kontakt: <?php print get_kunde_name(); ?><br />
 				Mail: <?php print get_kunde_email(); ?><br />

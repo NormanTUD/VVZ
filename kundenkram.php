@@ -409,11 +409,34 @@
 		return htmlentities($res ?? "");
 	}
 
-
 	function get_kunde_email () {
 		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 
 		$query = "select email from vvz_global.kundendaten where id = ".esc($kunde_id);
+
+		$res = get_single_row_from_query($query);
+		if($res == $GLOBALS["dbname"]) {
+			return "<i>Bisher nicht eingetragen</i>";
+		}
+		return htmlentities($res ?? "");
+	}
+
+	function get_kunde_ort () {
+		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+
+		$query = "select kundeort from vvz_global.kundendaten where id = ".esc($kunde_id);
+
+		$res = get_single_row_from_query($query);
+		if($res == $GLOBALS["dbname"]) {
+			return "<i>Bisher nicht eingetragen</i>";
+		}
+		return htmlentities($res ?? "");
+	}
+
+	function get_kunde_plz () {
+		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+
+		$query = "select kundeplz from vvz_global.kundendaten where id = ".esc($kunde_id);
 
 		$res = get_single_row_from_query($query);
 		if($res == $GLOBALS["dbname"]) {
