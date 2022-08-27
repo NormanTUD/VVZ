@@ -28,7 +28,7 @@
 			<table>
 				<tr>
 					<th>Option</th>
-					<th style="width: 300px">Wert</th>
+					<th class="neuerdozent_input">Wert</th>
 					<th>Speichern</th>
 				</tr>
 				<tr>
@@ -48,15 +48,15 @@
 ?>
 				<tr>
 					<td>Vorname</td>
-					<td><input type="text" style="width: 200px;" name="first_name" value="" /></td>
+					<td><input type="text" class="neuerdozent_input" name="first_name" value="" /></td>
 				</tr>
 				<tr>
 					<td>Nachname</td>
-					<td><input type="text" style="width: 200px;" name="last_name" value="" /></td>
+					<td><input type="text" class="neuerdozent_input" name="last_name" value="" /></td>
 				</tr>
 				<tr>
 					<td>Passwort</td>
-					<td><input type="text" style="width: 200px;" name="password" value="<?php print generate_random_string(20); ?>" /></td>
+					<td><input type="text" class="neuerdozent_input" name="password" value="<?php print generate_random_string(20); ?>" /></td>
 				</tr>
 				<tr>
 					<td>Barrierefreie Gebäude bevorzugen?</td>

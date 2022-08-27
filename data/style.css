@@ -1032,3 +1032,7 @@ a, a:visited, a:hover, a:active {
 .bg_A9A9A9 {
 	background-color: #A9A9A9;
 }
+
+.neuerdozent_input {
+	width: 200px;
+}
