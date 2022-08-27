@@ -67,7 +67,7 @@
 
 
 		if(get_post("update_kunde_data")) {
-			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname)) {
+			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname) && $kunde_ok && $email_ok && $iban_ok) {
 				$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
 
 				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
@@ -79,8 +79,6 @@
 				}
 
 				$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
-			} else {
-				die("URL ALREADY EXISTS");
 			}
 		}
 
@@ -88,7 +86,7 @@
 
 		if((!$urlname_exists && $kunde_ok && $iban_ok && $email_ok) || get_get("done_migration")) {
 			if(!get_get("done_migration")) {
-				if(kunde_owns_url($kunde_id, get_url_uni_name())) {
+				if(kunde_owns_url($kunde_id, get_url_uni_name()) && $kunde_ok && $email_ok && $iban_ok) {
 					update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
 				}
 			}
