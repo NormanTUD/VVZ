@@ -15,6 +15,20 @@
 			include_once('hinweise.php');
 ?>
 			<?php simple_edit(array('name'), 'bereich', array('Name', 'Speichern', 'Löschen'), $GLOBALS['this_page_number'], array('id', 'name'), 0, array(), null, 0, 0, 0, array(700)); ?>
+
+			<h2>Importiere Bereiche aus einer Liste:</h2>
+			<p>Format:</p>
+			<pre>
+bereich_name
+Wissen und Technik (Referat)
+Wissen und Technik (Seminararbeit)
+Wissen, Natur und Technik (Referat)
+			</pre>
+			<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
+				<textarea style="width: 50%; min-height: 200px;" name="csv"><?php print htmlentities(get_post("csv") ?? ""); ?></textarea>
+				<input type="hidden" name="import_bereiche_from_csv" value="1">
+				<input type="submit" value="Importieren">
+			</form>
 		</div>
 
 <?php
