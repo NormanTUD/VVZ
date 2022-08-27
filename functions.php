@@ -662,6 +662,7 @@ declare(ticks=1);
 			} else if (get_post('neue_veranstaltung')) {
 				error('Für eine Veranstaltung muss ein Name, ein Dozent, der Typ der Institut und ein Veranstaltungstyp definiert sein. Sofern Sie kein Administrator sind, muss Ihrem Account zum Erstellen von Veranstaltungen ein Dozent zugewiesen sein. Bitte kontaktieren Sie die <a href="kontakt.php">Administratoren</a>, damit Ihr Account diese Zuordnung bekommt.');
 			}
+
 		} else {
 			#dier($_POST);
 			# NO_ID
@@ -983,6 +984,29 @@ declare(ticks=1);
 
 				if($frage && $antwort) {
 					create_faq($frage, $antwort, $wie_oft_gestellt);
+				}
+			}
+
+			if(get_post("import_gebaeude_from_csv")) {
+				if(check_page_rights(get_page_id_by_filename("gebaeude.php"))) {
+					$struct = parse_csv(get_post("csv"), ",");
+					if($struct[0][0] == "gebaeude_name") {
+						array_shift($struct);
+					}
+
+					foreach ($struct as $id => $row) {
+						if(isset($row[0]) && isset($row[1])) {
+							create_gebaeude($row[0], $row[1]);
+						} else if(isset($row[0])) {
+							create_gebaeude($row[0], $row[0]);
+						} else if(isset($row[1])) {
+							create_gebaeude($row[1], $row[1]);
+						} else if(!isset($row[0]) && !isset($row[1])) {
+							warning("Konnte kein Gebäude finden");
+						}
+					}
+				} else {
+					right_issue("Sie haben kein recht dazu, Gebäude hinzuzufügen");
 				}
 			}
 		}
@@ -9455,4 +9479,25 @@ order by
 			}
 		}
 	}
+
+
+	function parse_csv($text, $delimiter) {
+		$res = array();
+		$lines = preg_split("/\R+/", $text);
+		$lines = array_filter($lines);
+
+		foreach ($lines as $id => $line) {
+			$line_res = preg_split("/\s*".$delimiter."\s*/", $line);
+			foreach ($line_res as $item_id => $item) {
+				$line_res[$item_id] = preg_replace("/'/", "", $line_res[$item_id]);
+				$line_res[$item_id] = preg_replace('/"/', "", $line_res[$item_id]);
+			}
+			$res[] = $line_res;
+		}
+
+		return $res;
+	}
+
+	#dier(parse_csv("a-b'-c\nd-e- f\n\ng- h- i", "-"));
+	#dier(parse_csv("a,b,c\nd,e, f\n\ng, h, i", ","));
 ?>
