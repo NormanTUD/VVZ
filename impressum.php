@@ -18,12 +18,20 @@ mit folgenden Änderungen:
 </p>
 
 <p>
-Ansprechpartner: <br><?php print $GLOBALS['ansprechpartner']; ?><br>
+Ansprechpartner: <br><?php print get_kunde_name(); ?><br>
 Betreiber:<br>
 <?php print get_university_name(); ?><br>
 <?php print $GLOBALS['university_plz_city']; ?><br>
 Tel.: <?php print $GLOBALS['ansprechpartner_tel_nr']; ?><br>
-E-Mail: <?php print $GLOBALS['ansprechpartner_email']; ?><br>
+<?php
+	$email = get_kunde_email();
+	if($email) {
+?>
+
+	E-Mail: <?php print get_kunde_email(); ?><br>
+<?php
+	}
+?>
 </p>
 
 <p>

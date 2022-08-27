@@ -385,10 +385,35 @@
 		rquery($query);
 	}
 
+	function get_kunde_name () {
+		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+
+		$query = "select kundename from vvz_global.kundendaten where id = ".esc($kunde_id);
+
+		$res = get_single_row_from_query($query);
+		if($res == $GLOBALS["dbname"]) {
+			return "<i>Bisher nicht eingetragen</i>";
+		}
+		return htmlentities($res ?? "");
+	}
+
 	function get_university_name () {
 		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 
 		$query = "select universitaet from vvz_global.kundendaten where id = ".esc($kunde_id);
+
+		$res = get_single_row_from_query($query);
+		if($res == $GLOBALS["dbname"]) {
+			return "<i>Bisher nicht eingetragen</i>";
+		}
+		return htmlentities($res ?? "");
+	}
+
+
+	function get_kunde_email () {
+		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+
+		$query = "select email from vvz_global.kundendaten where id = ".esc($kunde_id);
 
 		$res = get_single_row_from_query($query);
 		if($res == $GLOBALS["dbname"]) {
