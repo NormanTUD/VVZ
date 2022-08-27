@@ -1,3 +1,5 @@
+"use strict";
+
 function colorHashMe () {
 	$(".colorhashme").each(function () {
 		var input = this;

@@ -15,7 +15,7 @@ table {
 #mainindexnocenter {
 	padding: 5px;
 	background-color: white;
-	border-radius: 5px;
+	border-radius: 5px 5px 5px 5px;
 	margin-left: auto;
 	margin-right: auto;
 	min-width: 600px;
@@ -24,7 +24,7 @@ table {
 #mainindex {
 	padding: 5px;
 	background-color: white;
-	border-radius: 5px;
+	border-radius: 5px 5px 5px 5px;
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
@@ -174,7 +174,7 @@ div#menu li a:hover {
 }
 
 .topnav li a:hover {
-	background-color: #black;
+	background-color: #000000;
 }
 
 .dropdown {
@@ -218,7 +218,7 @@ textarea {
 	margin: 0;
 	appearance: none;
 	box-shadow: none;
-	border-radius: none;
+	border-radius: 0px 0px 0px 0px;
 	padding: 4px;
 	outline: none;
 	border: solid 1px #707070;
@@ -237,7 +237,7 @@ input[type="password"] {
 	font-family: sans-serif;
 	appearance: none;
 	box-shadow: none;
-	border-radius: none;
+	border-radius: 0px 0px 0px 0px;
 	padding: 4px;
 	border: solid 1px #dcdcdc;
 	transition: box-shadow 0.3s, border 0.3s;
@@ -257,7 +257,7 @@ input[type="text"] {
 	font-family: sans-serif;
 	appearance: none;
 	box-shadow: none;
-	border-radius: none;
+	border-radius: 0px 0px 0px 0px;
 	padding: 4px;
 	border: solid 1px #dcdcdc;
 	transition: box-shadow 0.3s, border 0.3s;
@@ -556,6 +556,7 @@ a, a:visited, a:hover, a:active {
 	80% {color: blue;}
 	100% {color: orange;}	
 }
+
 @-ms-keyframes rainbow{
 	20% {color: red;}
 	40% {color: yellow;}
@@ -666,8 +667,8 @@ a, a:visited, a:hover, a:active {
 }
 
 .width_100_break_word {
-	word-wrap: break-all;
-	white-space:normal;
+	word-wrap: break-word;
+	white-space: normal;
 	max-width: 100%;
 }
 
