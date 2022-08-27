@@ -8,10 +8,12 @@
 		$query = "show databases like 'db_vvz_%'";
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
+			print "Dropping '$row[0]'\n";
 			rquery("drop database $row[0];");
 		}
 
 		try {
+			print "Dropping 'startpage'\n";
 			rquery("drop database startpage;");
 		} catch (\Throwable $e) {
 			print $e;
