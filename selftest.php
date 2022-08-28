@@ -263,13 +263,24 @@
 
 		if(!table_exists_and_has_entries("customizations")) {
 			$default_values = array(
-				"button" => [[ "background-color", "green" ]]
+				"button, input[type='button'], input[type='submit']" => array(
+					"name" => "Buttons",
+					"values" => [
+						[ "background-color", "green" ], [ "font-size", "50px" ]
+					],
+				),
+				"h2" => array(
+					"name" => "Header",
+					"values" => [
+						[ "background-color", "yellow" ]
+					]
+				)
 			);
 
 #'customizations' => 'create table customizations (id int unsigned primary key, classname varchar(100), property varchar(100), val varchar(100))'
 			foreach ($default_values as $default_key => $default_item) {
-				foreach ($default_item as $real_default_item) {
-					$query = "insert into customizations (classname, property, val) values (".esc($default_key).", ".esc($real_default_item[0]).", ".esc($real_default_item[1]).")";
+				foreach ($default_item["values"] as $real_default_item) {
+					$query = "insert into customizations (humanname, classname, property, val) values (".esc($default_item["name"]).", ".esc($default_key).", ".esc($real_default_item[0]).", ".esc($real_default_item[1]).")";
 					rquery($query);
 				}
 			}
