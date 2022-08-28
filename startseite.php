@@ -38,7 +38,16 @@
 				</div>
 			</div>
 <?php
-			$page_str = "<img src='default_logo.png'>";
+			$page_str = "<center><img src='default_logo.png'></center><br>";
+			$page_str .= "omni-concept ist Ihr kreativer Ansprechpartner, wenn es um innovative Lösungen im Bereich Prozessautomatisierung, Internet, Datenbanken und Printdesign geht. ";
+			$page_str .= "omni-concept wurde Anfang 2000 gegründet. ";
+			$page_str .= "<center><h2>Das Vorlesungsverzeichnis:</h2></center>";
+			$page_str .= "Sind Sie auf der Suche nach einer Software, die sowohl für Sie als auch Ihre Studierenden zeitsparend ist? Möchten Sie nicht mehr manuell Excel-Dateien herumsenden, um Vorlesungen und Prüfung zu verwalten die man dann mühsam zusammenfügen muss? Würden Sie gerne die angebotenen Prüfungen an das Prüfungsamt melden, diese fordern es im Excel-Format?<br>";
+			$page_str .= "Unser Vorlesungsverzeichnis bietet Ihnen diese Möglichkeit. Hier werden zentral alle Dozenten, Prüfungen, Studiengänge, Termine, Vorlesungen, Übungen und sonstige Veranstaltngen gespeichert. Wenn jemand heiratet, reicht es aus, seinen Namen in einer Zeile zu ändern, dann ist es überall anders.<br>";
+			$page_str .= "Das Beste: die Dozenten verwalten sich selbst. Jeder Dozent kann sehr einfach seine Veranstaltungen erstellen und bearbeiten, und alle Änderungen sind sofort live.<br>";
+			$page_str .= "Auch der Raumplanungsprozess und die Abstimmungen mit den Raumplanungsdezernaten ist hier abgebildet und einfach, aus dem Browser heraus, möglich.<br>";
+			$page_str .= "<i>Für spezielle Fälle vorgesorgt</i>: Es gibt etliche schwer vorhersehbare Fälle, z.B. wenn ein Dozent plötzlich einen Gastdozent verwalten muss. Dafür ist an vielen Stellen vorgesorgt. In diesem Speziellen gibt es den Account-Typ Superdozent. Dieser darf seine eigenen Veranstaltungen editieren, aber auch die von ausgewählten Dozenten.<br>";
+			$page_str .= "";
 			$page_str .= "<center><h2>Aktuelle Kunden:</h2></center>";
 			$page_str .= "<ul class='side_by_side'>";
 			$str_contents = "";
