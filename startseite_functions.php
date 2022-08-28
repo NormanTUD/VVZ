@@ -235,7 +235,7 @@
 			}
 			foreach ($available_stunden as $stunde) {
 ?>
-				<option value="<?php print $stunde; ?>" <?php print $stunde == get_get('stunde') ? 'selected' : ''; ?>><?php print htmlentities($stunde); ?></option>
+				<option value="<?php print $stunde; ?>" <?php print $stunde == get_get('stunde') ? 'selected' : ''; ?>><?php print htmlentities($stunde ?? ""); ?></option>
 <?php
 		}
 ?>
@@ -930,9 +930,7 @@
 			<input type="hidden" value="<?php print htmlentities(get_get('studiengang')); ?>" name="studiengang">
 			<center><div class="warning_studienordnung_div"><i class="red_text">Trotz aller Sorgfaltsmaßnahmen übernehmen wir keine Gewähr dafür, dass der Stundenplan korrekt ist. <b>Bitte konsultieren Sie immer die Prüfungsordnung Ihres Studienganges und überprüfen Sie die Angaben manuell!</b> Benutzen Sie diese Software nicht, wenn Sie nicht damit einverstanden sind!</i></div></center>
 			<input type="submit" value="Aus markierten Veranstaltungen einen Stundenplan erstellen" /><br />
-			<br />
-			<input name="generate_cookie_stundenplan" type="submit" value="Aus Veranstaltungen und Cookies einen Stundenplan erstellen" /><br />
-			<br />
+			<!--<input name="generate_cookie_stundenplan" type="submit" value="Aus Veranstaltungen und Cookies einen Stundenplan erstellen" /><br />-->
 <?php
 			if($GLOBALS['shown_etwa']) {
 ?>
@@ -1568,7 +1566,8 @@
 			$GLOBALS['auswaehlbare_veranstaltungen_counter'] = 0;
 			if(mysqli_num_rows($result)) {
 				$pruefungen = create_pruefungen_by_studiengang_array(get_get('studiengang'), get_get('bereich'));
-
+?>
+<?php
 				while ($row = mysqli_fetch_row($result)) {
 					create_veranstaltung_box_from_row($row, $veranstaltungsabkuerzungen_array, $raum_gebaeude_array, $dozent_array, $wochentag_abk_nach_name, $pruefungen);
 				}
@@ -1582,7 +1581,7 @@
 				show_auswaehlbare_veranstaltungen_stuff();
 ?>
 				</form>
-				<button id="stundenplan_addieren">Stundenplancookies updaten</button><br />
+				<!--<button id="stundenplan_addieren">Stundenplancookies updaten</button><br />-->
 <?php
 				show_link_alle_pruefungen_for_studiengang($GLOBALS['this_institut'], $GLOBALS['this_semester']);
 			} else {
@@ -1590,6 +1589,8 @@
 				<i class="red_text">Mit den gegebenen Suchkriterien konnten keine Veranstaltungen gefunden werden.</i>
 <?php
 			}
+
+			//js("toc.js");
 ?>
 		</form>
 <?php
