@@ -78,9 +78,9 @@
 		if(!table_exists_and_has_entries("plan")) {
 			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Demo', 0, 0)");
 			rquery("insert ignore  into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic Faculty', 50, 500)");
-			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic University', 80, 800)");
-			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 90, 1000)");
-			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro University', 120, 1100)");
+			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic University', 500, 3000)");
+			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 70, 700)");
+			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro University', 350, 4000)");
 		}
 
 		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {

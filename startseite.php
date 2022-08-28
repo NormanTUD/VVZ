@@ -63,7 +63,7 @@
 
 
 			$page_str .= "<center><h2>Aktuelle Kunden:</h2></center>";
-			$page_str .= "<ul class='side_by_side'>";
+			$page_str .= "<ul class='side_by_side list_style_none'>";
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
 				$urlname = $row[0];
@@ -79,7 +79,7 @@
 				}
 
 				if($plan_name != "Demo") {
-					$desc = "$uniname ($plan_name)";
+					$desc = "<img width=300 src='tudlogo.svg' /><br>$uniname";
 
 					$str_contents .= "<li><a target='_blank' href='$urlname/'>$desc</a></li>";
 				}
@@ -121,17 +121,10 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 						</tr>
+
 						<tr>
 							<td>Automatische Dokumentenerstellung für Prüfungsämter</td>
 							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-						</tr>
-						<tr>
-							<td>Unterstützung bei technischen Problemen</td>
-							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -145,6 +138,7 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 						</tr>
+
 						<tr>
 							<td>Dozenten können ihre Veranstaltungen selbst eintragen und verwalten</td>
 							<td>&#9989;</td>
@@ -156,6 +150,22 @@
 						<tr>
 							<td>Einheitliche Raumplanung</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Ihre eigene URL der Form <?php print htmlentities($_SERVER['HTTP_HOST'] ?? ""); ?>/name_ihrer_uni</td>
+							<td>&#10060;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Unterstützung bei technischen Problemen</td>
+							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -192,6 +202,14 @@
 							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Einrichtungsgebühr</td>
+							<td>0 €</td>
+							<td>0 €</td>
+							<td>0 €</td>
+							<td>0 €</td>
+							<td>0 €</td>
 						</tr>
 						<tr>
 							<td>Anzahl Institute</td>
