@@ -74,7 +74,7 @@
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
 			}
-			error($fehler);
+			warning($fehler);
 		}
 
 
@@ -86,7 +86,7 @@
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
-			error($fehler);
+			warning($fehler);
 		}
 
 		$module = create_modul_array();
@@ -97,7 +97,7 @@
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
-			error($fehler);
+			warning($fehler);
 		}
 
 		$gebaeude = create_gebaeude_array();
@@ -108,7 +108,7 @@
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
-			error($fehler);
+			warning($fehler);
 		}
 
 		$pruefungsnummern = create_pruefungsnummern_array();
@@ -119,7 +119,7 @@
 			} else {
 				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
 			}
-			error($fehler);
+			warning($fehler);
 		}
 
 		if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
