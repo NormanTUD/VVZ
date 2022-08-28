@@ -1,14 +1,15 @@
 body {
 	background-image: url("adminbg.jpg");
 	background-position: top;
+	background-repeat: no-repeat;
 	background-attachment: fixed;
 }
 
 .blurbox {
-    margin: 20px;
-    background-color: #fff;
-    top: -20px;
-    position: absolute;
-    min-width: 90%;
-    box-shadow: 0 0 10px 10px #fff;
+	margin: 20px;
+	background-color: #fff;
+	top: -20px;
+	position: absolute;
+	min-width: 90%;
+	box-shadow: 0 0 10px 10px #fff;
 }
