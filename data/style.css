@@ -1051,3 +1051,7 @@ a, a:visited, a:hover, a:active {
 .klingon {
 	height: 15px;
 }
+
+.toggle_details {
+	user-select: none;
+}
