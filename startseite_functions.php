@@ -1480,7 +1480,7 @@
 
 			$url = 'savecookie.php?absolviertepruefungsleistungen='.urlencode($absolviertepruefungsleistungen).'&geplante_pruefungsleistungen='.urlencode($geplante_pruefungsleistungen);
 ?>
-		<button onclick="location.href='<?php print htmlentities($url); ?>'">Cookie-URL generieren</button>
+		<!--<button onclick="location.href='<?php print htmlentities($url); ?>'">Cookie-URL generieren</button>-->
 <?php
 	}
 
