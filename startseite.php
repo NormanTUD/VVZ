@@ -63,7 +63,7 @@
 
 
 			$page_str .= "<center><h2>Aktuelle Kunden:</h2></center>";
-			$page_str .= "<ul class='side_by_side list_style_none'>";
+			$page_str .= "<ul class='side_by_side list_style_none display_inline'>";
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
 				$urlname = $row[0];
@@ -79,9 +79,13 @@
 				}
 
 				if($plan_name != "Demo") {
-					$desc = "<img width=300 src='tudlogo.svg' /><br>$uniname";
+					if($external_url) {
+						$desc = "<img height=100 src='tudlogo.svg' />";
+					} else {
+						$desc = "<img height=100 src='default_logo.png' />";
+					}
 
-					$str_contents .= "<li><a target='_blank' href='$urlname/'>$desc</a></li>";
+					$str_contents .= "<li class='display_inline'><a target='_blank' href='$urlname/'>$desc</a></li>";
 				}
 			}
 

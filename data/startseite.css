@@ -126,3 +126,7 @@ a:active {
 	color: blue;
 }
 
+
+.display_inline {
+	display: inline;
+}
