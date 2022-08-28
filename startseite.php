@@ -69,6 +69,9 @@
 				print "</div></div>";
 			}
 ?>
+			<div class="parallax bgimg-2">
+				hallo
+			</div>
 			<div class="footer_link"><a target="_blank" href="http://www.omni-concept.com/v1024/Pages/impressum.htm">Impressum</a> | <a target="_blank" href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm">Datenschutzerklärung</a></div>
 		</div> 
 
