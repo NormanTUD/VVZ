@@ -1009,20 +1009,24 @@ declare(ticks=1);
 			if(get_post("import_gebaeude_from_csv")) {
 				if(check_page_rights(get_page_id_by_filename("gebaeude.php"))) {
 					$struct = parse_csv(get_post("csv"), ",");
-					if($struct[0][0] == "gebaeude_name") {
-						array_shift($struct);
-					}
-
-					foreach ($struct as $id => $row) {
-						if(isset($row[0]) && isset($row[1])) {
-							create_gebaeude($row[0], $row[1]);
-						} else if(isset($row[0])) {
-							create_gebaeude($row[0], $row[0]);
-						} else if(isset($row[1])) {
-							create_gebaeude($row[1], $row[1]);
-						} else if(!isset($row[0]) && !isset($row[1])) {
-							warning("Konnte kein Gebäude finden");
+					if(is_array($struct) && isset($struct[0])) {
+						if($struct[0][0] == "gebaeude_name") {
+							array_shift($struct);
 						}
+
+						foreach ($struct as $id => $row) {
+							if(isset($row[0]) && isset($row[1])) {
+								create_gebaeude($row[0], $row[1]);
+							} else if(isset($row[0])) {
+								create_gebaeude($row[0], $row[0]);
+							} else if(isset($row[1])) {
+								create_gebaeude($row[1], $row[1]);
+							} else if(!isset($row[0]) && !isset($row[1])) {
+								warning("Konnte kein Gebäude finden");
+							}
+						}
+					} else {
+						warning("Die eingegebene CSV Datei konnte nicht geparst werden oder war leer.");
 					}
 				} else {
 					right_issue("Sie haben kein recht dazu, Gebäude hinzuzufügen");
