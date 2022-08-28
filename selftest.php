@@ -266,14 +266,16 @@
 				"button, input[type='button'], input[type='submit']" => array(
 					"name" => "Buttons",
 					"values" => [
-						[ "background-color", "green" ],
-						[ "font-size", "10px" ]
+						[ "background-color", "white" ],
+						[ "color", "black" ],
+						[ "border", "1px solid #006092" ]
 					],
 				),
-				"h2" => array(
-					"name" => "Header",
+				"th" => array(
+					"name" => "Tabellenheader",
 					"values" => [
-						[ "background-color", "yellow" ]
+						[ "background-color", "#006092" ],
+						[ "color", "#ffffff" ]
 					]
 				)
 			);
