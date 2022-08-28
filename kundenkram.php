@@ -447,4 +447,10 @@
 		}
 		return htmlentities($res ?? "");
 	}
+
+	function get_css_property_value($class, $prop) {
+		$sql = "select val from customizations where classname = ".esc($class)." and property = ".esc($prop);
+
+		return get_single_row_from_query($sql);
+	}
 ?>

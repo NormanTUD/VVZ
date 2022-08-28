@@ -129,7 +129,13 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 						</tr>
-
+						<tr>
+							<td>Automatische tägliche Backups</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
 						<tr>
 							<td>JSON-API</td>
 							<td>&#10060;</td>

@@ -591,8 +591,9 @@
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_version` (`name_id`,`version`),
   CONSTRAINT `ua_specific_browser_ibfk_1` FOREIGN KEY (`name_id`) REFERENCES `ua_browser` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
+'customizations' => 'create table customizations (id int unsigned primary key AUTO_INCREMENT, classname varchar(100), property varchar(100), val varchar(100))'
 		);
 
 	$GLOBALS['views'] = array(

@@ -275,9 +275,9 @@
 						$page_file = dirname(__FILE__).'/pages/'.$page_file;
 
 						if(!file_exists($page_file)) {
-							die("Die Datei `$page_file_basename` konnte nicht gefunden werden!");
+							print "Die Datei `$page_file_basename` konnte nicht gefunden werden!";
 						} else if (!$page_file_basename) {
-							die("Die Unterseite konnte in der Datenbank nicht gefunden werden!");
+							print "Die Unterseite konnte in der Datenbank nicht gefunden werden!";
 						} else {
 							if(check_page_rights($page_file_basename)) {
 								if($GLOBALS['deletion_page']) {

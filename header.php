@@ -125,6 +125,9 @@
 			<meta name="robots" content="noindex, nofollow" /> 
 <?php
 		}
+
+		css("custom.php");
+
 		js(array("color-hash.js"));
 ?>
 	</head>
