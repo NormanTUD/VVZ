@@ -2008,7 +2008,7 @@ declare(ticks=1);
 	}
 
 	function my_mysqli_real_escape_string ($arg) {
-		return mysqli_real_escape_string($GLOBALS['dbh'], $arg);
+		return mysqli_real_escape_string($GLOBALS['dbh'], $arg ?? "");
 	}
 
 
