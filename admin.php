@@ -151,7 +151,7 @@
 <?php
 			}
 ?>
-		Willkommen, <?php print $dozent_name; ?>! <?php print get_demo_expiry_time(); ?>
+		Willkommen, <?php print $dozent_name; ?>!
 <?php
 			if(get_post('password') == 'test' && get_post('try_login')) {
 ?>
@@ -161,6 +161,7 @@
 			if(!file_exists('/etc/x11test')) {
 ?>
 				<img src="empty.gif" width="200" height=1 /><div class="tooltip"><a class="red_large" href="logout.php">Abmelden</a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+				 <?php print get_demo_expiry_time(); ?>
 <?php
 			}
 			if($GLOBALS['user_role_id'] == 1) {
