@@ -19,7 +19,8 @@
 			"style.css",
 			"startseite.css",
 			"bootstrap-tour-standalone.css",
-			"jquery-ui-timepicker-addon.css"
+			"jquery-ui-timepicker-addon.css",
+			"custom.php"
 		));
 ?>
 
@@ -98,6 +99,7 @@
 					<table>
 						<tr>
 							<th></th>
+							<th>Demo</th>
 							<th>Basic Faculty</th>
 							<th>Basic University</th>
 							<th>Pro Faculty</th>
@@ -109,9 +111,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Weniger Fragen von Studenten, weil alle nötigen Infos zentralisiert sind</td>
+							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -123,9 +127,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Unterstützung bei technischen Problemen</td>
+							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -137,9 +143,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Dozenten können ihre Veranstaltungen selbst eintragen und verwalten</td>
+							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -151,9 +159,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Automatische tägliche Backups</td>
+							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -161,6 +171,7 @@
 						</tr>
 						<tr>
 							<td>JSON-API</td>
+							<td>&#9989;</td>
 							<td>&#10060;</td>
 							<td>&#10060;</td>
 							<td>&#9989;</td>
@@ -168,6 +179,7 @@
 						</tr>
 						<tr>
 							<td>Halbautomatischer Stundenplanersteller für Studenten</td>
+							<td>&#9989;</td>
 							<td>&#10060;</td>
 							<td>&#10060;</td>
 							<td>&#9989;</td>
@@ -177,11 +189,13 @@
 							<td>Priorisierter Support</td>
 							<td>&#10060;</td>
 							<td>&#10060;</td>
+							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Anzahl Institute</td>
+							<td>Keine Grenze</td>
 							<td>1*</td>
 							<td>Keine Grenze</td>
 							<td>1*</td>
@@ -189,6 +203,7 @@
 						</tr>
 						<tr>
 							<td>Preis pro Monat</td>
+							<td rowspan=2>7-Tage-Demo kostenlos</td>
 							<td><?php print get_plan_price_by_name("basic_faculty")[0]; ?> €</td>
 							<td><?php print get_plan_price_by_name("basic_university")[0]; ?> €</td>
 							<td><?php print get_plan_price_by_name("pro_faculty")[0]; ?> €</td>
@@ -203,19 +218,21 @@
 						</tr>
 						<tr>
 							<td>Plan wählen</td>
+							<td><button>Demo ausprobieren</button></td>
 							<td>A</td>
 							<td>B</td>
 							<td>C</td>
 							<td>D</td>
 						</tr>
 					</table>
+
+					* Es können weitere Lizenzen für Institute dazugebucht werden. Schreiben Sie uns dazu einfach eine Email.
 				</div></div>
 			</div>
 
 			
 			<div class="footer_link"><a target="_blank" href="http://www.omni-concept.com/v1024/Pages/impressum.htm">Impressum</a> | <a target="_blank" href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm">Datenschutzerklärung</a></div>
 		</div> 
-
 <?php
 
 		exit(0);

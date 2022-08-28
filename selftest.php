@@ -273,7 +273,8 @@
 					"values" => [
 						[ "background-color", "white" ],
 						[ "color", "black" ],
-						[ "border", "1px solid #006092" ]
+						[ "border", "1px solid #006092" ],
+						[ "cursor", "unset" ],
 					],
 				),
 				"th" => array(
