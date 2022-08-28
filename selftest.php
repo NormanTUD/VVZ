@@ -245,6 +245,11 @@
 			insert_values('veranstaltungstyp', array('name', 'abkuerzung'), $veranstaltungstypen);
 		}
 
+		if(!table_exists_and_has_entries("api_error_code")) {
+			$sql = "insert into api_error_code (name) values ('Kein Fehler'), ('Falscher Auth-Code'), ('Falsche Parameter'), ('Zu wenig Zeit vergangen');";
+			rquery($sql);
+		}
+
 		if(table_exists($GLOBALS['dbname'], 'users')) {
 			$query = 'SELECT username FROM `'.$GLOBALS['dbname'].'`.`users` `u` JOIN `role_to_user` `ur` ON `ur`.`user_id` = `u`.`id` WHERE `role_id` = 1';
 			$result = rquery($query);
