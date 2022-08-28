@@ -142,7 +142,14 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 						</tr>
-
+						<tr>
+							<td>Funktioniert auch auf älteren Rechnern oder Smartphones</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
 						<tr>
 							<td>Dozenten können ihre Veranstaltungen selbst eintragen und verwalten</td>
 							<td>&#9989;</td>
