@@ -69,9 +69,121 @@
 				print "</div></div>";
 			}
 ?>
-			<div class="parallax bgimg-2">
-				hallo
+			<div class="bgimg-2">
+				<div class="startseite_div_content"><div class="startseite_div">
+					<center><h2>Übersicht:</h2></center>
+					<table>
+						<tr>
+							<th></th>
+							<th>Basic Faculty</th>
+							<th>Basic University</th>
+							<th>Pro Faculty</th>
+							<th>Pro University</th>
+						</tr>
+						<tr>
+							<td>Einheitliche Verwaltung von Dozenten, Vorlesungen und Prüfungsleistungen</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Weniger Fragen von Studenten, weil alle nötigen Infos zentralisiert sind</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Automatische Dokumentenerstellung für Prüfungsämter</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Unterstützung bei technischen Problemen</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Rollenverwaltung (Dozent, Administrator, Raumplaner, ...)</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Dozenten können ihre Veranstaltungen selbst eintragen und verwalten</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Einheitliche Raumplanung</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+
+						<tr>
+							<td>JSON-API</td>
+							<td>&#10060;</td>
+							<td>&#10060;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Halbautomatischer Stundenplanersteller für Studenten</td>
+							<td>&#10060;</td>
+							<td>&#10060;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Priorisierter Support</td>
+							<td>&#10060;</td>
+							<td>&#10060;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
+							<td>Anzahl Institute</td>
+							<td>1*</td>
+							<td>Keine Grenze</td>
+							<td>1*</td>
+							<td>Keine Grenze</td>
+						</tr>
+						<tr>
+							<td>Preis pro Monat</td>
+							<td><?php print get_plan_price_by_name("basic_faculty")[0]; ?> €</td>
+							<td><?php print get_plan_price_by_name("basic_university")[0]; ?> €</td>
+							<td><?php print get_plan_price_by_name("pro_faculty")[0]; ?> €</td>
+							<td><?php print get_plan_price_by_name("pro_university")[0]; ?> €</td>
+						</tr>
+						<tr>
+							<td>Preis pro Semester</td>
+							<td><?php print get_plan_price_by_name("basic_faculty")[1]; ?> €</td>
+							<td><?php print get_plan_price_by_name("basic_university")[1]; ?> €</td>
+							<td><?php print get_plan_price_by_name("pro_faculty")[1]; ?> €</td>
+							<td><?php print get_plan_price_by_name("pro_university")[1]; ?> €</td>
+						</tr>
+						<tr>
+							<td>Plan wählen</td>
+							<td>A</td>
+							<td>B</td>
+							<td>C</td>
+							<td>D</td>
+						</tr>
+					</table>
+				</div></div>
 			</div>
+
+			
 			<div class="footer_link"><a target="_blank" href="http://www.omni-concept.com/v1024/Pages/impressum.htm">Impressum</a> | <a target="_blank" href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm">Datenschutzerklärung</a></div>
 		</div> 
 
