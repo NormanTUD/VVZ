@@ -38,7 +38,8 @@
 				</div>
 			</div>
 <?php
-			$page_str = "<center><h2>Aktuelle Kunden:</h2></center>";
+			$page_str = "<img src='default_logo.png'>";
+			$page_str .= "<center><h2>Aktuelle Kunden:</h2></center>";
 			$page_str .= "<ul class='side_by_side'>";
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
