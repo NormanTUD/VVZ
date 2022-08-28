@@ -990,16 +990,20 @@ declare(ticks=1);
 			if(get_post("import_bereiche_from_csv")) {
 				if(check_page_rights(get_page_id_by_filename("bereiche.php"))) {
 					$struct = parse_csv(get_post("csv"), ",");
-					if($struct[0][0] == "bereich_name") {
-						array_shift($struct);
-					}
-
-					foreach ($struct as $id => $row) {
-						if(isset($row[0])) {
-							create_bereich($row[0]);
-						} else {
-							warning("Konnte kein Bereiche finden");
+					if(is_array($struct) && isset($struct[0])) {
+						if($struct[0][0] == "bereich_name") {
+							array_shift($struct);
 						}
+
+						foreach ($struct as $id => $row) {
+							if(isset($row[0])) {
+								create_bereich($row[0]);
+							} else {
+								warning("Konnte kein Bereiche finden");
+							}
+						}
+					} else {
+						warning("Die eingegebene CSV Datei konnte nicht geparst werden oder war leer.");
 					}
 				} else {
 					right_issue("Sie haben kein recht dazu, Gebäude hinzuzufügen");
