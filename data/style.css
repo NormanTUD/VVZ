@@ -309,7 +309,6 @@ td, th {
 }
 
 th {
-	background: #006092;
 	font-weight: bold;
 	color: white;
 }
@@ -440,7 +439,7 @@ pre {
 
 form {
 	margin: 8px;
-	border: 1px solid #f1f1f1;
+	//border: 1px solid #f1f1f1;
 	padding: 8px;    
 	border-radius: 4px;
 }
