@@ -74,7 +74,7 @@
 		if(array_key_exists("SCRIPT_NAME", $_SERVER) && $_SERVER["SCRIPT_NAME"] != "/admin.php") {
 			css(array("foundation.min.css"));
 		} else {
-
+			css(array("admin.css"));
 		}
 ?>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">

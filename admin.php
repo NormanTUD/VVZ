@@ -8,6 +8,7 @@
 
 	if(!$GLOBALS['logged_in']) {
 ?>
+		<div class="blurbox">
 		<div id="main">
 			<a href="admin" border="0"><?php print_uni_logo(); ?></a>
 			<div id="wrapper" class="text_align_center">
@@ -140,6 +141,7 @@
 			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account hat keine ihm zugeordnete Rolle! !!!</span>';
 		}
 ?>
+		<div class="blurbox">
 		<div id="main">
 <?php
 			if(!file_exists('/etc/x11test')) {
@@ -380,6 +382,10 @@
 				</form>
 <?php
 			}
+?>
+
+			</div>
+<?php
 		}
 		include("footer.php");
 ?>
