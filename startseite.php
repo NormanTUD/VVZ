@@ -19,7 +19,8 @@
 			"style.css",
 			"startseite.css",
 			"bootstrap-tour-standalone.css",
-			"jquery-ui-timepicker-addon.css"
+			"jquery-ui-timepicker-addon.css",
+			"custom.php"
 		));
 ?>
 
@@ -38,7 +39,29 @@
 				</div>
 			</div>
 <?php
-			$page_str = "<img src='default_logo.png'>";
+			$page_str = "<center><img src='default_logo.png'></center><br>";
+			$page_str .= "omni-concept ist Ihr kreativer Ansprechpartner, wenn es um innovative Lösungen im Bereich Prozessautomatisierung, Internet, Datenbanken und Printdesign geht. ";
+			$page_str .= "omni-concept wurde Anfang 2000 gegründet. ";
+
+			$page_str .= "<center><h2>Das Vorlesungsverzeichnis:</h2></center>";
+			$page_str .= "Sind Sie auf der Suche nach einer Software, die sowohl für Sie als auch Ihre Studierenden zeitsparend ist? Möchten Sie nicht mehr manuell Excel-Dateien herumsenden, um Vorlesungen und Prüfung zu verwalten die man dann mühsam zusammenfügen muss? Würden Sie gerne die angebotenen Prüfungen an das Prüfungsamt melden, diese fordern es im Excel-Format?<br>";
+			$page_str .= "Das Beste: die Dozenten verwalten sich selbst. Jeder Dozent kann sehr einfach seine Veranstaltungen erstellen und bearbeiten, und alle Änderungen sind sofort live.<br>";
+			$page_str .= "Auch der Raumplanungsprozess und die Abstimmungen mit den Raumplanungsdezernaten ist hier abgebildet und einfach, aus dem Browser heraus, möglich.<br>";
+			$page_str .= "Das Vorlesungsverzeichnis entstand als studentisches Projekt an der philosophischen Fakultät der TU Dresden. Es läuft dort seit 2017 und ist durchgehend in der Praxis erprobt.<br>";
+			$page_str .= "<br>";
+			$page_str .= "<i>Für spezielle Fälle vorgesorgt</i>: Es gibt etliche schwer vorhersehbare Fälle im Uni-Alltag, z.B. wenn ein Dozent plötzlich einen Gastdozent verwalten muss. Für solche Spezialfälle ist vorgesorgt: dafür gibt es den Account-Typ Superdozent. Dieser darf seine eigenen Veranstaltungen editieren, aber auch die von ausgewählten Dozenten. Wir haben seit 2017 für jeden Spezialfall, der in der Praxis an der TU Dresden aufgetreten ist, eine technische Lösung gefunden.<br>";
+			$page_str .= "In der <b>Pro</b>-Version gibt es ein Tool, das Ihren Studenten hilft, ihren Stundenplan zu erstellen. Man gibt Studiengang und Semester an und kriegt eine exakte Auflistung aller Veranstaltungen, die für einen infragekommen.<br>";
+			$page_str .= "<br>";
+			$page_str .= "Dadurch, dass alle nur genau das sehen, was sie interessiert, finden auch alle schneller die Informationen, die sie suchen. Ob Räume, Videocall-Links, oder Informationen. Alles ist da, wo es Sinn macht, sichtbar, und sonst versteckt. Resultat: jeder bekommt genau die Information, die er sucht, undzwar zentral und live.<br>";
+			$page_str .= "<br>";
+			$page_str .= "Unser Vorlesungsverzeichnis bietet Ihnen diese Möglichkeit. Hier werden zentral alle Dozenten, Prüfungen, Studiengänge, Termine, Vorlesungen, Übungen und sonstige Veranstaltengen gespeichert.<br>";
+			$page_str .= "Man muss nie mehr Informationen zwei Mal eingeben. Alles, was gespeichert werden muss, wird zentral an einer Stelle gespeichert. Wenn jemand heiratet, reicht es aus, seinen Namen in einer Zeile zu ändern, dann ist es überall anders.<br>";
+			$page_str .= "<br>";
+			$page_str .= "Und das Beste? Sie können in weniger als 2 Minuten loslegen.<br>";
+			$page_str .= "<br>";
+			$page_str .= '<a target="_blank" href="?new_demo_uni=1"><button>Kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>';
+
+
 			$page_str .= "<center><h2>Aktuelle Kunden:</h2></center>";
 			$page_str .= "<ul class='side_by_side'>";
 			$str_contents = "";
@@ -76,6 +99,7 @@
 					<table>
 						<tr>
 							<th></th>
+							<th>Demo</th>
 							<th>Basic Faculty</th>
 							<th>Basic University</th>
 							<th>Pro Faculty</th>
@@ -87,9 +111,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Weniger Fragen von Studenten, weil alle nötigen Infos zentralisiert sind</td>
+							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -101,9 +127,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Unterstützung bei technischen Problemen</td>
+							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -115,9 +143,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Dozenten können ihre Veranstaltungen selbst eintragen und verwalten</td>
+							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -129,9 +159,11 @@
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
+							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Automatische tägliche Backups</td>
+							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
@@ -139,6 +171,7 @@
 						</tr>
 						<tr>
 							<td>JSON-API</td>
+							<td>&#9989;</td>
 							<td>&#10060;</td>
 							<td>&#10060;</td>
 							<td>&#9989;</td>
@@ -146,6 +179,7 @@
 						</tr>
 						<tr>
 							<td>Halbautomatischer Stundenplanersteller für Studenten</td>
+							<td>&#9989;</td>
 							<td>&#10060;</td>
 							<td>&#10060;</td>
 							<td>&#9989;</td>
@@ -155,11 +189,13 @@
 							<td>Priorisierter Support</td>
 							<td>&#10060;</td>
 							<td>&#10060;</td>
+							<td>&#10060;</td>
 							<td>&#9989;</td>
 							<td>&#9989;</td>
 						</tr>
 						<tr>
 							<td>Anzahl Institute</td>
+							<td>Keine Grenze</td>
 							<td>1*</td>
 							<td>Keine Grenze</td>
 							<td>1*</td>
@@ -167,6 +203,7 @@
 						</tr>
 						<tr>
 							<td>Preis pro Monat</td>
+							<td rowspan=2>7-Tage-Demo kostenlos</td>
 							<td><?php print get_plan_price_by_name("basic_faculty")[0]; ?> €</td>
 							<td><?php print get_plan_price_by_name("basic_university")[0]; ?> €</td>
 							<td><?php print get_plan_price_by_name("pro_faculty")[0]; ?> €</td>
@@ -181,19 +218,21 @@
 						</tr>
 						<tr>
 							<td>Plan wählen</td>
+							<td><a target="_blank" href="?new_demo_uni=1"><button>Demo ausprobieren</button></a></td>
 							<td>A</td>
 							<td>B</td>
 							<td>C</td>
 							<td>D</td>
 						</tr>
 					</table>
+
+					* Es können weitere Lizenzen für Institute dazugebucht werden. Schreiben Sie uns dazu einfach eine Email.
 				</div></div>
 			</div>
 
 			
 			<div class="footer_link"><a target="_blank" href="http://www.omni-concept.com/v1024/Pages/impressum.htm">Impressum</a> | <a target="_blank" href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm">Datenschutzerklärung</a></div>
 		</div> 
-
 <?php
 
 		exit(0);

@@ -144,14 +144,22 @@
 ?>
 		<div class="blurbox">
 		<div id="main">
+
+		<table>
+			<tr>
 <?php
-			if(!file_exists('/etc/x11test')) {
+					if(!file_exists('/etc/x11test')) {
 ?>
-			<a href="admin" border="0"><?php print_uni_logo(); ?></a>
+						<a href="admin" border="0"><?php print_uni_logo(); ?></a>
 <?php
-			}
+					}
 ?>
-		Willkommen, <?php print $dozent_name; ?>!
+			</tr>
+			<tr valign="middle">
+					Willkommen, <?php print $dozent_name; ?>!
+					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden</a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+			</tr>
+		</table>
 <?php
 			if(get_post('password') == 'test' && get_post('try_login')) {
 ?>
@@ -160,7 +168,6 @@
 			}
 			if(!file_exists('/etc/x11test')) {
 ?>
-				<img src="empty.gif" width="200" height=1 /><div class="tooltip"><a class="red_large" href="logout.php">Abmelden</a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
 				 <?php print get_demo_expiry_time(); ?>
 <?php
 			}
