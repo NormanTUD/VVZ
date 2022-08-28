@@ -266,7 +266,8 @@
 				"button, input[type='button'], input[type='submit']" => array(
 					"name" => "Buttons",
 					"values" => [
-						[ "background-color", "green" ], [ "font-size", "50px" ]
+						[ "background-color", "green" ],
+						[ "font-size", "10px" ]
 					],
 				),
 				"h2" => array(

@@ -8,7 +8,7 @@
 
 	if(!file_exists('/etc/x11test') && check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 ?>
-		<div id="accounts">
+		<div id="delete_old_data">
 			<?php print get_seitentext(); ?>
 <?php
 			include_once('hinweise.php');
@@ -50,6 +50,7 @@
 ?>
 							</td>
 						</tr>
+					</table>
 <?php
 					}
 			} else {
