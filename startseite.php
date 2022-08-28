@@ -218,7 +218,7 @@
 						</tr>
 						<tr>
 							<td>Plan wählen</td>
-							<td><button>Demo ausprobieren</button></td>
+							<td><a target="_blank" href="?new_demo_uni=1"><button>Demo ausprobieren</button></a></td>
 							<td>A</td>
 							<td>B</td>
 							<td>C</td>

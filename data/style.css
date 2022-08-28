@@ -1055,3 +1055,15 @@ a, a:visited, a:hover, a:active {
 .toggle_details {
 	user-select: none;
 }
+
+.float_left {
+	float: left;
+}
+
+.float_right {
+	float: right;
+}
+
+.float_left img {
+	float: left;
+}
