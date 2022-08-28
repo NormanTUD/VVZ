@@ -5,6 +5,7 @@
 	$filename = 'admin';
 	$GLOBALS['adminpage'] = 1;
 	include("header.php");
+	include_once("selftest.php");
 
 	if(!$GLOBALS['logged_in']) {
 ?>
