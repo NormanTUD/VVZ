@@ -335,7 +335,7 @@
 #'customizations' => 'create table customizations (id int unsigned primary key, classname varchar(100), property varchar(100), val varchar(100))'
 			foreach ($default_values as $default_key => $default_item) {
 				foreach ($default_item["values"] as $real_default_item) {
-					$query = "insert into customizations (humanname, classname, property, val) values (".esc($default_item["name"]).", ".esc($default_key).", ".esc($real_default_item[0]).", ".esc($real_default_item[1]).")";
+					$query = "insert into customizations (humanname, classname, property, val, default_val) values (".esc($default_item["name"]).", ".esc($default_key).", ".esc($real_default_item[0]).", ".esc($real_default_item[1]).", ".esc($real_default_item[1]).")";
 					rquery($query);
 				}
 			}

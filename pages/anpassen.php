@@ -45,9 +45,10 @@
 				<th>Klassenname</th>
 				<th>Eigenschaft</th>
 				<th>Wert</th>
+				<th>Standardwert</th>
 			</tr>
 <?php
-			$query = "select id, humanname, classname, property, val from customizations order by humanname, classname, property, id, val";
+			$query = "select id, humanname, classname, property, val, default_val from customizations order by humanname, classname, property, id, val";
 			$results = rquery($query);
 
 			while ($row = mysqli_fetch_assoc($results)) {
@@ -67,6 +68,9 @@
 						</td>
 						<td>
 							<input type="text" name="value" value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
+						</td>
+						<td>
+							<?php print htmlentities($row["default_val"] ?? ""); ?>
 						</td>
 					</tr>
 				</form>
