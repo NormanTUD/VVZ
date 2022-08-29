@@ -193,7 +193,7 @@
 		}
 
 		if(!table_exists_and_has_entries("titel")) {
-			rquery("insert ignore into `titel` VALUES (1,'Doktor der Philosophie','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor','Prof. Dr.');");
+			rquery("insert ignore into `titel` VALUES (1,'Doktor','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor Doktor','Prof. Dr.'), (4, 'Professor', 'Prof.');");
 		}
 
 		if(!table_exists_and_has_entries("page_info")) {
