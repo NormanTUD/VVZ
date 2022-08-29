@@ -20,6 +20,9 @@ $(document).ready(function(){
 					data: $(this.form).serialize(),
 					success: function (data) {
 						show_info(data, 2000);
+						if($(".auto_reload_stylesheets").length != 0) {
+							reloadStylesheets();
+						}
 					},
 					error: function (jXHR, textStatus, errorThrown) {
 						show_info(errorThrown, 10000);

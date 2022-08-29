@@ -541,6 +541,13 @@ function toc () {
     document.getElementById("toc").innerHTML += toc;
 };
 
+function reloadStylesheets() {
+    var queryString = '?reload=' + new Date().getTime();
+    $('link[rel="stylesheet"]').each(function () {
+        this.href = this.href.replace(/\?.*|$/, queryString);
+    });
+}
+
 $(document).ready(function() {
     $('.accordion-title').on('keydown', function(e) {
         if(e.keyCode === 13){

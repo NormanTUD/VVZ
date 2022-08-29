@@ -30,14 +30,51 @@
 ?>
 		<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
 			Logo hochladen: <input type="file" name="neues_logo" id="neues_logo">
-			<input type="submit" value="Neues Logo hochladen" name="submit"><br>
+			<input type="submit" noautosubmit=1 value="Neues Logo hochladen" name="submit"><br>
 			<i>Sie haben selbst Verantwortung über das Logo. Mit dem Hochladen akzeptieren Sie, dass Sie für das Logo rechtlich verantwortlich sind und gegen keine Gesetze verstoßen.</i>
 		</form>
 
 		<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
-			<input type="hidden" value="1" name="delete_logo" />
+			<input type="hidden" noautosubmit=1 value="1" name="delete_logo" />
 			<button>Logo löschen</button>
 		</form>
+
+		<table class="auto_reload_stylesheets">
+			<tr>
+				<th>Beschreibung</th>
+				<th>Klassenname</th>
+				<th>Eigenschaft</th>
+				<th>Wert</th>
+			</tr>
 <?php
+			$query = "select id, humanname, classname, property, val from customizations order by humanname, classname, property, id, val";
+			$results = rquery($query);
+
+			while ($row = mysqli_fetch_assoc($results)) {
+?>
+				<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
+					<input type="hidden" value="<?php print htmlentities($row["id"] ?? ""); ?>" name="id" />
+					<input type="hidden" value="1" name="customize_value" />
+					<tr>
+						<td>
+							<?php print htmlentities($row["humanname"] ?? ""); ?>
+						</td>
+						<td>
+							<?php print htmlentities($row["classname"] ?? ""); ?>
+						</td>
+						<td>
+							<?php print htmlentities($row["property"] ?? ""); ?>
+						</td>
+						<td>
+							<input type="text" name="value" value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
+						</td>
+					</tr>
+				</form>
+<?php
+			}
+?>
+			</table>
+<?php
+			js(array("autosubmit.js"));
 	}
 ?>

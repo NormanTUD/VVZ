@@ -667,6 +667,16 @@ declare(ticks=1);
 				error('Für eine Veranstaltung muss ein Name, ein Dozent, der Typ der Institut und ein Veranstaltungstyp definiert sein. Sofern Sie kein Administrator sind, muss Ihrem Account zum Erstellen von Veranstaltungen ein Dozent zugewiesen sein. Bitte kontaktieren Sie die <a href="kontakt.php">Administratoren</a>, damit Ihr Account diese Zuordnung bekommt.');
 			}
 
+
+			if(get_post("customize_value") && get_post("value") && get_post("id")) {
+				$query = "update customizations set val = ".esc(get_post("value") ?? "")." where id = ".esc(get_post("id") ?? "");
+				$res = rquery($query);
+				if($res) {
+					success("Einstellung wurde gespeichert");
+				} else {
+					warning("Einstellung konnte nicht gespeichert werden");
+				}
+			}
 		} else {
 			#dier($_POST);
 			# NO_ID
