@@ -317,7 +317,9 @@
 					"name" => "Tabellenheader",
 					"values" => [
 						[ "background-color", "#006092" ],
-						[ "color", "#ffffff" ]
+						[ "color", "#ffffff" ],
+						[ "padding-left", "10px" ],
+						[ "padding-right", "10px" ]
 					]
 				),
 				".topnav li:hover a" => array(
