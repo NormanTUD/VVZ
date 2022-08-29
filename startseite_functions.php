@@ -377,8 +377,8 @@
 					</td>
 				</tr>
 				<tr>
-					<td>OPAL-Seite vorhanden?</td>
-					<td><input label="OPAL-Seite vorhanden?" type="checkbox" value="1" name="opal_zwingend" <?php print htmlentities(get_get('opal_zwingend') ?? "") ? 'checked="CHECKED"' : '' ?> /></td>
+					<td>eLearning-Seite vorhanden?</td>
+					<td><input label="eLearning-Seite vorhanden?" type="checkbox" value="1" name="opal_zwingend" <?php print htmlentities(get_get('opal_zwingend') ?? "") ? 'checked="CHECKED"' : '' ?> /></td>
 				</tr>
 				<tr>
 					<td></td>
