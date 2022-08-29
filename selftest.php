@@ -213,9 +213,11 @@
 			rquery("insert ignore into `pruefungstyp` VALUES (34,'-'),(14,'Bericht'),(3,'Bibliographie'),(39,'Bibliographie (unbenotet)'),(25,'Doktoranden-/Forschungsseminar'),(2,'Essay'),(32,'Essay (unbenotet)'),(10,'Exposé'),(37,'Kein spezifischer Prüfungstyp'),(1,'Klausur'),(26,'Lektürebericht'),(38,'Lektürebericht (unbenotet)'),(27,'mdl. Prüfung'),(5,'Mündliche Prüfung'),(33,'nach Absprache'),(16,'Nachweis 2h begl. Unterricht'),(17,'Nachweis Schulprakt. Studien'),(15,'Nachweis SPS'),(28,'Portfolio'),(12,'Portfolio 1'),(13,'Portfolio 2'),(6,'Protokoll'),(30,'Protokoll (unbenotet)'),(35,'Prüfungsleistung in zugehöriger Veranstaltung'),(8,'Referat'),(31,'Referat (unbenotet)'),(11,'Rezension'),(9,'Seminararbeit'),(7,'Thesenpapier'),(36,'Thesenpapier (unbenotet)'),(4,'Vortrag');");
 		}
 
+		/*
 		if(!table_exists_and_has_entries("seitentext")) {
 			rquery("insert ignore into `seitentext` VALUES (18,'<h2>Willkommen auf der Administrationsseite des Vorlesungsverzeichnisses</h2>');");
 		}
+		 */
 
 		if(!table_exists_and_has_entries("titel")) {
 			rquery("insert ignore into `titel` VALUES (1,'Doktor','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor Doktor','Prof. Dr.'), (4, 'Professor', 'Prof.');");

@@ -22,16 +22,19 @@
 			}
 
 			$aktuelles_semester = get_this_semester()[0];
-			if(isset($aktuelles_semester) && isset($GLOBALS['user_dozent_id'])) {
 ?>
-				<h2>Eigenen Stundenplan anzeigen</h2>
-				<a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>">Eigenen Stundenplan für das aktuelle Semester anzeigen</a><br>
-<?php
-			}
-?>
+
 
 			<h2>Shortcuts zu wichtigen Seiten:</h2>
 			<ul class="list_style_none">
+<?php
+				if(isset($aktuelles_semester) && isset($GLOBALS['user_dozent_id'])) {
+?>
+				
+					<li><a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>"><span class="utf8symbol">&#128467;</span> Eigenen Stundenplan für das aktuelle Semester anzeigen</a></li>
+<?php
+				}
+?>
 <?php
 				if(check_page_rights(get_page_id_by_filename("neuerdozent.php"))) {
 ?>

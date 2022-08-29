@@ -59,7 +59,7 @@
 					<td><input type="text" class="neuerdozent_input" name="password" value="<?php print generate_random_string(20); ?>" /></td>
 				</tr>
 				<tr>
-					<td>Barrierefreie Gebäude bevorzugen?</td>
+					<td><span class="utf8symbol">&#128104;&#8205;&#129455;</span> Barrierefreie Gebäude bevorzugen?</td>
 					<td><input type="checkbox" value="1" name="barrierefrei" /></td>
 				</tr>
 			</table>
