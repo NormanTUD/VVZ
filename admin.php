@@ -260,7 +260,7 @@
 							}
 						}
 						$subpage_texts = get_page_info_by_id($subpage_ids);
-						print "<h2>Untermenüs von &raquo;".get_page_name_by_id(get_get('show_items'))."&laquo;</h2>\n";
+						print "<h2>Untermenüs von <i>".get_page_name_by_id(get_get('show_items'))."</i></h2>\n";
 						$GLOBALS['submenu_id'] = get_get('show_items');
 						include('hinweise.php');
 						print "<ul class='submenu_ul'>\n";
