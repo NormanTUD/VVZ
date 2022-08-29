@@ -205,6 +205,15 @@
 							<td>&#9989;</td>
 						</tr>
 						<tr>
+							<td>Änderungswünsche bis zum Wert von 1000 € inkludiert</td>
+							<td>&#10060;</td>
+							<td>&#10060;</td>
+							<td>&#10060;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+
+						<tr>
 							<td>JSON-API</td>
 							<td>&#9989;</td>
 							<td>&#10060;</td>
