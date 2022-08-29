@@ -244,7 +244,7 @@
 									}
 ?>
 									<td><?php create_select($veranstaltungstypen, $row[1], 'veranstaltungstyp'); ?></td>
-									<td><input type="submit" name="speichern" class="save_buttons" value="Nur speichern" /></td>
+									<td><input type="submit" name="speichern" class="save_buttons" value="Speichern" /></td>
 									<td><input type="submit" name="speichern_metainfos" class="edit_buttons" value="Bearbeiten" /></td>
 									<td><?php print array_key_exists($row[0], $pruefungen) ? $pruefungen[$row[0]] : '<span class="class_red">!!! 0 !!!</span>'; ?></td>
 									<!--<td>Etwa <?php print(htmlentities(sprintf("%0.1f", $row[14] / 86400))); ?> Tage her</td>-->
