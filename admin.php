@@ -366,7 +366,7 @@
 				ausschließlich zum Zweck der weltweiten Veröffentlichung in einem Vorlesungsverzeichnis im Internet <b>einwillige</b>.<br />
 				Eine darüberhinausgehende Übermittlung von Daten erfolgt nicht, soweit dies nicht anders gesetzlich bestimmt ist.<br />
 				Mir ist bekannt, dass ich diese Einwilligung ohne Angabe von Gründen und ohne Rechtsfolgen verweigern oder mit Wirkung für die Zukunft bei unten genannter datenverarbeitenden Stelle widerrufen kann.<br />
-				Im Falle der Verweigerung der Einwilligung oder eines Widerrufes kann das online-Vorlesungsverzeichnis nicht oder nicht mehr genutzt werden.<br /></p>
+				Im Falle der Verweigerung der Einwilligung oder eines Widerrufes kann das Vorlesungsverzeichnis nicht oder nicht mehr genutzt werden.<br /></p>
 
 				<p>Datenverarbeitende Stelle<br />
 				<?php print get_university_name(); ?><br />

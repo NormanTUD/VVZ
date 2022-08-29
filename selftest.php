@@ -268,6 +268,16 @@
 
 		if(!table_exists_and_has_entries("customizations")) {
 			$default_values = array(
+				"button:hover, input[type='button']:hover, input[type='submit']:hover" => array(
+					"name" => "Buttons",
+					"values" => [
+						[ "background-color", "#d1ffce" ],
+						[ "color", "black" ],
+						[ "border", "1px solid #006092" ],
+						[ "cursor", "unset" ],
+						[ "border-radius", "5px" ],
+					],
+				),
 				"button, input[type='button'], input[type='submit']" => array(
 					"name" => "Buttons",
 					"values" => [
@@ -275,6 +285,7 @@
 						[ "color", "black" ],
 						[ "border", "1px solid #006092" ],
 						[ "cursor", "unset" ],
+						[ "border-radius", "5px" ],
 					],
 				),
 				"th" => array(
