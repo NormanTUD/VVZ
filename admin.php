@@ -184,7 +184,7 @@
 ?>
 			<div class="height_5px"></div>
 				<ul class="topnav">
-					<li><a href="admin" <?php print (get_get('page') || get_get('show_items')) ? '' : 'class="selected_tab"'; ?>><?php print (get_get('page') || get_get('show_items')) ? '' : '&rarr; '; ?>Willkommen!</a></li>
+					<li class="menu_item"><a class='menu_link <?php print (get_get('page') || get_get('show_items')) ? '' : 'selected_tab'; ?>' href="admin" ><?php print (get_get('page') || get_get('show_items')) ? '' : '&rarr; '; ?>Willkommen!</a></li>
 <?php
 					if(count($GLOBALS['pages'])) {
 						foreach ($GLOBALS['pages'] as $this_page) {
@@ -194,25 +194,25 @@
 								if($this_page[1]) { # Kein Dropdown
 									if(!$this_page[4]) {
 										if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
-											print "<li class='selected_tab'><a href='admin?page=".$this_page[2]."'>&rarr; $this_page[0]</a></li>\n";
+											print "<li class='selected_tab menu_item'><a class='menu_link' href='admin?page=".$this_page[2]."'>&rarr; $this_page[0]</a></li>\n";
 										} else {
-											print "<li><a href='admin?page=".$this_page[2]."'>$this_page[0]</a></li>\n";
+											print "<li class='menu_item'><a class='menu_link' href='admin?page=".$this_page[2]."'>$this_page[0]</a></li>\n";
 										}
 									}
 								} else { # Dropdown
 									$subnav_data = print_subnavigation($this_page[2]);
 									if($subnav_data[0]) {
 ?>
-										<li class='selected_tab'><a href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+										<li class='selected_tab'><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
 									} else {
 										if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
 ?>
-											<li class="dropdown selected_tab"><a href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+											<li class="dropdown selected_tab menu_item"><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
 										} else {
 ?>
-											<li class="dropdown"><a href='admin?show_items=<?php print $this_page[2];?>'><?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+											<li class="dropdown menu_item"><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'><?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
 										}
 									}

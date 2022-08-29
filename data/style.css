@@ -1082,3 +1082,7 @@ a, a:visited, a:hover, a:active {
 .submenu_ul {
 	list-style: disclosure-closed;
 }
+
+.menu_link {
+	border-radius: 10px;
+}
