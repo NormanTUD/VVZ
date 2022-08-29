@@ -4179,11 +4179,15 @@ INSERT INTO
 				}
 			}
 
-			$query = 'UPDATE `veranstaltung` SET `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
-			if(rquery($query)) {
-				success('Das Niveau wurde angepasst.');
-			} else {
-				warning("Die Studiengangsniveaueinstellung konnte nicht gespeichert werden");
+			$old_master_niveau = get_single_row_from_query("select master_niveau from veranstaltung where id = ".esc($id));
+			if($old_master_niveau != $master_niveau) {
+				$query = 'UPDATE `veranstaltung` SET `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
+
+				if(rquery($query)) {
+					success('Das Niveau wurde angepasst.');
+				} else {
+					warning("Die Studiengangsniveaueinstellung konnte nicht gespeichert werden");
+				}
 			}
 		} else {
 			message('Die Metadaten zur Veranstaltung konnten nicht geändert werden oder es waren keine Änderungen notwendig.');

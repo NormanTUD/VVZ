@@ -194,6 +194,7 @@
 ?>
 					</p>
 					<input type="hidden" value="update_einzelne_veranstaltung" name="update_einzelne_veranstaltung" />
+					<input type="hidden" value="<?php print htmlentities($veranstaltung_id ?? ""); ?>" name="id" />
 					<br />
 
 					<h3>Einzelne Termine hinzufügen</h3>
@@ -427,6 +428,8 @@
 			} else {
 				print "<span class='red_large'>Sie haben keine Rechte, auf diese Veranstaltung zuzugreifen.</span>";
 			}
+
+			js(array("autosubmit.js"));
 		} else {
 ?>
 			<form method="get">
