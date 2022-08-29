@@ -4248,7 +4248,6 @@ INSERT INTO
 				commit();
 				$new_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
 				if($new_db_status_hash != $old_db_status_hash) {
-					warning("DIFFERENT");
 					success('Die Prüfungsnummern wurden erfolgreich zur Veranstaltung hinzugefügt bzw. entfernt.');
 				}
 			} else {
