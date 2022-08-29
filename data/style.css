@@ -206,9 +206,7 @@ div#menu li a:hover {
 .topnav li:hover ul{
 	left: auto;
 }
-.topnav li:hover a{
-	background: #a1baaf;
-}
+
 .topnav li:hover ul li a:hover{
 	background: #333;
 }

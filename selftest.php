@@ -283,7 +283,13 @@
 						[ "background-color", "#006092" ],
 						[ "color", "#ffffff" ]
 					]
-				)
+				),
+				".topnav li:hover a" => array(
+					"name" => "Mouse-Over Farbe für Navigationsleiste",
+					"values" => [
+						[ "background-color", "#008fd6" ]
+					]
+				),
 			);
 
 #'customizations' => 'create table customizations (id int unsigned primary key, classname varchar(100), property varchar(100), val varchar(100))'
