@@ -1146,7 +1146,7 @@ declare(ticks=1);
 	}
 
 	function get_bereich_name_by_id ($id) {
-		if(!strlen($id)) {
+		if(is_null($id) || !strlen($id)) {
 			return null;
 		}
 		$key = "get_bereich_name_by_id($id)";
