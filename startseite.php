@@ -173,6 +173,14 @@
 							<td>&#9989;</td>
 						</tr>
 						<tr>
+							<td>FAQ-Unterseite, um häufige Studentenfragen schneller zu beantworten</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+							<td>&#9989;</td>
+						</tr>
+						<tr>
 							<td>Ihre eigene URL der Form <?php print htmlentities($_SERVER['HTTP_HOST'] ?? ""); ?>/v/name_ihrer_uni</td>
 							<td>&#10060;</td>
 							<td>&#9989;</td>
