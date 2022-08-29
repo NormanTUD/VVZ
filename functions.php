@@ -1786,16 +1786,16 @@ declare(ticks=1);
 		$flag = '';
 		switch ($language) {
 			case 'deutsch':
-				$flag = '&#x1F1E9;&#x1F1EA; ';
+				$flag = '&#x1F1E9;&#x1F1EA;&nbsp;';
 				break;
 			case 'englisch':
-				$flag = '&#127468;&#127463; ';
+				$flag = '&#127468;&#127463;&nbsp;';
 				break;
 			case 'französisch':
-				$flag = '&#127468;&#127463; ';
+				$flag = '&#127468;&#127463;&nbsp;';
 				break;
 			case 'klingonisch':
-				$flag = '<img src="i/klingon.svg" class="klingon" /> ';
+				$flag = '<img src="i/klingon.svg" class="klingon" />&nbsp;';
 				break;
 		}
 
