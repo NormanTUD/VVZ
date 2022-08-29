@@ -1071,3 +1071,7 @@ a, a:visited, a:hover, a:active {
 .list_style_none {
 	list-style: none;
 }
+
+.user_select_none {
+	user-select: none;
+}

@@ -8,7 +8,7 @@
 		include_once('scripts/SqlFormatter.php');
 		print "<div class='clear_both' />\n";
 		print "<div class='autocenter_large'>\n";
-		print "<a id='toggle_query_analyzer' class='outline_text'>Debugger anzeigen/verstecken?</a>\n";
+		print "<br><a id='toggle_query_analyzer' class='outline_text user_select_none'><button>Debugger anzeigen/verstecken?</button></a><br>\n";
 		print "<div class='clear_both display_none;' id='query_analyzer' />\n";
 		print "\t<table class='query_analyzer_table'><tr><th>Query</th><th>Duration</th><th>Numrows</th><th>Query doppelt?</th></tr>\n";
 		$i = 0;
