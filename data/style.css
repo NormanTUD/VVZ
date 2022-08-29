@@ -910,7 +910,8 @@ a, a:visited, a:hover, a:active {
 .square {
 	min-width: 400px;
 	min-height: 80px;
-	border-style: dotted;
+	border-style: solid;
+	padding: 5px;
 }
 
 .one {
