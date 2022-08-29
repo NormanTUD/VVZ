@@ -1078,3 +1078,7 @@ a, a:visited, a:hover, a:active {
 .invisiblebg {
 	background-color: transparent !important;
 }
+
+.submenu_ul {
+	list-style: disclosure-closed;
+}

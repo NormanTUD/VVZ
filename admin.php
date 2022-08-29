@@ -264,10 +264,10 @@
 						print "<h2>Untermenüs von &raquo;".get_page_name_by_id(get_get('show_items'))."&laquo;</h2>\n";
 						$GLOBALS['submenu_id'] = get_get('show_items');
 						include('hinweise.php');
-						print "<ul>\n";
+						print "<ul class='submenu_ul'>\n";
 						foreach ($subpage_data as $row) {
 							if($row[1]) {
-								print "<li class='margin_5px_0'><a href='admin?page=$row[0]'>$row[1]</a> ".($subpage_texts[$row[0]] ? "&mdash; ".htmlentities($subpage_texts[$row[0]]) : "")."</li>\n";
+								print "<li class='submenu_li margin_5px_0'><a href='admin?page=$row[0]'>$row[1]</a> ".($subpage_texts[$row[0]] ? "&mdash; ".htmlentities($subpage_texts[$row[0]]) : "")."</li>\n";
 							}
 						}
 						print "</ul>\n";
