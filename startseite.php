@@ -40,24 +40,27 @@
 			</div>
 <?php
 			$page_str = "<center><img src='default_logo.png'></center><br>";
-			$page_str .= "omni-concept ist Ihr kreativer Ansprechpartner, wenn es um innovative Lösungen im Bereich Prozessautomatisierung, Internet, Datenbanken und Printdesign geht. ";
+			$page_str .= "omni-concept ist Ihr kreativer Ansprechpartner, wenn es um innovative Lösungen im Bereich Verwaltungsautomatisierung, Internet, Datenbanken und Printdesign geht. ";
 			$page_str .= "omni-concept wurde Anfang 2000 gegründet. ";
 
 			$page_str .= "<center><h2>Das Vorlesungsverzeichnis:</h2></center>";
 			$page_str .= "Sind Sie auf der Suche nach einer Software, die sowohl für Sie als auch Ihre Studierenden zeitsparend ist? Möchten Sie nicht mehr manuell Excel-Dateien herumsenden, um Vorlesungen und Prüfung zu verwalten die man dann mühsam zusammenfügen muss? Würden Sie gerne die angebotenen Prüfungen an das Prüfungsamt melden, diese fordern es im Excel-Format?<br>";
-			$page_str .= "Das Beste: die Dozenten verwalten sich selbst. Jeder Dozent kann sehr einfach seine Veranstaltungen erstellen und bearbeiten, und alle Änderungen sind sofort live.<br>";
+			$page_str .= "<br>";
 			$page_str .= "Auch der Raumplanungsprozess und die Abstimmungen mit den Raumplanungsdezernaten ist hier abgebildet und einfach, aus dem Browser heraus, möglich.<br>";
 			$page_str .= "Das Vorlesungsverzeichnis entstand als studentisches Projekt an der philosophischen Fakultät der TU Dresden. Es läuft dort seit 2017 und ist durchgehend in der Praxis erprobt.<br>";
 			$page_str .= "<br>";
 			$page_str .= "<i>Für spezielle Fälle vorgesorgt</i>: Es gibt etliche schwer vorhersehbare Fälle im Uni-Alltag, z.B. wenn ein Dozent plötzlich einen Gastdozent verwalten muss. Für solche Spezialfälle ist vorgesorgt: dafür gibt es den Account-Typ Superdozent. Dieser darf seine eigenen Veranstaltungen editieren, aber auch die von ausgewählten Dozenten. Wir haben seit 2017 für jeden Spezialfall, der in der Praxis an der TU Dresden aufgetreten ist, eine technische Lösung gefunden.<br>";
-			$page_str .= "In der <b>Pro</b>-Version gibt es ein Tool, das Ihren Studenten hilft, ihren Stundenplan zu erstellen. Man gibt Studiengang und Semester an und kriegt eine exakte Auflistung aller Veranstaltungen, die für einen infragekommen.<br>";
 			$page_str .= "<br>";
-			$page_str .= "Dadurch, dass alle nur genau das sehen, was sie interessiert, finden auch alle schneller die Informationen, die sie suchen. Ob Räume, Videocall-Links, oder Informationen. Alles ist da, wo es Sinn macht, sichtbar, und sonst versteckt. Resultat: jeder bekommt genau die Information, die er sucht, undzwar zentral und live.<br>";
+			$page_str .= "In der <b>Pro</b>-Version gibt es ein Tool, das Ihren Studenten hilft, ihren Stundenplan zu erstellen. Man gibt Studiengang und Semester an und kriegt eine exakte Auflistung aller Veranstaltungen, die für einen infragekommen. Das reduziert die Support-Anfragen von Studierenden erheblich.<br>";
+			$page_str .= "<br>";
+			$page_str .= "Dadurch, dass alle nur genau das sehen, was sie interessiert, finden auch alle schneller die Informationen, die sie suchen. Ob Räume, Videocall-Links, oder Informationen. Alles ist da, wo es Sinn macht, und sonst versteckt, so dass man nie überladen wird mit Informationen. Resultat: jeder bekommt genau die Information, die er sucht, undzwar zentral und live.<br>";
 			$page_str .= "<br>";
 			$page_str .= "Unser Vorlesungsverzeichnis bietet Ihnen diese Möglichkeit. Hier werden zentral alle Dozenten, Prüfungen, Studiengänge, Termine, Vorlesungen, Übungen und sonstige Veranstaltengen gespeichert.<br>";
+			$page_str .= "<br>";
 			$page_str .= "Man muss nie mehr Informationen zwei Mal eingeben. Alles, was gespeichert werden muss, wird zentral an einer Stelle gespeichert. Wenn jemand heiratet, reicht es aus, seinen Namen in einer Zeile zu ändern, dann ist es überall anders.<br>";
 			$page_str .= "<br>";
-			$page_str .= "Und das Beste? Sie können in weniger als 2 Minuten loslegen.<br>";
+			$page_str .= "Das Beste: die Dozenten verwalten sich selbst. Jeder Dozent kann sehr einfach seine Veranstaltungen erstellen und bearbeiten, und alle Änderungen sind sofort live.<br>";
+			$page_str .= "Und das allerbeste? Sie können in weniger als 2 Minuten loslegen.<br>";
 			$page_str .= "<br>";
 			$page_str .= '<a target="_blank" href="?new_demo_uni=1"><button>Kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>';
 
