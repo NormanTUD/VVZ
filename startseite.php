@@ -99,7 +99,10 @@
 ?>
 			<div class="bgimg-2">
 				<div class="startseite_div_content"><div class="startseite_div">
-					<center><h2>Übersicht:</h2></center>
+					<center>
+						<h2>Übersicht:</h2>
+					</center>
+					<center>
 					<table>
 						<tr>
 							<th></th>
@@ -256,6 +259,7 @@
 					</table>
 
 					* Es können weitere Lizenzen für Institute dazugebucht werden. Schreiben Sie uns dazu einfach eine Email.
+					</center>
 				</div></div>
 			</div>
 
