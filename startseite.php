@@ -27,7 +27,7 @@
 		<!-- Container element -->
 		<div class="parallax">
 <?php
-			$query = "select urlname, universitaet, plan_id, external_url from vvz_global.kundendaten where urlname is not null order by external_url desc, urlname asc";
+			$query = "select urlname, universitaet, plan_id, external_url, id from vvz_global.kundendaten where urlname is not null order by external_url desc, urlname asc";
 			$result = rquery($query);
 ?>
 			<div class="bgimg-1">
@@ -72,6 +72,7 @@
 				$urlname = $row[0];
 				$uniname = $row[1];
 				$plan_id = $row[2];
+				$kunde_id = $row[4];
 				$external_url = $row[3];
 				$plan_name = get_plan_name_by_id($plan_id);
 
@@ -85,7 +86,7 @@
 					if($external_url) {
 						$desc = "<img height=100 src='tudlogo.svg' />";
 					} else {
-						$desc = "<img height=100 src='default_logo.png' />";
+						$desc = "<img height=100 src='logo.php?kunde_id=".htmlentities($kunde_id)."' />";
 					}
 
 					$str_contents .= "<li class='display_inline'><a target='_blank' href='$urlname/'>$desc</a></li>";

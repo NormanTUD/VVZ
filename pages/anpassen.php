@@ -15,21 +15,10 @@
 		<?php print get_seitentext(); ?>
 <?php
 		include_once('hinweise.php');
-		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-			if(array_key_exists("neues_logo", $_FILES)) {
-				$file = file_get_contents($_FILES["neues_logo"]["tmp_name"]);
-				$query = "insert into vvz_global.logos (kunde_id, img) values (".esc(get_kunde_id_by_db_name(get_kunden_db_name())).", ".esc($file).") on duplicate key update img=values(img)";
-				rquery($query);
-			}
 
-			if(get_post("delete_logo")) {
-				$query = "delete from vvz_global.logos where kunde_id = ".esc(get_kunde_id_by_db_name(get_kunden_db_name()));
-				rquery($query);
-			}
-		}
 ?>
 		<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
-			Logo hochladen: <input type="file" name="neues_logo" id="neues_logo">
+			Logo hochladen: <input type="file" name="neues_logo" noautosubmit=1 id="neues_logo">
 			<input type="submit" noautosubmit=1 value="Neues Logo hochladen" name="submit"><br>
 			<i>Sie haben selbst Verantwortung über das Logo. Mit dem Hochladen akzeptieren Sie, dass Sie für das Logo rechtlich verantwortlich sind und gegen keine Gesetze verstoßen.</i>
 		</form>

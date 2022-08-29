@@ -1050,6 +1050,24 @@ declare(ticks=1);
 					right_issue("Sie haben kein recht dazu, Gebäude hinzuzufügen");
 				}
 			}
+
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				if(array_key_exists("neues_logo", $_FILES)) {
+					$file = file_get_contents($_FILES["neues_logo"]["tmp_name"]);
+					$query = "insert into vvz_global.logos (kunde_id, img) values (".esc(get_kunde_id_by_db_name($GLOBALS["dbname"])).", ".esc($file).") on duplicate key update img=values(img)";
+					$res = rquery($query);
+					if($res) {
+						success("Neues Logo hochgeladen");
+					} else {
+						error("Neues Logo konnte nicht hochgeladen werden");
+					}
+				}
+
+				if(get_post("delete_logo")) {
+					$query = "delete from vvz_global.logos where kunde_id = ".esc(get_kunde_id_by_db_name(get_kunden_db_name()));
+					rquery($query);
+				}
+			}
 		}
 	}
 
