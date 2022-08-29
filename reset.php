@@ -1,4 +1,5 @@
 <?php
+	$GLOBALS["no_selftest"] = 1;
 	include("functions.php");
 	function isCommandLineInterface() {
 		return (php_sapi_name() === 'cli');

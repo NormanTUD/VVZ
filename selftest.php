@@ -24,6 +24,10 @@
 
 
         function selftest () {
+		if(array_key_exists("no_selftest", $GLOBALS) && $GLOBALS["no_selftest"]) {
+			return;
+		}
+
                 $tables = $GLOBALS["databases"];
 
                 $missing_tables = array();
@@ -81,12 +85,17 @@
 			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic University', 500, 3000)");
 			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 70, 700)");
 			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro University', 350, 4000)");
+			rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Superadmin', 0, 0)");
 		}
 
 		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {
-			if($GLOBALS["dbname"] && ($GLOBALS["dbname"] != "startpage" || ($GLOBALS["dbname"] == "startpage" && get_single_row_from_query("select count(*) from vvz_global.kundendaten where universitaet = 'startpage'") == 0))) {
+			if($GLOBALS["dbname"]) {
 				$urlname = get_url_uni_name();
-				$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Testkunde", "Demo-Universität", "Jörg Noack", "Oldenburg", "26133", "Robert-Koch-Str. 2", "noack@omni-concept.com", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 1)';
+				if($GLOBALS["dbname"] != "startpage") {
+					$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Testkunde", "Demo-Universität", "Jörg Noack", "Oldenburg", "26133", "Robert-Koch-Str. 2", "noack@omni-concept.com", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 1)';
+				} else if ($GLOBALS["dbname"] == "startpage" && get_single_row_from_query("select count(*) from vvz_global.kundendaten where universitaet = 'startpage'") == 0) {
+					$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Superadmin", "Admin", "Jörg Noack", "Oldenburg", "26133", "Robert-Koch-Str. 2", "noack@omni-concept.com", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 6)';
+				}
 				rquery($query);
 			}
 		}
@@ -130,6 +139,22 @@
 			$result = rquery($query);
 
 			$query = "insert into role_to_user (role_id, user_id) values (1, 1)";
+			rquery($query);
+
+			if($result) {
+				set_session_id(1);
+				$GLOBALS["auto_login_id"] = 1;
+			}
+		}
+
+		if(!get_single_row_from_query("select count(*) from vvz_global.users")) {
+			$salt = generate_random_string(100);
+			$default_username = "Admin";
+			$default_password = "test";
+			$query = 'insert into vvz_global.users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
+			$result = rquery($query);
+
+			$query = "insert into vvz_global.role_to_user (role_id, user_id) values (1, 1)";
 			rquery($query);
 
 			if($result) {

@@ -35,9 +35,9 @@
 			if(!$result) {
 				if($die) {
 					if($GLOBALS['dbh']) {
-						dier("Ung&uuml;ltige Anfrage: <p><pre>".$internalquery."</pre></p>".htmlentities(mysqli_error($GLOBALS['dbh'])), 0, 1);
+						throw Exception("Ung&uuml;ltige Anfrage: <p><pre>".$internalquery."</pre></p>".htmlentities(mysqli_error($GLOBALS['dbh'])), 0, 1);
 					} else {
-						dier("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p><p>DBH undefined! This must never happen unless there is something seriously wrong with the database.</p>", 0, 0);
+						throw Exception("Ung&uuml;ltige Anfrage: <p><pre>".htmlentities($internalquery)."</pre></p><p>DBH undefined! This must never happen unless there is something seriously wrong with the database.</p>", 0, 0);
 					}
 				}
 			}
@@ -52,6 +52,10 @@
 
 	if(!function_exists("selftest_startpage")) {
 		function selftest_startpage() {
+			if(array_key_exists("no_selftest", $GLOBALS) && $GLOBALS["no_selftest"]) {
+				return;
+			}
+
 			$tables = array(
 				'plan' => 'CREATE TABLE plan (
 					id int unsigned auto_increment primary key,
@@ -87,6 +91,98 @@
 					rabatt int,
 					spezialpreis int
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+
+				'institut' => 'CREATE TABLE `institut` (
+					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+					`name` varchar(100) DEFAULT NULL,
+					`start_nr` int(10) unsigned DEFAULT NULL,
+					PRIMARY KEY (`id`),
+					UNIQUE KEY `name` (`name`),
+					UNIQUE KEY `start_nr` (`start_nr`)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+
+
+				'titel' => 'CREATE TABLE `titel` (
+					`id` int(11) NOT NULL AUTO_INCREMENT,
+					`name` varchar(100) NOT NULL,
+					`abkuerzung` varchar(100) NOT NULL,
+					PRIMARY KEY (`id`),
+					UNIQUE KEY `name` (`name`),
+					UNIQUE KEY `abkuerzung` (`abkuerzung`)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;', 
+
+				'dozent' => "CREATE TABLE `dozent` (
+					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+					`first_name` varchar(100) NOT NULL,
+					`last_name` varchar(100) NOT NULL,
+					`titel_id` int(11) DEFAULT NULL,
+					`ausgeschieden` enum('0','1') NOT NULL DEFAULT '0',
+					PRIMARY KEY (`id`),
+					UNIQUE KEY `first_last_name` (`first_name`,`last_name`),
+					KEY `titel_id_fk` (`titel_id`),
+					CONSTRAINT `titel_id_fk` FOREIGN KEY (`titel_id`) REFERENCES `vvz_global`.`titel` (`id`) ON DELETE CASCADE
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+
+
+				'users' => "CREATE TABLE `users` (
+					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+					`username` varchar(100) DEFAULT NULL,
+					`dozent_id` int(10) unsigned DEFAULT NULL,
+					`institut_id` int(10) unsigned DEFAULT NULL,
+					`password_sha256` varchar(256) DEFAULT NULL,
+					`salt` varchar(100) NOT NULL,
+					`enabled` enum('0','1') NOT NULL DEFAULT '1',
+					`barrierefrei` enum('0','1') NOT NULL DEFAULT '0',
+					`accepted_public_data` enum('0','1') NOT NULL DEFAULT '0',
+					PRIMARY KEY (`id`),
+					UNIQUE KEY `name` (`username`),
+					UNIQUE KEY `dozent_id` (`dozent_id`),
+					KEY `institut_id` (`institut_id`),
+					CONSTRAINT `users_ibfk_1` FOREIGN KEY (`dozent_id`) REFERENCES `vvz_global`.`dozent` (`id`) ON DELETE CASCADE,
+					CONSTRAINT `users_ibfk_2` FOREIGN KEY (`institut_id`) REFERENCES `vvz_global`.`institut` (`id`) ON DELETE CASCADE
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+
+				'role' => 'CREATE TABLE `role` (
+					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+					`name` varchar(100) DEFAULT NULL,
+					`beschreibung` varchar(100) DEFAULT NULL,
+					PRIMARY KEY (`id`),
+					UNIQUE KEY `name` (`name`)
+					) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+
+				'page' => "CREATE TABLE `page` (
+					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+					`name` varchar(50) NOT NULL,
+					`file` varchar(50) DEFAULT NULL,
+					`show_in_navigation` enum('0','1') NOT NULL DEFAULT '0',
+					`parent` int(10) unsigned DEFAULT NULL,
+					`disable_in_demo` int(1) unsigned not null default 0,
+					PRIMARY KEY (`id`),
+					UNIQUE KEY `name` (`name`),
+					UNIQUE KEY `file` (`file`),
+					KEY `page` (`parent`),
+					CONSTRAINT `page_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `page` (`id`) ON DELETE SET NULL
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+
+
+				'role_to_page' => 'CREATE TABLE `role_to_page` (
+					`role_id` int(10) unsigned NOT NULL,
+					`page_id` int(10) unsigned NOT NULL,
+					PRIMARY KEY (`role_id`,`page_id`),
+					KEY `page_id` (`page_id`),
+					CONSTRAINT `role_to_page_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `vvz_global`.`role` (`id`) ON DELETE CASCADE,
+					CONSTRAINT `role_to_page_ibfk_2` FOREIGN KEY (`page_id`) REFERENCES `vvz_global`.`page` (`id`) ON DELETE CASCADE
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+
+				'role_to_user' => 'CREATE TABLE `role_to_user` (
+					`role_id` int(10) unsigned NOT NULL,
+					`user_id` int(10) unsigned NOT NULL,
+					PRIMARY KEY (`role_id`,`user_id`),
+					UNIQUE KEY `name` (`user_id`),
+					CONSTRAINT `role_to_user_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `vvz_global`.`role` (`id`) ON DELETE CASCADE,
+					CONSTRAINT `role_to_user_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `vvz_global`.`users` (`id`) ON DELETE CASCADE
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+
 			);
 
 			rquery("CREATE DATABASE IF NOT EXISTS vvz_global");
@@ -97,16 +193,25 @@
 					$missing_tables[] = $this_table;
 					if(is_array($create_query)) {
 						foreach ($create_query as $this_create_query) {
-							rquery($this_create_query);
+							try {
+								rquery($this_create_query);
+							} catch (\Throwable $e) {
+								print $e;
+								die($query);
+							}
 						}
 					} else {
-						rquery($create_query);
+						try {
+							rquery($create_query);
+						} catch (\Throwable $e) {
+							print("<pre>$create_query\n\n$e</pre>");
+							exit(1);
+						}
 					}
 					$GLOBALS['settings_cache'] = array();
 				}
 			}
 		}
-
 	}
 
 	if(!function_exists("table_exists")) {
