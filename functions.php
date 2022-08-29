@@ -4159,23 +4159,29 @@ INSERT INTO
 				if(!rquery($delete)) {
 					$failed = 1;
 				}
+
+				$changed = 0;
+
 				if(!$failed) {
 					foreach ($language as $this_language) {
 						if(!$failed) {
 							$query = 'insert into veranstaltung_to_language (veranstaltung_id, language_id) values ('.esc($id).', '.esc($this_language).')';
 							if(!rquery($query)) {
 								$failed = 1;
+								$changed++;
 							}
 						}
 					}
 				}
 
-				if($failed) {
-					rollback();
-					error("Die gewählten Sprachen konnten nicht hinzugefügt werden.");
-				} else {
-					commit();
-					success("Die gewählten Sprachen wurden erfolgreich hinzugefügt.");
+				if($changed || $failed) {
+					if($failed) {
+						rollback();
+						error("Die gewählten Sprachen konnten nicht hinzugefügt werden.");
+					} else {
+						commit();
+						success("Die gewählten Sprachen wurden erfolgreich hinzugefügt.");
+					}
 				}
 			}
 
@@ -4197,10 +4203,34 @@ INSERT INTO
 		updated_raumplanung_relevante_daten($id, $alte_daten);
 	}
 
+	function query_to_json($query, $skip_array) {
+		$result = rquery($query);
+
+		$rows = array();
+		while($row = mysqli_fetch_assoc($result)) {
+			foreach ($skip_array as $skip_name) {
+				unset($row[$skip_name]);
+			}
+
+			if($row) {
+				$rows[] = $row;
+			}
+		}
+
+		return json_encode($rows);
+	}
+
+	function query_to_status_hash ($query, $skip_array) {
+		return hash('md5', query_to_json("select * from pruefung where veranstaltung_id = 1", $skip_array));
+	}
+
+
 	function assign_pruefungsnummer_to_veranstaltung ($pruefungsnummer, $id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		if(is_array($pruefungsnummer)) {
+			$check_query = "select * from pruefung where veranstaltung_id = ".esc($id)." order by id";
+			$old_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
 			start_transaction();
 			rquery('DELETE FROM pruefung where veranstaltung_id = '.esc($id));
 			$commit = 1;
@@ -4216,7 +4246,11 @@ INSERT INTO
 
 			if($commit) {
 				commit();
-				success('Die Prüfungsnummern wurden erfolgreich zur Veranstaltung hinzugefügt bzw. entfernt.');
+				$new_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
+				if($new_db_status_hash != $old_db_status_hash) {
+					warning("DIFFERENT");
+					success('Die Prüfungsnummern wurden erfolgreich zur Veranstaltung hinzugefügt bzw. entfernt.');
+				}
 			} else {
 				rollback();
 				error('Bei einer der Prüfungsnummern trat ein Fehler auf. Daher wird alles zurückgesetzt.');

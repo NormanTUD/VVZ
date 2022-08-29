@@ -50,6 +50,10 @@
 		return get_single_row_from_result($result, $default);
 	}
 
+	function gsv($query, $default = NULL) {
+		return get_single_row_from_query($query, $default);
+	}
+
 	function get_post ($name) {
 		if(array_key_exists($name, $_POST)) {
 			return $_POST[$name];
