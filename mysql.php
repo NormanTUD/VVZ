@@ -183,6 +183,13 @@
 					CONSTRAINT `role_to_user_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `vvz_global`.`users` (`id`) ON DELETE CASCADE
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
+
+				'logos' => "CREATE TABLE logos (
+					id INTEGER UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
+					kunde_id int unsigned,
+					img MEDIUMBLOB NOT NULL,
+					CONSTRAINT `kunde_id_fk` FOREIGN KEY (`kunde_id`) REFERENCES `vvz_global`.`kundendaten` (`id`) ON DELETE CASCADE
+				)"
 			);
 
 			rquery("CREATE DATABASE IF NOT EXISTS vvz_global");
