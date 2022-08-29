@@ -15,8 +15,13 @@
 		<?php print get_seitentext(); ?>
 <?php
 		include_once('hinweise.php');
+		die(print_r($_FILES));
 ?>
-a
+		<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
+			Select image to upload:
+			<input type="file" name="neues_logo" id="neues_logo">
+			<input type="submit" value="Upload Image" name="submit">
+		</form>
 <?php
 	}
 ?>
