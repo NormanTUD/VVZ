@@ -26,7 +26,7 @@
 <?php
 		if(!isset($GLOBALS['adminpage'])) {
 ?>
-		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a><br>
 <?php
 		print get_demo_expiry_time();
 ?>
