@@ -15,7 +15,11 @@
 		<?php print get_seitentext(); ?>
 <?php
 		include_once('hinweise.php');
-		die(print_r($_FILES));
+		if(user_is_admin($GLOBALS['logged_in_user_id']) && array_key_exists("neues_logo", $_FILES)) {
+			$file = file_get_contents($_FILES["neues_logo"]["tmp_name"]);
+			$query = "insert into vvz_global.logos (kunde_id, img) values (".esc(get_kunde_id_by_db_name(get_kunden_db_name())).", ".esc($file).") on duplicate key update img=values(img)";
+			rquery($query);
+		}
 ?>
 		<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
 			Select image to upload:

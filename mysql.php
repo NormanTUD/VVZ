@@ -186,7 +186,7 @@
 
 				'logos' => "CREATE TABLE logos (
 					id INTEGER UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-					kunde_id int unsigned,
+					kunde_id int unsigned unique,
 					img MEDIUMBLOB NOT NULL,
 					CONSTRAINT `kunde_id_fk` FOREIGN KEY (`kunde_id`) REFERENCES `vvz_global`.`kundendaten` (`id`) ON DELETE CASCADE
 				)"
