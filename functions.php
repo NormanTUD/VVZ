@@ -658,7 +658,11 @@ declare(ticks=1);
 				$praesenztyp = get_post('praesenztyp');
 				$related_veranstaltung = get_post('related_veranstaltung');
 
-				create_veranstaltung($name, $dozent, $veranstaltungstyp, $institut, $semester, $language, $related_veranstaltung, $praesenztyp);
+				$neue_veranstaltung_id = create_veranstaltung($name, $dozent, $veranstaltungstyp, $institut, $semester, $language, $related_veranstaltung, $praesenztyp);
+
+				if(get_post("speichern_und_bearbeiten") && $neue_veranstaltung_id) {
+					print '<meta http-equiv="refresh" content="0; url=admin.php?page='.get_page_id_by_filename("veranstaltung.php").'&id='.htmlentities($neue_veranstaltung_id ?? "").'" />';
+				}
 			} else if (get_post('neue_veranstaltung')) {
 				error('Für eine Veranstaltung muss ein Name, ein Dozent, der Typ der Institut und ein Veranstaltungstyp definiert sein. Sofern Sie kein Administrator sind, muss Ihrem Account zum Erstellen von Veranstaltungen ein Dozent zugewiesen sein. Bitte kontaktieren Sie die <a href="kontakt.php">Administratoren</a>, damit Ihr Account diese Zuordnung bekommt.');
 			}
@@ -3426,6 +3430,7 @@ WHERE 1
 
 			update_veranstaltung_metadata($inserted_id, null, null, $woche, null, null, null, null, null, null, null, null, null, null, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink);
 			success('Die Veranstaltung wurde erfolgreich eingetragen.');
+			return $inserted_id;
 		} else {
 			error('Die Veranstaltung konnte nicht eingetragen werden.');
 		}

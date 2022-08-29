@@ -299,7 +299,7 @@
 ?>
 									<td><?php create_select($veranstaltungstypen, null, 'veranstaltungstyp'); ?></td>
 									<td><input type="submit" name="speichern" class="save_buttons" value="Speichern" /></td>
-									<td>&mdash;</td>
+									<td><input type="submit" name="speichern_und_bearbeiten" class="save_buttons" value="Speichern und bearbeiten" /></td>
 									<td>&uarr;&sum; = <?php print $anzahl_pruefungen; ?></td>
 									<td>&mdash;</td>
 								</form>
