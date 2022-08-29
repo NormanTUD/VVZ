@@ -64,7 +64,7 @@
 			$result = rquery($query);
 
 			while ($row = mysqli_fetch_row($result)) {
-				$selected_pages = explode(',', $row[1]);
+				$selected_pages = explode(',', $row[1] ?? "");
 ?>
 				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<tr>
