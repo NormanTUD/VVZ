@@ -1075,3 +1075,7 @@ a, a:visited, a:hover, a:active {
 .user_select_none {
 	user-select: none;
 }
+
+.invisiblebg {
+	background-color: transparent !important;
+}

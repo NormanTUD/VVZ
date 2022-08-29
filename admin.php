@@ -147,8 +147,9 @@
 		<div class="blurbox">
 		<div id="main">
 
-		<table>
-			<tr>
+		<table class="invisiblebg">
+			<tr class="invisiblebg">
+				<td class="invisiblebg">
 <?php
 					if(!file_exists('/etc/x11test')) {
 ?>
@@ -156,10 +157,11 @@
 <?php
 					}
 ?>
-			</tr>
-			<tr valign="middle">
-					Willkommen, <?php print $dozent_name; ?>!
+				</td>
+				<td valign="middle" class="invisiblebg">
+					Willkommen, <?php print htmlentities($dozent_name ?? ""); ?>!
 					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden</a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+				</td>
 			</tr>
 		</table>
 <?php

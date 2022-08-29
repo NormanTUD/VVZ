@@ -12,7 +12,7 @@
 	}
 ?>
 	<div id="mainindex">
-		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
+		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a><br>
 			<br>
 			<?php logged_in_stuff(); ?>
 			<?php print get_demo_expiry_time(); ?>
