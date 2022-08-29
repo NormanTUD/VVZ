@@ -25,14 +25,44 @@
 			if(isset($aktuelles_semester) && isset($GLOBALS['user_dozent_id'])) {
 ?>
 				<h2>Eigenen Stundenplan anzeigen</h2>
-				<a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>">Eigenen Stundenplan für das aktuelle Semester anzeigen</a>
+				<a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>">Eigenen Stundenplan für das aktuelle Semester anzeigen</a><br>
 <?php
 			}
 ?>
 
+			<h2>Shortcuts zu wichtigen Seiten:</h2>
+			<ul class="list_style_none">
+<?php
+				if(check_page_rights(get_page_id_by_filename("neuerdozent.php"))) {
+?>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("neuerdozent.php"); ?>"><?php print teacher_icon(); ?> Dozenten hinzufügen</a></li>
+<?php
+				}
+
+				if(check_page_rights(get_page_id_by_filename("veranstaltungen.php"))) {
+?>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("veranstaltungen.php"); ?>"><span class="utf8symbol">&#128214;</span> Veranstaltungen bearbeiten</a></li>
+<?php
+				}
+
+
+				if(check_page_rights(get_page_id_by_filename("raumplanung.php"))) {
+?>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("raumplanung.php"); ?>"><span class="utf8symbol">&#x1f3e2;</span> Raumplanung</a></li>
+<?php
+				}
+
+				if(check_page_rights(get_page_id_by_filename("anpassen.php"))) {
+?>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("anpassen.php"); ?>"><span class="utf8symbol">&#127912;</span> Vorlesungverzeichnis personalieren</a></li>
+<?php
+				}
+
+?>
+			</ul>
 			<h2>Was versteckt sich hinter der Navigationsleiste?</h2>
 			<p>
-				<ul>
+				<ul class="list_style_closed">
 <?php
 					$pagedata = create_page_info();
 
