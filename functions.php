@@ -4126,6 +4126,7 @@ INSERT INTO
 			}
 
 			if(is_array($praesenztyp)) {
+				$old_db_status_hash = query_to_status_hash("select veranstaltung_id, praesenztyp_id from veranstaltung_to_praesenztyp where veranstaltungs_id = ".esc($id)." order by veranstaltungs_id, praesenztyp_id");
 				start_transaction();
 				$failed = 0;
 				$delete = 'delete from veranstaltung_to_praesenztyp where veranstaltung_id = '.esc($id);
@@ -4148,7 +4149,10 @@ INSERT INTO
 					error("Die gewählten Präsenztypen konnten nicht hinzugefügt werden.");
 				} else {
 					commit();
-					success("Die gewählten Präsenztypen wurden erfolgreich hinzugefügt.");
+					$new_db_status_hash = query_to_status_hash("select veranstaltung_id, praesenztyp_id from veranstaltung_to_praesenztyp where veranstaltungs_id = ".esc($id)." order by veranstaltungs_id, praesenztyp_id");
+					if($new_db_status_hash != $old_db_status_hash) {
+						success("Die gewählten Präsenztypen wurden erfolgreich hinzugefügt.");
+					}
 				}
 			}
 
@@ -4220,7 +4224,7 @@ INSERT INTO
 		return json_encode($rows);
 	}
 
-	function query_to_status_hash ($query, $skip_array) {
+	function query_to_status_hash ($query, $skip_array = array()) {
 		return hash('md5', query_to_json("select * from pruefung where veranstaltung_id = 1", $skip_array));
 	}
 
