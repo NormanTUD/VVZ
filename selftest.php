@@ -92,7 +92,7 @@
 			if($GLOBALS["dbname"]) {
 				$urlname = get_url_uni_name();
 				if($GLOBALS["dbname"] != "startpage") {
-					$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Testkunde", "Demo-Universität", "Jörg Noack", "Oldenburg", "26133", "Robert-Koch-Str. 2", "noack@omni-concept.com", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 1)';
+					$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Testkunde", "omni-concept", "Jörg Noack", "Oldenburg", "26133", "Robert-Koch-Str. 2", "noack@omni-concept.com", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 1)';
 				} else if ($GLOBALS["dbname"] == "startpage" && get_single_row_from_query("select count(*) from vvz_global.kundendaten where universitaet = 'startpage'") == 0) {
 					$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Superadmin", "Admin", "Jörg Noack", "Oldenburg", "26133", "Robert-Koch-Str. 2", "noack@omni-concept.com", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 6)';
 				}
