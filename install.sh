@@ -150,4 +150,6 @@ sed -i 's/PrivateTmp/#PrivateTmp/' /etc/systemd/system/multi-user.target.wants/a
 systemctl daemon-reload
 systemctl restart apache2
 
+rm /var/www/html/index.html
+
 whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS
