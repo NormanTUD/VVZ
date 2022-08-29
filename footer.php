@@ -32,32 +32,30 @@
 ?>
 	<i>
 <?php
-	if(1) {
-		$c = 0;
-		foreach ($sites as $url => $site_data) {
-			$name = $site_data['name'];
-			$id = $site_data['id'];
-			$admin_only = $site_data['admin_only'];
-			if(
-				!($url == 'faq' && !faq_has_entry()) &&
-				(!$admin_only || $admin_only && user_is_admin($GLOBALS["logged_in_user_id"]))
-			) {
-				if($url == $this_page_file) {
-	?>
-					<b><a id="<?php print $id; ?>" href="<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a></b>
-	<?php
-				} else {
-	?>
-					<a id="<?php print $id; ?>" href="<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a>
-	<?php
-				}
-				$c++;
-				if($c != count($sites)) {
-					print " / ";
-				}
+	$c = 0;
+	foreach ($sites as $url => $site_data) {
+		$name = $site_data['name'];
+		$id = $site_data['id'];
+		$admin_only = $site_data['admin_only'];
+		if(
+			!($url == 'faq' && !faq_has_entry()) &&
+			(!$admin_only || $admin_only && user_is_admin($GLOBALS["logged_in_user_id"]))
+		) {
+			if($url == $this_page_file) {
+?>
+				<b><a id="<?php print $id; ?>" href="<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a></b>
+<?php
 			} else {
-				$c++;
+?>
+				<a id="<?php print $id; ?>" href="<?php print get_kunde_url().$url; ?>"><?php print htmlentities($name); ?></a>
+<?php
 			}
+			$c++;
+			if($c != count($sites)) {
+				print " / ";
+			}
+		} else {
+			$c++;
 		}
 	}
 ?>
