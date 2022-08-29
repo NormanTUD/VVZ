@@ -180,7 +180,7 @@ declare(ticks=1);
 		}
 	}
 
-	if(!$GLOBALS['setup_mode'] && get_kunden_db_name() != "startpage") {
+	if(!$GLOBALS['setup_mode']) {
 		if(get_post('try_login')) {
 			$GLOBALS['logged_in_was_tried'] = 1;
 		}

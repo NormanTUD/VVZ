@@ -14,6 +14,8 @@ AddDefaultCharset UTF-8
 	RewriteRule ^v/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
 	RewriteRule ^v/(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
 	RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
+	RewriteRule ^admin$ admin.php [L]
+	RewriteRule ^impressum$ impressum.php [L]
 
 	RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
 	Redirect 301 ^/v/$ /

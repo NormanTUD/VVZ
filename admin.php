@@ -32,7 +32,6 @@
 				}
 ?>
 				<form method="post">
-					<i>Das Anmelden auf diesem Gerät meldet automatisch von allen anderen angemeldeten Geräten ab.</i>
 					<input type="hidden" name="try_login" value="1" />
 					<div class="height_10px"></div>
 					<input type="text" name="username" placeholder="Benutzername" />

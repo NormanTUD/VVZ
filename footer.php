@@ -32,7 +32,7 @@
 ?>
 	<i>
 <?php
-	if(get_kunden_db_name() != "startpage") {
+	if(1) {
 		$c = 0;
 		foreach ($sites as $url => $site_data) {
 			$name = $site_data['name'];
