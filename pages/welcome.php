@@ -59,6 +59,7 @@
 				}
 
 ?>
+				<li><a href="admin?page=<?php print get_page_id_by_filename("../kontakt.php"); ?>"><span class="utf8symbol">&#x1f4e7;</span> Kontakt</a></li>
 			</ul>
 			<h2>Was versteckt sich hinter der Navigationsleiste?</h2>
 			<p>
