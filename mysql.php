@@ -180,6 +180,10 @@
 
 			try {
 				mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
+
+
+				$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name($GLOBALS["dbname"]));
+				$GLOBALS["university_name"] = get_single_row_from_query($query);
 			} catch (\Throwable $e) {
 				error_log($e);
 				error_log("Trying to create database...");

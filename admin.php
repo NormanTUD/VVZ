@@ -1,9 +1,11 @@
 <?php
 	$php_start = microtime(true);
 	include_once("config.php");
-	$page_title = $GLOBALS['university_name']." | Administration";
+	include_once("mysql.php");
+	include_once("functions.php");
 	$filename = 'admin';
 	$GLOBALS['adminpage'] = 1;
+	$page_title = $GLOBALS['university_name']." | Administration";
 	include("header.php");
 	include_once("selftest.php");
 
