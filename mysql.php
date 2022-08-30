@@ -17,7 +17,26 @@
 		}
 	}
 
-
+	if(!function_exists('set_login_data')) {
+		function set_login_data ($row) {
+			/*
+			print "<pre>\n";
+			debug_print_backtrace();
+			print_r($GLOBALS);
+			print "</pre>\n";
+			die("A");
+			 */
+			$GLOBALS['logged_in'] = 1;
+			$GLOBALS['logged_in_data'] = $row;
+			$GLOBALS['logged_in_user_id'] = $row[0];
+			$GLOBALS['user_dozent_id'] = $row[2];
+			$GLOBALS['user_institut_id'] = $row[3];
+			$GLOBALS['user_role_id'] = get_role_id_by_user($row[0]);
+#dier($GLOBALS['user_role_id']);
+			$GLOBALS['this_semester_id'] = get_and_create_this_semester();
+			$GLOBALS['accepted_public_data'] = $row[4];
+		}
+	}
 
 	if(!function_exists("query_to_json")) {
 		function query_to_json($query, $skip_array) {

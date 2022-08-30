@@ -13,6 +13,12 @@
 		rquery($query);
 
 		setcookie($GLOBALS["cookie_hash"].'_session_id', $session_id, time() + (7 * 86400), "/");
+
+		$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `id` = '.esc($user_id);
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			set_login_data($row);
+		}
 	}
 
 	function generate_random_string ($length = 50) {
@@ -299,8 +305,8 @@
 		return false;
 	}
 
-	function db_is_demo ($db) {
-		if(!array_key_exists($db, $GLOBALS["is_demo"])) {
+	function db_is_demo ($db, $cache=1) {
+		if(!array_key_exists($db, $GLOBALS["is_demo"]) && $cache) {
 			if(database_exists($db) && table_exists($db, "instance_config") && table_exists($db, "plan")) {
 				$query = "select p.name from vvz_global.kundendaten k left join vvz_global.plan p on k.plan_id = p.id";
 				$GLOBALS["is_demo"][$db] = get_single_row_from_query($query) == "Demo" ? 1 : 0;
@@ -509,7 +515,7 @@
 		include_once("selftest.php");
 		print "Die neue Uni wird erstellt. Bitte warten...";
 		flush();
-		print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($new_rand_name).'/" />';
+		print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($new_rand_name).'/?first_login=1" />';
 		flush();
 		exit(0);
 	}

@@ -163,20 +163,6 @@ declare(ticks=1);
 
 	$GLOBALS['pages'] = NULL;
 
-	if(!function_exists('set_login_data')) {
-		function set_login_data ($row) {
-			$GLOBALS['logged_in'] = 1;
-			$GLOBALS['logged_in_data'] = $row;
-			$GLOBALS['logged_in_user_id'] = $row[0];
-			$GLOBALS['user_dozent_id'] = $row[2];
-			$GLOBALS['user_institut_id'] = $row[3];
-			$GLOBALS['user_role_id'] = get_role_id_by_user($row[0]);
-#dier($GLOBALS['user_role_id']);
-			$GLOBALS['this_semester_id'] = get_and_create_this_semester();
-			$GLOBALS['accepted_public_data'] = $row[4];
-		}
-	}
-
 	function show_in_current_page($page_id) {
 		$kunde_name = get_kunden_db_name();
 		if($kunde_name == "startpage") {
@@ -191,8 +177,8 @@ declare(ticks=1);
 		$GLOBALS['logged_in_was_tried'] = 1;
 	}
 
-	if(get_cookie($GLOBALS["cookie_hash"].'_session_id') && !$GLOBALS["db_freshly_created"] && table_exists($GLOBALS["dbname"], "view_user_session_id")) {
-		#delete_old_session_ids();
+	if(get_cookie($GLOBALS["cookie_hash"].'_session_id') && !$GLOBALS["db_freshly_created"] && table_exists($GLOBALS["dbname"], "view_user_session_id") && !get_get("new_demo_uni")) {
+		delete_old_session_ids();
 		$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `session_id` = '.esc($_COOKIE[$GLOBALS["cookie_hash"]."_".'session_id']).' AND `enabled` = "1"';
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
@@ -9607,6 +9593,14 @@ order by
 				return "";
 			}
 			return $result;
+		}
+	}
+
+	if(db_is_demo($GLOBALS["dbname"], 1) && !$GLOBALS["logged_in_user_id"] && get_get("first_login")) {
+		try {
+			set_session_id(1);
+		} catch (\Throwable $e) {
+			// Das kann vorkommen, wenn man gerade die Seite erstellt
 		}
 	}
 ?>
