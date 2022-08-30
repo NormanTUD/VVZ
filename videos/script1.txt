@@ -12,3 +12,35 @@ Sie können es innerhalb weniger Minuten einrichten und dann sofort los starten.
 Sie brauchen keinen Server und müssen kein Techniker sein. Es geht mit wenigen Klicks.
 Durch diesen Prozess möchte ich Sie gerne führen. 
 Keine Sorge. Es dauert keine 3 Minuten bis Sie das Vorlesungsverzeichnis benutzen können und eine Demo ist für 7 Tage kostenfrei und völlig ohne Verpflichtungen erhältlich.
+
+Zum Starten gehen Sie auf die Adresse vorlesungsverzeichnn, punkt, is. Sie sehen die Adresse auf dem Bildschirm.
+Dort werden Sie direkt mit dem Batten. Kostenlose Demo ohne Verpflichtungen ausprobieren. willkommen geheißen.
+Wenn Sie auf diesen Batten klicken, wird Ihre Demo-Version eingerichtet.
+In dieser sind Sie voller Administrator und dürfen Alles.
+Sie dürfen neue Veranstaltungen oder Dozenten Erstellen, Sie dürfen neue Prüfungsleistungen erstellen und so weiter.
+Wir beschränken uns hier jedoch erstmal auf einen kleinen Teil davon.
+Auf der Startseite haben Sie die Möglichkeit, die Datenbank mit Demo Daten zu füllen. 
+Dann sehen Sie, wie es im Getummel der richtigen Universität aussieht.
+Sie sehen dann auf der Startseite mehrere Informationen.
+Ganz oben ist unser Logo, das Sie bequem ändern können.
+Darunter sehen Sie den Namen es aktuellen Instituts.
+In den Demo Daten existiert nur ein Institut.
+Wenn Sie mehrere einrichten, sind die dort auswählbar.
+Darunter sind zwei Felder, in denen man alle Veranstaltungen des aktuell ausgewählten Semesters sehen kann, oder alle Prüfungsleistungen überhaupt.
+Darunter sind mehr Felder, für jeden Studiengang Eines.
+Klicken wir zum Beispiel auf Master Philosophie.
+Wir sehen dort am Montag eine Veranstaltung von Professor Dack.
+In der ersten Zeile der Box sind die genaue Stunde, Uhrzeit, der Ort, der Typ der Veranstaltung (hier V L für Vorlesung), der Raum und das Gebäude sowie ein Link zu einem Video Call Konferenzsystem wie Sum oder Big Blu Batten. Alles wird nur angezeigt, wenn es vorhanden ist.
+Klicken wir etwas weiter unten auf die Details, sehen wir einen Freitext, den der Dozent beliebig erstellen kann.
+Außerdem sehen wir alle Prüfungsleistungen im aktuell ausgewählten Studiengang, die in dieser Vorlesung angeboten werden.
+Die Vorlesung kann noch viel mehr Prüfungsleistungen anbieten, aber wir hier wird speziell für den Master Philosophie gefiltert, weil wir diesen ausgewählt haben.
+Darunter direkt ein Link, die Veranstaltung zu bearbeiten. Diesen sieht man natürlich nur, wenn man angemeldet ist, und auch die Rechte hat, die Veranstaltung zu bearbeiten.
+
+Machen wir aber erstmal etwas Spaßiges.
+Klicken Sie unten auf Administration und akzeptieren Sie die Datenschutzbedingungen.
+Dann können Sie das Vorlesungverzeichnis personalieren. Das ist direkt ein Batten, wie Sie sehen.
+Klicken wir dort auf Logo Hochladen und dann auf Neues Logo hochladen.
+Wählen Sie dafür das Logo ihres Institutes oder Ihrer Universität aus.
+Hier können Sie auch Farben einstellen. Klicken Sie dazu auf eines der bunten Felder und wählen Sie eine neue Farbe aus.
+Die Änderungen sind sofort laif.
+Experimentieren Sie jedoch ruhig herum. Alle Einstellungen lassen sich rückgängig machen, indem Sie auf Reset drücken.
