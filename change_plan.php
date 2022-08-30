@@ -45,7 +45,7 @@
 
 <?php
 	if($product = get_get("product")) {
-		$kunde_id = get_kunde_id_by_url(get_url_uni_name());
+		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 		$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
 		$urlname_exists = 0;
 		if(get_post("universitaet")) {
@@ -66,26 +66,34 @@
 		}
 
 		$uni_name_error = "";
+		$email_error = "";
+		$iban_error = "";
+
+		if(!$iban_ok) {
+			$iban_error = "Keine oder eine ungültige IBAN eingegeben";
+		}
+
+		if(!$email_ok) {
+			$email_error = "Keine oder eine ungültige Email eingegeben";
+		}
 
 		if(get_post("update_kunde_data")) {
-			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname)) {
-				if($email_ok && $iban_ok) {
-					$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+			if(!$urlname_exists) {
+				if($email_ok) {
+					if($iban_ok) {
+						if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
+							update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+						}
 
-					if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
-						update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+						if(get_post("daten_uebernehmen")) {
+							// TODO
+						}
+
+						$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
 					}
-
-					if(get_post("daten_uebernehmen")) {
-						// TODO
-					}
-
-					$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
-				} else {
-					die("TODO 2");
 				}
 			} else {
-				$uni_name_error = "Dieser Name ist bereits belegt und gehört nicht Ihnen. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
+				$uni_name_error = "Dieser Name ist bereits belegt. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
 			}
 		}
 
@@ -151,21 +159,21 @@
 					</tr>
 					<tr>
 					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_current_value("iban") ?? ""); ?>" /><?php
-					if(!$iban_ok && !get_current_value("iban") && get_current_value("iban") != "") {
-								print "<br><span class='red_text'>Die IBAN ist nicht richtig. Bitte eine korrekte IBAN eingeben.</span>";
-							}
-						?></td>
+							if($iban_error) {
+									print "<br><span class='red_text'>$iban_error.</span>";
+								}
+							?></td>
 					</tr>
 					<tr>
 						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_current_value("email") ?? ""); ?>" /><?php
-							if(!$email_ok && !get_current_value("email") && get_current_value("email") != "") {
-								print "<br><span class='red_text'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
+							if($email_error) {
+								print "<br><span class='red_text'>$email_error.</span>";
 							}
 						?></td>
 					</tr>
 					<tr>
 						<td>Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen?</td>
-						<td><input type="checkbox" name="daten_uebernehmen" value=1 /><td>
+						<td><input type="checkbox" name="daten_uebernehmen" value=1 /></td>
 					</tr>
 				</table>
 				<button>Ja, meine Daten sind korrekt</button>

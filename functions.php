@@ -9648,6 +9648,7 @@ order by
 			$query = "select $prop from vvz_global.kundendaten where id = ".get_kunde_id_by_db_name($GLOBALS["dbname"]);
 			$result = get_single_row_from_query($query);
 
+return $result;
 			if(array_key_exists("default_".$prop, $GLOBALS) && $GLOBALS["default_$prop"] == $result) {
 				return "";
 			}

@@ -38,6 +38,11 @@
 		<meta name="viewport" content="width=device-width, user-scalable=yes">
 		<script type="text/javascript" src="mathjax/es5/tex-chtml-full.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <?php
+		if(is_demo()) {
+?>
+			<meta name="robots" content="noindex" />
+<?php
+		}
 		if(preg_match('/admin/', basename($_SERVER['SCRIPT_NAME']))) {
 ?>
 			<title><?php
