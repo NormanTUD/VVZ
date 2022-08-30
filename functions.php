@@ -9539,19 +9539,25 @@ order by
 
 			if(table_exists($row[0], "instance_config")) {
 				if(db_is_demo($row[0])) {
-					$query = "select now() - installation_date from ".$row[0].".instance_config";
-					$seconds_diff = get_single_row_from_query($query);
-					if($seconds_diff) {
-						if($seconds_diff > 7 * 86400) {
+					try {
+						$query = "select now() - installation_date from ".$row[0].".instance_config";
+						$seconds_diff = get_single_row_from_query($query);
+						if($seconds_diff) {
+							if($seconds_diff > 7 * 86400) {
+								$drop = 1;
+							}
+						} else {
 							$drop = 1;
 						}
-					} else {
-						$drop = 1;
-					}
 
-					if($drop) {
-						$query = "drop database if exists $row[0];";
-						rquery($query);
+						if($drop) {
+							$query = "drop database if exists $row[0];";
+							rquery($query);
+						}
+					} catch (\Throwable $e) {
+						stderr("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+						stderrw($e);
+						stderr("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 					}
 				}
 			}
