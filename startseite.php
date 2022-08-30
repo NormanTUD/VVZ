@@ -303,6 +303,7 @@
 			flush();
 			print '<meta http-equiv="refresh" content="1; url=startseite" />';
 			flush();
+
 			exit(0);
 
 		}

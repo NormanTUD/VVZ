@@ -241,6 +241,7 @@
 			rquery("CREATE DATABASE IF NOT EXISTS vvz_global");
 			rquery('use `vvz_global`');
 
+			$new_tables = 0;
 			foreach ($tables as $this_table => $create_query) {
 				if(!table_exists("vvz_global", $this_table)) {
 					$missing_tables[] = $this_table;
@@ -248,6 +249,7 @@
 						foreach ($create_query as $this_create_query) {
 							try {
 								rquery($this_create_query);
+								$new_tables++;
 							} catch (\Throwable $e) {
 								print $e;
 								die($query);
@@ -262,6 +264,17 @@
 						}
 					}
 					$GLOBALS['settings_cache'] = array();
+				}
+			}
+
+			if($new_tables) {
+				// Delete old Cookies
+				$cookies = explode(';', $_SERVER['HTTP_COOKIE']);
+				foreach($cookies as $cookie) {
+					$parts = explode('=', $cookie);
+					$name = trim($parts[0]);
+					setcookie($name, '', time()-1000);
+					setcookie($name, '', time()-1000, '/');
 				}
 			}
 		}
@@ -321,14 +334,17 @@
 				die("Connection failed: ".$GLOBALS["dbh"]->connect_error);
 			}
 
-			selftest_startpage();
-			$url_uni_name = get_url_uni_name();
-			$query = 'select dbname from vvz_global.kundendaten where urlname = '.esc($url_uni_name);
-			$result_dbname = $GLOBALS["dbh"]->query($query);
 
-			if($result_dbname) {
-				while ($row = mysqli_fetch_row($result_dbname)) {
-					$GLOBALS["dbname"] = $row[0];
+			if(array_key_exists("no_selftest", $GLOBALS) && !$GLOBALS["no_selftest"]) {
+				selftest_startpage();
+				$url_uni_name = get_url_uni_name();
+				$query = 'select dbname from vvz_global.kundendaten where urlname = '.esc($url_uni_name);
+				$result_dbname = $GLOBALS["dbh"]->query($query);
+
+				if($result_dbname) {
+					while ($row = mysqli_fetch_row($result_dbname)) {
+						$GLOBALS["dbname"] = $row[0];
+					}
 				}
 			}
 
@@ -339,32 +355,36 @@
 			try {
 				mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
 
-
-				$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name($GLOBALS["dbname"]));
-				$GLOBALS["university_name"] = get_single_row_from_query($query);
+				if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
+					$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name($GLOBALS["dbname"]));
+					$GLOBALS["university_name"] = get_single_row_from_query($query);
+				}
 			} catch (\Throwable $e) {
 				error_log($e);
 				error_log("Trying to create database...");
-				$sql = "CREATE DATABASE ".$GLOBALS["dbname"];
-				if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
-					die("Error creating database: ".$GLOBALS["dbh"]->error);
-				} else {
-					try {
-						if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
-							$GLOBALS["db_freshly_created"] = 1;
-							include_once("selftest.php");
 
-							print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
-							flush();
-							print '<meta http-equiv="refresh" content="0; url=./" />';
-							flush();
+				if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
+					$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
+					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+						die("Error creating database: ".$GLOBALS["dbh"]->error);
+					} else {
+						try {
+							if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
+								$GLOBALS["db_freshly_created"] = 1;
+								include_once("selftest.php");
 
-							exit(0);
-						} else {
-							die("Could not use DB");
+								print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
+								flush();
+								print '<meta http-equiv="refresh" content="0; url=./" />';
+								flush();
+
+								exit(0);
+							} else {
+								die("Could not use DB");
+							}
+						} catch (\Throwable $e) {
+							die("Could not select DB: $e");
 						}
-					} catch (\Throwable $e) {
-						die("Could not select DB: $e");
 					}
 				}
 			}

@@ -9554,8 +9554,6 @@ order by
 						rquery($query);
 					}
 				}
-			} else {
-				rquery("drop database ".$row[0]);
 			}
 		}
 	}

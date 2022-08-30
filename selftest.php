@@ -34,9 +34,7 @@
 
                 rquery('SET foreign_key_checks = 0');
 
-		if(!database_exists($GLOBALS["dbname"])) {
-			die("DB existiert nicht");
-		}
+		rquery("CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"]);
 		rquery('use `'.$GLOBALS['dbname'].'`');
 
                 foreach ($tables as $this_table => $create_query) {

@@ -8,7 +8,7 @@
 
 	function set_session_id ($user_id) {
 		//delete_old_session_ids($GLOBALS['logged_in_user_id']);
-		$session_id = generate_random_string(1024);
+		$session_id = generate_random_string(128);
 		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
 		rquery($query);
 
@@ -69,19 +69,6 @@
 	}
 
 	function get_uni_name () {
-		/*
-		if(array_key_exists("new_uni_name", $_GET)) {
-			return $_GET["new_uni_name"];
-		}
-		if(array_key_exists("REDIRECT_SFURI", $_SERVER)) {
-			return "db_vvz_".get_kunden_db_name();
-			print "Die neue Uni wird erstellt. Bitte warten...";
-			flush();
-			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name(get_uni_name()).'/" />';
-			flush();
-		}
-		 */
-
 		return "db_vvz_".get_kunden_db_name();
 	}
 
