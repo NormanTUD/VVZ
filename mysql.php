@@ -9,6 +9,14 @@
 		$GLOBALS["no_selftest"] = 0;
 	}
 
+	if(!function_exists("stderrw")) {
+		function stderrw ($str) {
+			fwrite(STDERR, $str);
+		}
+	}
+
+
+
 	if(!function_exists("query_to_json")) {
 		function query_to_json($query, $skip_array) {
 			$result = rquery($query);
@@ -377,18 +385,25 @@
 					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
 						die("Error creating database: ".$GLOBALS["dbh"]->error);
 					} else {
-						if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
-							$GLOBALS["db_freshly_created"] = 1;
-							include_once("selftest.php");
+						try {
+							if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
+								$GLOBALS["db_freshly_created"] = 1;
+								include_once("selftest.php");
 
-							print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
-							flush();
+								print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
+								flush();
+								print '<meta http-equiv="refresh" content="0; url=./" />';
+								flush();
+								exit(0);
+							} else {
+								die("Could not use DB");
+							}
+						} catch (\Throwable $e) {
+							#stderrw("Could not select DB: $e");
+							print "Es kann noch einen Moment dauern. Bitte warten Sie.";
 							print '<meta http-equiv="refresh" content="0; url=./" />';
 							flush();
-
 							exit(0);
-						} else {
-							die("Could not use DB");
 						}
 					}
 				}

@@ -8052,10 +8052,6 @@ SE 1/2 oder BZW
 
 	/* Systemfunktionen */
 
-	function stderrw ($str) {
-		trigger_error($str, E_USER_WARNING);
-	}
-
 	function green_text ($str) {
 		return "\033[32m".$str."\033[0m";
 	}
@@ -9558,9 +9554,9 @@ order by
 							rquery($query);
 						}
 					} catch (\Throwable $e) {
-						stderr("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+						stderrw("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 						stderrw($e);
-						stderr("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+						stderrw("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 					}
 				}
 			}
