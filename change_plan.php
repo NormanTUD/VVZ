@@ -24,9 +24,15 @@
 		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 		$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
 		$urlname_exists = 0;
+		$old_urlname = get_urlname_by_dbname($GLOBALS["dbname"]);
 		if(get_post("universitaet")) {
 			$urlname = create_uni_name(get_post("universitaet"));
 			$urlname_exists = urlname_already_exists($urlname) ? 1 : 0;
+			if($urlname_exists) {
+				if($old_urlname = $urlname) {
+					$urlname_exists = 0;
+				}
+			}
 		}
 
 		$iban_ok = 0;
