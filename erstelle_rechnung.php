@@ -114,7 +114,7 @@
 				regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "strasse"));
 				regex_in_file($data_file, '/KUNDEPLZ/', get_kunde_X($kunde_id, "plz"));
 				regex_in_file($data_file, '/KUNDEORT/', get_kunde_X($kunde_id, "ort"));
-				regex_in_file($data_file, '/RECHNUNGSNUMMER/', get_kunde_rechnungsnummer($kunde_id, "$jahr-$monat-01"));
+				regex_in_file($data_file, '/RECHNUNGSNUMMER/', $rechnung_id);
 
 				$invoice_file = $tmp."/_invoice.tex";
 
