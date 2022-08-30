@@ -57,7 +57,6 @@ Das ist ein Format, in dem die Werte jeweils mit Kommata getrennt sind.
 Sie können eine Lange Liste im Format Gebäudename Komma Gebäudeabkürzung neue Zeile eingeben, die Sie zum Beispiel aus Exel exportieren können.
 Klicken Sie dann auf Importieren, und alle Gebäude aus der Liste werden importiert.
 
-=========================================
 
 Nun fügen wir einen Studiengang hinzu.
 Studiengänge sind auch Stammdaten, daher sind auch sie unter Stammdaten zu finden.
@@ -66,7 +65,7 @@ Optionalerweise können Sie auch direkt einen Link zur Studienordnung hinzufüge
 auf der Startseite für den Studiengang mitangezeigt. 
 Klicken Sie dann auf Speichern, und der Studiengang ist angelegt.
 
-Prüfungsleistungen sind zu Modulen zugehört, die widerrum zu Studiengängen zugeordnet sind.
+Prüfungsleistungen sind zu Modulen zugeordnet, die widerrum zu Studiengängen zugeordnet sind.
 Nachdem Ihr Studiengang erstellt ist, können wir nun Module hinzufügen. 
 Diese finden Sie unter dem Reiter Moduldaten und dort unter Module.
 Ein Modul ist einem Studiengang zugeordnet und braucht einen Namen. Beschreibung und Abkürzung sind optional, würden aber, wenn sie ausgefüllt wären, mitangezeigt werden, wo es sinnvoll ist.
@@ -76,7 +75,20 @@ Prüfungsleistungen gehören zu den Prüfungsdaten. Klicken Sie auf den entsprec
 Prüfungsnummern sind einem Modul zugeordnet. Wenn Sie möchten können Sie ihnen auch einen Bereich zuordnen. Kleiner Tipp. Bereiche gehören zu den Stammdaten. Das ist aber optional.
 Jede Prüfungsleistung hat einen Prüfungstyp, etwas wie Mündliche Prüfung oder Klausur. Wählen Sie einen Prüfungstyp. Hier können Sie auch eine Modulbezeichnung eingeben, eine Prüfungsnummer und einen Zeitraum, in dem die Prüfung stattfindet. Alle Werte sind optional, aber es wäre empfehlenswert, zumindest die Prüfungsnummer auszufüllen.
 
+=========================================
+
 Nun ist alles da, um die erste Veranstaltung zu erstellen.
 Gehen Sie dazu auf den Reiter Veranstaltungen.
+In der Tabelle auf dieser Seite können Sie den Titel einer Veranstaltung eingeben. Wir nehmen mal Die neue Phänomenologie von Hermann Schmitz und klicken auf. Speichern und Bearbeiten.
+Damit ist die Veranstaltung gespeichert und wir werden automatisch zur Seite weitergeleitet, wo wir sie näher bearbeiten können.
+Oben haben wir Meta-Informationen wie in welcher Sprache die Veranstaltung angeboten wird, ob sie eine Präsenz, online oder hybrid veranstaltung ist, wann sie ist, der Link zum
+i Lörning system und den Gebäudewunsch.
+Dies ist in der Standardeinstellung nur ein Wunsch, weil sie erst von einem Raumplaner freigegeben werden muss, der Absprache mit dem Raumplanungsdezernat hält. Dazu später mehr.
+Darunter sehen wir Felder mit Links zu Videokonferenz-Seiten, einem Hinweis für die Raumplanung und einem Hinweis für die Studierenden.
+Hier können wir diese Veranstaltung auch mit einer anderen verknüpfen, zum Beispiel eine Vorlesung und eine Übung, so dass sie auf der Startseite für Studierende offensichtlich erkennbar zusammenhängen.
+Darunter können wir, wenn wir wollen, einzelne Termine hinzufügen, zum Beispiel für Blockseminare.
+Darunter passiert die Magie. In der letzten Tabelle sind alle Prüfungsordnungen aufgelistet.
+Wenn Sie unsere neu erstelle Prüfungsleistung anklicken, wird sie sofort gespeichert.
+Dadurch, dass Prüfungsleistungen zu Modulen und Module zu Studiengängen zugeordnet sind, weiß die Software nun, dass diese Veranstaltung zu diesem Studiengang gehört, und sie wird sofort laif auf der Startseite ihr zugeordnet.
 
-
+Dozenten
