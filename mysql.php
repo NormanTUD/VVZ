@@ -9,6 +9,8 @@
 		$GLOBALS["no_selftest"] = 0;
 	}
 
+	if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
+
 	if(!function_exists("stderrw")) {
 		function stderrw ($str) {
 			fwrite(STDERR, $str);
