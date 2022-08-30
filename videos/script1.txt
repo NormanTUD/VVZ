@@ -92,7 +92,6 @@ Dadurch, dass Prüfungsleistungen zu Modulen und Module zu Studiengängen zugeor
 Wenn ein Dozent eine Veranstaltung bereits in vorherigen Semestern gehalten hat, kann man alle Prüfungsleistungen aus dieser vorherigen Veranstaltung einfach kopieren.
 Gehen Sie dazu ans Ende der Seite und wählen Sie eine der vorherigen Veranstaltungen aus und klicken auf Prüfungen von der ausgewählten Veranstaltung kopieren.
 
-=========================================
 
 Natürlich möchten Sie nicht jedem Ihr Administrator Passwort geben. Daher haben wir ein Nutzer- und Rollensystem eingebaut. 
 Wir gehen die einfachsten drei Fälle kurz durch.
@@ -108,4 +107,15 @@ Sie können mit der Checkbox Raumplanungsdozent auch dem Dozenten die Rechte geb
 
 !!!! TODO Superdozent!!!!
 
-Die Raumplanung 
+=========================================
+
+An einer Universität müssen sich viele Institute Gebäude und Räume teilen. Um dies besser koordinieren zu können, haben wir eine Zwischeninstanz eingefügt.
+Klicken Sie dazu auf den Reiter Raumplanung.
+Das ist eine Unterseite, die nur Administratoren und Raumplanungsdozenten sehen können.
+Dort ist eine genaue Übersicht aller für die Raumplanung relevanten Eigenschaften.
+Sollte sich seit dem letzten Mal etwas verändert haben, ist die Zeile mit einem kleinen Blitz gekennzeichnet.
+Man kann das Gebäude und den Raum auswählen und bestätigen, und ein Datum für die Raummeldung eingeben.
+Auch hier werden alle Daten automatisch gespeichert, indem man außerhalb des Feldes klickt.
+Gebäude und Raumnummern tauchen erst auf der Startseite auf, wenn sie hier bestätigt worden sind.
+Unten können verschiedene Formate heruntergeladen werden.
+Gegen einen Aufpreis oder durch die Pro-Variante kostenlos beinhaltet können Sie uns auch Ihre Excel-Formate senden, und wir versuchen sie in unserem Export aus den verfügbaren Daten abzubilden.
