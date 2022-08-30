@@ -79,7 +79,7 @@ Jede Prüfungsleistung hat einen Prüfungstyp, etwas wie Mündliche Prüfung ode
 
 Nun ist alles da, um die erste Veranstaltung zu erstellen.
 Gehen Sie dazu auf den Reiter Veranstaltungen.
-In der Tabelle auf dieser Seite können Sie den Titel einer Veranstaltung eingeben. Wir nehmen mal Die neue Phänomenologie von Hermann Schmitz und klicken auf. Speichern und Bearbeiten.
+In der Tabelle auf dieser Seite können Sie den Titel einer Veranstaltung eingeben. Wir nehmen mal Die neue Phänomenologie von Hermann Schmitz und klicken auf Speichern und Bearbeiten.
 Damit ist die Veranstaltung gespeichert und wir werden automatisch zur Seite weitergeleitet, wo wir sie näher bearbeiten können.
 Oben haben wir Meta-Informationen wie in welcher Sprache die Veranstaltung angeboten wird, ob sie eine Präsenz, online oder hybrid veranstaltung ist, wann sie ist, der Link zum
 i Lörning system und den Gebäudewunsch.
@@ -87,8 +87,12 @@ Dies ist in der Standardeinstellung nur ein Wunsch, weil sie erst von einem Raum
 Darunter sehen wir Felder mit Links zu Videokonferenz-Seiten, einem Hinweis für die Raumplanung und einem Hinweis für die Studierenden.
 Hier können wir diese Veranstaltung auch mit einer anderen verknüpfen, zum Beispiel eine Vorlesung und eine Übung, so dass sie auf der Startseite für Studierende offensichtlich erkennbar zusammenhängen.
 Darunter können wir, wenn wir wollen, einzelne Termine hinzufügen, zum Beispiel für Blockseminare.
-Darunter passiert die Magie. In der letzten Tabelle sind alle Prüfungsordnungen aufgelistet.
-Wenn Sie unsere neu erstelle Prüfungsleistung anklicken, wird sie sofort gespeichert.
-Dadurch, dass Prüfungsleistungen zu Modulen und Module zu Studiengängen zugeordnet sind, weiß die Software nun, dass diese Veranstaltung zu diesem Studiengang gehört, und sie wird sofort laif auf der Startseite ihr zugeordnet.
+Darunter passiert die Magie. In der letzten Tabelle sind alle Prüfungsleistungen aufgelistet.
+Wenn Sie unsere neu erstellte Prüfungsleistung anklicken, wird sie sofort gespeichert.
+Dadurch, dass Prüfungsleistungen zu Modulen und Module zu Studiengängen zugeordnet sind, weiß die Software nun, dass diese Veranstaltung zu diesem Studiengang gehört, und sie wird sofort laif auf der Startseite dem Studiengang zugeordnet.
+Wenn ein Dozent eine Veranstaltung bereits in vorherigen Semestern gehalten hat, kann man alle Prüfungsleistungen aus dieser vorherigen Veranstaltung einfach kopieren.
+Gehen Sie dazu ans Ende der Seite und wählen Sie eine der vorherigen Veranstaltungen aus und klicken auf Prüfungen von der ausgewählten Veranstaltung kopieren.
 
 Dozenten
+
+Raumplanung
