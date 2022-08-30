@@ -29,40 +29,44 @@
 		</form>
 
 		<table class="auto_reload_stylesheets autorowspan">
-			<tr>
-				<th>Beschreibung</th>
-				<th>Eigenschaft</th>
-				<th>Wert</th>
-				<th>Standardwert</th>
-			</tr>
+			<thead>
+				<tr>
+					<th>Beschreibung</th>
+					<th>Eigenschaft</th>
+					<th>Wert</th>
+					<th>Standardwert</th>
+				</tr>
+			</thead>
+			<tbody>
 <?php
-			$query = "select id, humanname, classname, property, val, default_val from customizations order by id";
-			$results = rquery($query);
+				$query = "select id, humanname, classname, property, val, default_val from customizations order by id";
+				$results = rquery($query);
 
-			while ($row = mysqli_fetch_assoc($results)) {
-				$gui_id = hash("md5", json_encode($row));
+				while ($row = mysqli_fetch_assoc($results)) {
+					$gui_id = hash("md5", json_encode($row));
 ?>
-				<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
-					<input type="hidden" value="<?php print htmlentities($row["id"] ?? ""); ?>" name="id" />
-					<input type="hidden" value="1" name="customize_value" />
-					<tr>
-						<td>
-							<?php print htmlentities($row["humanname"] ?? ""); ?>
-						</td>
-						<td>
-							<?php print htmlentities($row["property"] ?? ""); ?>
-						</td>
-						<td>
-							<input type="text" id="<?php print $gui_id; ?>" name="value" <?php print preg_match("/color/", $row["property"] )? 'class="jscolor"' : ''; ?> value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
-						</td>
-						<td>
-							<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Reset</button>
-						</td>
-					</tr>
-				</form>
+					<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
+						<input type="hidden" value="<?php print htmlentities($row["id"] ?? ""); ?>" name="id" />
+						<input type="hidden" value="1" name="customize_value" />
+						<tr>
+							<td>
+								<?php print htmlentities($row["humanname"] ?? ""); ?>
+							</td>
+							<td>
+								<?php print htmlentities($row["property"] ?? ""); ?>
+							</td>
+							<td>
+								<input type="text" id="<?php print $gui_id; ?>" name="value" <?php print preg_match("/color/", $row["property"] )? 'class="jscolor"' : ''; ?> value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
+							</td>
+							<td>
+								<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Reset</button>
+							</td>
+						</tr>
+					</form>
 <?php
-			}
+				}
 ?>
+			</tbody>
 		</table>
 <?php
 		js(array("jscolor.js"));
