@@ -38,9 +38,41 @@ Darunter direkt ein Link, die Veranstaltung zu bearbeiten. Diesen sieht man nat�
 
 Machen wir aber erstmal etwas Spaßiges.
 Klicken Sie unten auf Administration und akzeptieren Sie die Datenschutzbedingungen.
-Dann können Sie das Vorlesungverzeichnis personalieren. Das ist direkt ein Batten, wie Sie sehen.
+Dann können Sie das Vorlesungverzeichnis personalisieren. Das ist direkt ein Batten, wie Sie sehen.
 Klicken wir dort auf Logo Hochladen und dann auf Neues Logo hochladen.
 Wählen Sie dafür das Logo ihres Institutes oder Ihrer Universität aus.
 Hier können Sie auch Farben einstellen. Klicken Sie dazu auf eines der bunten Felder und wählen Sie eine neue Farbe aus.
 Die Änderungen sind sofort laif.
-Experimentieren Sie jedoch ruhig herum. Alle Einstellungen lassen sich rückgängig machen, indem Sie auf Reset drücken.
+Experimentieren Sie jedoch ruhig herum. Alle Einstellungen lassen sich rückgängig machen, indem Sie auf, Ri-set, klicken.. 
+
+=========================================
+
+Ich möchte Ihnen nun noch zeigen, wie Sie ihre eigenen Gebäude, Dozenten und Prüfungsleistungen erstellen können.
+Erst zu den Gebäuden. Diese gehören zu den Stammdaten. Klicken Sie also auf Stammdaten und dann auf Gebäude.
+Jedes Gebäude hat einen Namen und optionalerweise eine Abkürzung. Wo es sinnvoll ist, wird die Abkürzung gezeigt, wenn sie vorhanden ist.
+Sie können einzelne Gebäude eingeben, indem Sie in das letzte Feld der Eingabemaske einen neuen Namen eingeben und Speichern drücken.
+Auf gleiche Weise können Sie auch vorhandene Gebäude editieren. 
+Für viele Gebäude geht es aber auch einfacher.
+Unten auf der Seite ist die Möglichkeit, eine sogenannte C S V datei zu importieren.
+Das ist ein Format, in dem die Werte jeweils mit Kommata getrennt sind.
+Sie können eine Lange Liste im Format Gebäudename Komma Gebäudeabkürzung neue Zeile eingeben, die Sie zum Beispiel aus Excel exportieren können.
+Klicken Sie dann auf Importieren, und alle Gebäude aus der Liste werden importiert.
+
+Nun fügen wir einen Studiengang hinzu.
+Studiengänge sind auch Stammdaten, daher sind auch sie unter Stammdaten zu finden.
+Jeder Studiengang hat ein ihm zugeordnetes Institut, wenn Sie mehrere Institute haben. Wählen Sie dieses aus und benennen Sie den Studiengang.
+Optionalerweise können Sie auch direkt einen Link zur Studienordnung hinzufügen, damit Studenten diesen nicht erst suchen müssen. Dieser wird
+auf der Startseite für den Studiengang mitangezeigt. 
+Klicken Sie dann auf Speichern, und der Studiengang ist angelegt.
+
+Prüfungsleistungen sind zu Modulen zugehört, die widerrum zu Studiengängen zugeordnet sind.
+Nachdem Ihr Studiengang erstellt ist, können wir nun Module hinzufügen. 
+Diese finden Sie unter dem Reiter Moduldaten und dort unter Module.
+Ein Modul ist einem Studiengang zugeordnet und braucht einen Namen. Beschreibung und Abkürzung sind optional, würden aber, wenn sie ausgefüllt wären, mitangezeigt werden, wo es sinnvoll ist.
+
+Nun die letzte Hürde. Die Prüfungsleistungen.
+Prüfungsleistungen gehören zu den Prüfungsdaten. Klicken Sie auf den entsprechenden Reiter und dann auf	Prüfungsnummern.
+Prüfungsnummern sind einem Modul zugeordnet. Wenn Sie möchten können Sie ihnen auch einen Bereich zuordnen. Kleiner Tipp. Bereiche gehören zu den Stammdaten. Das ist aber optional.
+Jede Prüfungsleistung hat einen Prüfungstyp, etwas wie Mündliche Prüfung oder Klausur. Wählen Sie einen Prüfungstyp. Hier können Sie auch eine Modulbezeichnung eingeben, eine Prüfungsnummer und einen Zeitraum, in dem die Prüfung stattfindet. Alle Werte sind optional, aber es wäre empfehlenswert, zumindest die Prüfungsnummer auszufüllen.
+
+
