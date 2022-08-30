@@ -76,21 +76,13 @@
 					urlname varchar(100) unique,
 					external_url varchar(200),
 					iban varchar(100),
-					`plan_id` int unsigned,
+					plan_id int unsigned,
+					zahlungszyklus_monate int default 1,
 					number_of_faculties int unsigned default 1,
 					email varchar(100),
 					CONSTRAINT `plan_fk` FOREIGN KEY (`plan_id`) REFERENCES `vvz_global`.`plan` (`id`) ON DELETE CASCADE,
 					personalized int default 0
 				)",
-
-				'rechnungen' => "create table rechnungen (
-					id int unsigned auto_increment primary key,
-					datum date DEFAULT NULL,
-					zahlungszyklus_monate int default 1,
-					eingegangen DATETIME,
-					rabatt int,
-					spezialpreis int
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 				'institut' => 'CREATE TABLE `institut` (
 					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -190,7 +182,21 @@
 					kunde_id int unsigned unique,
 					img MEDIUMBLOB NOT NULL,
 					CONSTRAINT `kunde_id_fk` FOREIGN KEY (`kunde_id`) REFERENCES `vvz_global`.`kundendaten` (`id`) ON DELETE CASCADE
-				)"
+				)",
+
+
+				'rechnungen' => "create table rechnungen (
+					id int unsigned auto_increment primary key,
+					kunde_id int unsigned not null,
+					plan_id int unsigned not null,
+					monat int unsigned not null,
+					jahr int unsigned not null,
+					rabatt int,
+					spezialpreis int,
+					UNIQUE KEY `kunde_monat_jahr` (`kunde_id`, `monat`, `jahr`),
+					CONSTRAINT `plan_fk_rechnungen` FOREIGN KEY (`plan_id`) REFERENCES `vvz_global`.`plan` (`id`) ON DELETE CASCADE,
+					CONSTRAINT `kunde_id_fk_rechnungen` FOREIGN KEY (`kunde_id`) REFERENCES `vvz_global`.`kundendaten` (`id`) ON DELETE CASCADE
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 			);
 
 			rquery("CREATE DATABASE IF NOT EXISTS vvz_global");
