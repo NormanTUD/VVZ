@@ -10,6 +10,7 @@
 	if(!user_is_admin($GLOBALS["logged_in_user_id"])) {
 		die("Nur Admins dürfen hier drauf");
 	}
+
 ?>
 	<div id="mainindex">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a><br>
@@ -18,31 +19,6 @@
 			<?php print get_demo_expiry_time(); ?>
 
 			<h1>Verfügbare Pläne</h1>
-
-			<style>
-.container {
-  display: flex;
-}
-.container > div {
-  flex: 1; /*grow*/
-}
-.plan_div {
-	border: 1px solid blue;
-}
-
-.buy_button {
-	background-color: #aaff00;
-}
-
-.chosen_plan {
-	background-color: #6a8aff;
-}
-
-.possible_plan {
-	background-color: #fbff00;
-}
-			</style>
-
 <?php
 	if($product = get_get("product")) {
 		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);

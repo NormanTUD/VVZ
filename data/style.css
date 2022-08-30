@@ -1062,3 +1062,25 @@ a, a:visited, a:hover, a:active {
 .td_iframe {
 	vertical-align: baseline;
 }
+
+.container {
+	display: flex;
+}
+.container > div {
+	flex: 1; /*grow*/
+}
+.plan_div {
+	border: 1px solid blue;
+}
+
+.buy_button {
+	background-color: #aaff00;
+}
+
+.chosen_plan {
+	background-color: #6a8aff;
+}
+
+.possible_plan {
+	background-color: #fbff00;
+}
