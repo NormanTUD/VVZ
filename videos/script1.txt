@@ -1,4 +1,4 @@
-Hallihallo, und willkommen beim Vorlesungsverzeichnis.
+Hallo, und willkommen beim Vorlesungsverzeichnis.
 Wir wollen Ihnen ein Werkzeug an die Hand geben, mit dem das Mänätschen von Fakultäten, Instituten oder sogar ganzen Universitäten viel einfacher wird.
 Unser Tuhl hat alle Informationen in einer Software an den Stellen, wo Sie sie brauchen. 
 Das Vorlesungsverzeichnis Mänätscht sich selbst, wenn es eingerichtet ist. Die Dozenten tragen ihre Veranstaltungen ein und alle Änderungen dort sind sofort laif.
@@ -104,8 +104,6 @@ Die Zweite Option ist der Superdozent. Ein Superdozent darf das, was ein normale
 Aktivieren Sie zum Erstellen eines Superdozenten einfach die Checkbox Superdozent und erstellen Sie den Dozenten.
 Unter Stammdaten, Superdozenten können Sie auswählen, welche anderen Dozenten dieser Superdozent verwalten darf. Für jeden Nutzer, den er bearbeiten darf, setzen Sie eine Checkbox und klicken dann auf Speichern.
 Sie können mit der Checkbox Raumplanungsdozent auch dem Dozenten die Rechte geben, die Raumplanung zu übernehmen.
-
-!!!! TODO Superdozent!!!!
 
 An einer Universität müssen sich viele Institute Gebäude und Räume teilen. Um dies besser koordinieren zu können, haben wir eine Zwischeninstanz eingefügt.
 Klicken Sie dazu auf den Reiter Raumplanung.
