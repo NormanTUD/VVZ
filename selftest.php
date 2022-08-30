@@ -298,9 +298,9 @@
 				"button:hover, input[type='button']:hover, input[type='submit']:hover" => array(
 					"name" => "Buttons Mouseover",
 					"values" => [
-						[ "background-color", "#d1ffce" ],
+						[ "background-color", "d1ffce" ],
 						[ "color", "black" ],
-						[ "border", "1px solid #006092" ],
+						[ "border", "1px solid 006092" ],
 						[ "cursor", "unset" ],
 						[ "border-radius", "5px" ],
 					],
@@ -308,10 +308,10 @@
 				"button, input[type='button'], input[type='submit']" => array(
 					"name" => "Buttons",
 					"values" => [
-						[ "background-color", "white" ],
+						[ "background-color", "ffffff" ],
 						[ "color", "black" ],
 						[ "border", "1px solid" ],
-						[ "border-color", "#006092" ],
+						[ "border-color", "006092" ],
 						[ "cursor", "unset" ],
 						[ "border-radius", "5px" ]
 					],
@@ -319,8 +319,8 @@
 				"th" => array(
 					"name" => "Tabellenheader",
 					"values" => [
-						[ "background-color", "#006092" ],
-						[ "color", "#ffffff" ],
+						[ "background-color", "006092" ],
+						[ "color", "ffffff" ],
 						[ "padding-left", "10px" ],
 						[ "padding-right", "10px" ]
 					]
@@ -328,19 +328,19 @@
 				".topnav li:hover a" => array(
 					"name" => "Mouse-Over Farbe für Navigationsleiste",
 					"values" => [
-						[ "background-color", "#008fd6" ]
+						[ "background-color", "008fd6" ]
 					]
 				),
 				"tr:nth-child(even)" => array(
 					"name" => "Jede gerade Zeile in einer Tabelle",
 					"values" => [
-						[ "background-color", "#F5F5F5" ]
+						[ "background-color", "F5F5F5" ]
 					]
 				),
 				"tr:nth-child(odd)" => array(
 					"name" => "Jede ungerade Zeile in einer Tabelle",
 					"values" => [
-						[ "background-color", "#EDEDED" ]
+						[ "background-color", "EDEDED" ]
 					]
 				)
 			);

@@ -40,6 +40,7 @@
 			$results = rquery($query);
 
 			while ($row = mysqli_fetch_assoc($results)) {
+				$gui_id = hash("md5", json_encode($row));
 ?>
 				<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
 					<input type="hidden" value="<?php print htmlentities($row["id"] ?? ""); ?>" name="id" />
@@ -52,10 +53,10 @@
 							<?php print htmlentities($row["property"] ?? ""); ?>
 						</td>
 						<td>
-							<input type="text" name="value" value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
+							<input type="text" id="<?php print $gui_id; ?>" name="value" <?php print preg_match("/color/", $row["property"] )? 'class="jscolor"' : ''; ?> value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
 						</td>
 						<td>
-							<?php print htmlentities($row["default_val"] ?? ""); ?>
+							<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Reset</button>
 						</td>
 					</tr>
 				</form>
@@ -64,6 +65,7 @@
 ?>
 		</table>
 <?php
+		js(array("jscolor.js"));
 		js(array("autorowspan.js"));
 		js(array("autosubmit.js"));
 	}

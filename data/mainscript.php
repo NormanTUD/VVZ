@@ -548,10 +548,24 @@ function reloadStylesheets() {
     });
 }
 
+function reset_value (e) {
+	var button = e.currentTarget;
+	var gui_id = $(button).data("gui-id");
+	var reset = $(button).data("reset");
+	var is_color = $("#" + gui_id).hasClass("jscolor") ? 1 : 0;
+
+	$("#" + gui_id).val(reset).trigger("change");
+	if(is_color) {
+		$("#" + gui_id).css("background-color", "#" + reset);
+	}
+}
+
 $(document).ready(function() {
     $('.accordion-title').on('keydown', function(e) {
-        if(e.keyCode === 13){
-            $(this).click();
-        }
+	if(e.keyCode === 13){
+	    $(this).click();
+	}
     });
+
+	$(".reset_value_button").on("click", reset_value);
 });
