@@ -8,7 +8,8 @@
 		array("vvz_debug_query_all", "Zeige alle Queries im Query-Debugger"),
 		array("vvz_snow", "Easter Egg (geht aber nicht)"),
 		array("x11test", "Deaktiviert einige Sachen, um automatisches X11-Testen einfacher zu machen."),
-		array("fill_form_by_default", "Fuellt die change plan seite mit default daten aus (NUR FÜR DEVELOPER)")
+		array("fill_form_by_default", "Fuellt die change plan seite mit default daten aus (NUR FÜR DEVELOPER)"),
+		array("no_cache", "Zwingt dazu, KEINEN Cache anzulegen")
 	);
 ?>
 	<table>
