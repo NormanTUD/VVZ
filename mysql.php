@@ -72,7 +72,7 @@
 					strasse varchar(100) default 'Benutzer',
 					plz varchar(100) default '12345',
 					ort varchar(100) default 'Teststadt',
-					dbname varchar(100) not null,
+					dbname varchar(100) not null unique,
 					urlname varchar(100) unique,
 					external_url varchar(200),
 					iban varchar(100),
