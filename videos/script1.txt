@@ -75,7 +75,6 @@ Prüfungsleistungen gehören zu den Prüfungsdaten. Klicken Sie auf den entsprec
 Prüfungsnummern sind einem Modul zugeordnet. Wenn Sie möchten können Sie ihnen auch einen Bereich zuordnen. Kleiner Tipp. Bereiche gehören zu den Stammdaten. Das ist aber optional.
 Jede Prüfungsleistung hat einen Prüfungstyp, etwas wie Mündliche Prüfung oder Klausur. Wählen Sie einen Prüfungstyp. Hier können Sie auch eine Modulbezeichnung eingeben, eine Prüfungsnummer und einen Zeitraum, in dem die Prüfung stattfindet. Alle Werte sind optional, aber es wäre empfehlenswert, zumindest die Prüfungsnummer auszufüllen.
 
-=========================================
 
 Nun ist alles da, um die erste Veranstaltung zu erstellen.
 Gehen Sie dazu auf den Reiter Veranstaltungen.
@@ -93,6 +92,20 @@ Dadurch, dass Prüfungsleistungen zu Modulen und Module zu Studiengängen zugeor
 Wenn ein Dozent eine Veranstaltung bereits in vorherigen Semestern gehalten hat, kann man alle Prüfungsleistungen aus dieser vorherigen Veranstaltung einfach kopieren.
 Gehen Sie dazu ans Ende der Seite und wählen Sie eine der vorherigen Veranstaltungen aus und klicken auf Prüfungen von der ausgewählten Veranstaltung kopieren.
 
-Dozenten
+=========================================
 
-Raumplanung
+Natürlich möchten Sie nicht jedem Ihr Administrator Passwort geben. Daher haben wir ein Nutzer- und Rollensystem eingebaut. 
+Wir gehen die einfachsten drei Fälle kurz durch.
+Der einfachste Fall ist der Dozent. Klicken Sie dazu auf der Startseite auf Dozenten hinzufügen.
+Sie können nun Titel, Vornamen und Nachnamen eingeben und bekommen direkt ein Nutzer-Passwort vorgeschlagen.
+Sie können auch aktivieren, dass dieser Dozent barrierefreie Gebäude bevorzugt. Diese Information wird der Raumplanung dann immer automatisch angezeigt.
+Wenn Sie fertig mit der Eingabe sind, klicken Sie auf Neuen Dozenten und Account anlegen.
+Der neue Dozent kann sich nun auf der Administrationsseite anmelden und eigene Veranstaltungen erstellen und nur seine eigenen bearbeiten.
+Die Zweite Option ist der Superdozent. Ein Superdozent darf das, was ein normaler Dozent darf, aber er darf auch Veranstaltungen von ausgewählten anderen Dozenten bearbeiten und in ihrem Namen Veranstaltungen erstellen, zum Beispiel für Gastdozenten.
+Aktivieren Sie zum Erstellen eines Superdozenten einfach die Checkbox Superdozent Fragezeichen? und erstellen Sie den Dozenten.
+Unter Stammdaten, Superdozenten können Sie auswählen, welche anderen Dozenten dieser Superdozent verwalten darf. Für jeden Nutzer, den er bearbeiten darf, setzen Sie eine Checkbox und klicken dann auf Speichern.
+Sie können mit der Checkbox Raumplanungsdozent auch dem Dozenten die Rechte geben, die Raumplanung zu übernehmen.
+
+!!!! TODO Superdozent!!!!
+
+Die Raumplanung 
