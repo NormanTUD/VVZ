@@ -315,13 +315,6 @@ td {
 	text-align: center;
 }
 
-tr:nth-child(even) td {
-	background-color: #F5F5F5;
-}
-
-tr:nth-child(odd) td {
-	background-color: #EDEDED;
-}
 
 .bg_ededed {
 	background-color: #ededed;
