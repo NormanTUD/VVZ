@@ -296,7 +296,7 @@
 		if(!table_exists_and_has_entries("customizations")) {
 			$default_values = array(
 				"button:hover, input[type='button']:hover, input[type='submit']:hover" => array(
-					"name" => "Buttons",
+					"name" => "Buttons Mouseover",
 					"values" => [
 						[ "background-color", "#d1ffce" ],
 						[ "color", "black" ],

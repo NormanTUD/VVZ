@@ -21,7 +21,7 @@
 'veranstaltungstyp' => 'CREATE TABLE `veranstaltungstyp` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `abkuerzung` varchar(5) NOT NULL,
-  `name` varchar(20) NOT NULL,
+  `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `abkuerzung` (`abkuerzung`),
   UNIQUE KEY `name` (`name`)

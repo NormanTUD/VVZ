@@ -31,7 +31,6 @@
 		<table class="auto_reload_stylesheets">
 			<tr>
 				<th>Beschreibung</th>
-				<th>Klassenname</th>
 				<th>Eigenschaft</th>
 				<th>Wert</th>
 				<th>Standardwert</th>
@@ -48,9 +47,6 @@
 					<tr>
 						<td>
 							<?php print htmlentities($row["humanname"] ?? ""); ?>
-						</td>
-						<td>
-							<?php print htmlentities($row["classname"] ?? ""); ?>
 						</td>
 						<td>
 							<?php print htmlentities($row["property"] ?? ""); ?>
