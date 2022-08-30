@@ -9531,14 +9531,14 @@ order by
 	}
 
 	function delete_demo() {
-		$query = "show databases like 'db_vvz_%'";
-		$result = rquery($query);
-		while ($row = mysqli_fetch_row($result)) {
+		try {
+			$query = "show databases like 'db_vvz_%'";
+			$result = rquery($query);
+			while ($row = mysqli_fetch_row($result)) {
 			$drop = 0;
 
 			if(table_exists($row[0], "instance_config")) {
-				if(db_is_demo($row[0])) {
-					try {
+					if(db_is_demo($row[0])) {
 						$query = "select now() - installation_date from ".$row[0].".instance_config";
 						$seconds_diff = get_single_row_from_query($query);
 						if($seconds_diff) {
@@ -9553,13 +9553,13 @@ order by
 							$query = "drop database if exists $row[0];";
 							rquery($query);
 						}
-					} catch (\Throwable $e) {
-						stderrw("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-						stderrw($e);
-						stderrw("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 					}
 				}
 			}
+		} catch (\Throwable $e) {
+			stderrw("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+			stderrw($e);
+			stderrw("\n<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 		}
 	}
 
