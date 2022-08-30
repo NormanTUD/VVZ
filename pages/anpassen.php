@@ -35,6 +35,7 @@
 					<th>Eigenschaft</th>
 					<th>Wert</th>
 					<th>Standardwert</th>
+					<th>Startseite</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -42,7 +43,13 @@
 				$query = "select id, humanname, classname, property, val, default_val from customizations order by id";
 				$results = rquery($query);
 
+				$whole = array();
 				while ($row = mysqli_fetch_assoc($results)) {
+					$whole[] = $row;
+				}
+
+				$i = 0;
+				foreach ($whole as $row) {
 					$gui_id = hash("md5", json_encode($row));
 ?>
 					<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
@@ -61,9 +68,19 @@
 							<td>
 								<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Reset</button>
 							</td>
+<?php
+							if($i == 0) {
+?>
+								<td class="td_iframe" rowspan="<?php print count($whole); ?>">
+									<iframe id="iframe_reloader" class="full_height_iframe" src="startseite">Ihr Browser unterstützt leider keine IFrames</iframe>
+								</td>
+<?php
+							}
+?>
 						</tr>
 					</form>
 <?php
+					$i++;
 				}
 ?>
 			</tbody>

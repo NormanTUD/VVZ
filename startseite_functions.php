@@ -1604,7 +1604,7 @@
 			<div class="row">
 				<div class="<?php print $width_determining_class; ?> medium-centered columns">
 				<a href="startseite?studiengang=alle&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
-						<div id="alle_lehrveranstaltungen" class="callout alert text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Lehrveranstaltungen</h4></div>
+						<div id="alle_lehrveranstaltungen" class="callout text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Lehrveranstaltungen</h4></div>
 					</a>
 				</div>
 			</div>

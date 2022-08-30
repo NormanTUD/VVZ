@@ -394,7 +394,26 @@
 					"values" => array(
 						[ "background-color", "ADD8E6"]
 					)
+				),
+
+				"#alle_lehrveranstaltungen" => array(
+					"name" => "Farbe des Links zu 'Alle Lehrveranstaltungen' auf der Startseite",
+					"values" => array(
+						[ "background-color", "f7e4e1" ],
+						[ "color", "0a0a0a" ]
+					)
+				),
+
+
+				".allepls" => array(
+					"name" => "Farbe des Links zu 'Alle Prüfungsleistungen' auf der Startseite",
+					"values" => array(
+						[ "background-color", "98FB98" ],
+						[ "color", "black" ]
+					)
 				)
+
+
 			);
 
 #'customizations' => 'create table customizations (id int unsigned primary key, classname varchar(100), property varchar(100), val varchar(100))'

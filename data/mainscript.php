@@ -546,6 +546,11 @@ function reloadStylesheets() {
     $('link[rel="stylesheet"]').each(function () {
         this.href = this.href.replace(/\?.*|$/, queryString);
     });
+
+	const iframe = document.getElementById("iframe_reloader");
+	if(iframe) {
+		iframe.contentWindow.location.reload();
+	}
 }
 
 function reset_value (e) {

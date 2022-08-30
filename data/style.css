@@ -897,11 +897,6 @@ a, a:visited, a:hover, a:active {
 	white-space: pre-wrap;
 }
 
-.allepls {
-	background-color:  #98FB98;
-	color: black;
-}
-
 .calendarlarge {
 	font-size: 25px;
 }
@@ -1056,4 +1051,14 @@ a, a:visited, a:hover, a:active {
 
 .list_style_closed {
 	list-style: disclosure-closed;
+}
+
+.full_height_iframe {
+	position: absolute;
+	height: 100%;
+	min-width: 500px;
+}
+
+.td_iframe {
+	vertical-align: baseline;
 }
