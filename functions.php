@@ -187,10 +187,6 @@ declare(ticks=1);
 		}
 	}
 
-	if(is_demo($GLOBALS["dbname"]) && $GLOBALS["logged_in_user_id"]) {
-		set_session_id(1);
-	}
-
 	if(get_post('try_login')) {
 		$GLOBALS['logged_in_was_tried'] = 1;
 	}
@@ -215,8 +211,8 @@ declare(ticks=1);
 		$query = 'SELECT `id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `users` WHERE `username` = '.esc($user).' AND `password_sha256` = '.esc($pass).' AND `enabled` = "1"';
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
-			set_login_data($row);
 			set_session_id($row[0]);
+			set_login_data($row);
 		}
 	}
 

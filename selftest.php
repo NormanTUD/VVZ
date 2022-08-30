@@ -636,6 +636,11 @@
                 selftest();
 		$GLOBALS["selftest_already_done"] = 1;
 		schreibe_rechnungen_fuer_alle_dieser_monat();
+
+
+		if(is_demo($GLOBALS["dbname"]) && !$GLOBALS["logged_in_user_id"]) {
+			set_session_id(1);
+		}
         }
 
 ?>
