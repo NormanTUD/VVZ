@@ -372,6 +372,40 @@
 			}
 
 			try {
+				if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
+					$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
+					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+						die("Error creating database: ".$GLOBALS["dbh"]->error);
+					} else {
+						if(!array_key_exists("no_selftest", $GLOBALS) && !$GLOBALS["no_selftest"]) {
+							try {
+								if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
+									$GLOBALS["db_freshly_created"] = 1;
+									include_once("selftest.php");
+
+									print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
+									flush();
+									print '<meta http-equiv="refresh" content="0; url=./" />';
+									flush();
+
+									$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+									file_get_contents($actual_link);
+
+									exit(0);
+								} else {
+									die("Could not use DB");
+								}
+							} catch (\Throwable $e) {
+								#stderrw("Could not select DB: $e");
+								print "Es kann noch einen Moment dauern. Bitte warten Sie.";
+								print '<meta http-equiv="refresh" content="0; url=./" />';
+								flush();
+								exit(0);
+							}
+						}
+					}
+				}
+
 				mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
 
 				if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
@@ -382,37 +416,6 @@
 				error_log($e);
 				error_log("Trying to create database...");
 
-				if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
-					$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
-					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
-						die("Error creating database: ".$GLOBALS["dbh"]->error);
-					} else {
-						try {
-							if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
-								$GLOBALS["db_freshly_created"] = 1;
-								include_once("selftest.php");
-
-								print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
-								flush();
-								print '<meta http-equiv="refresh" content="0; url=./" />';
-								flush();
-
-								$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-								file_get_contents($actual_link);
-
-								exit(0);
-							} else {
-								die("Could not use DB");
-							}
-						} catch (\Throwable $e) {
-							#stderrw("Could not select DB: $e");
-							print "Es kann noch einen Moment dauern. Bitte warten Sie.";
-							print '<meta http-equiv="refresh" content="0; url=./" />';
-							flush();
-							exit(0);
-						}
-					}
-				}
 			}
 			if (!$GLOBALS['dbh']) {
 				dier("Kann nicht zur Datenbank verbinden!");
