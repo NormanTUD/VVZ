@@ -31,9 +31,9 @@
 		<table class="auto_reload_stylesheets autorowspan">
 			<thead>
 				<tr>
-					<th>Beschreibung</th>
+					<th width=100>Beschreibung</th>
 					<th>Eigenschaft</th>
-					<th>Wert</th>
+					<th width=100>Wert</th>
 					<th>Standardwert</th>
 					<th>Startseite</th>
 				</tr>
