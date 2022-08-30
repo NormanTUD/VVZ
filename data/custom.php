@@ -23,6 +23,11 @@
 			$last_classname = $classname;
 			print "$classname {\n";
 		}
+
+		if(preg_match("/color/", $prop) && !preg_match("/^#/", $val) && preg_match("/^([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/", $val)) {
+			$val = "#$val";
+		}
+
 		print "\t$prop: $val;\n";
 	}
 
