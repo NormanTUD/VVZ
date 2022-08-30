@@ -45,7 +45,6 @@ Hier können Sie auch Farben einstellen. Klicken Sie dazu auf eines der bunten F
 Die Änderungen sind sofort laif.
 Experimentieren Sie jedoch ruhig herum. Alle Einstellungen lassen sich rückgängig machen, indem Sie auf, Ri-set, klicken.. 
 
-=========================================
 
 Ich möchte Ihnen nun noch zeigen, wie Sie ihre eigenen Gebäude, Dozenten und Prüfungsleistungen erstellen können.
 Erst zu den Gebäuden. Diese gehören zu den Stammdaten. Klicken Sie also auf Stammdaten und dann auf Gebäude.
@@ -53,10 +52,12 @@ Jedes Gebäude hat einen Namen und optionalerweise eine Abkürzung. Wo es sinnvo
 Sie können einzelne Gebäude eingeben, indem Sie in das letzte Feld der Eingabemaske einen neuen Namen eingeben und Speichern drücken.
 Auf gleiche Weise können Sie auch vorhandene Gebäude editieren. 
 Für viele Gebäude geht es aber auch einfacher.
-Unten auf der Seite ist die Möglichkeit, eine sogenannte C S V datei zu importieren.
+Unten auf der Seite ist die Möglichkeit, eine sogenannte Zeh Es Fau datei zu importieren.
 Das ist ein Format, in dem die Werte jeweils mit Kommata getrennt sind.
-Sie können eine Lange Liste im Format Gebäudename Komma Gebäudeabkürzung neue Zeile eingeben, die Sie zum Beispiel aus Excel exportieren können.
+Sie können eine Lange Liste im Format Gebäudename Komma Gebäudeabkürzung neue Zeile eingeben, die Sie zum Beispiel aus Exel exportieren können.
 Klicken Sie dann auf Importieren, und alle Gebäude aus der Liste werden importiert.
+
+=========================================
 
 Nun fügen wir einen Studiengang hinzu.
 Studiengänge sind auch Stammdaten, daher sind auch sie unter Stammdaten zu finden.
@@ -74,5 +75,8 @@ Nun die letzte Hürde. Die Prüfungsleistungen.
 Prüfungsleistungen gehören zu den Prüfungsdaten. Klicken Sie auf den entsprechenden Reiter und dann auf	Prüfungsnummern.
 Prüfungsnummern sind einem Modul zugeordnet. Wenn Sie möchten können Sie ihnen auch einen Bereich zuordnen. Kleiner Tipp. Bereiche gehören zu den Stammdaten. Das ist aber optional.
 Jede Prüfungsleistung hat einen Prüfungstyp, etwas wie Mündliche Prüfung oder Klausur. Wählen Sie einen Prüfungstyp. Hier können Sie auch eine Modulbezeichnung eingeben, eine Prüfungsnummer und einen Zeitraum, in dem die Prüfung stattfindet. Alle Werte sind optional, aber es wäre empfehlenswert, zumindest die Prüfungsnummer auszufüllen.
+
+Nun ist alles da, um die erste Veranstaltung zu erstellen.
+Gehen Sie dazu auf den Reiter Veranstaltungen.
 
 
