@@ -45,8 +45,8 @@ declare(ticks=1);
 	}
 
 	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' ; ";
-	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."'  ";
-	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."'; ";
+	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' ; ";
+	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "style-src 'self'; ";
 	header("Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("X-Content-Security-Policy: ".$GLOBALS['csp_string']);
