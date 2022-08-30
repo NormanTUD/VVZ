@@ -101,7 +101,7 @@ Sie können auch aktivieren, dass dieser Dozent barrierefreie Gebäude bevorzugt
 Wenn Sie fertig mit der Eingabe sind, klicken Sie auf Neuen Dozenten und Account anlegen.
 Der neue Dozent kann sich nun auf der Administrationsseite anmelden und eigene Veranstaltungen erstellen und nur seine eigenen bearbeiten.
 Die Zweite Option ist der Superdozent. Ein Superdozent darf das, was ein normaler Dozent darf, aber er darf auch Veranstaltungen von ausgewählten anderen Dozenten bearbeiten und in ihrem Namen Veranstaltungen erstellen, zum Beispiel für Gastdozenten.
-Aktivieren Sie zum Erstellen eines Superdozenten einfach die Checkbox Superdozent Fragezeichen? und erstellen Sie den Dozenten.
+Aktivieren Sie zum Erstellen eines Superdozenten einfach die Checkbox Superdozent und erstellen Sie den Dozenten.
 Unter Stammdaten, Superdozenten können Sie auswählen, welche anderen Dozenten dieser Superdozent verwalten darf. Für jeden Nutzer, den er bearbeiten darf, setzen Sie eine Checkbox und klicken dann auf Speichern.
 Sie können mit der Checkbox Raumplanungsdozent auch dem Dozenten die Rechte geben, die Raumplanung zu übernehmen.
 
@@ -117,7 +117,6 @@ Auch hier werden alle Daten automatisch gespeichert, indem man außerhalb des Fe
 Gebäude und Raumnummern tauchen erst auf der Startseite auf, wenn sie hier bestätigt worden sind.
 Unten können verschiedene Formate heruntergeladen werden.
 Gegen einen Aufpreis oder durch die Pro Variante kostenlos beinhaltet können Sie uns auch Ihre Exel-Formate senden, und wir versuchen sie in unserem Export aus den verfügbaren Daten abzubilden.
-=========================================
 
 Das Vorlesungsverzeichnis ist bereits seit 2017 in aktiver Benutzung der Technischen Universität Dresden. Daher sind wir sicher, dass wir Sie überzeugen können.
 Es gibt noch viel mehr Funktionen. Probieren Sie in Ihrer Demo-Variante gerne ruhig alles aus. Sie können nichts kaputtmachen und gehen keinerlei Verpflichtungen ein.
