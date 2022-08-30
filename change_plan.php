@@ -114,44 +114,44 @@
 			<h2>Wir haben es echt so lange wie möglich herausgezögert...</h2>
 			<p>Aber ab diesem Punkt brauchen wir Ihre realen Daten</p>
 <?php
-			$uni_name = get_post("universitaet");
+			$uni_name = get_current_value("universitaet");
 ?>
 			<form method="post" enctype="multipart/form-data" action="change_plan?product=<?php print htmlentities(get_get("product") ?? ""); ?>">
 				<input type="hidden" name="update_kunde_data" value=1 />
 				<table>
 					</tr>
 					<tr>
-						<td>Ihre Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="<?php print htmlentities(get_post("anrede") ?? "Sehr geehrte(r) Kunde"); ?>" /></td>
+						<td>Ihre Anrede</td><td><input type="text" name="anrede" placeholder="Anrede" value="<?php print htmlentities(get_current_value("anrede") ?? "Sehr geehrte(r) Kunde"); ?>" /></td>
 					</tr>
 					<tr>
-					<td>Universität:</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_post("universitaet") ?? ""); ?>" /><?php
+					<td>Universität:</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_current_value("universitaet") ?? ""); ?>" /><?php
 						if($urlname_exists) {
 							print "<br><span class='red_text'>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.</span>";
 						}
 ?></td>
 					</tr>
 					<tr>
-						<td>Ihr Name:</td><td><input type="text" name="name" placeholder="Ihr Name" value="<?php print htmlentities(get_post("name") ?? ""); ?>" /></td>
+						<td>Ihr Name:</td><td><input type="text" name="name" placeholder="Ihr Name" value="<?php print htmlentities(get_current_value("name") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Straße, Hausnummer:</td><td><input type="text" name="strasse" placeholder="Straße" value="<?php print htmlentities(get_post("strasse") ?? ""); ?>" /></td>
+						<td>Straße, Hausnummer:</td><td><input type="text" name="strasse" placeholder="Straße" value="<?php print htmlentities(get_current_value("strasse") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Postleitzahl:</td><td><input type="text" name="plz" placeholder="Postleitzahl" value="<?php print htmlentities(get_post("plz") ?? ""); ?>" /></td>
+						<td>Postleitzahl:</td><td><input type="text" name="plz" placeholder="Postleitzahl" value="<?php print htmlentities(get_current_value("plz") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-						<td>Ort:</td><td><input type="text" name="ort" placeholder="Ort" value="<?php print htmlentities(get_post("ort") ?? ""); ?>" /></td>
+						<td>Ort:</td><td><input type="text" name="ort" placeholder="Ort" value="<?php print htmlentities(get_current_value("ort") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_post("iban") ?? ""); ?>" /><?php
-					if(!$iban_ok && get_post("iban")) {
+					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_current_value("iban") ?? ""); ?>" /><?php
+					if(!$iban_ok && get_current_value("iban")) {
 								print "<br><span class='red_text'>Die IBAN ist nicht richtig. Bitte eine korrekte IBAN eingeben.</span>";
 							}
 						?></td>
 					</tr>
 					<tr>
-						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_post("email") ?? ""); ?>" /><?php
-							if(!$email_ok && get_post("email")) {
+						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_current_value("email") ?? ""); ?>" /><?php
+							if(!$email_ok && get_current_value("email")) {
 								print "<br><span class='red_text'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
 							}
 						?></td>

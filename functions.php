@@ -9640,4 +9640,18 @@ order by
 
 		return false;
 	}
+
+	function get_current_value($prop) {
+		if(get_post($prop)) {
+			return get_post($prop);
+		} else {
+			$query = "select $prop from vvz_global.kundendaten where id = ".get_kunde_id_by_db_name($GLOBALS["dbname"]);
+			$result = get_single_row_from_query($query);
+
+			if(array_key_exists("default_".$prop, $GLOBALS) && $GLOBALS["default_$prop"] == $result) {
+				return "";
+			}
+			return $result;
+		}
+	}
 ?>

@@ -475,7 +475,6 @@
   `user_id` int(10) unsigned NOT NULL,
   `last_access` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `api_auth_codes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',

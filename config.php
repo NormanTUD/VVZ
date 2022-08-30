@@ -157,4 +157,14 @@
 	$GLOBALS['name_non_technical'] = "Holm Bräuer";
 	$GLOBALS['to_non_technical'] = "holm.braeuer@tu-dresden.de";
 	$GLOBALS['cc_non_technical'] = array('nengemaier@gmail.com', $GLOBALS['admin_email']);
+
+/*
+	Default settings
+ */
+	$GLOBALS["default_universitaet"] = "omni-concept";
+	$GLOBALS["default_name"] = "Jörg Noack";
+	$GLOBALS["default_ort"] = "Oldenburg";
+	$GLOBALS["default_plz"] = "26133";
+	$GLOBALS["default_strasse"] = "Robert-Koch-Str. 2";
+	$GLOBALS["default_email"] = "noack@omni-concept.com";
 ?>
