@@ -377,22 +377,18 @@
 					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
 						die("Error creating database: ".$GLOBALS["dbh"]->error);
 					} else {
-						try {
-							if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
-								$GLOBALS["db_freshly_created"] = 1;
-								include_once("selftest.php");
+						if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
+							$GLOBALS["db_freshly_created"] = 1;
+							include_once("selftest.php");
 
-								print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
-								flush();
-								print '<meta http-equiv="refresh" content="0; url=./" />';
-								flush();
+							print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
+							flush();
+							print '<meta http-equiv="refresh" content="0; url=./" />';
+							flush();
 
-								exit(0);
-							} else {
-								die("Could not use DB");
-							}
-						} catch (\Throwable $e) {
-							die("Could not select DB: $e");
+							exit(0);
+						} else {
+							die("Could not use DB");
 						}
 					}
 				}
