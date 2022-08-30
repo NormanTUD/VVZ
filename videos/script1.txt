@@ -88,7 +88,6 @@ Hier können wir diese Veranstaltung auch mit einer anderen verknüpfen, zum Bei
 Darunter können wir, wenn wir wollen, einzelne Termine hinzufügen, zum Beispiel für Blockseminare.
 Darunter passiert die Magie. In der letzten Tabelle sind alle Prüfungsleistungen aufgelistet.
 Wenn Sie unsere neu erstellte Prüfungsleistung anklicken, wird sie sofort gespeichert.
-=========================================
 Dadurch, dass Prüfungsleistungen zu Modulen und Module zu Studiengängen zugeordnet sind, weiß die Software nun, dass diese Veranstaltung zu diesem Studiengang gehört, und sie wird sofort laif auf der Startseite dem Studiengang zugeordnet.
 Wenn ein Dozent eine Veranstaltung bereits in vorherigen Semestern gehalten hat, kann man alle Prüfungsleistungen aus dieser vorherigen Veranstaltung einfach kopieren.
 Gehen Sie dazu ans Ende der Seite und wählen Sie eine der vorherigen Veranstaltungen aus und klicken auf Prüfungen von der ausgewählten Veranstaltung kopieren.
@@ -108,8 +107,6 @@ Sie können mit der Checkbox Raumplanungsdozent auch dem Dozenten die Rechte geb
 
 !!!! TODO Superdozent!!!!
 
-=========================================
-
 An einer Universität müssen sich viele Institute Gebäude und Räume teilen. Um dies besser koordinieren zu können, haben wir eine Zwischeninstanz eingefügt.
 Klicken Sie dazu auf den Reiter Raumplanung.
 Das ist eine Unterseite, die nur Administratoren und Raumplanungsdozenten sehen können.
@@ -120,3 +117,17 @@ Auch hier werden alle Daten automatisch gespeichert, indem man außerhalb des Fe
 Gebäude und Raumnummern tauchen erst auf der Startseite auf, wenn sie hier bestätigt worden sind.
 Unten können verschiedene Formate heruntergeladen werden.
 Gegen einen Aufpreis oder durch die Pro Variante kostenlos beinhaltet können Sie uns auch Ihre Exel-Formate senden, und wir versuchen sie in unserem Export aus den verfügbaren Daten abzubilden.
+=========================================
+
+Das Vorlesungsverzeichnis ist bereits seit 2017 in aktiver Benutzung der Technischen Universität Dresden. Daher sind wir sicher, dass wir Sie überzeugen können.
+Es gibt noch viel mehr Funktionen. Probieren Sie in Ihrer Demo-Variante gerne ruhig alles aus. Sie können nichts kaputtmachen und gehen keinerlei Verpflichtungen ein.
+
+Sollten Sie sich für unseren Service entscheiden, stellen Sie in ihrer Demo Version sicher, dass Sie angemeldet sind und klicken Sie auf Business plan ändern.
+Dort sehen Sie die Pläne, die wir anbieten.
+Die Basic-Variante reicht, um ein Institut oder eine Universität zu verwalten, hat jedoch nicht alle Funktionen.
+Nur die Pro Variante gibt Ihnen den vollen Funktions umfang, inklusive Stundenplanersteller, priorisiertem Support und bis zu tausend euro pro Monat an Weiterentwicklungskosten inklusive.
+Sie können diese jeweils für ein Institut, oder eine gesamte Universität mit beliebig vielen Instituten buchen.
+
+Unsere Server stehen in Deutschland und sind datenschutzkonform.
+
+Wir würden uns freuen, Ihnen beim Verwalten ihres Institutes oder ihrer Universität behilflich seien zu können.
