@@ -118,16 +118,25 @@
 		}
 	}
 
-	function get_kunden_db_name() {
-		if(array_key_exists("new_demo_uni", $_GET)) {
-			print "Die neue Uni wird erstellt. Bitte warten...";
-			flush();
-			$randname = generate_random_string(20);
-			print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($randname).'/" />';
-			flush();
-			exit(0);
-		}
+	function get_nonexisting_db_name () {
+		$success = false;
+		while (!$success) {
+			$rndInt = rand(0, pow(36, 10) - 1);
+			$rndStr = base_convert($rndInt, 10, 36);
+			$rndStr = str_pad($rndStr, 10, "0", STR_PAD_LEFT);
 
+			$query = "SELECT 1 FROM vvz_global.kundendaten WHERE urlname = ".esc("db_vvz_".$rndStr)." LIMIT 1";
+			if (!get_single_row_from_query($query)) {
+				return $rndStr;
+			} else {
+				// do nothing - try again in the next loop
+			}
+		}
+	}
+
+	#die(get_nonexisting_db_name());
+
+	function get_kunden_db_name() {
 		if(array_key_exists("REDIRECT_URL", $_SERVER)) {
 			$url = $_SERVER["REDIRECT_URL"];
 
@@ -460,5 +469,16 @@
 		$sql = "select val from customizations where classname = ".esc($class)." and property = ".esc($prop);
 
 		return get_single_row_from_query($sql);
+	}
+
+	if(array_key_exists("new_demo_uni", $_GET)) {
+		$new_rand_name = get_nonexisting_db_name();
+		$GLOBALS["dbname"] = "db_vvz_".$new_rand_name;
+		include_once("selftest.php");
+		print "Die neue Uni wird erstellt. Bitte warten...";
+		flush();
+		print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($new_rand_name).'/" />';
+		flush();
+		exit(0);
 	}
 ?>
