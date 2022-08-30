@@ -618,6 +618,7 @@
         if(!get_get('noselftest') && !$GLOBALS["no_selftest"] && !$GLOBALS["selftest_already_done"]) {
                 selftest();
 		$GLOBALS["selftest_already_done"] = 1;
+		schreibe_rechnungen_fuer_alle_dieser_monat();
         }
 
 ?>

@@ -2069,16 +2069,6 @@ declare(ticks=1);
 	}
 
 
-	function multiple_esc_join ($data) {
-		if(is_array($data)) {
-			$data = array_map('esc', $data);
-			$string = join(", ", $data);
-			return $string;
-		} else {
-			return esc($data);
-		}
-	}
-
 	function get_post_multiple_check ($names) {
 		if(is_array($names)) {
 			$return = 1;
@@ -4254,26 +4244,6 @@ INSERT INTO
 		updated_raumplanung_relevante_daten($id, $alte_daten);
 	}
 
-	function query_to_json($query, $skip_array) {
-		$result = rquery($query);
-
-		$rows = array();
-		while($row = mysqli_fetch_assoc($result)) {
-			foreach ($skip_array as $skip_name) {
-				unset($row[$skip_name]);
-			}
-
-			if($row) {
-				$rows[] = $row;
-			}
-		}
-
-		return json_encode($rows);
-	}
-
-	function query_to_status_hash ($query, $skip_array = array()) {
-		return hash('md5', query_to_json("select * from pruefung where veranstaltung_id = 1", $skip_array));
-	}
 
 
 	function assign_pruefungsnummer_to_veranstaltung ($pruefungsnummer, $id) {

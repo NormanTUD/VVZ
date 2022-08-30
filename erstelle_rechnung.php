@@ -6,8 +6,8 @@
 		return get_single_row_from_query("select $prop from vvz_global.kundendaten where id = ".esc($id));
 	}
 
-	function get_rechnung_name () {
-		return "abc";
+	function get_rechnung_name ($kunde_id, $monat, $jahr) {
+		return get_kunde_name($kunde_id)."_${jahr}_${monat}";
 	}
 
 	function regex_in_file ($file, $regex, $replace) {
@@ -87,57 +87,71 @@
 		return $rechnungsnummer;
 	}
 
-	$kunde_id = get_kunde_id_by_url(get_url_uni_name());
+	$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 
 	if($kunde_id) {
-		$tmp = tempdir();
-		recurseCopy("rechnung_template", $tmp);
+		$rechnung_id = get_get("id");
+		if($rechnung_id) {
+			if(kunde_can_access_rechnung($kunde_id, $rechnung_id)) {
+				$tmp = tempdir();
+				recurseCopy("rechnung_template", $tmp);
 
-		$data_file = $tmp."/_data.tex";
+				$query = "select jahr from vvz_global.rechnungen where id = ".esc($rechnung_id);
+				$jahr = get_single_row_from_query($query);
+				$query = "select monat from vvz_global.rechnungen where id = ".esc($rechnung_id);
+				$monat = get_single_row_from_query($query);
 
-		$rechnungsstellung = "2021-05-03";
+				$data_file = $tmp."/_data.tex";
 
-		$zahlungsfrist = date('Y-m-d', strtotime("+6 months", strtotime($rechnungsstellung)));
+				$rechnungsstellung = "1.$monat.$jahr";
+
+				#$zahlungsfrist = date('Y-m-d', strtotime("+6 months", strtotime($rechnungsstellung)));
+
+				regex_in_file($data_file, "/ANREDE/", get_kunde_X($kunde_id, "anrede"));
+				regex_in_file($data_file, '/DATUMRECHNUNGSSTELLUNG/', $rechnungsstellung);
+				regex_in_file($data_file, '/UNIVERSITAET/', get_kunde_X($kunde_id, "universitaet"));
+				regex_in_file($data_file, '/KUNDENAME/', get_kunde_X($kunde_id, "name"));
+				regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "strasse"));
+				regex_in_file($data_file, '/KUNDEPLZ/', get_kunde_X($kunde_id, "plz"));
+				regex_in_file($data_file, '/KUNDEORT/', get_kunde_X($kunde_id, "ort"));
+				regex_in_file($data_file, '/RECHNUNGSNUMMER/', get_kunde_rechnungsnummer($kunde_id, "$jahr-$monat-01"));
+
+				$invoice_file = $tmp."/_invoice.tex";
+
+				$plan_id = get_plan_id_by_kunde_id($kunde_id);
+				$plan_name = get_plan_name_by_id($plan_id);
+				// [Name, Anzahl, Preis]
+				$fees = array(
+					[ $plan_name, 1, get_plan_price_by_name($plan_name)[0] ]
+				);
+
+				$fees_string = "";
+				for ($i = 0; $i < count($fees); $i++) {
+					$fees_string .= "\\Fee{".$fees[$i][0]."}{".$fees[$i][1]."}{".$fees[$i][2]."}\n";
+				}
+
+				regex_in_file($invoice_file, "/FEESHERE/", $fees_string);
+
+				ob_start();
+				system("cd $tmp && latexmk -quiet -pdf _main.tex 2>&1 > /dev/null");
+				ob_clean();
+
+				$filename = $tmp."/_main.pdf";
+
+				header('Content-Type: application/octet-stream');
+				header("Content-Transfer-Encoding: Binary");
+				header("Content-disposition: attachment; filename=\"".get_rechnung_name($kunde_id, $jahr, $monat).".pdf\"");
+
+				readfile($filename);
 
 
-		regex_in_file($data_file, "/ANREDE/", get_kunde_X($kunde_id, "anrede"));
-		regex_in_file($data_file, '/DATUMRECHNUNGSSTELLUNG/', $rechnungsstellung);
-		regex_in_file($data_file, '/UNIVERSITAET/', get_kunde_X($kunde_id, "universitaet"));
-		regex_in_file($data_file, '/KUNDENAME/', get_kunde_X($kunde_id, "name"));
-		regex_in_file($data_file, '/KUNDESTRASSE/', get_kunde_X($kunde_id, "strasse"));
-		regex_in_file($data_file, '/KUNDEPLZ/', get_kunde_X($kunde_id, "plz"));
-		regex_in_file($data_file, '/KUNDEORT/', get_kunde_X($kunde_id, "ort"));
-		regex_in_file($data_file, '/RECHNUNGSNUMMER/', get_kunde_rechnungsnummer($kunde_id, $rechnungsstellung));
-
-		$invoice_file = $tmp."/_invoice.tex";
-
-		$fees = array(
-			["Demo", "1", 0],
-			["Pro", 1, 50],
-			["Superduperultrapropremiumplus", 10, 500]
-		);
-
-		$fees_string = "";
-		for ($i = 0; $i < count($fees); $i++) {
-			$fees_string .= "\\Fee{".$fees[$i][0]."}{".$fees[$i][1]."}{".$fees[$i][2]."}\n";
+				deleteDir($tmp);
+			} else {
+				die("Sie dürfen nicht die Rechnung Anderer einsehen. Das sollte eigentlich einleuchten, oder?");
+			}
+		} else {
+			die("Keine Rechnungs-ID eingegeben");
 		}
-
-		regex_in_file($invoice_file, "/FEESHERE/", $fees_string);
-
-		ob_start();
-		system("cd $tmp && latexmk -quiet -pdf _main.tex 2>&1 > /dev/null");
-		ob_clean();
-
-		$filename = $tmp."/_main.pdf";
-
-		header('Content-Type: application/octet-stream');
-		header("Content-Transfer-Encoding: Binary");
-		header("Content-disposition: attachment; filename=\"".get_rechnung_name().".pdf\"");
-
-		readfile($filename);
-
-
-		deleteDir($tmp);
 	} else {
 		die("Es konnte keine Kunden-ID gefunden werden");
 	}

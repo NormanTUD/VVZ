@@ -269,22 +269,27 @@
 		$plan_id = null;
 		switch($name) {
 		case 'demo':
+		case "Demo":
 			$plan_id = 1;
 			break;
 		case 'basic_faculty':
+		case "Basic Faculty":
 			$plan_id = 2;
 			break;
 		case 'basic_university':
+		case "Basic University":
 			$plan_id = 3;
 			break;
 		case 'pro_faculty':
+		case "Pro Faculty":
 			$plan_id = 4;
 			break;
 		case 'pro_university':
+		case 'Pro University':
 			$plan_id = 5;
 			break;
 		default:
-			die("Unknown plan: >>".htmlentities(get_get("product"))."<<");
+			die("Unknown plan: >>".htmlentities(get_get("product") ?? "")."<<");
 			break;
 		}
 
@@ -471,6 +476,48 @@
 		return get_single_row_from_query($sql);
 	}
 
+/*
++--------------+------------------+------+-----+---------+----------------+
+| Field        | Type             | Null | Key | Default | Extra          |
++--------------+------------------+------+-----+---------+----------------+
+| id           | int(10) unsigned | NO   | PRI | <null>  | auto_increment |
+| kunde_id     | int(10) unsigned | NO   | MUL | <null>  |                |
+| plan_id      | int(10) unsigned | NO   | MUL | <null>  |                |
+| monat        | int(10) unsigned | NO   |     | <null>  |                |
+| jahr         | int(10) unsigned | NO   |     | <null>  |                |
+| rabatt       | int(11)          | YES  |     | <null>  |                |
+| spezialpreis | int(11)          | YES  |     | <null>  |                |
++--------------+------------------+------+-----+---------+----------------+
+ */
+
+	function get_plan_id_by_kunde_id($kunde_id) {
+		return get_single_row_from_query("select plan_id from vvz_global.kundendaten where id = ".esc($kunde_id));
+	}
+
+	function schreibe_rechnung ($kunde_id, $plan_id, $monat, $jahr, $rabatt, $spezialpreis) {
+		$query = "insert into vvz_global.rechnungen (kunde_id, plan_id, monat, jahr, rabatt, spezialpreis) values (".multiple_esc_join(array($kunde_id, $plan_id, $monat, $jahr, $rabatt, $spezialpreis)).") on duplicate key update jahr=values(jahr), monat=values(monat), rabatt=values(rabatt), spezialpreis=values(spezialpreis), plan_id=values(plan_id)";
+		return rquery($query);
+	}
+
+	function schreibe_rechnungen_fuer_alle_dieser_monat () {
+		$check_query = "select kunde_id, plan_id, monat, jahr, rabatt, spezialpreis from vvz_global.rechnungen";
+		$before = query_to_status_hash($check_query, []);
+
+		$query = "select id from vvz_global.kundendaten where plan_id not in (1, 6) and external_url is null";
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			schreibe_rechnung($row[0], get_plan_id_by_kunde_id($row[0]), date("m"), date("Y"), null, null);
+		}
+
+		$after = query_to_status_hash($check_query, []);
+
+		if($before == $after) {
+			// Keine neue Rechnung
+		} else {
+			// Neue Rechnung. TODO: Email schreiben
+		}
+	}
+
 	if(array_key_exists("new_demo_uni", $_GET)) {
 		$new_rand_name = get_nonexisting_db_name();
 		$GLOBALS["dbname"] = "db_vvz_".$new_rand_name;
@@ -480,5 +527,10 @@
 		print '<meta http-equiv="refresh" content="0; url=v/'.create_uni_name($new_rand_name).'/" />';
 		flush();
 		exit(0);
+	}
+
+	function kunde_can_access_rechnung ($kunde_id, $rechnung_id) {
+		$query = "select count(*) from vvz_global.rechnungen where id = ".esc($rechnung_id)." and kunde_id = ".esc($kunde_id);
+		return get_single_row_from_query($query);
 	}
 ?>
