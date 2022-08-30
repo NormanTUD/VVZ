@@ -90,13 +90,18 @@
 
 		if(!table_exists_and_has_entries("vvz_global.kundendaten")) {
 			if($GLOBALS["dbname"]) {
+				$query = "";
 				$urlname = get_url_uni_name();
 				if($GLOBALS["dbname"] != "startpage") {
 					$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo", "'.$GLOBALS["default_universitaet"].'", "'.$GLOBALS["default_name"].'", "'.$GLOBALS["default_ort"].'", "'.$GLOBALS["default_plz"].'", "'.$GLOBALS["default_strasse"].'", "'.$GLOBALS["default_email"].'", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 1)';
 				} else if ($GLOBALS["dbname"] == "startpage" && get_single_row_from_query("select count(*) from vvz_global.kundendaten where universitaet = 'startpage'") == 0) {
-					$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Superadmin", "Admin", "'.$GLOBALS["default_name"].'", "'.$GLOBALS["default_ort"].'", "'.$GLOBALS["default_plz"].'", "'.$GLOBALS["default_strasse"].'", "'.$GLOBALS["default_email"].'", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 6)';
+					if(!get_single_row_from_query("select count(*) from vvz_global.kundendaten where plan_id = 6")) {
+						$query = 'insert ignore into vvz_global.kundendaten (anrede, universitaet, name, ort, plz, strasse, email, dbname, urlname, plan_id) values ("Hallo Superadmin", "Admin", "'.$GLOBALS["default_name"].'", "'.$GLOBALS["default_ort"].'", "'.$GLOBALS["default_plz"].'", "'.$GLOBALS["default_strasse"].'", "'.$GLOBALS["default_email"].'", '.esc($GLOBALS["dbname"]).', '.esc($urlname).', 6)';
+					}
 				}
-				rquery($query);
+				if($query) {
+					rquery($query);
+				}
 			}
 		}
 
