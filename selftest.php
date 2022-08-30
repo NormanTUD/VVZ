@@ -135,7 +135,13 @@
 			$salt = generate_random_string(100);
 			$default_username = "Admin";
 			$default_password = "test";
-			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
+
+			$accepted_public_data = 0;
+			if(file_exists("/etc/always_accept_public_data")) {
+				$accepted_public_data = 1;
+			}
+
+			$query = 'insert into users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`, `accepted_public_data`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1, '.esc($accepted_public_data).')';
 			$result = rquery($query);
 
 			$query = "insert into role_to_user (role_id, user_id) values (1, 1)";
@@ -151,7 +157,11 @@
 			$salt = generate_random_string(100);
 			$default_username = "Admin";
 			$default_password = "test";
-			$query = 'insert into vvz_global.users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1)';
+			$accepted_public_data = 0;
+			if(file_exists("/etc/always_accept_public_data")) {
+				$accepted_public_data = 1;
+			}
+			$query = 'insert into vvz_global.users (`id`, `username`, `password_sha256`, `salt`, `dozent_id`, `institut_id`, `accepted_public_data`) values (1, '.esc($default_username).', '.esc(hash('sha256', $default_password.$salt)).', '.esc($salt).', 1, 1, '.esc($accepted_public_data).')';
 			$result = rquery($query);
 
 			$query = "insert into vvz_global.role_to_user (role_id, user_id) values (1, 1)";
@@ -331,13 +341,13 @@
 						[ "background-color", "008fd6" ]
 					]
 				),
-				"tr:nth-child(even)" => array(
+				"table:nth-child(even)" => array(
 					"name" => "Jede gerade Zeile in einer Tabelle",
 					"values" => [
 						[ "background-color", "F5F5F5" ]
 					]
 				),
-				"tr:nth-child(odd)" => array(
+				"table:nth-child(odd)" => array(
 					"name" => "Jede ungerade Zeile in einer Tabelle",
 					"values" => [
 						[ "background-color", "EDEDED" ]
