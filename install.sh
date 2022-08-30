@@ -147,6 +147,9 @@ touch /etc/hardcore_debugging
 
 # Für Rechnungserstellungs-LaTeX Apache erlauben auf /tmp zuzugreifen
 sed -i 's/PrivateTmp/#PrivateTmp/' /etc/systemd/system/multi-user.target.wants/apache2.service
+
+sed 's/\(\(post_max_size\|upload_max_filesize\) = \).M/\16M/g' /etc/php/*/apache2/php.ini
+
 systemctl daemon-reload
 systemctl restart apache2
 
