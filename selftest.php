@@ -176,7 +176,7 @@
 		if(!table_exists_and_has_entries("page")) {
 			rquery("insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) VALUES 
 				(1,'Accounts','accounts.php','1',25, 1),
-				(2,'Dozenten','dozenten.php','1',28, 1),
+				(2,'Dozenten','dozenten.php','1',28, 0),
 				(3,'Institute','institute.php','1',28, 0),
 				(4,'Gebäude','gebaeude.php','1',28, 0),
 				(5,'Module','modul.php','1',26, 0),

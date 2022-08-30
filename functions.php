@@ -2144,11 +2144,13 @@ declare(ticks=1);
 		if(mysqli_num_rows($result)) {
 			$str .= "\t<ul>\n";
 			while ($row = mysqli_fetch_row($result)) {
-				if($row[2] == get_get('page')) {
-					$str .= "\t\t<li class='font_weight_bold'><a href='admin?page=".$row[2]."'>&rarr; $row[0]</a></li>\n";
-					$subnav_selected = 1;
-				} else {
-					$str .= "\t\t<li><a href='admin?page=".$row[2]."'>$row[0]</a></li>\n";
+				if(show_in_current_page($row[2])) {
+					if($row[2] == get_get('page')) {
+						$str .= "\t\t<li class='font_weight_bold'><a href='admin?page=".$row[2]."'>&rarr; $row[0]</a></li>\n";
+						$subnav_selected = 1;
+					} else {
+						$str .= "\t\t<li><a href='admin?page=".$row[2]."'>$row[0]</a></li>\n";
+					}
 				}
 			}
 			$str .= "\t</ul>\n";

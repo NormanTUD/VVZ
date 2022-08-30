@@ -191,28 +191,32 @@
 							#`name`, `file`, `page_id`, `show_in_navigation`, `parent`
 							if($this_page[3]) {
 								if($this_page[1]) { # Kein Dropdown
-									if(!$this_page[4]) {
-										if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
-											print "<li class='selected_tab menu_item'><a class='menu_link' href='admin?page=".$this_page[2]."'>&rarr; $this_page[0]</a></li>\n";
-										} else {
-											print "<li class='menu_item'><a class='menu_link' href='admin?page=".$this_page[2]."'>$this_page[0]</a></li>\n";
+									if(show_in_current_page($this_page[2])) {
+										if(!$this_page[4]) {
+											if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
+												print "<li class='selected_tab menu_item'><a class='menu_link' href='admin?page=".$this_page[2]."'>&rarr; $this_page[0]</a></li>\n";
+											} else {
+												print "<li class='menu_item'><a class='menu_link' href='admin?page=".$this_page[2]."'>$this_page[0]</a></li>\n";
+											}
 										}
 									}
 								} else { # Dropdown
 									$subnav_data = print_subnavigation($this_page[2]);
-									if($subnav_data[0]) {
+									if(show_in_current_page($this_page[2])) {
+										if($subnav_data[0]) {
 ?>
-										<li class='selected_tab'><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
-<?php
-									} else {
-										if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
-?>
-											<li class="dropdown selected_tab menu_item"><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+											<li class='selected_tab'><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
 										} else {
+											if($this_page[2] == get_get('page') || $this_page[2] == get_get('show_items')) {
 ?>
-											<li class="dropdown menu_item"><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'><?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+												<li class="dropdown selected_tab menu_item"><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'>&rarr; <?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
 <?php
+											} else {
+?>
+												<li class="dropdown menu_item"><a class='menu_link' href='admin?show_items=<?php print $this_page[2];?>'><?php print $this_page[0]; ?> &darr;</a><?php print $subnav_data[1]; ?></li>
+<?php
+											}
 										}
 									}
 								}
