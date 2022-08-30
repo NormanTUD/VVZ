@@ -386,6 +386,14 @@
 					"values" => array(
 						[ "background-color", "004d74" ]
 					)
+				),
+
+
+				".bg_multispan_col_header" => array(
+					"name" => "Spaltenüberschreitende Überschriften in Tabellen",
+					"values" => array(
+						[ "background-color", "ADD8E6"]
+					)
 				)
 			);
 

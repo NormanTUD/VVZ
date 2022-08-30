@@ -197,7 +197,7 @@
 							if($row[11]) {
 ?>
 								<tr>
-									<td colspan="9" class="bg_add8e6"><?php print $wochentage[$row[11]]; ?></td>
+									<td colspan="9" class="bg_multispan_col_header"><?php print $wochentage[$row[11]]; ?></td>
 								</tr>
 <?php
 							} else if (!$no_date_shown) {

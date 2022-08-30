@@ -6594,7 +6594,7 @@ WHERE
 				$ic = 0;
 
 				foreach ($data as $studiengang => $local_data) {
-					$ret_string .= "<tr><td colspan='4' class='bg_add8e6'>".htmle($studiengang)."</td></tr>\n";
+					$ret_string .= "<tr><td colspan='4' class='bg_multispan_col_header'>".htmle($studiengang)."</td></tr>\n";
 					foreach ($local_data as $pnname => $pruefungsnummer_array) {
 						$ret_string .= "<tr><td>".htmle($pnname)."</td><td>\n";
 						if(array_key_exists("dozenten", $pruefungsnummer_array)) {
@@ -6717,7 +6717,7 @@ WHERE
 					<th>Prüfungsnummer</th>
 					</tr>";
 foreach ($data2 as $studiengang => $local_data) {
-	$ret_string .= "<tr><td colspan='2' class='bg_add8e6'>".htmle($studiengang)."</td></tr>\n";
+	$ret_string .= "<tr><td colspan='2' class='bg_multispan_col_header'>".htmle($studiengang)."</td></tr>\n";
 
 	foreach ($local_data as $dozent_name => $pruefungsnummer_array) {
 		$ret_string .= "<tr><td>".htmle($dozent_name)."</td><td>\n";
@@ -8813,7 +8813,7 @@ SE 1/2 oder BZW
 
 			$studiengang = $this_pruefung[9];
 			if($this_modul_id != $last_modul_name) {
-				$bgc = "background_color_add8e6";
+				$bgc = "bg_multispan_col_header";
 				if(
 					(get_get('modul') == $this_modul_id) || 
 					(
@@ -9035,7 +9035,7 @@ order by
 					$bemerkungen = $local_data[9];
 					$last_update = $local_data[10];
 
-					$ret_string .= "<tr><td class='bg_add8e6'>".htmle($modulname)."</td>\n";
+					$ret_string .= "<tr><td class='bg_multispan_col_header'>".htmle($modulname)."</td>\n";
 					$ret_string .= "<td>".htmle($stg)."</td>\n";
 					$ret_string .= "<td>".htmle($modulnummer)."</td>\n";
 					$ret_string .= "<td>".htmle($pruefungsnummer)."</td>\n";
@@ -9250,7 +9250,7 @@ order by
 					$last_update = $local_data[9];
 
 					if($letzter_studiengang != $studiengang_name) {
-						$ret_string .= "<tr><td colspan='9' class='bg_add8e6'>".htmle($studiengang_name)."</td></tr>\n";
+						$ret_string .= "<tr><td colspan='9' class='bg_multispan_col_header'>".htmle($studiengang_name)."</td></tr>\n";
 						$letzter_studiengang = $studiengang_name;
 					}
 

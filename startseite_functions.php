@@ -529,7 +529,7 @@
 				</tr>
 <?php
 				foreach ($metadata as $this_metadata_id => $this_metadata) {
-					$bgc = "background_color_add8e6";
+					$bgc = "bg_multispan_col_header";
 					if(in_array($this_metadata_id, $relevante_module)) {
 						$bgc = "background_color_ffa500";
 					}
@@ -1007,7 +1007,7 @@
 						if($fach != $row[0]) {
 ?>
 							<tr>
-								<td class="background_color_add8e6" colspan="3"><?php print htmlentities($row[0]); ?>:</td>
+								<td class="bg_multispan_col_header" colspan="3"><?php print htmlentities($row[0]); ?>:</td>
 							</tr>
 <?php
 							$fach = $row[0];
@@ -1432,7 +1432,7 @@
 							if($last_studiengang != $this_studiengang[1]) {
 ?>
 								<tr>
-									<td colspan="2" class="background_color_add8e6">Studiengang: <?php print htmle($this_studiengang[1]); ?></td>
+									<td colspan="2" class="bg_multispan_col_header">Studiengang: <?php print htmle($this_studiengang[1]); ?></td>
 								</tr>
 <?php
 								$last_studiengang = $this_studiengang[1];

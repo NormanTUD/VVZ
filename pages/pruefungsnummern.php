@@ -114,7 +114,7 @@ JOIN
 						foreach ($rows as $row) {
 							if(is_null($this_studiengang) || $this_studiengang != $row[0]) {
 								$this_studiengang = $row[0];
-								print "<tr class='colordarkblue'><td class='bg_add8e6' colspan='9'>".htmlentities($this_studiengang ?? "")."</td></tr>\n";
+								print "<tr class='colordarkblue'><td class='bg_multispan_col_header' colspan='9'>".htmlentities($this_studiengang ?? "")."</td></tr>\n";
 							}
 
 							$bgcolor = 'ededed';

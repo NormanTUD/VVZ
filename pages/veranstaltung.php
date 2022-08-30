@@ -303,7 +303,7 @@
 											$last_studiengang = $this_studiengang[1];
 ?>
 												<tr>
-													<td colspan="10" class="bg_add8e6"><?php print htmlentities($this_studiengang[1]); ?></td>
+													<td colspan="10" class="bg_multispan_col_header"><?php print htmlentities($this_studiengang[1]); ?></td>
 												</tr>
 <?php
 											}
