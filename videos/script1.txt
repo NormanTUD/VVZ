@@ -38,7 +38,7 @@ Darunter direkt ein Link, die Veranstaltung zu bearbeiten. Diesen sieht man nat�
 
 Machen wir aber erstmal etwas Spaßiges.
 Klicken Sie unten auf Administration und akzeptieren Sie die Datenschutzbedingungen.
-Dann können Sie das Vorlesungverzeichnis personalisieren. Das ist direkt ein Batten, wie Sie sehen.
+Dann können Sie das Vorlesungsverzeichnis personalisieren. Das ist direkt ein Batten, wie Sie sehen.
 Klicken wir dort auf Logo Hochladen und dann auf Neues Logo hochladen.
 Wählen Sie dafür das Logo ihres Institutes oder Ihrer Universität aus.
 Hier können Sie auch Farben einstellen. Klicken Sie dazu auf eines der bunten Felder und wählen Sie eine neue Farbe aus.
