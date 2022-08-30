@@ -36,7 +36,7 @@
 				<th>Standardwert</th>
 			</tr>
 <?php
-			$query = "select id, humanname, classname, property, val, default_val from customizations order by humanname, classname, property, id, val";
+			$query = "select id, humanname, classname, property, val, default_val from customizations order by id";
 			$results = rquery($query);
 
 			while ($row = mysqli_fetch_assoc($results)) {

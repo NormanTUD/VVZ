@@ -336,11 +336,18 @@
 					]
 				),
 				".topnav li:hover a" => array(
-					"name" => "Mouse-Over Farbe für Navigationsleiste",
+					"name" => "Mouseover-Farbe für Tabs in der Navigationsleiste",
 					"values" => [
 						[ "background-color", "008fd6" ]
 					]
 				),
+				".selected_tab" => array(
+					"name" => "Farbe des ausgewählten Tabs in der Navigationsleiste",
+					"values" => [
+						[ "background-color", "00aaff" ]
+					]
+				),
+
 				"table:nth-child(even)" => array(
 					"name" => "Jede gerade Zeile in einer Tabelle",
 					"values" => [
@@ -352,6 +359,33 @@
 					"values" => [
 						[ "background-color", "EDEDED" ]
 					]
+				),
+
+
+				".topnav" => array(
+					"name" => "Navigationsleiste",
+					"values" => array(
+						[ "background-color", "006092" ],
+						[ "overflow", "hidden" ],
+						[ "padding-left", "0px" ]
+					)
+				),
+
+				".topnav ul" => array(
+					"name" => "Navigationsleiste (Einzelnes Element)",
+					"values" => array(
+						[ "list-style-type", "none" ],
+						[ "margin", "0" ],
+						[ "padding", "0" ],
+						[ "overflow", "hidden" ]
+					)
+				),
+
+				".dropdown" => array(
+					"name" => "Navigationsleiste Dropdown",
+					"values" => array(
+						[ "background-color", "004d74" ]
+					)
 				)
 			);
 

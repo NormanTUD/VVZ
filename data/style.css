@@ -144,19 +144,6 @@ div#menu li a:hover {
 	display: inline;
 }
 
-.topnav {
-	background-color: #006092;
-	overflow: hidden;
-	padding-left: 0px;
-}
-
-.topnav ul {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-	overflow: hidden;
-	background-color: #006092;
-}
 
 .topnav li {
 	float: left;
@@ -177,17 +164,6 @@ div#menu li a:hover {
 	background-color: #000000;
 }
 
-.dropdown {
-	background-color: #004d74;
-}
-
-.selected_tab_important {
-	background-color: #00aaff !important;
-}
-
-.selected_tab {
-	background-color: #00aaff;
-}
 
 .topnav ul {
 	background: #ffffff;
