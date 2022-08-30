@@ -180,6 +180,16 @@ declare(ticks=1);
 		}
 	}
 
+	function show_in_current_page($page_id) {
+		$kunde_name = get_kunden_db_name();
+		if($kunde_name == "startpage") {
+			$query = "select show_in_startpage from page where id = ".esc($page_id);
+			return !!get_single_row_from_query($query);
+		} else {
+			return true;
+		}
+	}
+
 	if(!$GLOBALS['setup_mode']) {
 		if(get_post('try_login')) {
 			$GLOBALS['logged_in_was_tried'] = 1;
@@ -215,7 +225,9 @@ declare(ticks=1);
 			$result = rquery($query);
 
 			while ($row = mysqli_fetch_row($result)) {
-				$GLOBALS['pages'][$row[2]] = $row;
+				if(show_in_current_page($row[2])) {
+					$GLOBALS['pages'][$row[2]] = $row;
+				}
 			}
 
 			if(get_get('sdsg_einverstanden')) {
