@@ -111,14 +111,14 @@
 			}
 
 			$tables = array(
-				'plan' => 'CREATE TABLE plan (
+				'plan' => 'create table if not exists plan (
 					id int unsigned auto_increment primary key,
 					name varchar(100) unique,
 					monatliche_zahlung float(2),
 					jaehrliche_zahlung float(2)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8',
 
-				'kundendaten' => "CREATE TABLE kundendaten (
+				'kundendaten' => "create table if not exists kundendaten (
 					id int unsigned auto_increment primary key,
 					anrede varchar(100) DEFAULT 'Hallo Testkunde',
 					universitaet varchar(100) DEFAULT 'Name der Universität',
@@ -138,7 +138,7 @@
 					personalized int default 0
 				)",
 
-				'institut' => 'CREATE TABLE `institut` (
+				'institut' => 'create table if not exists `institut` (
 					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 					`name` varchar(100) DEFAULT NULL,
 					`start_nr` int(10) unsigned DEFAULT NULL,
@@ -148,7 +148,7 @@
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 
-				'titel' => 'CREATE TABLE `titel` (
+				'titel' => 'create table if not exists `titel` (
 					`id` int(11) NOT NULL AUTO_INCREMENT,
 					`name` varchar(100) NOT NULL,
 					`abkuerzung` varchar(100) NOT NULL,
@@ -157,7 +157,7 @@
 					UNIQUE KEY `abkuerzung` (`abkuerzung`)
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;', 
 
-				'dozent' => "CREATE TABLE `dozent` (
+				'dozent' => "create table if not exists `dozent` (
 					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 					`first_name` varchar(100) NOT NULL,
 					`last_name` varchar(100) NOT NULL,
@@ -170,7 +170,7 @@
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 
-				'users' => "CREATE TABLE `users` (
+				'users' => "create table if not exists `users` (
 					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 					`username` varchar(100) DEFAULT NULL,
 					`dozent_id` int(10) unsigned DEFAULT NULL,
@@ -188,7 +188,7 @@
 					CONSTRAINT `users_ibfk_2` FOREIGN KEY (`institut_id`) REFERENCES `vvz_global`.`institut` (`id`) ON DELETE CASCADE
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
-				'role' => 'CREATE TABLE `role` (
+				'role' => 'create table if not exists `role` (
 					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 					`name` varchar(100) DEFAULT NULL,
 					`beschreibung` varchar(100) DEFAULT NULL,
@@ -196,7 +196,7 @@
 					UNIQUE KEY `name` (`name`)
 					) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
-				'page' => "CREATE TABLE `page` (
+				'page' => "create table if not exists `page` (
 					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 					`name` varchar(50) NOT NULL,
 					`file` varchar(50) DEFAULT NULL,
@@ -212,7 +212,7 @@
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 
-				'role_to_page' => 'CREATE TABLE `role_to_page` (
+				'role_to_page' => 'create table if not exists `role_to_page` (
 					`role_id` int(10) unsigned NOT NULL,
 					`page_id` int(10) unsigned NOT NULL,
 					PRIMARY KEY (`role_id`,`page_id`),
@@ -221,7 +221,7 @@
 					CONSTRAINT `role_to_page_ibfk_2` FOREIGN KEY (`page_id`) REFERENCES `vvz_global`.`page` (`id`) ON DELETE CASCADE
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
-				'role_to_user' => 'CREATE TABLE `role_to_user` (
+				'role_to_user' => 'create table if not exists `role_to_user` (
 					`role_id` int(10) unsigned NOT NULL,
 					`user_id` int(10) unsigned NOT NULL,
 					PRIMARY KEY (`role_id`,`user_id`),
@@ -231,7 +231,7 @@
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 
-				'logos' => "CREATE TABLE logos (
+				'logos' => "create table if not exists logos (
 					id INTEGER UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
 					kunde_id int unsigned unique,
 					img MEDIUMBLOB NOT NULL,
@@ -239,7 +239,7 @@
 				)",
 
 
-				'rechnungen' => "create table rechnungen (
+				'rechnungen' => "create table if not exists rechnungen (
 					id int unsigned auto_increment primary key,
 					kunde_id int unsigned not null,
 					plan_id int unsigned not null,
