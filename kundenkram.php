@@ -256,12 +256,13 @@
 		return get_single_row_from_query($query);
 	}
 
-	function update_kunde ($id, $anrede, $universitaet, $name, $strasse, $plz, $ort, $dbname, $plan_id, $iban, $email) {
+	function update_kunde ($id, $anrede, $universitaet, $name, $strasse, $plz, $ort, $dbname, $plan_id, $iban, $email, $zahlungszyklus_monate) {
 		$urlname = create_uni_name($universitaet);
 		if(urlname_already_exists($urlname)) {
 			return 1;
 		}
-		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, name, strasse, plz, ort, personalized, dbname, urlname, plan_id, iban, email) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($name).', '.esc($strasse).', '.esc($plz).', '.esc($ort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).", ".esc($iban).", ".esc($email).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), name=values(name), strasse=values(strasse), plz=values(plz), ort=values(ort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id), iban=values(iban), email=values(email)";
+		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, name, strasse, plz, ort, personalized, dbname, urlname, plan_id, iban, email, zahlungszyklus_monate) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($name).', '.esc($strasse).', '.esc($plz).', '.esc($ort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).", ".esc($iban).", ".esc($email).", ".esc($zahlungszyklus_monate).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), name=values(name), strasse=values(strasse), plz=values(plz), ort=values(ort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id), iban=values(iban), email=values(email), zahlungszyklus_monate=values(zahlungszyklus_monate)";
+		die($query);
 		rquery($query);
 	}
 
@@ -532,5 +533,34 @@
 	function kunde_can_access_rechnung ($kunde_id, $rechnung_id) {
 		$query = "select count(*) from vvz_global.rechnungen where id = ".esc($rechnung_id)." and kunde_id = ".esc($kunde_id);
 		return get_single_row_from_query($query);
+	}
+
+	function get_zahlungszyklus_by_kunde_id($kunde_id) {
+		$query = "select zahlungszyklus_monate from vvz_global.kundendaten where id = ".esc($kunde_id);
+		return get_single_row_from_query($query);
+	}
+
+	function get_zahlungszyklus_name_by_monate ($name) {
+		if($name == 12) {
+			$name = "Jährlich";
+		} else if($name == 1) {
+			$name = "Monatlich";
+		} else {
+			die("Unbekannter Zahlungszyklus");
+		}
+
+		return $name;
+	}
+
+	function get_zahlungszyklus_monate_by_name ($name) {
+		if($name == "Jährlich") {
+			$name = 6;
+		} else if($name == "Monatlich") {
+			$name = 1;
+		} else {
+			die("Unbekannter Zahlungszyklus");
+		}
+
+		return $name;
 	}
 ?>

@@ -167,4 +167,5 @@
 	$GLOBALS["default_plz"] = "26133";
 	$GLOBALS["default_strasse"] = "Robert-Koch-Str. 2";
 	$GLOBALS["default_email"] = "noack@omni-concept.com";
+	$GLOBALS["default_zahlungszyklus_monate"] = "1";
 ?>

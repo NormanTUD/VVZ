@@ -58,7 +58,8 @@
 				if($email_ok) {
 					if($iban_ok) {
 						if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
-							update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+
+							update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"), get_zahlungszyklus_monate_by_name(get_post("zahlungszyklus_monate")));
 						}
 
 						if(get_post("daten_uebernehmen")) {
@@ -134,17 +135,26 @@
 						<td>Ort:</td><td><input type="text" name="ort" placeholder="Ort" value="<?php print htmlentities(get_current_value("ort") ?? ""); ?>" /></td>
 					</tr>
 					<tr>
-					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_current_value("iban") ?? ""); ?>" /><?php
+						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_current_value("email") ?? ""); ?>" /><?php
+							if($email_error) {
+								print "<br><span class='red_text'>$email_error.</span>";
+							}
+						?></td>
+					</tr>
+					<tr>
+						<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_current_value("iban") ?? ""); ?>" /><?php
 							if($iban_error) {
 									print "<br><span class='red_text'>$iban_error.</span>";
 								}
 							?></td>
 					</tr>
+
 					<tr>
-						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_current_value("email") ?? ""); ?>" /><?php
-							if($email_error) {
-								print "<br><span class='red_text'>$email_error.</span>";
-							}
+						<td>Zahlungszyklus:</td>
+						<td><?php
+							$aktueller_zahlungszyklus = get_zahlungszyklus_by_kunde_id($kunde_id);
+							$werte = array("Monatlich", "Jährlich");
+							create_select($werte, get_zahlungszyklus_name_by_monate($aktueller_zahlungszyklus), 'zahlungszyklus_monate', 0);
 						?></td>
 					</tr>
 					<tr>
