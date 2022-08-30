@@ -1053,13 +1053,18 @@ declare(ticks=1);
 
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
 				if(array_key_exists("neues_logo", $_FILES)) {
-					$file = file_get_contents($_FILES["neues_logo"]["tmp_name"]);
-					$query = "insert into vvz_global.logos (kunde_id, img) values (".esc(get_kunde_id_by_db_name($GLOBALS["dbname"])).", ".esc($file).") on duplicate key update img=values(img)";
-					$res = rquery($query);
-					if($res) {
-						success("Neues Logo hochgeladen");
+					$tmp_name = $_FILES["neues_logo"]["tmp_name"];
+					if(file_is_image($tmp_name)) {
+						$file = file_get_contents($tmp_name);
+						$query = "insert into vvz_global.logos (kunde_id, img) values (".esc(get_kunde_id_by_db_name($GLOBALS["dbname"])).", ".esc($file).") on duplicate key update img=values(img)";
+						$res = rquery($query);
+						if($res) {
+							success("Neues Logo hochgeladen");
+						} else {
+							error("Neues Logo konnte nicht hochgeladen werden");
+						}
 					} else {
-						error("Neues Logo konnte nicht hochgeladen werden");
+						error("Die hochgeladene Datei war kein Bild oder größer als 16 MB");
 					}
 				}
 
@@ -9606,5 +9611,19 @@ order by
 		$teachers = ["&#x1F9D1;&#x200D;&#x1F3EB;", "&#x1f469;&#x200d;&#x1f3eb;"];
 		$teacher = $teachers[array_rand($teachers, 1)];
 		return '<span class="utf8symbol">'.$teacher.'</span>';
+	}
+
+	function file_is_image ($mediapath) {
+		if(is_file($mediapath)) {
+			try {
+				if(is_array(getimagesize($mediapath))) {
+					return true;
+				}
+			} catch (\Throwable $e) {
+				return false;
+			}
+		}
+
+		return false;
 	}
 ?>
