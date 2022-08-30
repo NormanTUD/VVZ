@@ -36,7 +36,7 @@
 		<meta name="keywords" content="Vorlesungsverzeichnis, <?php print $GLOBALS['university_name']; ?>">
 		<meta name="author" content="Norman Koch">
 		<meta name="viewport" content="width=device-width, user-scalable=yes">
-		<script type="text/javascript" src="mathjax/es5/tex-chtml-full.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<!--<script type="text/javascript" src="mathjax/es5/tex-chtml-full.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
 <?php
 		if(is_demo()) {
 ?>
