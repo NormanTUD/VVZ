@@ -72,6 +72,7 @@
 	
 		js("footer.js");
 ?>
+<!--
 		<script nonce="<?php print nonce(); ?>" type="text/x-mathjax-config">
 		<script type="text/x-mathjax-config">
 			MathJax.Hub.Config({
@@ -83,6 +84,7 @@
                 </script>
 
 	</body>
+-->
 </html>
 <?php
 	}
