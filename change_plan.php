@@ -93,7 +93,7 @@
 
 		if((!$urlname_exists && $kunde_ok && $iban_ok && $email_ok) || get_get("done_migration")) {
 			if(!get_get("done_migration")) {
-				if(kunde_owns_url($kunde_id, get_url_uni_name()) && $kunde_ok && $email_ok && $iban_ok) {
+				if(!$urlname_exists || (kunde_owns_url($kunde_id, get_url_uni_name()) && $kunde_ok && $email_ok && $iban_ok)) {
 					update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
 				}
 			}

@@ -7,8 +7,8 @@
 	header("Content-type: image/png");
 
 	$id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
-	if(get_get("id")) {
-		$id = get_get("id");
+	if(get_get("kunde_id")) {
+		$id = get_get("kunde_id");
 	}
 
 	if($id) {
