@@ -310,9 +310,10 @@
 					"values" => [
 						[ "background-color", "white" ],
 						[ "color", "black" ],
-						[ "border", "1px solid #006092" ],
+						[ "border", "1px solid" ],
+						[ "border-color", "#006092" ],
 						[ "cursor", "unset" ],
-						[ "border-radius", "5px" ],
+						[ "border-radius", "5px" ]
 					],
 				),
 				"th" => array(
@@ -330,6 +331,18 @@
 						[ "background-color", "#008fd6" ]
 					]
 				),
+				"tr:nth-child(even)" => array(
+					"name" => "Jede gerade Zeile in einer Tabelle",
+					"values" => [
+						[ "background-color", "#F5F5F5" ]
+					]
+				),
+				"tr:nth-child(odd)" => array(
+					"name" => "Jede ungerade Zeile in einer Tabelle",
+					"values" => [
+						[ "background-color", "#EDEDED" ]
+					]
+				)
 			);
 
 #'customizations' => 'create table customizations (id int unsigned primary key, classname varchar(100), property varchar(100), val varchar(100))'
