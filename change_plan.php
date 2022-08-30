@@ -65,20 +65,27 @@
 			$email_ok = 1;
 		}
 
+		$uni_name_error = "";
 
 		if(get_post("update_kunde_data")) {
-			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname) && $kunde_ok && $email_ok && $iban_ok) {
-				$kunde_id = get_kunde_id_by_db_name(get_kunden_db_name());
+			if(!$urlname_exists || kunde_owns_url($kunde_id, $urlname)) {
+				if($email_ok && $iban_ok) {
+					$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 
-				if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
-					update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+					if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
+						update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"));
+					}
+
+					if(get_post("daten_uebernehmen")) {
+						// TODO
+					}
+
+					$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+				} else {
+					die("TODO 2");
 				}
-
-				if(get_post("daten_uebernehmen")) {
-					// TODO
-				}
-
-				$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+			} else {
+				$uni_name_error = "Dieser Name ist bereits belegt und gehört nicht Ihnen. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
 			}
 		}
 
@@ -125,8 +132,8 @@
 					</tr>
 					<tr>
 					<td>Universität:</td><td><input type="text" name="universitaet" placeholder="Universität" value="<?php print htmlentities(get_current_value("universitaet") ?? ""); ?>" /><?php
-						if($urlname_exists) {
-							print "<br><span class='red_text'>Diese Uni hat bereits eine URL. Bitte geben Sie einen neuen Namen ein, erhöhen Sie die Anzahl ihrer Fakultäten oder buchen Sie die Pro-University-Variante, um eine gesamte Uni zu verwalten.</span>";
+						if($uni_name_error) {
+							print "<br><span class='red_text'>$uni_name_error</span>";
 						}
 ?></td>
 					</tr>
@@ -144,14 +151,14 @@
 					</tr>
 					<tr>
 					<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_current_value("iban") ?? ""); ?>" /><?php
-					if(!$iban_ok && get_current_value("iban")) {
+					if(!$iban_ok && !get_current_value("iban") && get_current_value("iban") != "") {
 								print "<br><span class='red_text'>Die IBAN ist nicht richtig. Bitte eine korrekte IBAN eingeben.</span>";
 							}
 						?></td>
 					</tr>
 					<tr>
 						<td>Email:</td><td><input type="text" name="email" placeholder="Email" value="<?php print htmlentities(get_current_value("email") ?? ""); ?>" /><?php
-							if(!$email_ok && get_current_value("email")) {
+							if(!$email_ok && !get_current_value("email") && get_current_value("email") != "") {
 								print "<br><span class='red_text'>Die Email ist nicht richtig. Bitte eine richtige Email eingeben.</span>";
 							}
 						?></td>
