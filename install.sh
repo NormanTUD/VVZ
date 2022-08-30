@@ -53,26 +53,6 @@ while [[ -z "$PASSWORD" ]]; do
 	fi
 done
 
-'
-ADMIN_USERNAME=""
-while [[ -z "$ADMIN_USERNAME" ]]; do
-	ADMIN_USERNAME=$(whiptail --inputbox "Admin-Username" $LINES $COLUMNS "Admin" --title "Admin-Username" 3>&1 1>&2 2>&3)
-	if [ $? == 1 ]; then
-	    echo "User selected Cancel."
-	    exit
-	fi
-done
-
-ADMIN_PASSWORD=""
-while [[ -z "$ADMIN_PASSWORD" ]]; do
-	ADMIN_PASSWORD=$(whiptail --passwordbox "What should be the admin password?" $LINES $COLUMNS --title "Admin-password" 3>&1 1>&2 2>&3)
-	if [ $? == 1 ]; then
-	    echo "User selected Cancel."
-	    exit
-	fi
-done
-'
-
 git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
 
 git config --global user.name "$(hostname)"
@@ -149,6 +129,10 @@ touch /etc/hardcore_debugging
 sed -i 's/PrivateTmp/#PrivateTmp/' /etc/systemd/system/multi-user.target.wants/apache2.service
 
 sed 's/\(\(post_max_size\|upload_max_filesize\) = \).M/\16M/g' /etc/php/*/apache2/php.ini
+
+if [[ $(grep -L "curl -s localhost" /etc/crontab ) ]]; then
+	echo "*/30 * * * * curl -s localhost 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
+fi
 
 systemctl daemon-reload
 systemctl restart apache2
