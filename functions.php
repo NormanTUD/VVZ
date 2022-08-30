@@ -34,6 +34,7 @@ declare(ticks=1);
 
 	header_remove("X-Powered-By"); // Serverinfos entfernen
 	header("X-Frame-Options: ALLOW-FROM ".$GLOBALS['university_page_url']); // Gegen Clickjacking
+	header("Cache-Control: no-cache, must-revalidate");
 
 	$GLOBALS['nonce'] = generate_random_string(10);
 
