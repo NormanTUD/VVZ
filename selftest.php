@@ -42,11 +42,15 @@
                                 $missing_tables[] = $this_table;
                                 if(is_array($create_query)) {
                                         foreach ($create_query as $this_create_query) {
+						rquery("create database if not exists ".$GLOBALS["dbname"]);
+						rquery("use ".$GLOBALS["dbname"]);
                                                 rquery($this_create_query);
 						while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
                                         }
                                 } else {
 					try {
+						rquery("create database if not exists ".$GLOBALS["dbname"]);
+						rquery("use ".$GLOBALS["dbname"]);
 						rquery($create_query);
 					} catch (\Throwable $e) {
 						//
@@ -62,6 +66,8 @@
                 foreach ($views as $this_view => $create_query) {
                         if(!table_exists($GLOBALS['dbname'], $this_view)) {
                                 $missing_views[] = $this_view;
+				rquery("create database if not exists ".$GLOBALS["dbname"]);
+				rquery("use ".$GLOBALS["dbname"]);
                                 rquery($create_query);
 				while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
                         }
@@ -508,7 +514,9 @@
 						[ "border", "1px solid" ],
 						[ "border-color", "006092" ],
 						[ "cursor", "unset" ],
-						[ "border-radius", "5px" ]
+						[ "border-radius", "5px" ],
+						[ "box-shadow", "none" ],
+						[ "padding", " 4px" ]
 					],
 				),
 				"th" => array(

@@ -2,7 +2,6 @@
 	include_once("../config.php");
 	include_once("../kundenkram.php");
 	include_once("../functions.php");
-	include_once("../selftest.php");
 
 
 	header("Content-type: text/css");
