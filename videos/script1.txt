@@ -22,18 +22,18 @@ Wir beschränken uns hier jedoch erstmal auf einen kleinen Teil davon.
 Auf der Startseite haben Sie die Möglichkeit, die Datenbank mit Demo Daten zu füllen. 
 Dann sehen Sie, wie es im Getummel der richtigen Universität aussieht.
 Sie sehen dann auf der Startseite mehrere Informationen.
-Ganz oben ist unser Logo, das Sie bequem ändern können.
+Ganz oben ist unser Logo, das Sie später bequem ändern können.
 Darunter sehen Sie den Namen es aktuellen Instituts.
-In den Demo Daten existiert nur ein Institut.
-Wenn Sie mehrere einrichten, sind die dort auswählbar.
+In den Demo Daten existiert nur ein einziges Institut.
+Wenn Sie mehrere einrichten, sind diese dort auswählbar.
 Darunter sind zwei Felder, in denen man alle Veranstaltungen des aktuell ausgewählten Semesters sehen kann, oder alle Prüfungsleistungen überhaupt.
 Darunter sind mehr Felder, für jeden Studiengang Eines.
 Klicken wir zum Beispiel auf Master Philosophie.
 Wir sehen dort am Montag eine Veranstaltung von Professor Dack.
-In der ersten Zeile der Box sind die genaue Stunde, Uhrzeit, der Ort, der Typ der Veranstaltung (hier V L für Vorlesung), der Raum und das Gebäude sowie ein Link zu einem Video Call Konferenzsystem wie Sum oder Big Blu Batten. Alles wird nur angezeigt, wenn es vorhanden ist.
+In der ersten Zeile der Box sind die genaue Stunde, Uhrzeit, der Typ der Veranstaltung, hier V L für Vorlesung, der Raum und das Gebäude sowie ein Link zu einem Video Konferenzsystem wie Suum oder Bick Blu Batten. Alles wird nur angezeigt, wenn es vorhanden ist.
 Klicken wir etwas weiter unten auf die Details, sehen wir einen Freitext, den der Dozent beliebig erstellen kann.
 Außerdem sehen wir alle Prüfungsleistungen im aktuell ausgewählten Studiengang, die in dieser Vorlesung angeboten werden.
-Die Vorlesung kann noch viel mehr Prüfungsleistungen anbieten, aber wir hier wird speziell für den Master Philosophie gefiltert, weil wir diesen ausgewählt haben.
+Die Vorlesung kann noch viel mehr Prüfungsleistungen anbieten, aber hier wird speziell für den Master Philosophie gefiltert, weil wir diesen ausgewählt haben.
 Darunter direkt ein Link, die Veranstaltung zu bearbeiten. Diesen sieht man natürlich nur, wenn man angemeldet ist, und auch die Rechte hat, die Veranstaltung zu bearbeiten.
 
 Machen wir aber erstmal etwas Spaßiges.
