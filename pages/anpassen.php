@@ -28,7 +28,7 @@
 			<button>Logo löschen</button>
 		</form>
 
-		<table class="auto_reload_stylesheets">
+		<table class="auto_reload_stylesheets autorowspan">
 			<tr>
 				<th>Beschreibung</th>
 				<th>Eigenschaft</th>
@@ -62,8 +62,9 @@
 <?php
 			}
 ?>
-			</table>
+		</table>
 <?php
-			js(array("autosubmit.js"));
+		js(array("autorowspan.js"));
+		js(array("autosubmit.js"));
 	}
 ?>
