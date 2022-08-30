@@ -4,7 +4,7 @@ Unser Tuhl hat alle Informationen in einer Software an den Stellen, wo Sie sie b
 Das Vorlesungsverzeichnis Mänätscht sich selbst, wenn es eingerichtet ist. Die Dozenten tragen ihre Veranstaltungen ein und alle Änderungen dort sind sofort laif.
 Sie müssen nie wieder an vielen Stellen die gleichen Daten eingeben oder Exel-Tabellen herum senden.
 Es gibt sogar einen halbautomatischen Stundenplanersteller, der die Erstsemesterstudierenden entlastet und zu weitaus weniger Support Anfragen führt.
-Alles läuft im Browser, es ist egal, ob Sie Windows, Mäck, Linux oder auch Smartphones benutzen.
+Alles läuft im Brauser, es ist egal, ob Sie Windows, Mäck, Linux oder auch Smartphones benutzen.
 Sie können jederzeit von jedem Gerät aus alle Daten bequem einsehen und ändern.
 Es ist auch möglich, Exel-Dateien, zum Beispiel für Prüfungsämter oder Raumplanungsdezernate, zu exportieren.
 Und das Beste.
