@@ -9550,7 +9550,7 @@ order by
 					}
 
 					if($drop) {
-						$query = "drop database $row[0];";
+						$query = "drop database if exists $row[0];";
 						rquery($query);
 					}
 				}

@@ -43,6 +43,7 @@
                                 if(is_array($create_query)) {
                                         foreach ($create_query as $this_create_query) {
                                                 rquery($this_create_query);
+						while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
                                         }
                                 } else {
 					try {
@@ -62,6 +63,7 @@
                         if(!table_exists($GLOBALS['dbname'], $this_view)) {
                                 $missing_views[] = $this_view;
                                 rquery($create_query);
+				while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
                         }
                 }
 

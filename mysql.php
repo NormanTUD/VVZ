@@ -2,6 +2,13 @@
 	$GLOBALS["dbh"] = null;
 	include("config.php");
 
+	if(!array_key_exists("no_selftest_force", $GLOBALS)) {
+		$GLOBALS["no_selftest_force"] = 0;
+	}
+	if(!array_key_exists("no_selftest", $GLOBALS)) {
+		$GLOBALS["no_selftest"] = 0;
+	}
+
 	if(!function_exists("query_to_json")) {
 		function query_to_json($query, $skip_array) {
 			$result = rquery($query);
@@ -249,6 +256,7 @@
 						foreach ($create_query as $this_create_query) {
 							try {
 								rquery($this_create_query);
+								while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
 								$new_tables++;
 							} catch (\Throwable $e) {
 								print $e;
@@ -258,6 +266,7 @@
 					} else {
 						try {
 							rquery($create_query);
+							while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
 						} catch (\Throwable $e) {
 							print("<pre>$create_query\n\n$e</pre>");
 							exit(1);
