@@ -1,5 +1,4 @@
 <?php
-	$GLOBALS['setup_mode'] = 0;
 	include_once("functions.php");
 
 	if(get_get('veranstaltung')) {

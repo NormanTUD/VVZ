@@ -1,5 +1,4 @@
 <?php
-	$GLOBALS['setup_mode'] = 0;
 	include_once("functions.php");
 	if(check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 		$filedate = date('Y-m-d_H-m-s', time());

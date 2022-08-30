@@ -1,8 +1,4 @@
 <?php
-	if(!isset($setup_mode)) {
-		$setup_mode = 0; // Im setup-Modus werden keine Anfragen ausgeführt. Setupmodus deaktiviert.
-	}
-
 	include_once("functions.php");
 
 	if($GLOBALS['reload_page']) {
@@ -13,7 +9,7 @@
 		$page_title = 'Vorlesungsverzeichnis '.$GLOBALS['university_name'];
 	}
 
-	if(get_get("studiengang") && !$GLOBALS["setup_mode"]) {
+	if(get_get("studiengang")) {
 		$page_title = "$page_title | ".get_studiengang_name(get_get('studiengang'));
 	}
 

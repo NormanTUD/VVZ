@@ -1,6 +1,5 @@
 <?php
 	$php_start = microtime(true);
-	$setup_mode = 0;
 	include_once("functions.php");
 
 	$query_string = $_SERVER['QUERY_STRING'];

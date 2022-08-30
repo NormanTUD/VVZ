@@ -24,8 +24,8 @@
 
 
 	function selftest () {
-		if(array_key_exists("no_selftest", $GLOBALS) || $GLOBALS["no_selftest"]) {
-			return;
+		if(array_key_exists("no_selftest_force", $GLOBALS) || $GLOBALS["no_selftest"]) {
+			#return;
 		}
 
 		try {

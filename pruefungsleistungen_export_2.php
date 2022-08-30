@@ -1,5 +1,4 @@
 <?php
-	$setup_mode = 0;
 	include_once("functions.php");
 	include_once('./Classes/PHPExcel.php');
 

@@ -148,15 +148,9 @@ declare(ticks=1);
 
 	include('mysql.php');
 
-	if(!isset($GLOBALS['setup_mode'])) {
-		$GLOBALS['setup_mode'] = 0;
-	}
-
-	if(!$GLOBALS['setup_mode']) {
-		rquery('USE `'.$GLOBALS['dbname'].'`');
-		rquery('SELECT @@FOREIGN_KEY_CHECKS');
-		rquery('SET FOREIGN_KEY_CHECKS=1');
-	}
+	rquery('USE `'.$GLOBALS['dbname'].'`');
+	rquery('SELECT @@FOREIGN_KEY_CHECKS');
+	rquery('SET FOREIGN_KEY_CHECKS=1');
 
 	rquery("SET NAMES utf8");
 
@@ -193,63 +187,65 @@ declare(ticks=1);
 		}
 	}
 
-	if(!$GLOBALS['setup_mode']) {
-		if(get_post('try_login')) {
-			$GLOBALS['logged_in_was_tried'] = 1;
+	if(is_demo($GLOBALS["dbname"]) && $GLOBALS["logged_in_user_id"]) {
+		set_session_id(1);
+	}
+
+	if(get_post('try_login')) {
+		$GLOBALS['logged_in_was_tried'] = 1;
+	}
+
+	if(get_cookie($GLOBALS["cookie_hash"].'_session_id') && !$GLOBALS["db_freshly_created"] && table_exists($GLOBALS["dbname"], "view_user_session_id")) {
+		#delete_old_session_ids();
+		$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `session_id` = '.esc($_COOKIE[$GLOBALS["cookie_hash"]."_".'session_id']).' AND `enabled` = "1"';
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			set_login_data($row);
 		}
+	}
 
-		if(get_cookie($GLOBALS["cookie_hash"].'_session_id') && !$GLOBALS["db_freshly_created"] && table_exists($GLOBALS["dbname"], "view_user_session_id")) {
-			#delete_old_session_ids();
-			$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `session_id` = '.esc($_COOKIE[$GLOBALS["cookie_hash"]."_".'session_id']).' AND `enabled` = "1"';
-			$result = rquery($query);
-			while ($row = mysqli_fetch_row($result)) {
-				set_login_data($row);
-			}
+	if (!$GLOBALS['logged_in'] && get_post('username') && get_post('password')) {
+		#delete_old_session_ids();
+		$GLOBALS['logged_in_was_tried'] = 1;
+		$user = $_POST['username'];
+		$possible_user_id = get_user_id($user);
+		$salt = get_salt($possible_user_id);
+		$pass = hash('sha256', $_POST['password'].$salt);
+
+		$query = 'SELECT `id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `users` WHERE `username` = '.esc($user).' AND `password_sha256` = '.esc($pass).' AND `enabled` = "1"';
+		$result = rquery($query);
+		while ($row = mysqli_fetch_row($result)) {
+			set_login_data($row);
+			set_session_id($row[0]);
 		}
+	}
 
-		if (!$GLOBALS['logged_in'] && get_post('username') && get_post('password')) {
-			#delete_old_session_ids();
-			$GLOBALS['logged_in_was_tried'] = 1;
-			$user = $_POST['username'];
-			$possible_user_id = get_user_id($user);
-			$salt = get_salt($possible_user_id);
-			$pass = hash('sha256', $_POST['password'].$salt);
+	if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id'] && basename($_SERVER['SCRIPT_NAME']) == 'admin.php') {
+		$query = 'SELECT `name`, `file`, `page_id`, `show_in_navigation`, `parent` FROM `view_account_to_role_pages` WHERE `user_id` = '.esc($GLOBALS['logged_in_user_id']).' ORDER BY `parent`, `name`';
+		$result = rquery($query);
 
-			$query = 'SELECT `id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `users` WHERE `username` = '.esc($user).' AND `password_sha256` = '.esc($pass).' AND `enabled` = "1"';
-			$result = rquery($query);
-			while ($row = mysqli_fetch_row($result)) {
-				set_login_data($row);
-				set_session_id($row[0]);
-			}
-		}
-
-		if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id'] && basename($_SERVER['SCRIPT_NAME']) == 'admin.php') {
-			$query = 'SELECT `name`, `file`, `page_id`, `show_in_navigation`, `parent` FROM `view_account_to_role_pages` WHERE `user_id` = '.esc($GLOBALS['logged_in_user_id']).' ORDER BY `parent`, `name`';
-			$result = rquery($query);
-
-			while ($row = mysqli_fetch_row($result)) {
-				if(show_in_current_page($row[2])) {
-					$GLOBALS['pages'][$row[2]] = $row;
-				}
-			}
-
-			if(get_get('sdsg_einverstanden')) {
-				$query = 'UPDATE `users` SET `accepted_public_data` = "1" WHERE `id` = '.esc($GLOBALS['logged_in_user_id']);
-				rquery($query);
-
-				$GLOBALS['accepted_public_data'] = 1;
+		while ($row = mysqli_fetch_row($result)) {
+			if(show_in_current_page($row[2])) {
+				$GLOBALS['pages'][$row[2]] = $row;
 			}
 		}
 
-		if(array_key_exists('REQUEST_URI', $_SERVER) && preg_match('/\/pages\//', $_SERVER['REQUEST_URI'])) {
-			$script_name = basename($_SERVER['REQUEST_URI']);
-			$page_id = get_page_id_by_filename($script_name);
-			if($page_id) {
-				$header = 'Location: ../admin?page='.$page_id;
-				header($header);
-			} else {
-				die("Die internen Seiten dürfen nicht direkt aufgerufen werden. Die gesuchte Seite konnte nicht gefunden werden. Nehmen Sie &mdash; statt der direkten Datei-URL &mdash; den Weg über das Administrationsmenü.");
-			}
+		if(get_get('sdsg_einverstanden')) {
+			$query = 'UPDATE `users` SET `accepted_public_data` = "1" WHERE `id` = '.esc($GLOBALS['logged_in_user_id']);
+			rquery($query);
+
+			$GLOBALS['accepted_public_data'] = 1;
+		}
+	}
+
+	if(array_key_exists('REQUEST_URI', $_SERVER) && preg_match('/\/pages\//', $_SERVER['REQUEST_URI'])) {
+		$script_name = basename($_SERVER['REQUEST_URI']);
+		$page_id = get_page_id_by_filename($script_name);
+		if($page_id) {
+			$header = 'Location: ../admin?page='.$page_id;
+			header($header);
+		} else {
+			die("Die internen Seiten dürfen nicht direkt aufgerufen werden. Die gesuchte Seite konnte nicht gefunden werden. Nehmen Sie &mdash; statt der direkten Datei-URL &mdash; den Weg über das Administrationsmenü.");
 		}
 	}
 
@@ -1091,15 +1087,6 @@ declare(ticks=1);
 		}
 	}
 
-	if($GLOBALS['setup_mode']) {
-		if(get_post('import_datenbank')) {
-			rquery('USE `'.$GLOBALS['dbname'].'`');
-			if(array_key_exists('sql_file', $_FILES) && array_key_exists('tmp_name', $_FILES['sql_file'])) {
-				SplitSQL($_FILES['sql_file']['tmp_name']);
-			}
-		}
-	}
-
 	function htmle ($str, $shy = 0) {
 		if($shy) {
 			if($str) {
@@ -1292,9 +1279,7 @@ declare(ticks=1);
 
 	// https://stackoverflow.com/questions/1883079/best-practice-import-mysql-file-in-php-split-queries
 	function SplitSQL($file, $delimiter = ';') {
-		if(!$GLOBALS['setup_mode']) {
-			if(!check_function_rights(__FUNCTION__)) { return; }
-		}
+		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$GLOBALS['slurped_sql_file'] = 1;
 		set_time_limit(0);
@@ -1354,9 +1339,7 @@ declare(ticks=1);
 
 	/* https://davidwalsh.name/backup-mysql-database-php */
 	function backup_tables ($tables = '*', $skip = null, $data = 1) {
-		if(!$GLOBALS['setup_mode']) {
-			if(!check_function_rights(__FUNCTION__)) { return; }
-		}
+		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		rquery('USE `'.$GLOBALS['dbname'].'`');
 		//get all of the tables
