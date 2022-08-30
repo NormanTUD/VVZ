@@ -379,5 +379,5 @@
 	}
 
 
-
+	$GLOBALS['cookie_hash'] = hash("md5", $GLOBALS["dbname"]);
 ?>

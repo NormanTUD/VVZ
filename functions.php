@@ -195,9 +195,9 @@ declare(ticks=1);
 			$GLOBALS['logged_in_was_tried'] = 1;
 		}
 
-		if(get_cookie('session_id') && !$GLOBALS["db_freshly_created"] && table_exists($GLOBALS["dbname"], "view_user_session_id")) {
+		if(get_cookie($GLOBALS["cookie_hash"].'_session_id') && !$GLOBALS["db_freshly_created"] && table_exists($GLOBALS["dbname"], "view_user_session_id")) {
 			#delete_old_session_ids();
-			$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `session_id` = '.esc($_COOKIE['session_id']).' AND `enabled` = "1"';
+			$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `session_id` = '.esc($GLOBALS["cookie_hash"]."_".$_COOKIE['session_id']).' AND `enabled` = "1"';
 			$result = rquery($query);
 			while ($row = mysqli_fetch_row($result)) {
 				set_login_data($row);

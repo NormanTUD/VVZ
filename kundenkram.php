@@ -12,7 +12,7 @@
 		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
 		rquery($query);
 
-		setcookie('session_id', $session_id, time() + (7 * 86400), "/");
+		setcookie($GLOBALS["cookie_hash"].'_session_id', $session_id, time() + (7 * 86400), "/");
 	}
 
 	function generate_random_string ($length = 50) {
