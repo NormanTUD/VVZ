@@ -348,13 +348,13 @@
 					]
 				),
 
-				"table:nth-child(even)" => array(
+				"table tbody tr:nth-child(2n)" => array(
 					"name" => "Jede gerade Zeile in einer Tabelle",
 					"values" => [
 						[ "background-color", "F5F5F5" ]
 					]
 				),
-				"table:nth-child(odd)" => array(
+				"table tbody tr:nth-child(2n+1)" => array(
 					"name" => "Jede ungerade Zeile in einer Tabelle",
 					"values" => [
 						[ "background-color", "EDEDED" ]
