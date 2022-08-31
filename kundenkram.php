@@ -9,15 +9,17 @@
 	function set_session_id ($user_id) {
 		//delete_old_session_ids($GLOBALS['logged_in_user_id']);
 		$session_id = generate_random_string(128);
-		$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
-		rquery($query);
+		if(table_exists($GLOBALS["dbname"], "session_ids")) {
+			$query = 'INSERT IGNORE INTO `session_ids` (`session_id`, `user_id`) VALUES ('.esc($session_id).', '.esc($user_id).')';
+			rquery($query);
 
-		setcookie($GLOBALS["cookie_hash"].'_session_id', $session_id, time() + (7 * 86400), "/");
+			setcookie($GLOBALS["cookie_hash"].'_session_id', $session_id, time() + (7 * 86400), "/");
 
-		$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `user_id` = '.esc($user_id);
-		$result = rquery($query);
-		while ($row = mysqli_fetch_row($result)) {
-			set_login_data($row);
+			$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `user_id` = '.esc($user_id);
+			$result = rquery($query);
+			while ($row = mysqli_fetch_row($result)) {
+				set_login_data($row);
+			}
 		}
 	}
 
