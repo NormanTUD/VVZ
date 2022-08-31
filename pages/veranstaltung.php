@@ -127,7 +127,7 @@
 							if(count($languages)) {
 ?>
 								<td class="text_align_left_nowrap"><?php
-									foreach ($language_array as $this_language) {
+									foreach ($languages as $this_language) {
 										$praesenz_id = $this_language[0];
 										$language_name = $this_language[1];
 
