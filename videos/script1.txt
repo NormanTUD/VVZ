@@ -20,7 +20,7 @@ In dieser sind Sie voller Administrator und dürfen Alles.
 Sie dürfen neue Veranstaltungen oder Dozenten Erstellen, Sie dürfen neue Prüfungsleistungen erstellen und so weiter.
 Wir beschränken uns hier jedoch erstmal auf einen kleinen Teil davon.
 Auf der Startseite haben Sie die Möglichkeit, die Datenbank mit Demo Daten zu füllen. 
-Dann sehen Sie, wie es im Getummel der richtigen Universität aussieht.
+Dann sehen Sie, wie es im Getümmel der richtigen Universität aussieht.
 Sie sehen dann auf der Startseite mehrere Informationen.
 Ganz oben ist unser Logo, das Sie später bequem ändern können.
 Darunter sehen Sie den Namen es aktuellen Instituts.
