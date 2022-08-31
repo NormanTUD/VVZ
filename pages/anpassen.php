@@ -28,66 +28,71 @@
 			<button>Logo löschen</button>
 		</form>
 
-		<table class="auto_reload_stylesheets autorowspan">
-			<thead>
-				<tr>
-					<th width=100>Beschreibung</th>
-					<th>Eigenschaft</th>
-					<th width=100>Wert</th>
-					<th>Standardwert</th>
-					<th>Startseite</th>
-				</tr>
-			</thead>
-			<tbody>
+		<table><tr><td>
+			<table class="auto_reload_stylesheets autorowspan">
+				<thead>
+					<tr>
+						<th width=100>Beschreibung</th>
+						<th>Eigenschaft</th>
+						<th width=100>Wert</th>
+						<th>Standardwert</th>
+					</tr>
+				</thead>
+				<tbody>
 <?php
-				$query = "select id, humanname, classname, property, val, default_val from customizations order by id";
-				$results = rquery($query);
+					$query = "select id, humanname, classname, property, val, default_val from customizations order by id";
+					$results = rquery($query);
 
-				$whole = array();
-				while ($row = mysqli_fetch_assoc($results)) {
-					$whole[] = $row;
-				}
-
-				$i = 0;
-				foreach ($whole as $row) {
-					$gui_id = hash("md5", json_encode($row));
-
-					if(preg_match("/color/", $row["property"])) {
-?>
-						<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
-							<input type="hidden" value="<?php print htmlentities($row["id"] ?? ""); ?>" name="id" />
-							<input type="hidden" value="1" name="customize_value" />
-							<tr>
-								<td>
-									<?php print htmlentities($row["humanname"] ?? ""); ?>
-								</td>
-								<td>
-									<?php print htmlentities($row["property"] ?? ""); ?>
-								</td>
-								<td>
-									<input type="text" id="<?php print $gui_id; ?>" name="value" <?php print preg_match("/color/", $row["property"] )? 'class="jscolor"' : ''; ?> value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
-								</td>
-								<td>
-									<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Reset</button>
-								</td>
-	<?php
-								if($i == 0) {
-	?>
-									<td class="td_iframe" rowspan="<?php print count($whole); ?>">
-										<iframe id="iframe_reloader" class="full_height_iframe" src="startseite">Ihr Browser unterstützt leider keine IFrames</iframe>
-									</td>
-	<?php
-								}
-	?>
-							</tr>
-						</form>
-<?php
-						$i++;
+					$whole = array();
+					while ($row = mysqli_fetch_assoc($results)) {
+						$whole[] = $row;
 					}
-				}
+
+					$i = 0;
+					foreach ($whole as $row) {
+						$gui_id = hash("md5", json_encode($row));
+
+						if(preg_match("/color/", $row["property"])) {
 ?>
-			</tbody>
-		</table>
+							<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
+								<input type="hidden" value="<?php print htmlentities($row["id"] ?? ""); ?>" name="id" />
+								<input type="hidden" value="1" name="customize_value" />
+								<tr>
+									<td>
+										<?php print htmlentities($row["humanname"] ?? ""); ?>
+									</td>
+									<td>
+										<?php print htmlentities($row["property"] ?? ""); ?>
+									</td>
+									<td>
+										<input type="text" id="<?php print $gui_id; ?>" name="value" <?php print preg_match("/color/", $row["property"] )? 'class="jscolor"' : ''; ?> value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
+									</td>
+									<td>
+										<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Reset</button>
+									</td>
+<?php
+									/*
+									if($i == 0) {
+?>
+										<td class="td_iframe" rowspan="<?php print count($whole); ?>">
+											<iframe id="iframe_reloader" class="full_height_iframe" src="startseite">Ihr Browser unterstützt leider keine IFrames</iframe>
+										</td>
+<?php
+									}
+									*/
+?>
+								</tr>
+							</form>
+<?php
+							$i++;
+						}
+					}
+?>
+				</tbody>
+			</table>
+			</td><td valign=top>
+				<iframe id="iframe_reloader" class="full_height_iframe" src="startseite">Ihr Browser unterstützt leider keine IFrames</iframe>
+			</td></table>
 <?php
 		js(array("jscolor.js"));
 		js(array("autorowspan.js"));
