@@ -82,6 +82,16 @@
 			message($fehler);
 		}
 
+		$pruefungstypen = create_pruefungstypen_array();
+		if(!count($pruefungstypen)) {
+			$fehler = "Es sind keine Prüfungstypen vorhanden. ";
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				$fehler .= "<a href='admin?page=".get_page_id_by_filename("pruefungstypen.php")."'>Hier können Sie welche hinzufügen.</a>";
+			} else {
+				$fehler .= "Bitten Sie einen Administrator, Prüfungstypen hinzuzufügen.";
+			}
+			message($fehler);
+		}
 
 		$bereiche = create_bereiche_array();
 		if(!count($bereiche)) {
