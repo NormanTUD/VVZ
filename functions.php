@@ -2206,7 +2206,9 @@ declare(ticks=1);
 			}
 			$where = '`id` IN ('.join(', ', array_map('esc', $wherea)).')';
 			$query = "DELETE FROM `$table` WHERE $where";
-			return simple_query_success_fail_message($query, 'Die Keys wurden erfolgreich gelöscht.', 'Die Daten wurden nicht erfolgreich gemergt.');
+			if(count($wherea)) {
+				return simple_query_success_fail_message($query, 'Die Keys wurden erfolgreich gelöscht.', 'Die Daten wurden nicht erfolgreich gemergt.');
+			}
 		} else {
 			error('Die Tabelle `'.htmlentities($table).'` konnte ist nicht valide.');
 		}
