@@ -1706,10 +1706,10 @@
 
 	function logged_in_stuff () {
 		if(isset($GLOBALS['logged_in_user_id'])) {
-			$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]));
+			$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]) ?? "");
 			if(!user_is_verwalter($GLOBALS['logged_in_user_id'])) {
 				if(!preg_match('/\w{2,}/', $dozent_name)) {
-					$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! !!!</span>';
+					$dozent_name = htmlentities($GLOBALS['logged_in_data'][1] ?? "").' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! !!!</span>';
 				}
 			} else {
 				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]);
