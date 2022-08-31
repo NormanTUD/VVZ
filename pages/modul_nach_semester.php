@@ -42,8 +42,8 @@
 								<input type="hidden" name="modul_nach_semester" value="1" />
 								<input type="hidden" name="modul" value="<?php print $row[1]; ?>" />
 								<td><?php print htmlentities($row[0] ?? ""); ?></td>
-								<td><input type="text" name="semester" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
-								<td><input type="submit" value="Speichern" /></td>
+								<td><input noautosubmit=1 type="text" name="semester" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
+								<td><input noautosubmit=1 type="submit" value="Speichern" /></td>
 							</tr>
 						</form>
 <?php
@@ -68,10 +68,9 @@
 					<tr>
 						<th>Semester</th>
 						<th>Modul</th>
-						<th>Anzahl Veranstaltungen pro Typ</th>
+						<th>Anzahl Ver&shy;an&shy;stal&shy;tungen pro Typ</th>
 						<th>Anzahl Credit-Points</th>
-						<th>Anzahl Prüfungsleistungen</th>
-						<th>Speichern</th>
+						<th>Anzahl Prü&shy;fungs&shy;leis&shy;tungen</th>
 					</tr>
 <?php
 					foreach (range(1, $max_semester) as $this_semester) {
@@ -109,9 +108,8 @@
 										}
 ?>
 									</td>
-									<td><input type="text" value="<?php print htmlentities($credit_points ?? ""); ?>" name="credit_points" /></td>
-									<td><input type="text" value="<?php print htmlentities($anzahl_pruefungsleistungen ?? ""); ?>" name="pruefungsleistung_anzahl" /></td>
-									<td><input type="submit" value="Speichern" /><td>
+									<td><input type="text" class="width50px" value="<?php print htmlentities($credit_points ?? ""); ?>" name="credit_points" /></td>
+									<td><input type="text" class="width50px" value="<?php print htmlentities($anzahl_pruefungsleistungen ?? ""); ?>" name="pruefungsleistung_anzahl" /></td>
 								</tr>
 							</form>
 <?php
@@ -127,6 +125,8 @@
 <?php
 			}
 		}
+
+		js(array("autosubmit.js"));
 ?>
 	</div>
 <?php

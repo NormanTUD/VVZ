@@ -838,7 +838,7 @@ a, a:visited, a:hover, a:active {
 }
 
 .width50px {
-	width: 50px;
+	width: 50px !important;
 }
 
 .font40px {

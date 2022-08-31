@@ -4782,11 +4782,20 @@ INSERT INTO
 
 		foreach (preg_split('/\s*,\s*/', $semester) as $this_semester) {
 			if(preg_match('/^\d+$/', $this_semester)) {
-				$query = 'INSERT IGNORE INTO `modul_nach_semester` (`modul_id`, `semester`) VALUES ('.esc($modul).', '.esc($this_semester).')';
-				$result = rquery($query);
-				if($result) {
-					$success_counter++;
+				if($this_semester > 0) {
+					if($this_semester > 32) {
+						$query = 'INSERT IGNORE INTO `modul_nach_semester` (`modul_id`, `semester`) VALUES ('.esc($modul).', '.esc($this_semester).')';
+						$result = rquery($query);
+						if($result) {
+							$success_counter++;
+						} else {
+							$failure++;
+						}
+					} else {
+						warning("Semester muss kleiner als 32 sein.");
+					}
 				} else {
+					warning("Semester muss größer als 0 sein.");
 					$failure++;
 				}
 			}
