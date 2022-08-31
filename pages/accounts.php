@@ -83,8 +83,8 @@
 			<tr>
 				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<input type="hidden" name="new_user" value="1" />
-					<td><input type="text" name="name" value="" /></td>
-					<td><input type="password" name="password" value="" placeholder="passwort" /></td>
+					<td><input autocomplete="off" type="text" name="name" value="" /></td>
+					<td><input autocomplete="new-password" type="password" name="password" value="" placeholder="passwort" /></td>
 					<td><?php create_select($rollen, 2, 'role'); ?></td>
 					<td><?php create_select($dozenten, '', 'dozent', 0); ?></td>
 <?php
