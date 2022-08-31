@@ -11,6 +11,16 @@
 
 	include_once("sql_datenbanken.php");
 
+	function already_initialized ($name) {
+		$query = "select count(*) from initialized_db where name = ".esc($name);
+		return get_single_row_from_query($query);
+	}
+
+	function initialized ($name) {
+		$query = "insert ignore into initialized_db (name) values (".esc($name).")";
+		rquery($query);
+	}
+
 	function table_exists_and_has_entries($table) {
 		if(!table_exists($GLOBALS["dbname"], $table)) {
 			return 0;
@@ -421,12 +431,14 @@
 			}
 			 */
 
-			if(!table_exists_and_has_entries("titel")) {
+			if(!table_exists_and_has_entries("titel") && !already_initialized("titel")) {
 				rquery("insert ignore into `titel` VALUES (1,'Doktor','Dr.'),(2,'Privatdozent','PD Dr.'),(3,'Professor Doktor','Prof. Dr.'), (4, 'Professor', 'Prof.');");
+				initialized("titel");
 			}
 
-			if(!table_exists_and_has_entries("page_info")) {
+			if(!table_exists_and_has_entries("page_info") && !already_initialized("role_to_user")) {
 				rquery("INSERT ignore INTO `role_to_user` VALUES (1,1);");
+				initialized("role_to_user");
 			}
 
 			$show_importer = 0;
@@ -467,16 +479,20 @@
 			);
 
 
-			if(!table_exists_and_has_entries("pruefungstyp")) {
+			if(!table_exists_and_has_entries("pruefungstyp") && !already_initialized("pruefungstyp")) {
 				insert_values('pruefungstyp', array('name'), $pruefungstypen);
-			}
-			if(!table_exists_and_has_entries("veranstaltungstyp")) {
-				insert_values('veranstaltungstyp', array('name', 'abkuerzung'), $veranstaltungstypen);
+				initialized("pruefungstyp");
 			}
 
-			if(!table_exists_and_has_entries("api_error_code")) {
+			if(!table_exists_and_has_entries("veranstaltungstyp") && !already_initialized("veranstaltungstyp")) {
+				insert_values('veranstaltungstyp', array('name', 'abkuerzung'), $veranstaltungstypen);
+				initialized("veranstaltungstyp");
+			}
+
+			if(!table_exists_and_has_entries("api_error_code") && !already_initialized("api_error_code")) {
 				$sql = "insert into api_error_code (name) values ('Kein Fehler'), ('Falscher Auth-Code'), ('Falsche Parameter'), ('Zu wenig Zeit vergangen');";
 				rquery($sql);
+				initialized("api_error_code");
 			}
 
 			if(table_exists($GLOBALS['dbname'], 'users')) {
@@ -490,12 +506,13 @@
 			#$query = 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = "'.$GLOBALS['dbname'].'"';
 			#$result = rquery($query);
 
-			if(!table_exists_and_has_entries("bereiche")) {
+			if(!table_exists_and_has_entries("bereiche") && !already_initialized("bereich")) {
 				$bereiche_query = "INSERT IGNORE INTO `bereich` VALUES (1, '-');";
 				rquery($bereiche_query);
+				initialized("bereich");
 			}
 
-			if(!table_exists_and_has_entries("customizations")) {
+			if(!table_exists_and_has_entries("customizations") && !already_initialized("customizations")) {
 				$default_values = array(
 					"button:hover, input[type='button']:hover, input[type='submit']:hover" => array(
 						"name" => "Buttons Mouseover",
@@ -617,8 +634,9 @@
 						rquery($query);
 					}
 				}
-			}
 
+				initialized("customizations");
+			}
 
 			rquery('set FOREIGN_KEY_CHECKS=1');
 		} catch (\Throwable $e) {
