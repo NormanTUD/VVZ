@@ -20,7 +20,7 @@
 				print get_demo_expiry_time();
 				if($GLOBALS['logged_in_was_tried']) {
 					if(get_post('username') || get_post('password')) {
-						sleep(3);
+						sleep(5);
 ?>
 						<span class="red_text">Benutzername oder Passwort falsch</span><br />
 <?php

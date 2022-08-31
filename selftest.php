@@ -52,6 +52,7 @@
 			rquery("CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"]);
 			rquery('use `'.$GLOBALS['dbname'].'`');
 
+			$done_sth = 0;
 			foreach ($tables as $this_table => $create_query) {
 				if(!table_exists($GLOBALS["dbname"], $this_table)) {
 					$missing_tables[] = $this_table;
@@ -61,12 +62,14 @@
 							rquery("use ".$GLOBALS["dbname"]);
 							rquery($this_create_query);
 							while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
+							$done_sth++;
 						}
 					} else {
 						try {
 							rquery("create database if not exists ".$GLOBALS["dbname"]);
 							rquery("use ".$GLOBALS["dbname"]);
 							rquery($create_query);
+							$done_sth++;
 						} catch (\Throwable $e) {
 							//
 						}
@@ -74,10 +77,13 @@
 					$GLOBALS['settings_cache'] = array();
 				}
 			}
-			sleep(1);
+			if($done_sth) {
+				sleep(1);
+			}
 
 			$views = $GLOBALS["views"];
 
+			$done_sth = 0;
 			$missing_views = array();
 			foreach ($views as $this_view => $create_query) {
 				if(!table_exists($GLOBALS['dbname'], $this_view)) {
@@ -85,10 +91,13 @@
 					rquery("create database if not exists ".$GLOBALS["dbname"]);
 					rquery("use ".$GLOBALS["dbname"]);
 					rquery($create_query);
+					$done_sth++;
 					while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
 				}
 			}
-			sleep(1);
+			if($done_sth) {
+				sleep(1);
+			}
 
 			$errormsg = array();
 
