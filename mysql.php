@@ -11,6 +11,64 @@
 
 	if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
 
+
+	if(!function_exists("add_to_output")) {
+		function add_to_output ($name, $msg) {
+			if($name) {
+				if($msg) {
+					$GLOBALS[$name][] = $msg;
+				}
+			} else {
+				die(htmlentities($name)." existiert nicht!");
+			}
+		}
+	}
+
+	if(!function_exists("error")) {
+		function error ($message) {
+			add_to_output("error", $message);
+		}
+	}
+
+	if(!function_exists("success")) {
+		function success ($message) {
+			add_to_output("success", $message);
+		}
+	}
+
+	if(!function_exists("debug")) {
+		function debug ($message) {
+			$bt = debug_backtrace();
+			$caller = array_shift($bt);
+			$data = array("msg" => $message, "caller" => $caller);
+			add_to_output("debug", $data);
+		}
+	}
+
+	if(!function_exists("warning")) {
+		function warning ($message) {
+			add_to_output("warning", $message);
+		}
+	}
+
+	if(!function_exists("right_issue")) {
+		function right_issue ($message) {
+			add_to_output("right_issue", $message);
+		}
+	}
+
+	if(!function_exists("message")) {
+		function message ($message) {
+			add_to_output("message", $message);
+		}
+	}
+
+	if(!function_exists("show_easter_egg")) {
+		function show_easter_egg ($message) {
+			add_to_output("easter_egg", $message);
+		}
+	}
+
 	if(!function_exists("stderrw")) {
 		function stderrw ($str) {
 			fwrite(STDERR, $str);

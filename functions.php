@@ -8570,46 +8570,6 @@ SE 1/2 oder BZW
 		return $title_plus;
 	}
 
-	function add_to_output ($name, $msg) {
-		if($name) {
-			if($msg) {
-				$GLOBALS[$name][] = $msg;
-			}
-		} else {
-			die(htmlentities($name)." existiert nicht!");
-		}
-	}
-
-	function error ($message) {
-		add_to_output("error", $message);
-	}
-
-	function success ($message) {
-		add_to_output("success", $message);
-	}
-
-	function debug ($message) {
-		$bt = debug_backtrace();
-		$caller = array_shift($bt);
-		$data = array("msg" => $message, "caller" => $caller);
-		add_to_output("debug", $data);
-	}
-
-	function warning ($message) {
-		add_to_output("warning", $message);
-	}
-
-	function right_issue ($message) {
-		add_to_output("right_issue", $message);
-	}
-
-	function message ($message) {
-		add_to_output("message", $message);
-	}
-
-	function show_easter_egg ($message) {
-		add_to_output("easter_egg", $message);
-	}
 
 	function nonce () {
 		if($GLOBALS['nonce']) {
