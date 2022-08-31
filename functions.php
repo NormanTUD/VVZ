@@ -9600,6 +9600,10 @@ order by
 	if(db_is_demo($GLOBALS["dbname"], 1) && !$GLOBALS["logged_in_user_id"] && get_get("first_login")) {
 		try {
 			set_session_id(1);
+			sleep(1);
+			print '<meta http-equiv="refresh" content="0; url=./" />';
+			flush();
+			exit(0);
 		} catch (\Throwable $e) {
 			// Das kann vorkommen, wenn man gerade die Seite erstellt
 		}

@@ -624,6 +624,7 @@
 		} catch (\Throwable $e) {
 			stderrw($e);
 
+			sleep(1);
 			print "Es kann noch einen Moment dauern. Bitte warten Sie.";
 			print '<meta http-equiv="refresh" content="0; url=./" />';
 			flush();

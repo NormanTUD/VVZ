@@ -127,6 +127,9 @@
 <?php
 		}
 
+		#$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+		#file_get_contents("$actual_link/data/custom.php");
+
 		css("custom.php");
 
 		js(array("color-hash.js"));

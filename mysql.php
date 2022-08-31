@@ -408,7 +408,6 @@
 									flush();
 
 									$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-									file_get_contents($actual_link);
 
 									exit(0);
 								} else {
@@ -416,6 +415,7 @@
 								}
 							} catch (\Throwable $e) {
 								#stderrw("Could not select DB: $e");
+								sleep(1);
 								print "Es kann noch einen Moment dauern. Bitte warten Sie.";
 								print '<meta http-equiv="refresh" content="0; url=./" />';
 								flush();
