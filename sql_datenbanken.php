@@ -148,17 +148,14 @@
   `stunde` enum('1','1-2','1-3','1-4','1-5','1-6','1-7','1-8','2','2-3','2-4','2-5','2-6','2-7','2-8','3','3-4','3-5','3-6','3-7','3-8','4','4-5','4-6','4-7','4-8','5','5-6','5-7','5-8','6','6-7','6-8','7','7-8','8','*','Ganztägig') DEFAULT '1',
   `woche` enum('gerade Woche','ungerade Woche','jede Woche','keine Angabe') DEFAULT 'jede Woche',
   `abgabe_pruefungsleistungen` date DEFAULT NULL,
-  `language_id` int(11) DEFAULT 1,
   `related_veranstaltung` int(10) unsigned DEFAULT NULL,
   `fester_bbb_raum` int(11) DEFAULT 0,
   `videolink` varchar(1000) DEFAULT NULL,
   UNIQUE KEY `veranstaltung_id` (`veranstaltung_id`),
   KEY `fk_related_veranstaltung` (`related_veranstaltung`),
-  KEY `veranstaltung_metadaten_ibfk_2` (`language_id`),
   CONSTRAINT `fk_related_veranstaltung` FOREIGN KEY (`related_veranstaltung`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
   CONSTRAINT `related_veranstaltung_fk` FOREIGN KEY (`related_veranstaltung`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `veranstaltung_metadaten_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `veranstaltung_metadaten_ibfk_2` FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE
+  CONSTRAINT `veranstaltung_metadaten_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'veranstaltung_nach_lv_nr' => 'create table if not exists `veranstaltung_nach_lv_nr` (

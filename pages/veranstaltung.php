@@ -110,7 +110,7 @@
 							$this_data[$this_column] = '';
 						}
 
-						$query = 'SELECT `vm`.`wunsch`, `vm`.`hinweis`, `vm`.`opal_link`, `vm`.`wochentag`, `vm`.`stunde`, `vm`.`woche`, `vm`.`anzahl_hoerer`, `vm`.`erster_termin`, `vm`.`abgabe_pruefungsleistungen`, `v`.`raumwunsch_id`, `v`.`gebaeudewunsch_id`, `v`.`last_change`, `v`.`master_niveau`, `vm`.`language_id`, `vm`.`related_veranstaltung`, `vm`.`fester_bbb_raum`, `vm`.`videolink` FROM `veranstaltung_metadaten` `vm` JOIN `veranstaltung` `v` ON `v`.`id` = `vm`.`veranstaltung_id` WHERE `veranstaltung_id` = '.esc(get_get('id'));
+						$query = 'SELECT `vm`.`wunsch`, `vm`.`hinweis`, `vm`.`opal_link`, `vm`.`wochentag`, `vm`.`stunde`, `vm`.`woche`, `vm`.`anzahl_hoerer`, `vm`.`erster_termin`, `vm`.`abgabe_pruefungsleistungen`, `v`.`raumwunsch_id`, `v`.`gebaeudewunsch_id`, `v`.`last_change`, `v`.`master_niveau`, null, `vm`.`related_veranstaltung`, `vm`.`fester_bbb_raum`, `vm`.`videolink` FROM `veranstaltung_metadaten` `vm` JOIN `veranstaltung` `v` ON `v`.`id` = `vm`.`veranstaltung_id` WHERE `veranstaltung_id` = '.esc(get_get('id'));
 						$result = rquery($query);
 						while ($row = mysqli_fetch_row($result)) {
 							$i = 0;
