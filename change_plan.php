@@ -60,23 +60,31 @@
 		}
 
 		if(get_post("update_kunde_data")) {
-			if(!$urlname_exists) {
-				if($email_ok) {
-					if($iban_ok) {
-						if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
-
-							update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"), get_zahlungszyklus_monate_by_name(get_post("zahlungszyklus_monate")));
-						}
+			if($email_ok) {
+				if($iban_ok) {
+					if($kunde_id && get_post("anrede") && get_post("universitaet") && get_post("name") && get_post("strasse") && get_post("plz") && get_post("ort") && get_get("product") && get_post("iban") && get_post("email")) {
+						update_kunde($kunde_id, get_post("anrede"), get_post("universitaet"), get_post("name"), get_post("strasse"), get_post("plz"), get_post("ort"), $GLOBALS["dbname"], get_plan_id(get_get("product") ?? "basic_faculty"), get_post("iban"), get_post("email"), get_zahlungszyklus_monate_by_name(get_post("zahlungszyklus_monate")));
 
 						if(get_post("daten_uebernehmen")) {
 							// TODO
 						}
-
-						$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
 					}
 				}
-			} else {
-				$uni_name_error = "Dieser Name ist bereits belegt. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
+			}
+
+			$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
+
+			if($kunde_ok) {
+				$new_kunde_url = create_uni_name(get_post("universitaet"));
+				if(get_kunde_url_name_by_id($kunde_id) != $new_kunde_url && $new_kunde_url) {
+					if($urlname_exists) {
+						$uni_name_error = "Dieser Name ist bereits belegt. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
+					} else {
+						update_kunde_urlname($kunde_id, $new_kunde_url);
+					}
+				} else {
+					die("c: ".$new_kunde_url);
+				}
 			}
 		}
 
@@ -165,7 +173,7 @@
 					</tr>
 					<tr>
 						<td>Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen?</td>
-						<td><input type="checkbox" name="daten_uebernehmen" value=1 /></td>
+						<!--<td><input type="checkbox" name="daten_uebernehmen" value=1 /></td>-->
 					</tr>
 				</table>
 				<button>Ja, meine Daten sind korrekt</button>

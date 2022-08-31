@@ -250,9 +250,7 @@
 	}
 
 	function update_kunde ($id, $anrede, $universitaet, $name, $strasse, $plz, $ort, $dbname, $plan_id, $iban, $email, $zahlungszyklus_monate) {
-		$urlname = create_uni_name($universitaet);
-
-		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, name, strasse, plz, ort, personalized, dbname, urlname, plan_id, iban, email, zahlungszyklus_monate) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($name).', '.esc($strasse).', '.esc($plz).', '.esc($ort).', 1, '.esc($dbname).", ".esc($urlname).", ".esc($plan_id).", ".esc($iban).", ".esc($email).", ".esc($zahlungszyklus_monate).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), name=values(name), strasse=values(strasse), plz=values(plz), ort=values(ort), personalized=values(personalized), dbname=values(dbname), urlname=values(urlname), plan_id=values(plan_id), iban=values(iban), email=values(email), zahlungszyklus_monate=values(zahlungszyklus_monate), urlname=values(urlname)";
+		$query = 'insert into vvz_global.kundendaten (id, anrede, universitaet, name, strasse, plz, ort, personalized, dbname, plan_id, iban, email, zahlungszyklus_monate) values ('.esc($id).', '.esc($anrede).', '.esc($universitaet).', '.esc($name).', '.esc($strasse).', '.esc($plz).', '.esc($ort).', 1, '.esc($dbname).", ".esc($plan_id).", ".esc($iban).", ".esc($email).", ".esc($zahlungszyklus_monate).") on duplicate key update anrede=values(anrede), universitaet=values(universitaet), name=values(name), strasse=values(strasse), plz=values(plz), ort=values(ort), personalized=values(personalized), dbname=values(dbname), plan_id=values(plan_id), iban=values(iban), email=values(email), zahlungszyklus_monate=values(zahlungszyklus_monate)";
 		rquery($query);
 	}
 
@@ -557,5 +555,10 @@
 	function get_urlname_by_dbname ($dbn) {
 		$query = "select urlname from vvz_global.kundendaten where dbname = ".esc($dbn);
 		return get_single_row_from_query($query);
+	}
+
+	function update_kunde_urlname($kunde_id, $urlname) {
+		$query = "update vvz_global.kundendaten set urlname = ".esc($urlname)." where id = ".esc($kunde_id);
+		rquery($query);
 	}
 ?>
