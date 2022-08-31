@@ -346,7 +346,7 @@
   `bereich_id` int(10) unsigned DEFAULT NULL,
   `pruefungsnummer_fach_id` int(10) unsigned DEFAULT NULL,
   `modulbezeichnung` varchar(500) DEFAULT NULL,
-  `zeitraum_id` int(11) NOT NULL DEFAULT 1,
+  `zeitraum_id` int(11) DEFAULT NULL,
   `disabled` enum('0','1') DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `pruefungstyp_id` (`pruefungstyp_id`),

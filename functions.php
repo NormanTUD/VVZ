@@ -3381,10 +3381,10 @@ WHERE 1
 			if(mysqli_affected_rows($GLOBALS['dbh'])) {
 				success('Die Prüfungsnummer wurde erfolgreich eingetragen.');
 			} else {
-				error('Der Prüfungsnummer konnte nicht eingetragen werden.');
+				error('Die Prüfungsnummer konnte nicht eingetragen werden.');
 			}
 		} else {
-			error('Der Prüfungsnummer konnte nicht eingetragen werden.');
+			error('Die Prüfungsnummer konnte nicht eingetragen werden.');
 		}	
 	}
 

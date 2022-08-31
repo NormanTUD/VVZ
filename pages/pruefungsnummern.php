@@ -65,7 +65,13 @@
 							<th>Prüfungstyp</th>
 							<th>Modulbezeichnung</th>
 							<th class="pn_th">PN</th>
-							<th>Zeitraum</th>
+<?php
+							if(count($zeitraum)) {
+?>
+								<th>Zeitraum</th>
+<?php
+							}
+?>
 							<th>PN Deaktiviert?</th>
 							<th>Löschen?</th>
 						</tr>
@@ -140,7 +146,13 @@ JOIN
 									<td><?php create_select($pruefungstypen, $row[3], 'pruefungstyp'); ?></td>
 									<td><input type="text" name="modulbezeichnung" class="width_auto" value="<?php print htmlentities($row[8] ?? ""); ?>" /></td>
 									<td><input type="text" name="pruefungsnummer" class="width_auto" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
-									<td><?php create_select($zeitraum, $row[9], 'zeitraum'); ?></td>
+<?php
+									if(count($zeitraum)) {
+?>
+										<td><?php create_select($zeitraum, $row[9], 'zeitraum'); ?></td>
+<?php
+									}
+?>
 									<td><?php create_select(array("0" => "Nein", "1" => "Ja"), $row[10] ? 'Ja' : 'Nein', 'pndisabled')  ?></td>
 									<td><input type="submit" name="delete" value="Löschen" /></td>
 								</form>
@@ -157,7 +169,13 @@ JOIN
 							<td><?php create_select($pruefungstypen, '', 'pruefungstyp', 0, 1); ?></td>
 							<td><input type="text" name="modulbezeichnung" class="width_auto" noautosubmit="1" value="" /></td>
 							<td><input type="text" name="pruefungsnummer" class="width_auto" noautosubmit="1" placeholder="pruefungsnummer" /></td>
-							<td><?php create_select($zeitraum, '', 'zeitraum', 0, 1); ?></td>
+<?php
+							if(count($zeitraum)) {
+?>
+								<td><?php create_select($zeitraum, '', 'zeitraum', 0, 1); ?></td>
+<?php
+							}
+?>
 							<td>&mdash;</td>
 							<td><input type="submit" value="Speichern" /></td>
 						</form>
