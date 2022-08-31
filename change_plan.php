@@ -81,7 +81,7 @@
 					if($urlname_exists) {
 						$uni_name_error = "Dieser Name ist bereits belegt. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
 					} else {
-						if(kunde_owns_url($kunde_id, $new_kunde_url)) {
+						if(kunde_owns_url($kunde_id, $new_kunde_url) || !urlname_already_exists($new_kunde_url)) {
 							update_kunde_urlname($kunde_id, $new_kunde_url);
 
 							print '<meta http-equiv="refresh" content="0; url=/v/'.$new_kunde_url.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
