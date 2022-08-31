@@ -81,11 +81,15 @@
 					if($urlname_exists) {
 						$uni_name_error = "Dieser Name ist bereits belegt. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
 					} else {
-						update_kunde_urlname($kunde_id, $new_kunde_url);
+						if(kunde_owns_url($kunde_id, $new_kunde_url)) {
+							update_kunde_urlname($kunde_id, $new_kunde_url);
 
-						print '<meta http-equiv="refresh" content="0; url=/v/'.$new_kunde_url.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
-						flush();
-						exit(0);
+							print '<meta http-equiv="refresh" content="0; url=/v/'.$new_kunde_url.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
+							flush();
+							exit(0);
+						} else {
+							$uni_name_error = "Dieser Name ist bereits belegt. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
+						}
 					}
 				} else {
 					// Kundenurl gleich, keine Änderungen
@@ -98,14 +102,12 @@
 
 		#print("urlname_exists: $urlname_exists, kunde_ok: $kunde_ok, iban_ok: $iban_ok, email_ok: $email_ok");
 
-		if((!$urlname_exists && $kunde_ok && $iban_ok && $email_ok) || get_get("done_migration")) {
+		if(((!$urlname_exists && $kunde_ok && $iban_ok && $email_ok) || get_get("done_migration")) && !$uni_name_error) {
 			if(!get_get("done_migration")) {
 				if(!$urlname_exists || (kunde_owns_url($kunde_id, get_url_uni_name()) && $kunde_ok && $email_ok && $iban_ok)) {
 					update_kunde_plan($kunde_id, get_plan_id(get_get("product")));
 				}
-			}
-
-			if(get_get("done_migration")) {
+			} else {
 				# Zahlungsinfos, DB speichern
 ?>
 				Ihr Plan wurde geändert. Sie können die Software nun als Vorlesungsverzeichnis für Ihre Universität benutzen.<br>
