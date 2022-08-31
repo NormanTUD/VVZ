@@ -154,7 +154,16 @@
 				$caller_function = $debug_backtrace[1]['function'];
 			}
 			$start = microtime(true);
-			$result = mysqli_query($GLOBALS['dbh'], $internalquery);
+			try {
+				$result = mysqli_query($GLOBALS['dbh'], $internalquery);
+			} catch (\Throwable $e) {
+				if(file_exists("/etc/hardcore_debugging")) {
+					include_once('scripts/SqlFormatter.php');
+					print "<pre>Query:\n".SqlFormatter::highlight($internalquery)."\n\nError:\n";
+					print "$e</pre>";
+				}
+				exit(1);
+			}
 			$end = microtime(true);
 			$used_time = $end - $start;
 			$numrows = "&mdash;";

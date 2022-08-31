@@ -81,6 +81,10 @@
 						$uni_name_error = "Dieser Name ist bereits belegt. Sie können keine URLs Anderer übernehmen. Bitte wählen Sie einen anderen Namen.";
 					} else {
 						update_kunde_urlname($kunde_id, $new_kunde_url);
+
+						print '<meta http-equiv="refresh" content="0; url=/v/'.$new_kunde_url.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
+						flush();
+						exit(0);
 					}
 				} else {
 					die("c: ".$new_kunde_url);
@@ -104,16 +108,6 @@
 
 				Sie können jederzeit die Rechnungen im Administrationsmenü einsehen und als PDF herunterladen.
 <?php
-			} else {
-?>
-				Ihr Plan wurde geändert. Sie werden nun auf die neue Seite umgeleitet.
-<?php
-				$kunde_id = get_kunde_id_by_url();
-				$new_url = get_kunde_url_name_by_id($kunde_id);
-
-				print '<meta http-equiv="refresh" content="0; url=/v/'.$new_url.'/change_plan?product='.htmlentities(get_get("product")).'&done_migration=1" />';
-				flush();
-				exit(0);
 			}
 		} else {
 ?>
