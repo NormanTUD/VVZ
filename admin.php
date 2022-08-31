@@ -59,7 +59,7 @@
 			}
 		}
 
-		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id'])) {
+		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id']) && get_institut_name($GLOBALS["user_institut_id"])) {
 			$chosen_institut = $GLOBALS['user_institut_id'];
 		}
 		
@@ -69,6 +69,8 @@
 				$chosen_institut = $value[0];
 			}
 		}
+
+		#die(">>$chosen_institut<<");
 
 		$studiengaenge = create_studiengaenge_array($chosen_institut);
 		$zeitraum = create_zeitraum_array();
