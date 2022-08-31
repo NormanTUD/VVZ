@@ -11,9 +11,9 @@
 		<div id="veranstaltungstypen">
 			<?php print get_seitentext(); ?>
 <?php
-				include_once('hinweise.php');
+			include_once('hinweise.php');
+			simple_edit(array('name', 'abkuerzung'), 'veranstaltungstyp', array('Name', 'Abkürzung', 'Aktion', 'Löschen?'), $GLOBALS['this_page_number'], array('id', 'veranstaltungstyp_name', 'veranstaltungstyp_abkuerzung'), 0) 
 ?>
-			<?php simple_edit(array('name', 'abkuerzung'), 'veranstaltungstyp', array('Name', 'Abkürzung', 'Löschen?', 'Aktion'), $GLOBALS['this_page_number'], array('id', 'veranstaltungstyp_name', 'veranstaltungstyp_abkuerzung'), 0) ?>
 		</div>
 
 <?php

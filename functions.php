@@ -502,11 +502,19 @@ declare(ticks=1);
 					}
 				}
 
-				if(get_post('veranstaltungstyp_name') && get_post('veranstaltungstyp_abkuerzung')) {
+				if(get_post('veranstaltungstyp_name') || get_post('veranstaltungstyp_abkuerzung')) {
 					if(get_post('delete')) {
 						delete_veranstaltungstyp($this_id);
 					} else {
-						update_veranstaltungstyp($this_id, get_post('veranstaltungstyp_name'), get_post('veranstaltungstyp_abkuerzung'));
+						if(get_post("veranstaltungstyp_name") && get_post("veranstaltungstyp_abkuerzung")) {
+							update_veranstaltungstyp($this_id, get_post('veranstaltungstyp_name'), get_post('veranstaltungstyp_abkuerzung'));
+						} else if(get_post("veranstaltungstyp_name") && !get_post("veranstaltungstyp_abkuerzung")) {
+							update_veranstaltungstyp($this_id, get_post('veranstaltungstyp_name'), get_post('veranstaltungstyp_name'));
+						} else if(!get_post("veranstaltungstyp_name") && get_post("veranstaltungstyp_abkuerzung")) {
+							update_veranstaltungstyp($this_id, get_post('veranstaltungstyp_abkuerzung'), get_post('veranstaltungstyp_abkuerzung'));
+						} else if(!get_post("veranstaltungstyp_name") && !get_post("veranstaltungstyp_abkuerzung")) {
+							warning("Ein Veranstaltungstyp muss einen Namen oder eine Abkürzung haben. Es wurde nichts eingetragen");
+						}
 					}
 				}
 
@@ -976,8 +984,17 @@ declare(ticks=1);
 				message('Ein Modul muss einem Studiengang zugeordnet sein.');
 			}
 
-			if(get_post('new_veranstaltungstyp_name') && get_post('new_veranstaltungstyp_abkuerzung')) {
-				create_veranstaltungstyp(get_post('new_veranstaltungstyp_name'), get_post('new_veranstaltungstyp_abkuerzung'));
+			if(get_post('new_veranstaltungstyp_name') || get_post('new_veranstaltungstyp_abkuerzung')) {
+				if(get_post("new_veranstaltungstyp_name") && get_post("new_veranstaltungstyp_abkuerzung")) {
+					create_veranstaltungstyp(get_post('new_veranstaltungstyp_name'), get_post('new_veranstaltungstyp_abkuerzung'));
+				} else if(get_post("new_veranstaltungstyp_name") && !get_post("new_veranstaltungstyp_abkuerzung")) {
+					create_veranstaltungstyp(get_post('new_veranstaltungstyp_name'), get_post('new_veranstaltungstyp_name'));
+				} else if(!get_post("new_veranstaltungstyp_name") && get_post("new_veranstaltungstyp_abkuerzung")) {
+					create_veranstaltungstyp(get_post('new_veranstaltungstyp_abkuerzung'), get_post('new_veranstaltungstyp_abkuerzung'));
+				} else if(!get_post("new_veranstaltungstyp_name") && !get_post("new_veranstaltungstyp_abkuerzung")) {
+					warning("Ein Veranstaltungstyp muss einen Namen oder eine Abkürzung haben. Es wurde nichts eingetragen");
+				}
+
 			} else if(get_post('new_veranstaltungstyp_name') && get_post('new_veranstaltungstyp_abkuerzung')) {
 				message('Es müssen Veranstaltungstyp-Name und Abkürzung eingetragen werden.');
 			}
