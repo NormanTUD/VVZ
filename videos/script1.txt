@@ -43,7 +43,7 @@ Klicken wir dort auf Logo Hochladen und dann auf Neues Logo hochladen.
 Wählen Sie dafür das Logo ihres Institutes oder Ihrer Universität aus.
 Hier können Sie auch Farben einstellen. Klicken Sie dazu auf eines der bunten Felder und wählen Sie eine neue Farbe aus.
 Die Änderungen sind sofort laif.
-Experimentieren Sie jedoch ruhig herum. Alle Einstellungen lassen sich rückgängig machen, indem Sie auf, Risett, klicken.. 
+Experimentieren Sie jedoch ruhig herum. Alle Einstellungen lassen sich rückgängig machen, indem Sie auf, Zurücksetzen, klicken.. 
 
 
 Ich möchte Ihnen nun noch zeigen, wie Sie ihre eigenen Gebäude, Dozenten und Prüfungsleistungen erstellen können.
