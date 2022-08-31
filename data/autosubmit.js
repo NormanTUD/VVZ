@@ -12,7 +12,7 @@ $(document).ready(function(){
 		if(!$(this).attr('noautosubmit')) {
 			$(this).change(function (index) {
 				var loc = window.location.pathname;
-				var dir = loc.substring(0, loc.lastIndexOf('/'));
+				var dir = window.location.protocol  + "//" + window.location.host + "/" + loc.substring(0, loc.lastIndexOf('/'));
 				var submitfile = dir + '/submit.php';
 				$.ajax({
 					url : submitfile,
