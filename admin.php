@@ -69,7 +69,7 @@
 		$studiengaenge = create_studiengaenge_array($chosen_institut);
 		$zeitraum = create_zeitraum_array();
 		if(!count($studiengaenge)) {
-			$fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut))."&laquo; sind noch keine Studiengänge vorhanden. ";
+			$fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut) ?? "!!! Institutsfehler: es existiert kein Institut !!!")."&laquo; sind noch keine Studiengänge vorhanden. ";
 			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
 				$fehler .= "<a href='admin?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
 			} else {
