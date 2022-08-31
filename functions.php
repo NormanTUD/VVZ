@@ -901,7 +901,7 @@ declare(ticks=1);
 			}
 
 			if(get_post('neue_pruefungsnummer')) {
-				if(get_post('modul') && get_post('pruefungstyp')) {
+				if(get_post('modul')) {
 					create_pruefungsnummer(get_post('modul'), get_post('pruefungsnummer'), get_post('pruefungstyp'), get_post('bereich'), get_post('modulbezeichnung'), get_post('zeitraum'));
 				}
 			}
@@ -3376,6 +3376,7 @@ WHERE 1
 	function create_pruefungsnummer($modul, $pruefungsnummer, $pruefungstyp, $bereich, $modulbezeichnung, $zeitraum_id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `bereich_id`, `modulbezeichnung`, `zeitraum_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul).', '.esc($pruefungstyp).', '.esc($bereich).', '.esc($modulbezeichnung).', '.esc($zeitraum_id).')';
+		die($query);
 		$result = rquery($query);
 		if($result) {
 			if(mysqli_affected_rows($GLOBALS['dbh'])) {

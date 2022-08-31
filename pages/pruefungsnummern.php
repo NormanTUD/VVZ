@@ -41,10 +41,11 @@
 			$studiengaenge_module = array();
 			$studiengaenge = create_studiengaenge_array($chosen_institut);
 			$zeitraum = create_zeitraum_array();
+			$pruefungstypen = create_pruefungstypen_array();
+
 			if(count($studiengaenge)) {
 				$module = create_modul_studiengang_array(70, $chosen_institut);
 				if(count($module)) {
-					$pruefungstypen = create_pruefungstypen_array();
 
 					$query = 'SELECT `ms`.`modul_id`, `ms`.`studiengang_id`, `ms`.`modul_name`, `ms`.`studiengang_name` FROM `view_modul_studiengang` `ms` LEFT JOIN `studiengang` `s` ON `s`.`id` = `ms`.`studiengang_id` ';
 					$query .= ' WHERE `s`.`institut_id` = '.esc($chosen_institut);
@@ -62,7 +63,13 @@
 						<tr>
 							<th>Modul</th>
 							<th>Bereich</th>
-							<th>Prüfungstyp</th>
+<?php
+							if(count($pruefungstypen)) {
+?>
+								<th>Prüfungstyp</th>
+<?php
+							}
+?>
 							<th>Modulbezeichnung</th>
 							<th class="pn_th">PN</th>
 <?php
@@ -143,7 +150,13 @@ JOIN
 									}
 ?>
 									<td><?php create_select($bereiche, $row[6], 'bereich'); ?></td>
-									<td><?php create_select($pruefungstypen, $row[3], 'pruefungstyp'); ?></td>
+<?php
+									if(count($pruefungstypen)) {
+?>
+										<td><?php create_select($pruefungstypen, $row[3], 'pruefungstyp'); ?></td>
+<?php
+									}
+?>
 									<td><input type="text" name="modulbezeichnung" class="width_auto" value="<?php print htmlentities($row[8] ?? ""); ?>" /></td>
 									<td><input type="text" name="pruefungsnummer" class="width_auto" value="<?php print htmlentities($row[2] ?? ""); ?>" /></td>
 <?php
@@ -166,7 +179,13 @@ JOIN
 							<input data-id="noautosubmit" type="hidden" value="neue_pruefungsnummer" name="neue_pruefungsnummer" />
 							<td><?php create_select($module, '', 'modul', 0, 1); ?></td>
 							<td><?php create_select($bereiche, '', 'bereich', 0, 1); ?></td>
-							<td><?php create_select($pruefungstypen, '', 'pruefungstyp', 0, 1); ?></td>
+<?php
+							if(count($pruefungstypen)) {
+?>
+								<td><?php create_select($pruefungstypen, '', 'pruefungstyp', 0, 1); ?></td>
+<?php
+							}
+?>
 							<td><input type="text" name="modulbezeichnung" class="width_auto" noautosubmit="1" value="" /></td>
 							<td><input type="text" name="pruefungsnummer" class="width_auto" noautosubmit="1" placeholder="pruefungsnummer" /></td>
 <?php
