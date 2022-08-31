@@ -9508,9 +9508,9 @@ order by
 			$query = "show databases like 'db_vvz_%'";
 			$result = rquery($query);
 			while ($row = mysqli_fetch_row($result)) {
-			$drop = 0;
+				$drop = 0;
 
-			if(table_exists($row[0], "instance_config")) {
+				if(table_exists($row[0], "instance_config")) {
 					if(db_is_demo($row[0])) {
 						$query = "select now() - installation_date from ".$row[0].".instance_config";
 						$seconds_diff = get_single_row_from_query($query);
@@ -9521,12 +9521,12 @@ order by
 						} else {
 							$drop = 1;
 						}
-
-						if($drop) {
-							$query = "drop database if exists $row[0];";
-							rquery($query);
-						}
 					}
+				}
+
+				if($drop) {
+					$query = "drop database if exists $row[0];";
+					rquery($query);
 				}
 			}
 		} catch (\Throwable $e) {
