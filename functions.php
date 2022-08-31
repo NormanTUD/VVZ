@@ -4838,7 +4838,7 @@ INSERT INTO
 
 	#			1		2	3	4	5		6		7		8			9
 	# 10
-	function simple_edit ($columnnames, $table, $columns, $page, $datanames, $block_user_id, $htmlentities = 1, $special_input = array(), $order_by = null, $disable_new = 0, $disable_delete = 0, $width = null, $noautosubmit = 0) {
+	function simple_edit ($columnnames, $table, $columns, $page, $datanames, $block_user_id, $htmlentities = 1, $special_input = array(), $order_by = null, $disable_new = 0, $disable_delete = 0, $width = null, $noautosubmit = 1) {
 		$query = 'SELECT `id`, `'.join('`, `', $columnnames).'` FROM `'.$table.'`';
 		if($order_by) {
 			$query .= ' ORDER BY `'.join('`, `', $order_by).'`';
