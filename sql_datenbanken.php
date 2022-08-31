@@ -14,13 +14,13 @@
   `reason` varchar(200) DEFAULT NULL,
   `stdout` text DEFAULT NULL,
   `stderr` text DEFAULT NULL,
-  `exit_code` int(11) DEFAULT NULL,
+  `exit_code` int DEFAULT NULL,
   `success` enum('0','1') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
 
 'veranstaltungstyp' => 'create table if not exists `veranstaltungstyp` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `abkuerzung` varchar(5) NOT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `abkuerzung` varchar(100) NOT NULL,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `abkuerzung` (`abkuerzung`),
@@ -565,12 +565,12 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'ua_call' => 'create table if not exists `ua_call` (
-  `specific_os_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `specific_browser_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `c` int(10) unsigned DEFAULT NULL,
-  `month` int(10) unsigned NOT NULL,
-  `year` int(10) unsigned NOT NULL,
-  `day` int(10) unsigned DEFAULT NULL,
+  `specific_os_id` int unsigned NOT NULL DEFAULT 0,
+  `specific_browser_id` int unsigned NOT NULL DEFAULT 0,
+  `c` int unsigned DEFAULT NULL,
+  `month` int unsigned NOT NULL,
+  `year` int unsigned NOT NULL,
+  `day` int unsigned DEFAULT NULL,
   PRIMARY KEY (`specific_os_id`,`specific_browser_id`,`month`,`year`),
   KEY `specific_browser_id` (`specific_browser_id`),
   CONSTRAINT `ua_call_ibfk_1` FOREIGN KEY (`specific_os_id`) REFERENCES `ua_specific_os` (`id`) ON DELETE CASCADE,
@@ -578,15 +578,15 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'ua_browser' => 'create table if not exists `ua_browser` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'ua_specific_browser' => 'create table if not exists `ua_specific_browser` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name_id` int(10) unsigned DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name_id` int unsigned DEFAULT NULL,
   `version` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_version` (`name_id`,`version`),

@@ -43,6 +43,7 @@
 			$gebaeude = create_gebaeude_abkuerzungen_array();
 			$dozent_id = get_dozent_id_by_veranstaltung_id($veranstaltung_id);
 			$this_institut_id = get_institut_id_by_veranstaltung_id($veranstaltung_id);
+
 			if($dozent_id == $GLOBALS['user_dozent_id'] || $GLOBALS['user_role_id'] == 1 || in_array($dozent_id, $valid_to_edit_dozenten)) {
 					if(count($studiengaenge)) {
 ?>
