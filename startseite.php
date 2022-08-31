@@ -27,7 +27,7 @@
 		<!-- Container element -->
 		<div class="parallax">
 <?php
-			$query = "select urlname, universitaet, plan_id, external_url, id from vvz_global.kundendaten where urlname is not null order by external_url desc, urlname asc";
+			$query = "select urlname, universitaet, plan_id, external_url, id from vvz_global.kundendaten where urlname is not null and (external_url is not null or id in (select kunde_id from vvz_global.logos)) order by external_url desc, urlname asc";
 			$result = rquery($query);
 ?>
 			<div class="bgimg-1">
