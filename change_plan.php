@@ -20,8 +20,9 @@
 
 			<h1>Verfügbare Pläne</h1>
 <?php
+	$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+
 	if($product = get_get("product")) {
-		$kunde_id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 		$kunde_ok = kunde_is_personalized($kunde_id) ? 1 : 0;
 		$urlname_exists = 0;
 		$old_urlname = get_urlname_by_dbname($GLOBALS["dbname"]);
@@ -87,7 +88,10 @@
 						exit(0);
 					}
 				} else {
-					die("c: ".$new_kunde_url);
+					// Kundenurl gleich, keine Änderungen
+?>
+					Ihr Plan wurde geändert.
+<?php
 				}
 			}
 		}
