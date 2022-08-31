@@ -400,29 +400,30 @@
 			}
 			#### FROM HERE
 
-			if(!table_exists_and_has_entries("hinweise")) {
+			if(!table_exists_and_has_entries("hinweise") && !already_initialized("hinweise")) {
 				rquery("insert ignore into `hinweise` VALUES (7,'Achtung! Die Daten werden jetzt hier automatisch gespeichert. Drücken Sie dazu entweder nach Eingabe der Daten Enter oder klicken Sie irgendwo auf der Seite!'),(11,'Jedem Benutzer ist eine Rolle zugeordnet. Diese Rolle bestimmt, welche Seiten er sehen und editieren darf.'),(12,'Achtung! Die Daten werden jetzt hier automatisch gespeichert. Drücken Sie dazu entweder nach Eingabe der Daten Enter oder klicken Sie irgendwo auf der Seite!'),(13,'Bitte achten Sie darauf, nachträgliche Änderungen gegebenenfalls der Raumplanung oder dem Prüfungsamt mitzuteilen.');");
+				initialized("hinweise");
 			}
 
-			if(!table_exists_and_has_entries("language")) {
+			if(!table_exists_and_has_entries("language") && !already_initialized("language")) {
 				rquery("insert ignore into `language` VALUES (1,'deu','deutsch'),(2,'eng','englisch'),(3,'tlh','klingonisch'),(4,'frz','französisch');");
+				initialized("language");
 			}
 
-			if(!table_exists_and_has_entries("page_info")) {
+			if(!table_exists_and_has_entries("page_info") && !already_initialized("page_info")) {
 				rquery("insert ignore into `page_info` VALUES (1,'Hier können neue Benutzerkonten angelegt und alte gelöscht werden.'),(2,'Führt neue Dozenten in das System ein.'),(3,'Dieses Vorlesungverzeichnis ist dafür ausgelegt, an beliebig vielen Instituten benutzt zu werden. In diesem Punkt kann man neue Institute einfügen.'),(4,'Führt Gebäude in das System ein (»GER — Gerberbau«, ...), die dann überall im System zur Verfügung stehen.'),(5,'Veranstaltungen sind normalerweise in Modulen. Hier können neue Module eingeführt werden, die später mit den Veranstaltungen verknüpft werden können.'),(6,'Führt neue Arten von Prüfungsleistungen ein (z. B. Klausur, Essay, ...)'),(7,'Liefert eine Liste (exportierbar als Excel-Datei) von Räumen und Nutzungen.'),(8,'Macht dem System neue Studiengänge bekannt.'),(9,'Hier können neue Veranstaltungen definiert und vorhandene bearbeitet werden.'),(10,'Hier können Arten von Veranstaltungen definiert werden (Vorlesung, Proseminar, Textproseminar, ...).'),(11,'Jeder Benutzer nimmt im System eine bestimmte Rolle ein. Je nach Rolle kann er einige Seiten sehen und andere nicht. Ein Administrator kann z.B. alles sehen und bearbeiten, während ein Dozent nur Räume, Veranstaltungen, Prüfungen und Nachprüfungen einsehen und editieren darf. Hier können die Rollen selbst, d. h. das, was der Benutzer darf, geändert werden.'),(12,'Hier können Prüfungsnummern erstellt und Modulen und Studiengängen zugeordnet werden.'),(13,'Hier können Sie ihre Lehrveranstaltungen einzeln editieren. Bitte achten Sie darauf, nachträgliche Änderungen gegebenenfalls der Raumplanung oder dem Prüfungsamt mitzuteilen.'),
 				(15,'Ermöglicht das Editieren der Startseiteninformationen'),(16,'Zeigt eine Liste der Rechteverstöße einzelner User an.'),(17,'Analysiert Queries'),(18,'Willkommensseite'),(19,'Ermöglicht es, neue API-Zugänge zu erstellen und Vorhandene zu bearbeiten.'),(20,'Hier kann festgelegt werden, welche Module in welchem Semester ausgeführt werden sollten, um daraus halbautomatisiert einen Stundenplan erstellen zu können.'),(21,'Hier kann jeder Nutzer sein eigenen Benutzermetadaten ändern.'),(22,'Hier können einzelne Bereiche der Studiengänge bearbeitet werden (Ergänzungsbereich, Kernbereich etc.).'),(23,'Ermöglicht halbautomatische Datenbankbackups.'),(24,'Erstellt Datenbank-Backups.'),(25,'In diesem Unterpunkt sind alle internen Systemseiten.'),(26,'In diesem Unterpunkt sind alle die Module betreffenden Optionen.'),(27,'Hier können alle Daten, die zu den Prüfungsinformationen gehören, bearbeitet werden.'),(28,'Hier können verschiedene Stammdaten bearbeitet werden (Dozenten, Gebäude, Institute etc.).'),(30,'Erlaubt das Mergen von Datensätzen (wenn z. B. zwei Module mit leicht unterschiedlichen Namen eigentlich eines sind, kann man hier diese Daten zusammenfügen.'),(31,'Zeigt Unterschiede zwischen Datenbankbackups und aktueller Datenbank.'),(32,'Zeigt die häufigsten User-Agents'),(33,'Erlaubt es, Veranstaltungen aus vorherigen Semestern zu löschen'),(34,'Setzt das aktuelle Semester'),(35,'Exportiert eine Liste von Dozenten und den von Ihnen angebotenen Prüfungsnummern'),(36,'Erlaubt die Zuordnung von einzelnen Prüfungsämtern zu Studiengängen'),(37,'Erlaubt es, die Einträge des FAQs zu bearbeiten'),(38,'Superdozenten haben das Recht, auf Veranstaltungen von (definierten) anderen Personen zugreifen zu können.'),(40,'Exportiert eine Liste von Prüfungsnummern den Dozenten, die sie anbieten.'),(41,'Erlaubt die Definition und Änderung von Prüfungszeiträumen'),(42,'Erlaubt die Definition und Änderung akademischer Titel zur Zuordnung zu Dozenten.'),(43,'Erlaubt die Bearbeitung von Seitentiteln, Rechten und Position in der Navigation.'),(44,'Kontakt zu den Administratoren herstellen.'),(45,'Definiert, welche Rolle bzw. welche Seite auf welche Funktionen zugreifen darf.'),(46,'Listet die Stundenpläne aller Dozenten auf'),(47,'Erlaubt die Bearbeitung von Semesterdaten'),(48,'Editiert angebotene Sprachen'),(49,NULL),(51,NULL),(52,NULL),(53,NULL),(54,NULL), ('55', NULL), ('56', 'Hier können Farben, Logos usw. angepasst werden.');");
+				initialized("page_info");
 			}
 
-			if(!table_exists_and_has_entries("praesenztyp")) {
+			if(!table_exists_and_has_entries("praesenztyp") && !already_initialized("praesenztyp")) {
 				rquery("insert ignore into `praesenztyp` VALUES (1,'Digital'),(2,'Hybrid'),(3,'Präsenz');");
+				initialized("praesenztyp");
 			}
 
-			if(!table_exists_and_has_entries("pruefung_zeitraum")) {
+			if(!table_exists_and_has_entries("pruefung_zeitraum") && !already_initialized("pruefung_zeitraum")) {
 				rquery("insert ignore into `pruefung_zeitraum` VALUES (1,'Kein spezifischer Zeitraum'),(2,'Erster Zeitraum'), (3, 'Zweiter Zeitraum');");
-			}
-
-			if(!table_exists_and_has_entries("pruefungstyp")) {
-				rquery("insert ignore into `pruefungstyp` VALUES (34,'-'),(14,'Bericht'),(3,'Bibliographie'),(39,'Bibliographie (unbenotet)'),(25,'Doktoranden-/Forschungsseminar'),(2,'Essay'),(32,'Essay (unbenotet)'),(10,'Exposé'),(37,'Kein spezifischer Prüfungstyp'),(1,'Klausur'),(26,'Lektürebericht'),(38,'Lektürebericht (unbenotet)'),(27,'mdl. Prüfung'),(5,'Mündliche Prüfung'),(33,'nach Absprache'),(16,'Nachweis 2h begl. Unterricht'),(17,'Nachweis Schulprakt. Studien'),(15,'Nachweis SPS'),(28,'Portfolio'),(12,'Portfolio 1'),(13,'Portfolio 2'),(6,'Protokoll'),(30,'Protokoll (unbenotet)'),(35,'Prüfungsleistung in zugehöriger Veranstaltung'),(8,'Referat'),(31,'Referat (unbenotet)'),(11,'Rezension'),(9,'Seminararbeit'),(7,'Thesenpapier'),(36,'Thesenpapier (unbenotet)'),(4,'Vortrag');");
+				initialized("pruefung_zeitraum");
 			}
 
 			/*
