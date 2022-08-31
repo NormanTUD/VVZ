@@ -75,13 +75,20 @@
 				<?php print get_seitentext(); ?>
 <?php
 				include_once('hinweise.php');
+				$languages = create_language_array();
 ?>
 				<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
 					<input type="submit" class="text_30px sticky_save" value="Speichern" />
 
 					<table>
 						<tr>
-							<th>Sprache (optional)</th>
+<?php
+							if(count($languages)) {
+?>
+								<th>Sprache (optional)</th>
+<?php
+							}
+?>
 							<th>Präsenztyp</th>
 							<th>Tag</th>
 							<th>Stunde</th>
@@ -116,21 +123,27 @@
 						}
 ?>
 						<tr>
-							<td class="text_align_left_nowrap"><?php
-								foreach (create_language_array() as $this_language) {
-									$praesenz_id = $this_language[0];
-									$language_name = $this_language[1];
-
-									$checked = '';
-
-									if(veranstaltung_has_language($veranstaltung_id, $praesenz_id)) {
-										$checked = ' checked="checked" ';
-									}
-?>
-									<input type="checkbox" name="language[]" value="<?php print htmlentities($praesenz_id); ?>" <?php print $checked; ?> /> <?php print htmlentities($language_name); ?><br />
 <?php
-								}
-							?></td>
+							if(count($languages)) {
+?>
+								<td class="text_align_left_nowrap"><?php
+									foreach ($language_array as $this_language) {
+										$praesenz_id = $this_language[0];
+										$language_name = $this_language[1];
+
+										$checked = '';
+
+										if(veranstaltung_has_language($veranstaltung_id, $praesenz_id)) {
+											$checked = ' checked="checked" ';
+										}
+?>
+										<input type="checkbox" name="language[]" value="<?php print htmlentities($praesenz_id); ?>" <?php print $checked; ?> /> <?php print htmlentities($language_name); ?><br />
+<?php
+									}
+								?></td>
+<?php
+							}
+?>
 							<td class="text_align_left_nowrap">
 								<select name="praesenztyp[]">
 									<?php
