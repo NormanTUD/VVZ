@@ -9601,6 +9601,11 @@ order by
 		}
 	}
 
+	function institut_id_exists($id) {
+		$query = 'select count(*) from institut where id = '.esc($id);
+		return get_single_row_from_query($query);
+	}
+
 	if(db_is_demo($GLOBALS["dbname"], 1) && !$GLOBALS["logged_in_user_id"] && get_get("first_login")) {
 		try {
 			set_session_id(1);

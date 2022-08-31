@@ -84,6 +84,15 @@
 			print "</pre>\n";
 			die("A");
 			 */
+
+			if(!institut_id_exists($row[3])) {
+				$institute = create_institute_array();
+				$row[3] = key($institute);
+
+				$query = 'update users set institut_id = '.esc($row[3])." where id = ".esc($row[0]);
+				rquery($query);
+			}
+
 			$GLOBALS['logged_in'] = 1;
 			$GLOBALS['logged_in_data'] = $row;
 			$GLOBALS['logged_in_user_id'] = $row[0];
