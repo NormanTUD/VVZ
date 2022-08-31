@@ -4838,12 +4838,18 @@ INSERT INTO
 
 	#			1		2	3	4	5		6		7		8			9
 	# 10
-	function simple_edit ($columnnames, $table, $columns, $page, $datanames, $block_user_id, $htmlentities = 1, $special_input = array(), $order_by = null, $disable_new = 0, $disable_delete = 0, $width = null) {
+	function simple_edit ($columnnames, $table, $columns, $page, $datanames, $block_user_id, $htmlentities = 1, $special_input = array(), $order_by = null, $disable_new = 0, $disable_delete = 0, $width = null, $noautosubmit = 0) {
 		$query = 'SELECT `id`, `'.join('`, `', $columnnames).'` FROM `'.$table.'`';
 		if($order_by) {
 			$query .= ' ORDER BY `'.join('`, `', $order_by).'`';
 		}
 		$result = rquery($query);
+
+		if($noautosubmit) {
+			$noautosubmit = " noautosubmit=1 ";
+		} else {
+			$noautosubmit = "";
+		}
 
 		$j = 0;
 ?>
@@ -4891,7 +4897,7 @@ INSERT INTO
 <?php
 								} else if($columnnames[$i - 1] == "erste_veranstaltung_default") {
 ?>
-	<td><input type="text" placeholder="erster_termin" name="erster_termin" class="datepicker" value="<?php print ($htmlentities ? htmlentities($row[$i] ?? "") : $row[$i]); ?>" /></td>
+									<td><input <?php print $noautosubmit; ?> type="text" placeholder="erster_termin" name="erster_termin" class="datepicker" value="<?php print ($htmlentities ? htmlentities($row[$i] ?? "") : $row[$i]); ?>" /></td>
 <?php
 								} else if($columnnames[$i - 1] == "typ" && $table == 'semester') {
 									//<td><?php create_select(create_semester_type_array(), $row[$i], 'typ'); ? ></td>
@@ -4905,16 +4911,20 @@ INSERT INTO
 <?php
 								} else {
 ?>
-									<td><input class="width500px" type="<?php print $c == 'password' ? 'password' : 'text'; ?>" name="<?php print $c; ?>" placeholder="<?php print $c; ?>" value="<?php print $c == 'password' ? '' : ($htmlentities ? htmlentities($row[$i] ?? "") : $row[$i]); ?>" /></td>
+									<td><input <?php print $noautosubmit; ?> class="width500px" type="<?php print $c == 'password' ? 'password' : 'text'; ?>" name="<?php print $c; ?>" placeholder="<?php print $c; ?>" value="<?php print $c == 'password' ? '' : ($htmlentities ? htmlentities($row[$i] ?? "") : $row[$i]); ?>" /></td>
 <?php
 								}
 							}
 						}
 						$i++;
 					}
+
+					if($noautosubmit) {
 ?>
-					<td><input type="submit"  value="Speichern" /></td>
+						<td><input type="submit"  value="Speichern" /></td>
 <?php
+					}
+
 					if($block_user_id && $GLOBALS['logged_in_data'][0] == $row[0]) {
 ?>
 						<td><button name="delete" value="1" disabled>Löschen</button></td>

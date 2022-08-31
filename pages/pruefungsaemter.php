@@ -18,7 +18,7 @@
 <?php
 		include_once('hinweise.php');
 ?>
-		<?php simple_edit(array('name'), 'pruefungsamt', array('Name', 'Speichern', 'Löschen'), $GLOBALS['this_page_number'], array('id', 'name'), 0); ?>
+		<?php simple_edit(array('name'), 'pruefungsamt', array('Name', 'Speichern', 'Löschen'), $GLOBALS['this_page_number'], array('id', 'name'), 0, 1, array(), null, 0, 0, null, 1); ?>
 <?php
 
 		if(count($pruefungsaemter)) {
@@ -34,13 +34,13 @@
 				<tr>
 					<th>Prüfungsamt</th>
 					<th>Studiengänge</th>
-					<th>Speichern</th>
 				</tr>
 <?php
 			foreach ($pruefungsaemter as $this_pa) {
 ?>
 				<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 					<input type="hidden" name="pruefungsamt_id" value="<?php print htmlentities($this_pa[0]); ?>" />
+					<input type="hidden" value=1 value="Speichern" name="pruefungsamt_nach_studiengang_zuordnung" />
 					<tr>
 						<td><?php print htmle($this_pa[1]); ?></td>
 						<td class="text_align_left">
@@ -57,12 +57,10 @@
 							}
 ?>
 						</td>
-						<td>
-							<input type="submit" value="Speichern" name="pruefungsamt_nach_studiengang_zuordnung" />
-						</td>
 					</form>
 				</tr>
 <?php
+				js(array("autosubmit.js"));
 			}
 ?>
 			</table>
