@@ -132,6 +132,7 @@ sed 's/\(\(post_max_size\|upload_max_filesize\) = \).M/\16M/g' /etc/php/*/apache
 
 if [[ $(grep -L "curl -s localhost" /etc/crontab ) ]]; then
 	echo "*/30 * * * * curl -s localhost 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
+	echo "*/30 * * * * curl -s localhost/delete_demo.php 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
 fi
 
 systemctl daemon-reload
