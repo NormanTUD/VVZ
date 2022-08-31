@@ -474,7 +474,7 @@
 							} catch (\Throwable $e) {
 								#stderrw("Could not select DB: $e");
 								sleep(1);
-								print "Es kann noch einen Moment dauern. Bitte warten Sie.";
+								print "Es dauert nur noch einen Augenblick. Bitte warten Sie...";
 								print '<meta http-equiv="refresh" content="0; url=./" />';
 								flush();
 								exit(0);
