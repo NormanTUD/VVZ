@@ -59,65 +59,70 @@
 					$max_semester = $row[0];
 				}
 
+				if($max_semester > 32) {
+					$max_semester = 32;
+					print "WARNUNG: Die Maximalsemesteranzahl liegt bei 32. Alle Werte darüber werden auf 32 gesetzt.";
+				}
+
 				$veranstaltungstypen = create_veranstaltungstyp_abkuerzung_array();
 
 				if($max_semester) {
 ?>
-				<br />
-				<table>
-					<tr>
-						<th>Semester</th>
-						<th>Modul</th>
-						<th>Anzahl Ver&shy;an&shy;stal&shy;tungen pro Typ</th>
-						<th>Anzahl Credit-Points</th>
-						<th>Anzahl Prü&shy;fungs&shy;leis&shy;tungen</th>
-					</tr>
+					<br />
+					<table>
+						<tr>
+							<th>Semester</th>
+							<th>Modul</th>
+							<th>Anzahl Ver&shy;an&shy;stal&shy;tungen pro Typ</th>
+							<th>Anzahl Credit-Points</th>
+							<th>Anzahl Prü&shy;fungs&shy;leis&shy;tungen</th>
+						</tr>
 <?php
-					foreach (range(1, $max_semester) as $this_semester) {
-						foreach (create_module_array_by_studiengang_and_semester($studiengang, $this_semester) as $this_modul) {
-							$credit_points = 0;
-							$anzahl_pruefungsleistungen = 0;
-							$query = 'SELECT `credit_points`, `anzahl_pruefungsleistungen` FROM `modul_nach_semester_metadata` WHERE `modul_id` = '.esc($this_modul[0]).' AND `semester` = '.esc($this_semester);
-							$result = rquery($query);
-							while ($row = mysqli_fetch_row($result)) {
-								$credit_points = $row[0];
-								$anzahl_pruefungsleistungen = $row[1];
-							}
+						foreach (range(1, $max_semester) as $this_semester) {
+							foreach (create_module_array_by_studiengang_and_semester($studiengang, $this_semester) as $this_modul) {
+								$credit_points = 0;
+								$anzahl_pruefungsleistungen = 0;
+								$query = 'SELECT `credit_points`, `anzahl_pruefungsleistungen` FROM `modul_nach_semester_metadata` WHERE `modul_id` = '.esc($this_modul[0]).' AND `semester` = '.esc($this_semester);
+								$result = rquery($query);
+								while ($row = mysqli_fetch_row($result)) {
+									$credit_points = $row[0];
+									$anzahl_pruefungsleistungen = $row[1];
+								}
 
-							$veranstaltungstyp_anzahl = create_array_veranstaltungstyp_anzahl_by_modul_id_semester($this_modul[0], $this_semester);
-?>
-							<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print htmlentities($studiengang ?? ""); ?>">
-								<tr>
-									<input type="hidden" name="semester" value="<?php print htmlentities($this_semester ?? ""); ?>" />
-									<input type="hidden" name="update_modul_semester_data" value="1" />
-									<input type="hidden" name="studiengang" value="<?php print htmlentities($studiengang ?? ""); ?>" />
-									<input type="hidden" name="modul" value="<?php print htmlentities($this_modul[0]); ?>" />
-									<td><?php print htmle($this_semester); ?></td>
-									<td><?php print htmle($this_modul[1]); ?></td>
-									<td>
-<?php
-										foreach ($veranstaltungstypen as $this_veranstaltungstyp) {
-?>
-											<table>
-												<tr>
-													<td><input class="width50px" type="text" value="<?php print htmlentities($veranstaltungstyp_anzahl[$this_veranstaltungstyp[0]]); ?>" name="<?php print "veranstaltungstyp_$this_veranstaltungstyp[0]"; ?>" /></td>
-													<td><?php print htmle($this_veranstaltungstyp[1]); ?></td>
-												</tr>
-											</table>
-<?php
-										}
-?>
-									</td>
-									<td><input type="text" class="width50px" value="<?php print htmlentities($credit_points ?? ""); ?>" name="credit_points" /></td>
-									<td><input type="text" class="width50px" value="<?php print htmlentities($anzahl_pruefungsleistungen ?? ""); ?>" name="pruefungsleistung_anzahl" /></td>
-								</tr>
-							</form>
-<?php
+								$veranstaltungstyp_anzahl = create_array_veranstaltungstyp_anzahl_by_modul_id_semester($this_modul[0], $this_semester);
+	?>
+								<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&studiengang=<?php print htmlentities($studiengang ?? ""); ?>">
+									<tr>
+										<input type="hidden" name="semester" value="<?php print htmlentities($this_semester ?? ""); ?>" />
+										<input type="hidden" name="update_modul_semester_data" value="1" />
+										<input type="hidden" name="studiengang" value="<?php print htmlentities($studiengang ?? ""); ?>" />
+										<input type="hidden" name="modul" value="<?php print htmlentities($this_modul[0]); ?>" />
+										<td><?php print htmle($this_semester); ?></td>
+										<td><?php print htmle($this_modul[1]); ?></td>
+										<td>
+	<?php
+											foreach ($veranstaltungstypen as $this_veranstaltungstyp) {
+	?>
+												<table>
+													<tr>
+														<td><input class="width50px" type="text" value="<?php print htmlentities($veranstaltungstyp_anzahl[$this_veranstaltungstyp[0]]); ?>" name="<?php print "veranstaltungstyp_$this_veranstaltungstyp[0]"; ?>" /></td>
+														<td><?php print htmle($this_veranstaltungstyp[1]); ?></td>
+													</tr>
+												</table>
+	<?php
+											}
+	?>
+										</td>
+										<td><input type="text" class="width50px" value="<?php print htmlentities($credit_points ?? ""); ?>" name="credit_points" /></td>
+										<td><input type="text" class="width50px" value="<?php print htmlentities($anzahl_pruefungsleistungen ?? ""); ?>" name="pruefungsleistung_anzahl" /></td>
+									</tr>
+								</form>
+	<?php
+							}
 						}
-					}
 ?>
-				</table>
-<?php
+					</table>
+	<?php
 				}
 			} else {
 ?>

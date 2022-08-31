@@ -4783,7 +4783,7 @@ INSERT INTO
 		foreach (preg_split('/\s*,\s*/', $semester) as $this_semester) {
 			if(preg_match('/^\d+$/', $this_semester)) {
 				if($this_semester > 0) {
-					if($this_semester > 32) {
+					if($this_semester < 32) {
 						$query = 'INSERT IGNORE INTO `modul_nach_semester` (`modul_id`, `semester`) VALUES ('.esc($modul).', '.esc($this_semester).')';
 						$result = rquery($query);
 						if($result) {
@@ -4792,10 +4792,10 @@ INSERT INTO
 							$failure++;
 						}
 					} else {
-						warning("Semester muss kleiner als 32 sein.");
+						warning("Semester muss kleiner als 32 sein, ".htmlentities($this_semester ?? "")." wurde eingegeben.");
 					}
 				} else {
-					warning("Semester muss größer als 0 sein.");
+					warning("Semester muss größer als 0 sein, ".htmlentities($this_semester ?? "")." wurde eingegeben.");
 					$failure++;
 				}
 			}
