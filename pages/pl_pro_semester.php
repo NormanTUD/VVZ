@@ -26,44 +26,52 @@
 				<input type="submit" value="Einstellungen wählen" />
 			</form>
 
-			<table>
-				<tr>
-					<th>Studiengang</th>
-					<th>Modul</th>
-					<th>Bereich</th>
-					<th>Prüfungstyp</th>
-					<th>Prüfungsnummer</th>
-					<th>Anzahl Prüfungen</th>
-				</tr>
+<?php
+			if(count($studiengang_module_pn)) {
+?>
+				<table>
+					<tr>
+						<th>Studiengang</th>
+						<th>Modul</th>
+						<th>Bereich</th>
+						<th>Prüfungstyp</th>
+						<th>Prüfungsnummer</th>
+						<th>Anzahl Prüfungen</th>
+					</tr>
 <?php
 
-				foreach ($studiengang_module_pn as $item) {
-					$studiengang = $item[0];
-					$modul = $item[1];
-					$pruefungsnummer = $item[2];
-					$bereich_name = $item[3];
-					$pruefungstyp = $item[4];
+					foreach ($studiengang_module_pn as $item) {
+						$studiengang = $item[0];
+						$modul = $item[1];
+						$pruefungsnummer = $item[2];
+						$bereich_name = $item[3];
+						$pruefungstyp = $item[4];
 
-					$anzahl = get_anzahl_pl_pro_semester($pruefungsnummer, $chosen_semester);
-					$anzahl_str = $anzahl;
+						$anzahl = get_anzahl_pl_pro_semester($pruefungsnummer, $chosen_semester);
+						$anzahl_str = $anzahl;
 
-					if($anzahl == 0) {
-						$anzahl_str = "<span class='red_text'>$anzahl</span>";
+						if($anzahl == 0) {
+							$anzahl_str = "<span class='red_text'>$anzahl</span>";
+						}
+
+						if((get_get("only_zero") && $anzahl == 0) || !get_get("only_zero")) {
+							print "<tr>";
+							print "<td>$studiengang</td>";
+							print "<td>$modul</td>";
+							print "<td>$bereich_name</td>";
+							print "<td>$pruefungstyp</td>";
+							print "<td>$pruefungsnummer</td>";
+							print "<td>$anzahl_str</td>";
+							print "</tr>\n";
+						}
 					}
-
-					if((get_get("only_zero") && $anzahl == 0) || !get_get("only_zero")) {
-						print "<tr>";
-						print "<td>$studiengang</td>";
-						print "<td>$modul</td>";
-						print "<td>$bereich_name</td>";
-						print "<td>$pruefungstyp</td>";
-						print "<td>$pruefungsnummer</td>";
-						print "<td>$anzahl_str</td>";
-						print "</tr>\n";
-					}
-				}
 ?>
-			</table>
+				</table>
+<?php
+			} else {
+				print "<i>Keine Module und/oder Studiengänge</i>";
+			}
+?>
 		</div>
 <?php
 	}
