@@ -19,6 +19,7 @@
 		$semester = create_semester_array_short();
 
 		$chosen_institut = null;
+
 		try {
 			$chosen_institut = (get_get('institut') ? get_get('institut') : $institute[1][0]);
 		} catch (\Throwable $e) {

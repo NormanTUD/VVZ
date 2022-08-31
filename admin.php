@@ -52,7 +52,11 @@
 		$chosen_institut = get_get('institut');
 		$institute = create_institute_array();
 		if(count($institute) == 0) {
-			error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen.");
+			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+				error("Keine Institute vorhanden. <a href='admin?page=".get_page_id_by_filename("institute.php")."'>Legen Sie hier welche an</a>.");
+			} else {
+				error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen.");
+			}
 		}
 
 		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id'])) {
