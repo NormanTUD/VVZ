@@ -68,7 +68,7 @@
 										<input type="text" id="<?php print $gui_id; ?>" name="value" <?php print preg_match("/color/", $row["property"] )? 'class="jscolor"' : ''; ?> value="<?php print addslashes(htmlentities($row["val"] ?? "")); ?>" />
 									</td>
 									<td>
-										<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Reset</button>
+										<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Zurücksetzen</button>
 									</td>
 <?php
 									/*
