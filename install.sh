@@ -13,7 +13,7 @@ fi
 INSTALL_PATH=/var/www/html
 
 apt-get update
-apt-get install xterm whiptail curl git etckeeper -y
+apt-get install xterm whiptail curl git etckeeper ntpdate -y
 
 git config --global credential.helper store
 
@@ -134,6 +134,10 @@ if [[ $(grep -L "curl -s localhost" /etc/crontab ) ]]; then
 	echo "*/30 * * * * curl -s localhost 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
 	echo "*/30 * * * * curl -s localhost/delete_demo.php 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
 fi
+
+
+if [[ $(grep -L "ntpdate" /etc/crontab ) ]]; then
+	echo "*/30 * * * * ntpdate -s time.nist.gov 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
 
 systemctl daemon-reload
 systemctl restart apache2
