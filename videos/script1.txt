@@ -121,7 +121,7 @@ Es gibt noch viel mehr Funktionen. Probieren Sie in Ihrer Demo-Variante gerne ru
 
 Sollten Sie sich für unseren Service entscheiden, stellen Sie in ihrer Demo Version sicher, dass Sie angemeldet sind und klicken Sie auf Business plan ändern.
 Dort sehen Sie die Pläne, die wir anbieten.
-Die Basic-Variante reicht, um ein Institut oder eine Universität zu verwalten, hat jedoch nicht alle Funktionen.
+Die bäisic version reicht, um ein Institut oder eine Universität zu verwalten, hat jedoch nicht alle Funktionen.
 Nur die Pro Variante gibt Ihnen den vollen Funktions umfang, inklusive Stundenplanersteller, priorisiertem Support und bis zu tausend euro pro Monat an Weiterentwicklungskosten inklusive.
 Sie können diese jeweils für ein Institut, oder eine gesamte Universität mit beliebig vielen Instituten buchen.
 
