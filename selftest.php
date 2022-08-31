@@ -413,7 +413,7 @@
 			#### FROM HERE
 
 			if(!table_exists_and_has_entries("hinweise") && !already_initialized("hinweise")) {
-				rquery("insert ignore into `hinweise` VALUES (7,'Achtung! Die Daten werden jetzt hier automatisch gespeichert. Drücken Sie dazu entweder nach Eingabe der Daten Enter oder klicken Sie irgendwo auf der Seite!'),(11,'Jedem Benutzer ist eine Rolle zugeordnet. Diese Rolle bestimmt, welche Seiten er sehen und editieren darf.'),(12,'Achtung! Die Daten werden jetzt hier automatisch gespeichert. Drücken Sie dazu entweder nach Eingabe der Daten Enter oder klicken Sie irgendwo auf der Seite!'),(13,'Bitte achten Sie darauf, nachträgliche Änderungen gegebenenfalls der Raumplanung oder dem Prüfungsamt mitzuteilen.');");
+				rquery("insert ignore into `hinweise` VALUES (11,'Jedem Benutzer ist eine Rolle zugeordnet. Diese Rolle bestimmt, welche Seiten er sehen und editieren darf.'),(13,'Bitte achten Sie darauf, nachträgliche Änderungen gegebenenfalls der Raumplanung oder dem Prüfungsamt mitzuteilen.');");
 				initialized("hinweise");
 			}
 
