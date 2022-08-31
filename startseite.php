@@ -439,5 +439,4 @@
 		}
 
 		include("footer.php");
-		delete_demo();
 ?>
