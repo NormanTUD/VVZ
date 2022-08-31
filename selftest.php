@@ -12,6 +12,10 @@
 	include_once("sql_datenbanken.php");
 
 	function already_initialized ($name) {
+		if(get_get("force_reinitialize")) {
+			return 0;
+		}
+
 		$query = "select count(*) from initialized_db where name = ".esc($name);
 		return get_single_row_from_query($query);
 	}

@@ -38,6 +38,16 @@
 
 		$chosen_semester = (get_get('semester') ? get_get('semester') : get_this_semester()[0]);
 		$user_role_id = get_role_id_by_user($GLOBALS['logged_in_user_id']);
+
+		$show_table = 1;
+
+		if(!count($veranstaltungstypen)) {
+			$show_table = 0;
+
+			print "Keine Veranstaltungstypen definiert.";
+		}
+
+		if($show_table) {
 ?>
 			<div id="veranstaltungen">
 				<script nonce=<?php print($GLOBALS['nonce']); ?> >
@@ -314,12 +324,13 @@
 							}
 ?>
 						</ul>
-				</div>
+					</div>
 <?php
-			} else {
+				} else {
 ?>
-				<h2 class="class_red">Sie haben keine zugeordnete Instituts-ID. Ohne diese kann die Seite nicht aufgerufen werden. Bitten Sie einen Administrator, Ihnen ein Institut zuzuordnen.</h2>
+					<h2 class="class_red">Sie haben keine zugeordnete Instituts-ID. Ohne diese kann die Seite nicht aufgerufen werden. Bitten Sie einen Administrator, Ihnen ein Institut zuzuordnen.</h2>
 <?php
+				}
 			}
 		}
 ?>
