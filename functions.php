@@ -6591,18 +6591,14 @@ WHERE
 				foreach ($local_data as $pnname => $pruefungsnummer_array) {
 					$zeitraum = $pruefungsnummer_array['zeitraum'];
 					$abgabe_pruefungsleistungen = $pruefungsnummer_array['abgabe_pruefungsleistungen'];
-					try {
-						$objPHPExcel->getActiveSheet()->SetCellValue("A".$number, $pnname);
-					} catch (\Throwable $e) {
-						print_r($pnname);
-						print "<br><pre>";
-						die("$e");
-					}
+					$objPHPExcel->getActiveSheet()->SetCellValue("A".$number, "$pnname");
 					$str = '';
-					if(count($pruefungsnummer_array['dozenten']) == 1) {
-						$str = strip_tags($pruefungsnummer_array['dozenten'][0])." ";
-					} else {
-						$str = join(", ", array_unique(array_map('strip_tags', $pruefungsnummer_array['dozenten'])));
+					if(array_key_exists("dozenten", $pruefungsnummer_array) && isset($pruefungsnummer_array["dozenten"])) {
+						if(count($pruefungsnummer_array['dozenten']) == 1) {
+							$str = strip_tags($pruefungsnummer_array['dozenten'][0])." ";
+						} else {
+							$str = join(", ", array_unique(array_map('strip_tags', $pruefungsnummer_array['dozenten'])));
+						}
 					}
 					$objPHPExcel->getActiveSheet()->SetCellValue('B'.$number, $str);
 					$objPHPExcel->getActiveSheet()->SetCellValue('C'.$number, $zeitraum);
