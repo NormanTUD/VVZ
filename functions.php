@@ -3376,7 +3376,6 @@ WHERE 1
 	function create_pruefungsnummer($modul, $pruefungsnummer, $pruefungstyp, $bereich, $modulbezeichnung, $zeitraum_id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `bereich_id`, `modulbezeichnung`, `zeitraum_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul).', '.esc($pruefungstyp).', '.esc($bereich).', '.esc($modulbezeichnung).', '.esc($zeitraum_id).')';
-		die($query);
 		$result = rquery($query);
 		if($result) {
 			if(mysqli_affected_rows($GLOBALS['dbh'])) {
