@@ -88,7 +88,7 @@
 							<th>Woche</th>
 							<th>Erster Termin</th>
 							<th>Anzahl Hörer</th>
-							<th>Opal-Link</th>
+							<th>eLearning-Link</th>
 							<th>Abgabe Prüfungsleistung</th>
 							<th>Gebäude&shy;wunsch</th>
 							<th>Raum&shy;wunsch</th>
