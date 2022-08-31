@@ -7332,9 +7332,12 @@ SE 1/2 oder BZW
 				$neue_nr = $start_nr;
 			}
 
-			rquery("insert into veranstaltung_nach_lv_nr (veranstaltung_id, lv_nr) values (".esc($veranstaltung_id).", ".$neue_nr.")");
+			if($neue_nr) {
+				$query = "insert into veranstaltung_nach_lv_nr (veranstaltung_id, lv_nr) values (".esc($veranstaltung_id).", ".$neue_nr.")";
+				rquery($query);
 
-			$nr = $neue_nr;
+				$nr = $neue_nr;
+			}
 		}
 		return $nr;
 	}
