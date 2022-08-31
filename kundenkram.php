@@ -14,7 +14,7 @@
 
 		setcookie($GLOBALS["cookie_hash"].'_session_id', $session_id, time() + (7 * 86400), "/");
 
-		$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `id` = '.esc($user_id);
+		$query = 'SELECT `user_id`, `username`, `dozent_id`, `institut_id`, `accepted_public_data` FROM `view_user_session_id` WHERE `user_id` = '.esc($user_id);
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
 			set_login_data($row);
