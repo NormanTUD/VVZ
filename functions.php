@@ -6954,7 +6954,7 @@ $ret_string .= '</table>';
 				$this_institut = get_get('institut');
 			} else {
 				if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
-					$this_institut = $institute[1][0];
+					$this_institut = $institute[keys($institute)][0];
 				}
 				
 				if(!$this_institut) {

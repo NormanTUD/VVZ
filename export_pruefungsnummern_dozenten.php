@@ -4,7 +4,7 @@
 	if(check_page_rights(get_page_id_by_filename('export_dozent_pruefungsnummern.php'))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 		if(get_get('semester')) {
 			$chosen_semester = (get_get('semester') ? get_get('semester') : get_this_semester()[0]);
-			$chosen_institut = (get_get('institut') ? get_get('institut') : $institute[1][0]);
+			$chosen_institut = (get_get('institut') ? get_get('institut') : $institute[key($institute)][0]);
 			$chosen_dozent = (get_get('dozent') ? get_get('dozent') : null);
 			$chosen_studiengang = (get_get('studiengang') ? get_get('studiengang') : null);
 			$chosen_pruefungsamt = (get_get('pruefungsamt') ? get_get('pruefungsamt') : null);

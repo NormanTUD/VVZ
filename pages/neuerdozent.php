@@ -21,7 +21,7 @@
 <?php
 			if(count($instituten) == 1) {
 ?>
-				<input type="hidden" name="institut" value="<?php print $instituten[1][0]; ?>" />
+				<input type="hidden" name="institut" value="<?php print $instituten[key($institute)][0]; ?>" />
 <?php
 			}
 ?>

@@ -351,7 +351,7 @@
 		$GLOBALS['this_institut'] = get_get('institut');
 	} else {
 		if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
-			$GLOBALS['this_institut'] = $GLOBALS['institute'][1][0];
+			$GLOBALS['this_institut'] = $GLOBALS['institute'][keys($GLOBALS["institute"])][0];
 		}
 		
 		if(!$GLOBALS['this_institut']) {
@@ -360,7 +360,7 @@
 					$GLOBALS['this_institut'] = $GLOBALS['institute'][0][0];
 				}
 				if(!$GLOBALS['this_institut']) {
-					$GLOBALS['this_institut'] = 1;
+					$GLOBALS['this_institut'] = key($institute);
 				}
 			} else {
 				if(table_exists($GLOBALS["dbname"], "institut")) {

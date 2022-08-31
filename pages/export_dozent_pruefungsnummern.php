@@ -21,7 +21,7 @@
 		$chosen_institut = null;
 
 		try {
-			$chosen_institut = (get_get('institut') ? get_get('institut') : $institute[1][0]);
+			$chosen_institut = (get_get('institut') ? get_get('institut') : $institute[key($institute)][0]);
 		} catch (\Throwable $e) {
 			// Wenn kein Institut definiert
 		}
