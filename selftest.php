@@ -74,6 +74,7 @@
 					$GLOBALS['settings_cache'] = array();
 				}
 			}
+			sleep(1);
 
 			$views = $GLOBALS["views"];
 
@@ -87,6 +88,7 @@
 					while (mysqli_next_result($GLOBALS["dbh"])); // Flush out the results.
 				}
 			}
+			sleep(1);
 
 			$errormsg = array();
 

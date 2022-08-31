@@ -468,8 +468,10 @@
 
 			try {
 				if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
+					error_log("Trying to create database...");
 					$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
 					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+						sleep(1);
 						die("Error creating database: ".$GLOBALS["dbh"]->error);
 					} else {
 						if(!array_key_exists("no_selftest", $GLOBALS) && !$GLOBALS["no_selftest"]) {
@@ -509,7 +511,6 @@
 				}
 			} catch (\Throwable $e) {
 				error_log($e);
-				error_log("Trying to create database...");
 
 			}
 			if (!$GLOBALS['dbh']) {
