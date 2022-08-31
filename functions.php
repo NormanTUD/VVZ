@@ -938,8 +938,12 @@ declare(ticks=1);
 			if(get_post('create_gebaeude')) {
 				if(get_post('new_gebaeude_name') && get_post('new_abkuerzung')) {
 					create_gebaeude(get_post('new_gebaeude_name'), get_post('new_abkuerzung'));
-				} else if(get_post('new_gebaeude_name') || get_post('new_abkuerzung')) {
-					message('Gebäude müssen Namen <b>und</b> Abkürzung haben.');
+				} else if(get_post('new_gebaeude_name') && !get_post('new_abkuerzung')) {
+					create_gebaeude(get_post('new_gebaeude_name'), get_post('new_gebaeude_name'));
+				} else if(!get_post('new_gebaeude_name') && get_post('new_abkuerzung')) {
+					create_gebaeude(get_post('new_abkuerzung'), get_post('new_abkuerzung'));
+				} else if(!get_post('new_gebaeude_name') && !get_post('new_abkuerzung')) {
+					message('Gebäude müssen Namen und optionalerweise eine Abkürzung haben.');
 				}
 			}
 
