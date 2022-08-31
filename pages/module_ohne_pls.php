@@ -25,34 +25,41 @@
 				Semester: <?php create_select($semester, $chosen_semester, 'semester'); ?><br>
 				<input type="submit" value="Einstellungen wählen" />
 			</form>
-
-			<table>
-				<tr>
-					<th>Studiengang</th>
-					<th>Modul</th>
-					<th>Anzahl Prüfungen</th>
-				</tr>
+<?php
+			if(count($module)) {
+?>
+				<table>
+					<tr>
+						<th>Studiengang</th>
+						<th>Modul</th>
+						<th>Anzahl Prüfungen</th>
+					</tr>
 <?php
 
-				foreach ($module as $modul) {
-					$modul_id = $modul[0];
-					$modul_name = $modul[1];
+					foreach ($module as $modul) {
+						$modul_id = $modul[0];
+						$modul_name = $modul[1];
 
-					$studiengang = get_studiengang_name_by_modul_id($modul_id);
+						$studiengang = get_studiengang_name_by_modul_id($modul_id);
 
-					$anzahl = get_anzahl_pruefungen_pro_modul_pro_semester($modul_id, $chosen_semester);
-					$anzahl_str = $anzahl;
+						$anzahl = get_anzahl_pruefungen_pro_modul_pro_semester($modul_id, $chosen_semester);
+						$anzahl_str = $anzahl;
 
-					if($anzahl == 0) {
-						$anzahl_str = "<span class='red_text'>$anzahl</span>";
+						if($anzahl == 0) {
+							$anzahl_str = "<span class='red_text'>$anzahl</span>";
+						}
+
+						if((get_get("only_zero") && $anzahl == 0) || !get_get("only_zero")) {
+							print "<tr><td>$studiengang</td><td>$modul_name</td><td>$anzahl_str</td></tr>\n";
+						}
 					}
-
-					if((get_get("only_zero") && $anzahl == 0) || !get_get("only_zero")) {
-						print "<tr><td>$studiengang</td><td>$modul_name</td><td>$anzahl_str</td></tr>\n";
-					}
-				}
 ?>
-			</table>
+				</table>
+<?php
+			} else {
+				print "<i>Bisher existieren keine Module</i>";
+			}
+?>
 		</div>
 <?php
 	}

@@ -129,6 +129,8 @@
 				<i>Für diesen Studiengang sind keine Module verfügbar.</i>
 <?php
 			}
+		} else {
+			print "<i>Kein Studiengang ausgewählt oder es existieren keine Studiengänge";
 		}
 
 		js(array("autosubmit.js"));
