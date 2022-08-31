@@ -98,7 +98,7 @@
 
 			if(!table_exists_and_has_entries("plan")) {
 				rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Demo', 0, 0)");
-				rquery("insert ignore  into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic Faculty', 50, 500)");
+				rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic Faculty', 50, 500)");
 				rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Basic University', 500, 3000)");
 				rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro Faculty', 70, 700)");
 				rquery("insert ignore into vvz_global.plan (name, monatliche_zahlung, jaehrliche_zahlung) VALUES ('Pro University', 350, 4000)");
@@ -134,16 +134,18 @@
 				rquery($query);
 			}
 
-			if(!table_exists_and_has_entries("dozent")) {
+			if(!table_exists_and_has_entries("dozent") && !already_initialized("dozent")) {
 				rquery("insert INTO `dozent` VALUES (1,'Admin','Istrator', null, '0')");
+				initialized("dozent");
 			}
 
-			if(!table_exists_and_has_entries("institut")) {
+			if(!table_exists_and_has_entries("institut") && !already_initialized("institut")) {
 				$default_institut_name = "Demo-Institut";
 				rquery("insert into institut VALUES (1, ".esc($default_institut_name).", 1);");
+				initialized("institut");
 			}
 
-			if(!table_exists_and_has_entries("role")) {
+			if(!table_exists_and_has_entries("role") && !already_initialized("role")) {
 				rquery("insert into role values ('1', 'Administrator', 'Darf alles');");
 				rquery("insert into role values ('2', 'Dozent', 'Darf eigene Sachen bearbeiten');");
 				rquery("insert into role values ('3', 'Dozent, Raumplanung', 'Darf eigene Sachen bearbeiten und auf Raumplanung zugreifen');");
@@ -151,6 +153,7 @@
 				rquery("insert into role values ('5', 'Verwalter', 'Darf auf Statistiken und Veranstaltungen zugreifen');");
 				rquery("insert into role values ('6', 'Studienverwalter', 'Darf Studiengange und Prüfungsnummern editieren');");
 				rquery("insert into role values ('7', 'Raumplanungsverwalter', 'Darf alles was der Verwalter darf + Raumplanung');");
+				initialized("role");
 			}
 
 			if(!table_exists_and_has_entries("users") || $GLOBALS["db_freshly_created"]) {
@@ -195,7 +198,7 @@
 				}
 			}
 
-			if(!table_exists_and_has_entries("page")) {
+			if(!table_exists_and_has_entries("page") && !already_initialized("page")) {
 				rquery("insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) VALUES 
 					(1,'Accounts','accounts.php','1',25, 1),
 					(2,'Dozenten','dozenten.php','1',28, 0),
@@ -250,9 +253,10 @@
 					(55, 'Rechnungen', 'rechnungen.php', '1', null, 0),
 					(56, 'Anpassen', 'anpassen.php', '1', NULL, 1);");
 				rquery("update page set disable_in_demo = 1 where id in (21, 23, 24, 31, 55)");
+				initialized("page");
 			}
 
-			if(!table_exists_and_has_entries("role_to_page")) {
+			if(!table_exists_and_has_entries("role_to_page") && !already_initialized("role_to_page")) {
 				# removed: (1,32),
 				rquery("insert ignore INTO `role_to_page` VALUES (1,1),
 					(1,2),
@@ -383,20 +387,24 @@
 					(1,55),
 					(1,56),
 					(1,43);");
+					initialized("role_to_page");
 			}
 
-			if(!table_exists_and_has_entries("function_right")) {
+			if(!table_exists_and_has_entries("function_right") && !already_initialized("function_right")) {
 				rquery("insert ignore INTO `function_right` VALUES 
 				(61,'assign_page_to_role',NULL),(62,'assign_pruefungsnummer_to_veranstaltung',NULL),(66,'backup_tables',NULL),(67,'compare_db',NULL),(68,'create_api',NULL),(69,'create_bereich',NULL),(70,'create_dozent',NULL),(71,'create_fach',NULL),(72,'create_faq',NULL),(73,'create_gebaeude',NULL),(74,'create_institut',NULL),(75,'create_modul',NULL),(78,'create_nachpruefung',NULL),(82,'create_nachpruefung_liste',NULL),(83,'create_new_page',NULL),(85,'create_pruefung',NULL),(89,'create_pruefungsamt',NULL),(91,'create_pruefungsnummer',NULL),(93,'create_pruefungstyp',NULL),(94,'create_pruefung_zeitraum',NULL),(95,'create_raum',NULL),(99,'create_role',NULL),(101,'create_studiengang',NULL),(106,'create_title',NULL),(107,'create_user',NULL),(108,'create_veranstaltung',NULL),(112,'create_veranstaltungstyp',NULL),(113,'delete_api',NULL),(114,'delete_bereich',NULL),(115,'delete_dozent',NULL),(116,'delete_faq',NULL),(117,'delete_gebaeude',NULL),(118,'delete_institut',NULL),(119,'delete_modul',NULL),(120,'delete_nachpruefung',NULL),(124,'delete_page',NULL),(131,'delete_pruefung',NULL),(135,'delete_pruefungsamt',NULL),(136,'delete_pruefungsnummer',NULL),(137,'delete_pruefungstyp',NULL),(141,'delete_pruefung_zeitraum',NULL),(142,'delete_raum',NULL),(143,'delete_role',NULL),(144,'delete_semester',NULL),(145,'delete_studiengang',NULL),(146,'delete_titel',NULL),(147,'delete_user',NULL),(148,'delete_veranstaltung',NULL),(152,'delete_veranstaltungstyp',NULL),(153,'delete_veranstaltung_modul',NULL),(159,'delete_veranstaltung_studiengang',NULL),(170,'get_and_create_salt',NULL),(178,'insert_pruefungsnummern',NULL),(179,'kopiere_pruefungen_von_nach',NULL),(183,'merge_data',NULL),(185,'modul_zu_veranstaltung_hinzufuegen',NULL),(194,'raumplanung',NULL),(196,'setze_semester',NULL),(199,'SplitSQL',NULL),(200,'studiengang_zu_veranstaltung_hinzufuegen',NULL),(206,'update_api',NULL),(207,'update_barrierefrei',NULL),(211,'update_bereich',NULL),(212,'update_dozent',NULL),(213,'update_dozent_titel',NULL),(214,'update_fach',NULL),(215,'update_faq',NULL),(216,'update_gebaeude',NULL),(217,'update_hinweis',NULL),(218,'update_institut',NULL),(219,'update_modul',NULL),(220,'update_modul_semester',NULL),(221,'update_modul_semester_data',NULL),(222,'update_nachpruefung',NULL),(226,'update_or_create_role_to_page',NULL),(227,'update_own_data',NULL),(235,'update_page',NULL),(241,'update_page_full',NULL),(242,'update_page_info',NULL),(243,'update_pruefung',NULL),(247,'update_pruefungsamt',NULL),(248,'update_pruefungsamt_studiengang',NULL),(249,'update_pruefungsnummer',NULL),(250,'update_pruefungstyp',NULL),(251,'update_pruefung_zeitraum',NULL),(252,'update_raum',NULL),(253,'update_raumplanung',NULL),(255,'update_role',NULL),(256,'update_startseitentext',NULL),(257,'update_studiengang',NULL),(258,'update_superdozent',NULL),(259,'update_text',NULL),(260,'update_titel',NULL),(262,'update_user',NULL),(263,'update_user_role',NULL),(264,'update_veranstaltung',NULL),(268,'update_veranstaltungstyp',NULL),
 				(269,'update_veranstaltung_metadata',NULL),(278,'delete_fach',NULL),(279,'update_role_to_page_page_info_hinweis',NULL),(280,'change_own_data',NULL),(281,'update_funktion_rights',NULL),(283,'delete_funktion_rights',NULL),(284,'create_function_rights',NULL),(285,'update_function_rights',NULL),(286,'create_function_right',NULL),(287,'update_right_to_page',NULL),(289,'update_right_to_user_role',NULL),(290,'update_semester',NULL),(291,'update_language',NULL),(293,'create_language',NULL),(294,'delete_language',NULL);");
+				initialized("function_right");
 			}
 
-			if(!table_exists_and_has_entries("function_right_to_page")) {
+			if(!table_exists_and_has_entries("function_right_to_page") && !already_initialized("function_right_to_page")) {
 				rquery("insert ignore into `function_right_to_page` VALUES (61,11),(62,13),(66,23),(67,31),(68,19),(69,22),(70,2),(72,37),(73,4),(74,3),(75,5),(83,43),(89,36),(91,12),(93,6),(94,41),(95,7),(99,11),(101,8),(106,42),(107,1),(108,9),(108,13),(112,10),(113,19),(114,22),(115,2),(116,37),(117,4),(118,3),(119,5),(124,43),(135,36),(136,12),(137,6),(141,41),(142,7),(143,11),(144,33),(145,8),(146,42),(147,1),(148,9),(152,10),(170,1),(170,21),(183,30),(196,34),(199,23),(206,19),(207,2),(207,21),(211,22),(212,2),(213,2),(215,37),(216,4),(217,15),(217,43),(218,3),(219,5),(220,20),(226,43),(227,21),(235,43),(241,43),(242,15),(242,43),(247,36),(248,36),(249,12),(250,6),(251,41),(253,7),(255,11),(257,8),(258,38),(259,15),(260,42),(262,1),(263,11),(264,9),(264,13),(268,10),(269,13),(279,43),(280,21),(281,45),(283,45),(284,45),(290,47),(291,48),(293,48),(294,48);");
+				initialized("function_right_to_page");
 			}
 
-			if(!table_exists_and_has_entries("function_right_to_user_role")) {
+			if(!table_exists_and_has_entries("function_right_to_user_role") && !already_initialized("function_right_to_user_role")) {
 				rquery("insert ignore into `function_right_to_user_role` VALUES (61,1),(62,1),(62,2),(62,3),(62,4),(62,5),(66,1),(67,1),(68,1),(69,1),(70,1),(71,1),(72,1),(73,1),(74,1),(75,1),(78,1),(78,2),(78,3),(78,4),(82,1),(83,1),(85,1),(85,2),(85,3),(85,4),(89,1),(91,1),(93,1),(94,1),(95,1),(95,2),(95,3),(95,4),(99,1),(101,1),(106,1),(107,1),(108,1),(108,2),(108,3),(108,4),(112,1),(113,1),(114,1),(115,1),(116,1),(117,1),(118,1),(119,1),(120,1),(120,2),(120,3),(120,4),(124,1),(131,1),(131,2),(131,3),(131,4),(135,1),(136,1),(137,1),(137,2),(137,3),(137,4),(141,1),(142,1),(143,1),(144,1),(145,1),(146,1),(147,1),(148,1),(148,2),(148,3),(148,4),(152,1),(153,1),(153,2),(153,3),(153,4),(159,1),(159,2),(159,3),(159,4),(170,1),(170,2),(170,3),(170,4),(178,1),(179,1),(179,2),(179,3),(179,4),(183,1),(185,1),(185,2),(185,3),(185,4),(194,1),(196,1),(196,5),(199,1),(200,1),(200,2),(200,3),(200,4),(206,1),(207,1),(207,2),(207,3),(207,4),(211,1),(212,1),(213,1),(214,1),(215,1),(216,1),(217,1),(218,1),(219,1),(220,1),(221,1),(222,1),(222,2),(222,3),(222,4),(226,1),(227,1),(227,2),(227,3),(227,4),(235,1),(241,1),(242,1),(243,1),(243,2),(243,3),(243,4),(247,1),(248,1),(249,1),(250,1),(251,1),(252,1),(253,1),(253,3),(255,1),(256,1),(257,1),(258,1),(259,1),(260,1),(262,1),(263,1),(264,1),(264,2),(264,3),(264,4),(264,5),(268,1),(269,1),(269,2),(269,3),(269,4),(269,5),(281,1),(283,1),(284,1),(286,1),(287,1),(289,1);");
+				initialized("function_right_to_user_role");
 			}
 			#### FROM HERE
 
