@@ -118,7 +118,7 @@
 		while (!$success) {
 			$rndInt = rand(0, pow(36, 10) - 1);
 			$rndStr = base_convert($rndInt, 10, 36);
-			$rndStr = str_pad($rndStr, 10, "0", STR_PAD_LEFT);
+			$rndStr = "demo_".str_pad($rndStr, 10, "0", STR_PAD_LEFT);
 
 			$query = "SELECT 1 FROM vvz_global.kundendaten WHERE urlname = ".esc("db_vvz_".$rndStr)." LIMIT 1";
 			if (!get_single_row_from_query($query)) {
