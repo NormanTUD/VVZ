@@ -148,7 +148,12 @@ declare(ticks=1);
 
 	include('mysql.php');
 
-	rquery('USE `'.$GLOBALS['dbname'].'`');
+	if(database_exists($GLOBALS["dbname"])) {
+		rquery('USE `'.$GLOBALS['dbname'].'`');
+	} else {
+		print '<meta http-equiv="refresh" content="0; url=/" />';
+		exit(0);
+	}
 	rquery('SELECT @@FOREIGN_KEY_CHECKS');
 	rquery('SET FOREIGN_KEY_CHECKS=1');
 
