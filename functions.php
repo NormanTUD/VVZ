@@ -3892,6 +3892,75 @@ WHERE 1
 		updated_raumplanung_relevante_daten($id, $alte_daten);
 	}
 
+	function value_fits_into_db_column ($database, $table, $column, $value, $wertname, $overwrite_type=0) {
+		if(database_exists($database)) {
+			if(table_exists($database, $table)) {
+				$query = "show full columns from apache_restarts where Field = ".esc($column);
+				$row = get_single_row_from_query_assoc($query);
+
+				$can_be_null = $row["Null"] == "YES" ? 1 : 0;
+
+				if(!$can_be_null && is_null($value)) {
+					return array("ok" => 0, "value" => $value, "warning" => "$wertname darf nicht leer sein, war aber leer.");
+				}
+
+				$type = $row["Type"];
+
+				if($overwrite_type) {
+					$type = $overwrite_type;
+				}
+
+				if($type == "datetime") {
+					if(preg_match("/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2}:\d{1,2}$/", $value)) {
+						return array("ok" => 1, "value" => $value);
+					}
+					return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Er muss dem Datumsformat YYYY-MM-DD HH:mm:SS folgen.");
+				} else if(preg_match("/^enum\((.*)\)/", $type, $matches)) {
+					$enums = explode(",", $matches[1]);
+					$enums = preg_replace("/(?:^'|'$)/", "", $enums);
+
+					if(in_array($value, $enums)) {
+						return array("ok" => 1, "value" => $value);
+					} else {
+						return array("ok" => 0, "value" => $value, "warning" => "$wertname ($value) war nicht in ".join(", ", $enums).".");
+					}
+				} else if(preg_match("/^varchar\((\d*)\)/", $type, $matches)) {
+					$max_length = $matches[1];
+
+					if(strlen($value) > $max_length) {
+						$value = substr($value, 0, $max_length - 1);
+						return array("ok" => 1, "value" => $value, "warning" => "$wertname war zu lang. Maximal $max_length Zeichen. Der Text wurde dementsprechend gekürzt.");
+					} else {
+						return array("ok" => 1, "value" => $value);
+					}
+				} else if(preg_match("/^int\((\d*)\)/", $type, $matches)) {
+					$max_length = $matches[1];
+
+					if(preg_match("/^[+-]?\d+$/", $value)) {
+						if(strlen($value) > $max_length) {
+							$value = substr($value, 0, $max_length - 1);
+							return array("ok" => 1, "value" => $value, "warning" => "$wertname war zu lang. Maximal $max_length Zeichen. Der Text wurde dementsprechend gekürzt.");
+						} else {
+							return array("ok" => 1, "value" => $value);
+						}
+					} else {
+						return array("ok" => 0, "value" => $value, "warning" => "$value ist keine ganze Zahl.");
+					}
+				} else if($type == "text") {
+					return value_fits_into_db_column($database, $table, $column, $value, $wertname, "varchar(65535)");
+				} else {
+					dier($type);
+				}
+			} else {
+				return array("ok" => 0, "value" => $value, "error" => "Table $database.$table does not exist");
+			}
+		} else {
+			return array("ok" => 0, "value" => $value, "error" => "Invalid database $database");
+		}
+	}
+
+	dier(value_fits_into_db_column($GLOBALS["dbname"], "apache_restarts", "stdout", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Success"));
+
 	function update_veranstaltungstyp ($id, $name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) {
 			return;

@@ -43,6 +43,12 @@
 	}
 
 
+	function get_single_row_from_result_assoc ($result, $default = NULL) {
+		while ($row = mysqli_fetch_assoc($result)) {
+			return $row;
+		}
+		return $default;
+	}
 
 	function get_single_row_from_result ($result, $default = NULL) {
 		$id = $default;
@@ -52,6 +58,11 @@
 		return $id;
 	}
 
+
+	function get_single_row_from_query_assoc ($query, $default = NULL) {
+		$result = rquery($query);
+		return get_single_row_from_result_assoc($result, $default);
+	}
 
 	function get_single_row_from_query ($query, $default = NULL) {
 		$result = rquery($query);
