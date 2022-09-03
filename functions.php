@@ -3874,6 +3874,11 @@ WHERE 1
 			}
 		}
 
+		if($name && strlen($name) > 499) {
+			$name = substr($name, 0, 499);
+			warning("Der Name der Veranstaltung war zu lang und wurde auf 500 Zeichen gekürzt.");
+		}
+
 		$master_niveau = !!$master_niveau;
 		$fester_bbb_raum = !!$fester_bbb_raum;
 
