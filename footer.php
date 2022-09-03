@@ -1,8 +1,5 @@
 		<div class="footer_style">
 <?php
-	if(file_exists('/etc/x11test')) {
-		exit(0);
-	}
 	$this_page_file = ($_SERVER['REQUEST_URI']);
 	if(preg_match("/^\/v\/[a-z-_0-9]+\/$/", $this_page_file)) {
 		$this_page_file = "startseite";
