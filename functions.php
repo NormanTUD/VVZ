@@ -3906,8 +3906,10 @@ WHERE 1
 						$can_be_null = 0;
 					}
 
-					if(!$can_be_null && is_null($value)) {
+					if(!$can_be_null && (is_null($value) || $value = "")) {
 						return array("ok" => 0, "value" => $value, "warning" => "$wertname darf nicht leer sein, war aber leer.");
+					} else if ($can_be_null && (is_null($value) || $value == "")) {
+						return array("ok" => 1, "value" => $value);
 					}
 
 					$type = $row["Type"];
@@ -3954,9 +3956,6 @@ WHERE 1
 							$unsigned = 1;
 						}
 
-						if(is_null($value)) {
-							return array("ok" => 1, "value" => $value);
-						}
 
 						if(preg_match("/^[+-]?\d+$/", $value)) {
 							if($unsigned && $value < 0) {
@@ -4189,7 +4188,7 @@ WHERE `id` = '.esc($id);
 
 	# 					1	2	   3	   4		5		6	    7		8	9		10			11
 # 12		    13
-	function update_veranstaltung_metadata ($id, $wochentag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, $pruefungsnummern, $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink) {
+	function update_veranstaltung_metadata ($id, $wochentag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch_id, $gebaeudewunsch_id, $pruefungsnummern, $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
@@ -4203,8 +4202,8 @@ WHERE `id` = '.esc($id);
 				array("table" => "veranstaltung_metadaten", "col" => "fester_bbb_raum", "name" => "Fester BBB-Raum"),
 				array("table" => "veranstaltung_metadaten", "col" => "videolink", "name" => "Videolink"),
 				array("table" => "veranstaltung_metadaten", "col" => "wunsch", "name" => "Wunsch"),
-				array("table" => "veranstaltung_metadaten", "col" => "raumwunsch", "name" => "Raumwunsch"),
-				array("table" => "veranstaltung_metadaten", "col" => "gebaeudewunsch", "name" => "Gebäudewunsch"),
+				array("table" => "veranstaltung", "col" => "raumwunsch_id", "name" => "Raumwunsch"),
+				array("table" => "veranstaltung", "col" => "gebaeudewunsch_id", "name" => "Gebäudewunsch"),
 				array("table" => "veranstaltung_metadaten", "col" => "hinweis", "name" => "Hinweis"),
 				array("table" => "veranstaltung_metadaten", "col" => "opal_link", "name" => "eLearning-Link")
 			]
@@ -4258,10 +4257,10 @@ INSERT INTO
 
 		if($result) {
 			$query = '';
-			if($raumwunsch && $gebaeudewunsch) {
-				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = '.esc($raumwunsch).', `gebaeudewunsch_id` = '.esc($gebaeudewunsch).' WHERE `id` = '.esc($id);
-			} elseif ($gebaeudewunsch) {
-				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch).' WHERE `id` = '.esc($id);
+			if($raumwunsch_id && $gebaeudewunsch_id) {
+				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = '.esc($raumwunsch_id).', `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
+			} elseif ($gebaeudewunsch_id) {
+				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
 			if($query) {
