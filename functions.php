@@ -4193,7 +4193,6 @@ WHERE `id` = '.esc($id);
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
 	
-		$abgabe_pruefungsleistungen = "hallo";
 		eval(check_values(
 			[
 				array("table" => "veranstaltung_metadaten", "col" => "abgabe_pruefungsleistungen", "name" => "Abgabe Prüfungsleistungen"),
