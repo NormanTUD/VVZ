@@ -4204,7 +4204,10 @@ WHERE `id` = '.esc($id);
 				array("table" => "veranstaltung", "col" => "raumwunsch_id", "name" => "Raumwunsch"),
 				array("table" => "veranstaltung", "col" => "gebaeudewunsch_id", "name" => "Gebäudewunsch"),
 				array("table" => "veranstaltung_metadaten", "col" => "hinweis", "name" => "Hinweis"),
-				array("table" => "veranstaltung_metadaten", "col" => "opal_link", "name" => "eLearning-Link")
+				array("table" => "veranstaltung_metadaten", "col" => "opal_link", "name" => "eLearning-Link"),
+				array("table" => "veranstaltung_metadaten", "col" => "stunde", "name" => "Stunde"),
+				array("table" => "veranstaltung_metadaten", "col" => "related_veranstaltung", "name" => "Zugehorige Veranstaltung"),
+				array("table" => "veranstaltung_metadaten", "col" => "wochentag", "name" => "Wochentag")
 			]
 		));
 
