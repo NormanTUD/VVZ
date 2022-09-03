@@ -4067,6 +4067,11 @@ WHERE `id` = '.esc($id);
 			$erster_termin = null;
 		}
 
+		if(!is_null($anzahl_hoerer) && $anzahl_hoerer && strlen($anzahl_hoerer) > 100) {
+			warning("Anzahl Hörrer zu lang. Wurde auf 100 Zeichen gekürzt.");
+			$anzahl_hoerer = substr($anzahl_hoerer, 0, 99);
+		}
+
 		if(!is_null($opal_link) && $opal_link && strlen($opal_link) > 500) {
 			warning("eLearning Link zu lang. Wurde auf 500 Zeichen gekürzt.");
 			$opal_link = substr($opal_link, 0, 499);
