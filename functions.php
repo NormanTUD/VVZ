@@ -148,6 +148,8 @@ declare(ticks=1);
 
 	include('mysql.php');
 
+	selftest_startpage();
+
 	if(database_exists($GLOBALS["dbname"])) {
 		rquery('USE `'.$GLOBALS['dbname'].'`');
 	} else {
