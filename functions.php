@@ -3920,12 +3920,12 @@ WHERE 1
 						if(preg_match("/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2}:\d{1,2}$/", $value)) {
 							return array("ok" => 1, "value" => $value);
 						}
-						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Er muss dem Datumsformat YYYY-MM-DD HH:mm:SS folgen.");
+						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Muss dem Datumsformat YYYY-MM-DD HH:mm:SS folgen.");
 					} else if($type == "date") {
 						if(preg_match("/^\d{4}-\d{1,2}-\d{1,2}$/", $value ?? "")) {
 							return array("ok" => 1, "value" => $value);
 						}
-						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Er muss dem Datumsformat YYYY-MM-DD folgen.");
+						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Muss dem Datumsformat YYYY-MM-DD folgen.");
 					} else if(preg_match("/^enum\((.*)\)/", $type, $matches)) {
 						$enums = explode(",", $matches[1]);
 						$enums = preg_replace("/(?:^'|'$)/", "", $enums);
@@ -4148,10 +4148,10 @@ WHERE `id` = '.esc($id);
 		$eval_str = "";
 		foreach ($data as $item) {
 			#value_fits_into_db_column ($database, $table, $column, $value, $wertname, $overwrite_type=0) {
-			$varname = $item["varname"];
 			$db = $item["db"] ?? $GLOBALS["dbname"];
 			$table = $item["table"];
 			$col = $item["col"];
+			$varname = $item["varname"] ?? $col;
 			$name = $item["name"];
 
 			$this_eval = "
@@ -4190,42 +4190,12 @@ WHERE `id` = '.esc($id);
 		$abgabe_pruefungsleistungen = "hallo";
 		eval(check_values(
 			[
-				array("table" => "veranstaltung_metadaten", "col" => "abgabe_pruefungsleistungen", "varname" => "abgabe_pruefungsleistungen", "name" => "Abgabe Prüfungsleistungen")
+				array("table" => "veranstaltung_metadaten", "col" => "abgabe_pruefungsleistungen", "name" => "Abgabe Prüfungsleistungen"),
+				array("table" => "veranstaltung_metadaten", "col" => "erster_termin", "name" => "Erster Termin"),
+				array("table" => "veranstaltung_metadaten", "col" => "anzahl_hoerer", "name" => "Anzahl Hörer"),
+				array("table" => "veranstaltung_metadaten", "col" => "opal_link", "name" => "eLearning-Link")
 			]
 		));
-
-		if($abgabe_pruefungsleistungen_check["ok"] == 1) {
-			if(isset($abgabe_pruefungsleistungen["error"])) {
-				error($abgabe_pruefungsleistungen_check["error"]);
-			}
-			if(isset($abgabe_pruefungsleistungen["warning"])) {
-				warning($abgabe_pruefungsleistungen_check["warning"]);
-			}
-			$abgabe_pruefungsleistungen = $abgabe_pruefungsleistungen_check["value"];
-		} else {
-			if(isset($abgabe_pruefungsleistungen["error"])) {
-				error($abgabe_pruefungsleistungen_check["error"]);
-			}
-			if(isset($abgabe_pruefungsleistungen["warning"])) {
-				warning($abgabe_pruefungsleistungen_check["warning"]);
-			}
-			$abgabe_pruefungsleistungen = null;
-		}
-
-		if(!is_null($abgabe_pruefungsleistungen) && $abgabe_pruefungsleistungen && !preg_match("/^\d{4}-\d+-\d+$/", $abgabe_pruefungsleistungen)) {
-			warning("Fehlerhafte Eingabe für <b>Abgabe Prüfungsleistungen</b>. Muss ein Datum im Format <i>YYYY-mm-dd</i> sein. Eingegebener Wert wird nicht gespeichert.");
-			$abgabe_pruefungsleistungen = null;
-		}
-
-		if(!is_null($erster_termin) && $erster_termin && !preg_match("/^\d{4}-\d+-\d+$/", $erster_termin)) {
-			warning("Fehlerhafte Eingabe für <b>Erster Termin</b>. Muss ein Datum im Format <i>YYYY-mm-dd</i> sein. Eingegebener Wert wird nicht gespeichert.");
-			$erster_termin = null;
-		}
-
-		if(!is_null($anzahl_hoerer) && $anzahl_hoerer && strlen($anzahl_hoerer) > 100) {
-			warning("Anzahl Hörrer zu lang. Wurde auf 100 Zeichen gekürzt.");
-			$anzahl_hoerer = substr($anzahl_hoerer, 0, 99);
-		}
 
 		if(!is_null($opal_link) && $opal_link && strlen($opal_link) > 500) {
 			warning("eLearning Link zu lang. Wurde auf 500 Zeichen gekürzt.");
