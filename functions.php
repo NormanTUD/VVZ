@@ -3959,7 +3959,7 @@ WHERE 1
 		}
 	}
 
-	dier(value_fits_into_db_column($GLOBALS["dbname"], "apache_restarts", "stdout", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Success"));
+	#dier(value_fits_into_db_column($GLOBALS["dbname"], "apache_restarts", "stdout", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "Success"));
 
 	function update_veranstaltungstyp ($id, $name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) {
