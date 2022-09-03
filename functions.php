@@ -3916,11 +3916,16 @@ WHERE 1
 						$type = $overwrite_type;
 					}
 
-					if($type == "datetime") {
+					if($type == "datetime" || $type == "timestamp") {
 						if(preg_match("/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2}:\d{1,2}$/", $value)) {
 							return array("ok" => 1, "value" => $value);
 						}
 						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Er muss dem Datumsformat YYYY-MM-DD HH:mm:SS folgen.");
+					} else if($type == "date") {
+						if(preg_match("/^\d{4}-\d{1,2}-\d{1,2}$/", $value ?? "")) {
+							return array("ok" => 1, "value" => $value);
+						}
+						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Er muss dem Datumsformat YYYY-MM-DD folgen.");
 					} else if(preg_match("/^enum\((.*)\)/", $type, $matches)) {
 						$enums = explode(",", $matches[1]);
 						$enums = preg_replace("/(?:^'|'$)/", "", $enums);
@@ -3930,6 +3935,9 @@ WHERE 1
 						} else {
 							return array("ok" => 0, "value" => $value, "warning" => "$wertname ($value) war nicht in ".join(", ", $enums).".");
 						}
+					} else if(preg_match("/^binary\((\d*)\)/", $type, $matches)) {
+						// TODO: Length checks!
+						return array("ok" => 1, "value" => $value);
 					} else if(preg_match("/^varchar\((\d*)\)/", $type, $matches)) {
 						$max_length = $matches[1];
 
@@ -3971,7 +3979,7 @@ WHERE 1
 		}
 	}
 
-	#dier(value_fits_into_db_column($GLOBALS["dbname"], "api_auth_codes", "id", "12", "Success"));
+	#dier(value_fits_into_db_column($GLOBALS["dbname"], "api_log", "ip", "12", "Success"));
 
 	function update_veranstaltungstyp ($id, $name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) {
@@ -4136,12 +4144,73 @@ WHERE `id` = '.esc($id);
 		return $data;
 	}
 
+	function check_values ($data) {
+		$eval_str = "";
+		foreach ($data as $item) {
+			#value_fits_into_db_column ($database, $table, $column, $value, $wertname, $overwrite_type=0) {
+			$varname = $item["varname"];
+			$db = $item["db"] ?? $GLOBALS["dbname"];
+			$table = $item["table"];
+			$col = $item["col"];
+			$name = $item["name"];
+
+			$this_eval = "
+				$${varname}_check = value_fits_into_db_column('$db', '$table', '${col}', \$$varname, '$name');
+				if($${varname}_check['ok'] == 1) {
+					if(array_key_exists('error', $${varname}_check)) {
+						error($${varname}_check['error']);
+					}
+					if(array_key_exists('warning', $${varname}_check)) {
+						warning($${varname}_check['warning']);
+					}
+					$${varname} = \$${varname}_check['value'];
+				} else {
+					if(array_key_exists('error', $${varname}_check)) {
+						error($${varname}_check['error']);
+					}
+					if(array_key_exists('warning', $${varname}_check)) {
+						warning($${varname}_check['warning']);
+					}
+					$${varname} = null;
+				}
+			";
+			$eval_str .= $this_eval;
+		}
+
+		return $eval_str;
+	}
+
 	# 					1	2	   3	   4		5		6	    7		8	9		10			11
 # 12		    13
 	function update_veranstaltung_metadata ($id, $wochentag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, $pruefungsnummern, $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
+	
+		$abgabe_pruefungsleistungen = "hallo";
+		eval(check_values(
+			[
+				array("table" => "veranstaltung_metadaten", "col" => "abgabe_pruefungsleistungen", "varname" => "abgabe_pruefungsleistungen", "name" => "Abgabe Prüfungsleistungen")
+			]
+		));
+
+		if($abgabe_pruefungsleistungen_check["ok"] == 1) {
+			if(isset($abgabe_pruefungsleistungen["error"])) {
+				error($abgabe_pruefungsleistungen_check["error"]);
+			}
+			if(isset($abgabe_pruefungsleistungen["warning"])) {
+				warning($abgabe_pruefungsleistungen_check["warning"]);
+			}
+			$abgabe_pruefungsleistungen = $abgabe_pruefungsleistungen_check["value"];
+		} else {
+			if(isset($abgabe_pruefungsleistungen["error"])) {
+				error($abgabe_pruefungsleistungen_check["error"]);
+			}
+			if(isset($abgabe_pruefungsleistungen["warning"])) {
+				warning($abgabe_pruefungsleistungen_check["warning"]);
+			}
+			$abgabe_pruefungsleistungen = null;
+		}
 
 		if(!is_null($abgabe_pruefungsleistungen) && $abgabe_pruefungsleistungen && !preg_match("/^\d{4}-\d+-\d+$/", $abgabe_pruefungsleistungen)) {
 			warning("Fehlerhafte Eingabe für <b>Abgabe Prüfungsleistungen</b>. Muss ein Datum im Format <i>YYYY-mm-dd</i> sein. Eingegebener Wert wird nicht gespeichert.");
