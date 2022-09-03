@@ -4387,12 +4387,16 @@ INSERT INTO
 
 			$old_master_niveau = get_single_row_from_query("select master_niveau from veranstaltung where id = ".esc($id));
 			if($old_master_niveau != $master_niveau) {
+				$old_db_status_hash = query_to_status_hash("select master_niveau from veranstaltung where id = ".esc($id));
 				$query = 'UPDATE `veranstaltung` SET `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
+				$new_db_status_hash = query_to_status_hash("select master_niveau from veranstaltung where id = ".esc($id));
 
-				if(rquery($query)) {
-					success('Das Niveau wurde angepasst.');
-				} else {
-					warning("Die Studiengangsniveaueinstellung konnte nicht gespeichert werden");
+				if($new_db_status_hash != $old_db_status_hash) {
+					if(rquery($query)) {
+						success('Das Niveau wurde angepasst.');
+					} else {
+						warning("Die Studiengangsniveaueinstellung konnte nicht gespeichert werden");
+					}
 				}
 			}
 		} else {
@@ -4416,10 +4420,12 @@ INSERT INTO
 			$commit = 1;
 			foreach ($pruefungsnummer as $this_pn) {
 				if($commit) {
-					$query = 'INSERT IGNORE INTO `pruefung` (veranstaltung_id, pruefungsnummer_id) values ('.esc($id).', '.esc($this_pn).')';
-					$result = rquery($query);
-					if(!$result) {
-						$commit = 0;
+					if(!is_null($this_pn)) {
+						$query = 'INSERT IGNORE INTO `pruefung` (veranstaltung_id, pruefungsnummer_id) values ('.esc($id).', '.esc($this_pn).')';
+						$result = rquery($query);
+						if(!$result) {
+							$commit = 0;
+						}
 					}
 				}
 			}
