@@ -4057,12 +4057,12 @@ WHERE `id` = '.esc($id);
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
 
-		if(!preg_match("/^\d{4}-\d+-\d+$/", $abgabe_pruefungsleistungen)) {
+		if(!is_null($abgabe_pruefungsleistungen) && $abgabe_pruefungsleistungen && !preg_match("/^\d{4}-\d+-\d+$/", $abgabe_pruefungsleistungen)) {
 			warning("Fehlerhafte Eingabe für <b>Abgabe Prüfungsleistungen</b>. Muss ein Datum im Format <i>YYYY-mm-dd</i> sein. Eingegebener Wert wird nicht gespeichert.");
 			$abgabe_pruefungsleistungen = null;
 		}
 
-		if(!preg_match("/^\d{4}-\d+-\d+$/", $erster_termin)) {
+		if(!is_null($erster_termin) && $erster_termin && !preg_match("/^\d{4}-\d+-\d+$/", $erster_termin)) {
 			warning("Fehlerhafte Eingabe für <b>Erster Termin</b>. Muss ein Datum im Format <i>YYYY-mm-dd</i> sein. Eingegebener Wert wird nicht gespeichert.");
 			$erster_termin = null;
 		}
