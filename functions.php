@@ -3860,24 +3860,29 @@ WHERE 1
 
  */
 
-	function update_veranstaltung($id, $name, $dozent, $veranstaltungstyp, $institut, $semester, $master_niveau, $fester_bbb_raum) {
+	function update_veranstaltung($id, $name, $dozent_id, $veranstaltungstyp, $institut_id, $semester_id, $master_niveau, $fester_bbb_raum) {
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
 
 
-		if(!user_can_edit_other_users_veranstaltungen($GLOBALS['logged_in_user_id'], $dozent)) {
-			if(get_role_id_by_user($GLOBALS['logged_in_user_id']) != 1 && $dozent != $GLOBALS['user_dozent_id']) {
+		if(!user_can_edit_other_users_veranstaltungen($GLOBALS['logged_in_user_id'], $dozent_id)) {
+			if(get_role_id_by_user($GLOBALS['logged_in_user_id']) != 1 && $dozent_id != $GLOBALS['user_dozent_id']) {
 				// Wenn der User nicht der Gruppe der Admins zugehörig ist, dann kann er nur seine eigenen Sachen ändern.
 				error('Sie haben nicht die notwendigen Rechte um Veränderungen an den Daten Anderer vorzunehmen.');
 				return;
 			}
 		}
 
-		if($name && strlen($name) > 499) {
-			$name = substr($name, 0, 499);
-			warning("Der Name der Veranstaltung war zu lang und wurde auf 500 Zeichen gekürzt.");
-		}
+		eval(check_values(
+			[
+				array("table" => "veranstaltung", "col" => "name", "name" => "Name der Veranstaltung"),
+				array("table" => "veranstaltung", "col" => "dozent_id", "name" => "Dozent"),
+				array("table" => "veranstaltung", "col" => "institut_id", "name" => "Institut"),
+				array("table" => "veranstaltung", "col" => "semester_id", "name" => "Semester"),
+				array("table" => "veranstaltung", "col" => "master_niveau", "name" => "Master-Niveau")
+			]
+		));
 
 		$master_niveau = !!$master_niveau;
 		$fester_bbb_raum = !!$fester_bbb_raum;
@@ -3886,7 +3891,7 @@ WHERE 1
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
 
-		$query = 'UPDATE `veranstaltung` SET `veranstaltungstyp_id` = '.esc($veranstaltungstyp).', `name` = '.esc($name).', `dozent_id` = '.esc($dozent).', `institut_id` = '.esc($institut).', `semester_id` = '.esc($semester).', `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
+		$query = 'UPDATE `veranstaltung` SET `veranstaltungstyp_id` = '.esc($veranstaltungstyp).', `name` = '.esc($name).', `dozent_id` = '.esc($dozent_id).', `institut_id` = '.esc($institut_id).', `semester_id` = '.esc($semester_id).', `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
 
 		simple_query_success_fail_message($query, 'Die Veranstaltung wurde erfolgreich geändert.', null, 'Die Veranstaltung konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 		updated_raumplanung_relevante_daten($id, $alte_daten);
@@ -3906,7 +3911,7 @@ WHERE 1
 						$can_be_null = 0;
 					}
 
-					if(!$can_be_null && (is_null($value) || $value = "")) {
+					if(!$can_be_null && (is_null($value) || $value == "")) {
 						return array("ok" => 0, "value" => $value, "warning" => "$wertname darf nicht leer sein, war aber leer.");
 					} else if ($can_be_null && (is_null($value) || $value == "")) {
 						return array("ok" => 1, "value" => $value);
