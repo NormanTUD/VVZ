@@ -4062,6 +4062,11 @@ WHERE `id` = '.esc($id);
 			$abgabe_pruefungsleistungen = null;
 		}
 
+		if(!preg_match("/^\d{4}-\d+-\d+$/", $erster_termin)) {
+			warning("Fehlerhafte Eingabe für <b>Erster Termin</b>. Muss ein Datum im Format <i>YYYY-mm-dd</i> sein. Eingegebener Wert wird nicht gespeichert.");
+			$erster_termin = null;
+		}
+
 		$query = '
 INSERT INTO 
 	`veranstaltung_metadaten` (
