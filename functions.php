@@ -3904,7 +3904,7 @@ WHERE 1
 				$row = get_single_row_from_query_assoc($query);
 
 				if(is_null($row)) {
-					return array("ok" => 0, "value" => $value, "warning" => "$database.$table ($column) does not exist!");
+					return array("ok" => 0, "value" => $value, "warning" => "$database.$table ($column) does not exist!", "cannot_continue" => 1);
 				} else {
 					$can_be_null = 1;
 					if(isset($row["Null"]) && !is_null($row["Null"]) && $row["Null"] == "NO") {
@@ -3912,7 +3912,7 @@ WHERE 1
 					}
 
 					if(!$can_be_null && (is_null($value) || $value == "")) {
-						return array("ok" => 0, "value" => $value, "warning" => "$wertname darf nicht leer sein, war aber leer.");
+						return array("ok" => 0, "value" => $value, "warning" => "$wertname darf nicht leer sein, war aber leer.", "cannot_continue" => 1);
 					} else if ($can_be_null && (is_null($value) || $value == "")) {
 						return array("ok" => 1, "value" => $value);
 					}
@@ -3964,7 +3964,7 @@ WHERE 1
 
 						if(preg_match("/^[+-]?\d+$/", $value)) {
 							if($unsigned && $value < 0) {
-								return array("ok" => 0, "value" => $value, "warning" => "$wertname darf nicht negativ werden.");
+								return array("ok" => 0, "value" => $value, "warning" => "$wertname darf nicht negativ werden.", "cannot_continue" => 1);
 							}
 
 							if(strlen($value) > $max_length) {
@@ -3974,7 +3974,7 @@ WHERE 1
 								return array("ok" => 1, "value" => $value);
 							}
 						} else {
-							return array("ok" => 0, "value" => $value, "warning" => "$value ist keine ganze Zahl.");
+							return array("ok" => 0, "value" => $value, "warning" => "$value ist keine ganze Zahl.", "cannot_continue" => 1);
 						}
 					} else if($type == "text") {
 						return value_fits_into_db_column($database, $table, $column, $value, $wertname, "varchar(65535)");
@@ -3989,8 +3989,6 @@ WHERE 1
 			return array("ok" => 0, "value" => $value, "error" => "Invalid database $database");
 		}
 	}
-
-	#dier(value_fits_into_db_column($GLOBALS["dbname"], "api_log", "ip", "12", "Success"));
 
 	function update_veranstaltungstyp ($id, $name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) {
@@ -4158,7 +4156,6 @@ WHERE `id` = '.esc($id);
 	function check_values ($data) {
 		$eval_str = "";
 		foreach ($data as $item) {
-			#value_fits_into_db_column ($database, $table, $column, $value, $wertname, $overwrite_type=0) {
 			$db = $item["db"] ?? $GLOBALS["dbname"];
 			$table = $item["table"];
 			$col = $item["col"];
@@ -4183,6 +4180,10 @@ WHERE `id` = '.esc($id);
 						warning($${varname}_check['warning']);
 					}
 					$${varname} = null;
+				}
+
+				if(array_key_exists('cannot_continue', \$${varname}_check)) {
+					return;
 				}
 			";
 			$eval_str .= $this_eval;
