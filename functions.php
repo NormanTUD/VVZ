@@ -3947,9 +3947,16 @@ WHERE 1
 						} else {
 							return array("ok" => 1, "value" => $value);
 						}
-					} else if(preg_match("/^int\((\d*)\)\s*((?:un)?signed)/", $type, $matches)) {
+					} else if(preg_match("/^int\((\d*)\)\s*((?:un)?signed)?/", $type, $matches)) {
 						$max_length = $matches[1];
-						$unsigned = $matches[2] == "unsigned" ? 1 : 0;
+						$unsigned = 0;
+						if(array_key_exists(2, $matches) && $matches[2] == "unsigned") {
+							$unsigned = 1;
+						}
+
+						if(is_null($value)) {
+							return array("ok" => 1, "value" => $value);
+						}
 
 						if(preg_match("/^[+-]?\d+$/", $value)) {
 							if($unsigned && $value < 0) {
@@ -4193,14 +4200,15 @@ WHERE `id` = '.esc($id);
 				array("table" => "veranstaltung_metadaten", "col" => "abgabe_pruefungsleistungen", "name" => "Abgabe Prüfungsleistungen"),
 				array("table" => "veranstaltung_metadaten", "col" => "erster_termin", "name" => "Erster Termin"),
 				array("table" => "veranstaltung_metadaten", "col" => "anzahl_hoerer", "name" => "Anzahl Hörer"),
+				array("table" => "veranstaltung_metadaten", "col" => "fester_bbb_raum", "name" => "Fester BBB-Raum"),
+				array("table" => "veranstaltung_metadaten", "col" => "videolink", "name" => "Videolink"),
+				array("table" => "veranstaltung_metadaten", "col" => "wunsch", "name" => "Wunsch"),
+				array("table" => "veranstaltung_metadaten", "col" => "raumwunsch", "name" => "Raumwunsch"),
+				array("table" => "veranstaltung_metadaten", "col" => "gebaeudewunsch", "name" => "Gebäudewunsch"),
+				array("table" => "veranstaltung_metadaten", "col" => "hinweis", "name" => "Hinweis"),
 				array("table" => "veranstaltung_metadaten", "col" => "opal_link", "name" => "eLearning-Link")
 			]
 		));
-
-		if(!is_null($opal_link) && $opal_link && strlen($opal_link) > 500) {
-			warning("eLearning Link zu lang. Wurde auf 500 Zeichen gekürzt.");
-			$opal_link = substr($opal_link, 0, 499);
-		}
 
 		$query = '
 INSERT INTO 
