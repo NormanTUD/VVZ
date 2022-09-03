@@ -156,11 +156,15 @@
 						?></td>
 					</tr>
 					<tr>
-						<td>IBAN für die Lastschrit:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_current_value("iban") ?? ""); ?>" /><?php
+						<td>IBAN für die Lastschrift:</td><td><input type="text" name="iban" placeholder="IBAN" value="<?php print htmlentities(get_current_value("iban") ?? ""); ?>" /><?php
 							if($iban_error) {
 									print "<br><span class='red_text'>$iban_error.</span>";
 								}
 							?></td>
+					</tr>
+					<tr>
+						<td>Lizenz:</td>
+						<td>Sie akzeptieren unsere <a target="_blank" href="license.php">Lizenzbedingungen</a> (<a target="_blank" href="license_short.php">Kurzversion</a>)</td>
 					</tr>
 
 					<tr>
@@ -171,10 +175,11 @@
 							create_select($werte, get_zahlungszyklus_name_by_monate($aktueller_zahlungszyklus), 'zahlungszyklus_monate', 0);
 						?></td>
 					</tr>
-					<tr>
+<!--					<tr>
 						<td>Wenn Sie bereits reale Daten eingegeben haben, wollen Sie diese übernehmen?</td>
-						<!--<td><input type="checkbox" name="daten_uebernehmen" value=1 /></td>-->
+						<td><input type="checkbox" name="daten_uebernehmen" value=1 /></td>
 					</tr>
+-->
 				</table>
 				<button>Ja, meine Daten sind korrekt</button>
 			</form>

@@ -1,4 +1,18 @@
-<h1>§ 1 Vertragsgegenstand</h1>
+<?php
+	$php_start = microtime(true);
+	include_once("config.php");
+	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name']." | Impressum";
+	$filename = 'startseite';
+	include("header.php");
+
+?>
+	<div id="mainindex">
+		<a href="startseite" border="0"><?php print_uni_logo(); ?></a><br>
+<?php
+		print get_demo_expiry_time();
+?>
+<h1>Lizenzbedingungen</h1>
+<h2>§ 1 Vertragsgegenstand</h2>
 
 <p>(1) Vertragsgegenstand ist die Überlassung von Software.</p>
 
@@ -14,40 +28,40 @@
 
 <p>(7) Während des Aktualisierungsvorgangs wird der Anbieter von seiner Vertragspflicht aus § 1 Abs. 2 dieses Vertrages befreit.</p>
 
-<h1>§ 2 Beginn und Laufzeit des Nutzungsverhältnisses</h1>
+<h2>§ 2 Beginn und Laufzeit des Nutzungsverhältnisses</h2>
 
 <p>(1) Dieser Vertrag tritt mit Unterzeichnung in Kraft und endet mit einer formlosen Kündigungsemail.</p>
 
-<h1>§ 3 Vergütung</h1>
+<h2>§ 3 Vergütung</h2>
 
 <p>(1) Im Gegenzug zu den Leistungen des Anbieters hat der Kunde eine entsprechende Vergütung zu erbringen.</p>
 
 <p>(2) Die Vergütung erfolgt unabhängig vom genutzten Volumen.</p>
 
-<h1>§ 4 Verfügbarkeit der Software</h1>
+<h2>§ 4 Verfügbarkeit der Software</h2>
 
 <p>(1) Der Anbieter weist den Kunden darauf hin, dass er keine 100%ige Verfügbarkeit der Software garantieren kann, wenn Einschränkungen oder Beeinträchtigungen entstehen, die außerhalb des Einflussbereichs des Anbieters stehen. Der Anbieter kann auch außerhalb der Fälle des § 1 Abs. 6 und 7 dieses Vertrages mit Zustimmung des Kunden für einen bestimmten Zeitraum von seiner Leistungspflicht befreit werden.</p>
 
 <p>(2) Der Kunde ist verpflichtet, den Anbieter unverzüglich schriftlich (per Brief oder per E-Mail) darüber zu unterrichten, sobald die Software nicht verfügbar ist.</p>
 
-<h1>§ 5 Nutzungsrecht des Kunden, Zugriffsberechtigung</h1>
+<h2>§ 5 Nutzungsrecht des Kunden, Zugriffsberechtigung</h2>
 
 <p>(1) Der Kunde erhält an der Software ein auf die Laufzeit des vorliegenden Vertrages beschränktes Nutzungsrecht.</p>
 
 <p>(2) Es erfolgt keine körperliche Überlassung der Software. Die Software bleibt jederzeit auf dem Server des Anbieters.</p>
 
-<h1>§ 6 Schulung</h1>
+<h2>§ 6 Schulung</h2>
 
 <p>Der Anbieter bietet kostenfreie Schulungsvideos zu allen relevanten Themen. Bei Bedarf können Sie uns kontaktieren und wir versuchen, neue Schulungsvideos zu erstellen.</p>
 
-<h1>§ 7 Support</h1>
+<h2>§ 7 Support</h2>
 
 <p>Der Anbieter stellt dem Kunden zur Beseitigung von technischen Störungen und Behebung von Fehlern, die im Rahmen der Nutzung der Software aufkommen, telefonisch einen Kundendienst zur Verfügung. Der Kundendienst des Anbieters ist via Email erreichbar, und zwar folgendermaßen:</p>
 
 <p>Email: noack@omni-concept.com</p>
 
 
-<h1>§ 8 Mängelansprüche</h1>
+<h2>§ 8 Mängelansprüche</h2>
 
 <p>(1) Der Anbieter haftet für Mängel der Vertragsleistungen.</p>
 
@@ -58,7 +72,7 @@
 <p>(4) Der Kunde ist verpflichtet, den Anbieter unverzüglich schriftlich (per Brief oder per E-Mail) von aufgetretenen Mängeln zu unterrichten.</p>
 
 
-<h1>§ 9 Haftung</h1>
+<h2>§ 9 Haftung</h2>
 
 <p>(1) Die Vertragsparteien haften für Vorsatz und grobe Fahrlässigkeit.</p>
 
@@ -68,13 +82,13 @@
 
 <p>(4) Der Anbieter haftet für Schäden seiner Erfüllungsgehilfen.</p>
 
-<h1>§ 10 Herausgabe und Löschung von Daten</h1>
+<h2>§ 10 Herausgabe und Löschung von Daten</h2>
 
 <p>(1) Nach Beendigung des Vertragsverhältnisses hat der Anbieter sämtliche Daten, Unterlagen und Datenträger des Kunden, die der Anbieter im Zusammenhang mit diesem Vertrag erhalten hat für den Kunden zum Download bereitgestellt werden.</p>
 
 <p>(2) Der Anbieter hat innerhalb von 48 Stunden nach Beendigung des Vertragsverhältnisses sämtliche gespeicherte Daten des Kunden auf dem eigenen Server vollständig zu löschen.</p>
 
-<h1>§ 11 Geheimhaltung, Vertraulichkeit</h1>
+<h2>§ 11 Geheimhaltung, Vertraulichkeit</h2>
 
 <p>(1) Die Parteien sind verpflichtet, alle ihnen im Zusammenhang mit diesem Vertrag bekannt gewordenen vertraulichen Informationen über die jeweils andere Partei dauerhaft geheim zu halten, nicht an Dritte weiterzugeben, aufzuzeichnen oder in anderer Weise zu verwerten, sofern die jeweils andere Partei der Offenlegung oder Verwendung nicht ausdrücklich und schriftlich zugestimmt hat oder die Informationen aufgrund Gesetzes, Gerichtsentscheidung oder Verwaltungsentscheidung offengelegt werden müssen. Liegt keine solche Zustimmung oder Offenlegung vor, sind die bekannt gewordenen Informationen nur zur Durchführung dieses Vertrages zu verwenden.</p>
 
@@ -88,7 +102,7 @@
 
 <p>(4) Die Verpflichtungen aus diesem Paragraphen sind auch auf den Zeitraum nach Beendigung des Vertragsverhältnisses anzuwenden.</p>
 
-<h1>§ 12 Schlussbestimmungen</h1>
+<h2>§ 12 Schlussbestimmungen</h2>
 
 <p>(1) Rechtserhebliche Erklärungen und Anzeigen, die nach Vertragsschluss abzugeben sind, bedürfen zu ihrer Wirksamkeit der Schriftform.</p>
 
@@ -104,3 +118,6 @@
 <p>(6) Dieser Vertrag unterliegt ausschließlich dem Recht der Bundesrepublik Deutschland.</p>
 
 <p>(7) Der Gerichtsstand für alle Streitigkeiten aus diesem Vertrag bestimmt sich nach den maßgeblichen Regeln der ZPO.</p>
+<?php
+	include("footer.php");
+?>
