@@ -4057,6 +4057,11 @@ WHERE `id` = '.esc($id);
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
 
+		if(!preg_match("/^\d{4}-\d+-\d+$/", $abgabe_pruefungsleistungen)) {
+			warning("Fehlerhafte Eingabe für <b>Abgabe Prüfungsleistungen</b>. Muss ein Datum im Format <i>YYYY-mm-dd</i> sein.");
+			$abgabe_pruefungsleistungen = null;
+		}
+
 		$query = '
 INSERT INTO 
 	`veranstaltung_metadaten` (
@@ -4275,6 +4280,7 @@ INSERT INTO
 				error('Bei einer der Prüfungsnummern trat ein Fehler auf. Daher wird alles zurückgesetzt.');
 			}
 		} else {
+			rollback();
 			assign_pruefungsnummer_to_veranstaltung(array($pruefungsnummer), $id);
 		}
 	}

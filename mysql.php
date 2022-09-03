@@ -161,8 +161,10 @@
 					include_once('scripts/SqlFormatter.php');
 					print "<pre>Query:\n".SqlFormatter::highlight($internalquery)."\n\nError:\n";
 					print "$e</pre>";
+					exit(1);
 				}
-				exit(1);
+
+				warning($e);
 			}
 			$end = microtime(true);
 			$used_time = $end - $start;
