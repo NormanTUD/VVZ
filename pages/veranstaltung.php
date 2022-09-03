@@ -237,17 +237,17 @@
 ?>
 								<tr>
 									<td>
-									<input type="text" name="einzelner_termin_start[]" value="<?php print htmlentities($et_start); ?>" class="datetimepicker" />
+									<input type="text" name="einzelner_termin_start[]" value="<?php print htmlentities($et_start ?? ""); ?>" class="datetimepicker" />
 									</td>
 									<td>
-										<input type="text" name="einzelner_termin_ende[]" value="<?php print htmlentities($et_end); ?>" class="datetimepicker" />
+										<input type="text" name="einzelner_termin_ende[]" value="<?php print htmlentities($et_end ?? ""); ?>" class="datetimepicker" />
 									</td>
 									<td>
 										<?php print create_select($gebaeude, $et_gebaeude_id, 'einzelner_termin_gebaeude[]', 1); ?>
 									</td>
 									<td>
 
-										<input type="text" value="<?php print htmlentities($et_raumname); ?>" name="einzelner_termin_raum[]" />
+										<input type="text" value="<?php print htmlentities($et_raumname ?? ""); ?>" name="einzelner_termin_raum[]" />
 									</td>
 									<td>
 										<span class="remove_this_tr"><img src="./i/remove.svg" alt="Zeile entfernen" width="30" /></span>
