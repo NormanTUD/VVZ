@@ -130,11 +130,11 @@
 				while ($row = mysqli_fetch_assoc($result)) {
 					// [ $plan_name, 1, get_plan_price_by_name($plan_name)[0] ]
 					if(preg_match("/Faculty/", $row["plan_name"])) {
-						$fees[] = [$row["plan_name"], $number_of_faculties, get_plan_price_by_name($plan_name)[$row["zahlungszyklus_monate"] == 1 ? 0 : 1] ];
+						$fees[] = [$row["plan_name"], get_plan_price_by_name($plan_name)[$row["zahlungszyklus_monate"] == 1 ? 0 : 1], $number_of_faculties ];
 						for ($j = 0; $j < $number_of_faculties; $j++) {
 						}
 					} else {
-						$fees[] = [$row["plan_name"], 1, get_plan_price_by_name($plan_name)[$row["zahlungszyklus_monate"] == 1 ? 0 : 1] ];
+						$fees[] = [$row["plan_name"], get_plan_price_by_name($plan_name)[$row["zahlungszyklus_monate"] == 1 ? 0 : 1], 1 ];
 					}
 				}
 
