@@ -174,6 +174,8 @@ fi
 systemctl daemon-reload
 systemctl restart apache2
 
-rm /var/www/html/index.html
+if [[ -f /var/www/html/index.html ]]; then
+	rm /var/www/html/index.html
+fi
 
 whiptail --title "Installer" --msgbox "Installation done!" $LINES $COLUMNS
