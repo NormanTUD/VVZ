@@ -122,8 +122,10 @@
 				$plan_name = get_plan_name_by_id($plan_id);
 				// [Name, Anzahl, Preis]
 				$fees = array(
-					[ $plan_name, 1, get_plan_price_by_name($plan_name)[0] ]
+					// [ $plan_name, 1, get_plan_price_by_name($plan_name)[0] ]
 				);
+
+
 
 				$fees_string = "";
 				for ($i = 0; $i < count($fees); $i++) {
@@ -132,7 +134,7 @@
 
 				regex_in_file($invoice_file, "/FEESHERE/", $fees_string);
 
-				dier(file_get_contents($invoice_file));
+				dier($fees_string);
 
 				ob_start();
 				system("cd $tmp && latexmk -quiet -pdf _main.tex 2>&1 > /dev/null");
