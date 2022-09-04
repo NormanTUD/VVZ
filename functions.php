@@ -3764,6 +3764,7 @@ WHERE 1
 				array("table" => "pruefungsnummer", "col" => "bereich_id", "name" => "Bereich"),
 				array("table" => "pruefungsnummer", "col" => "zeitraum_id", "name" => "Zeitraum"),
 				array("table" => "pruefungsnummer", "col" => "disabled", "name" => "Deaktiviert-Flag"),
+				array("table" => "pruefungsnummer", "col" => "modulbezeichnung", "name" => "Modulbezeichnung"),
 			]
 		));
 
