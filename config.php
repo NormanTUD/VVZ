@@ -30,7 +30,7 @@
 	}
 
 	if(!function_exists("dier")) {
-		function dier ($data, $sql = 0, $show_error = 1) {
+		function dier ($data, $sql=0, $show_error=1) {
 			if(might_be_query($data)) {
 				$sql = 1;
 			}
@@ -82,9 +82,11 @@
 					print "FEHLER!";
 				}
 				$source_data = debug_backtrace()[0];
-				@$source = 'Aufgerufen von <b>'.debug_backtrace()[1]['file'].'</b>::<i>'.debug_backtrace()[1]['function'].'</i>, line '.htmlentities($source_data['line'])."<br />\n";
-				if($GLOBALS['logged_in_user_id'] || $show_error) {
-					print $source;
+				if(array_key_exists(1, debug_backtrace())) {
+					$source = 'Aufgerufen von <b>'.debug_backtrace()[1]['file'].'</b>::<i>'.debug_backtrace()[1]['function'].'</i>, line '.htmlentities($source_data['line'])."<br />\n";
+					if($GLOBALS['logged_in_user_id'] || $show_error) {
+						print $source;
+					}
 				}
 				print "<pre>\n";
 				$buffer = '';

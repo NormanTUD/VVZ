@@ -132,6 +132,8 @@
 
 				regex_in_file($invoice_file, "/FEESHERE/", $fees_string);
 
+				dier(file_get_contents($invoice_file));
+
 				ob_start();
 				system("cd $tmp && latexmk -quiet -pdf _main.tex 2>&1 > /dev/null");
 				ob_clean();
