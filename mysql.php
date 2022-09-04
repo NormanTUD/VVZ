@@ -350,6 +350,9 @@
 					CONSTRAINT `plan_fk_rechnungen` FOREIGN KEY (`plan_id`) REFERENCES `vvz_global`.`plan` (`id`) ON DELETE CASCADE,
 					CONSTRAINT `kunde_id_fk_rechnungen` FOREIGN KEY (`kunde_id`) REFERENCES `vvz_global`.`kundendaten` (`id`) ON DELETE CASCADE
 				) ENGINE=InnoDB DEFAULT CHARSET=utf8;",
+
+
+				"view_rechnung" => "create view view_rechnung as select r.kunde_id, k.anrede, p.name as plan_name, r.monat, r.jahr, if(k.zahlungszyklus_monate=1, p.monatliche_zahlung, p.jaehrliche_zahlung) as preis, k.zahlungszyklus_monate from vvz_global.rechnungen r left join vvz_global.kundendaten k on k.id = r.kunde_id left join vvz_global.plan p on p.id = r.plan_id"
 			);
 
 			rquery("CREATE DATABASE IF NOT EXISTS vvz_global");
