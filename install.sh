@@ -44,7 +44,6 @@ done
 #fi
 
 mkdir -p $INSTALL_PATH
-cd $INSTALL_PATH
 
 PASSWORD=""
 while [[ -z "$PASSWORD" ]]; do
@@ -56,7 +55,6 @@ while [[ -z "$PASSWORD" ]]; do
 done
 
 cd $INSTALL_PATH
-set -x
 if [ -d "$INSTALL_PATH/../.git" ]; then
 	git pull
 else
@@ -64,7 +62,6 @@ else
 	git config --global user.name "$(hostname)"
 	git config --global user.email "kochnorman@rocketmail.com"
 fi
-set +x
 cd -
 
 
