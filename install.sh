@@ -155,9 +155,11 @@ apt-get install latexmk texlive imagemagick texlive-lang-german -y
 touch /etc/hardcore_debugging
 
 # Für Rechnungserstellungs-LaTeX Apache erlauben auf /tmp zuzugreifen
+set +e
 sed -i 's/PrivateTmp/#PrivateTmp/' /etc/systemd/system/multi-user.target.wants/apache2.service
 
 sed 's/\(\(post_max_size\|upload_max_filesize\) = \).M/\16M/g' /etc/php/*/apache2/php.ini
+set -e
 
 if [[ $(grep -L "curl -s localhost" /etc/crontab ) ]]; then
 	echo "*/30 * * * * curl -s localhost 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
