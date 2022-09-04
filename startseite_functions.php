@@ -1621,6 +1621,13 @@
 ?>
 				<i class="class_red">In diesem Semester existieren noch keine Veranstaltungen.</i><br />
 <?php
+				if(user_is_admin($GLOBALS["logged_in_user_id"])) {
+?>
+					<a href="admin">Gehen Sie auf die Admin-Seite und erstellen Sie neue Veranstaltungen</a><br />
+<?php
+				}
+?>
+<?php
 			}
 		}
 
