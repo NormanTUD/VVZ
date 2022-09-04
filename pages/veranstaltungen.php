@@ -135,8 +135,8 @@
 								<form class="form" method="get">
 									<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
 									<input type="hidden" value="<?php print $GLOBALS['user_institut_id']; ?>" name="institut" />
-									<input type="hidden" name="dozent_id" value="<?php print htmlentities(get_get('dozent_id')); ?>" />
-									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester')); ?>" />
+									<input type="hidden" name="dozent_id" value="<?php print htmlentities(get_get('dozent_id') ?? ""); ?>" />
+									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
 									<input type="submit" value="Nur die Daten meines Institutes anzeigen" />
 								</form>
 <?php
