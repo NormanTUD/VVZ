@@ -121,11 +121,22 @@
 				$plan_id = get_plan_id_by_kunde_id($kunde_id);
 				$plan_name = get_plan_name_by_id($plan_id);
 				// [Name, Anzahl, Preis]
-				$fees = array(
+
+				$number_of_faculties = get_single_row_from_query("select count(*) from ".$GLOBALS["dbname"].".institut");
+
+				$fees = array();
+				$fees_query = "select * from vvz_global.view_rechnung where kunde_id = ".esc($kunde_id);
+				$result = rquery($fees_query);
+				while ($row = mysqli_fetch_assoc($result)) {
 					// [ $plan_name, 1, get_plan_price_by_name($plan_name)[0] ]
-				);
-
-
+					if(preg_match("/Faculty/", $row["plan_name"])) {
+						$fees[] = [$row["plan_name"], $number_of_faculties, get_plan_price_by_name($plan_name)[$row["zahlungszyklus_monate"] == 1 ? 0 : 1] ];
+						for ($j = 0; $j < $number_of_faculties; $j++) {
+						}
+					} else {
+						$fees[] = [$row["plan_name"], 1, get_plan_price_by_name($plan_name)[$row["zahlungszyklus_monate"] == 1 ? 0 : 1] ];
+					}
+				}
 
 				$fees_string = "";
 				for ($i = 0; $i < count($fees); $i++) {
@@ -133,8 +144,6 @@
 				}
 
 				regex_in_file($invoice_file, "/FEESHERE/", $fees_string);
-
-				dier($fees_string);
 
 				ob_start();
 				system("cd $tmp && latexmk -quiet -pdf _main.tex 2>&1 > /dev/null");
