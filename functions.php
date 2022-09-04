@@ -4694,6 +4694,13 @@ INSERT INTO
 
 	function update_pruefung_zeitraum ($id, $name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "studiengang", "col" => "name", "name" => "Name")
+			]
+		));
+
 		$query = 'UPDATE `pruefung_zeitraum` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Der Zeitraum wurde erfolgreich geändert.', null, 'Der Zeitraum konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
