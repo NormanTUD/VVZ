@@ -95,7 +95,7 @@ function write_config_file {
 		i=0
 		while [ -f $config_file ]; do
 			config_file="/etc/apache2/sites-enabled/001-default.conf"
-			i=$(printf "%03d" $(($i+1)))
+			i=$(printf "%03d" $((i+1)))
 		done
 
 echo "Listen $PORT
