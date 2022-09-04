@@ -18,7 +18,7 @@
 
 <p>Die Kurzversion ist: wir versuchen zuvorkommend zu sein. Bei Problemen, auch bei Zahlungsproblemen, können Sie sich melden und wir sind kulant.</p>
 
-<p>Sie können jederzeit formlos kündigen und es folgen keine Konsequenzen. Sie können jederzeit zurückkehren, wenn Sie vorher ein Datenbank-Backup gemacht haben (wovon wir Sie dann in Kenntnis setzen), als wäre nichts gewesen. Wir löschen wir Ihre Daten nach bis zu 48 Stunden.</p>
+<p>Sie können jederzeit formlos kündigen und es folgen keine Konsequenzen. Sie können jederzeit zurückkehren, wenn Sie vorher ein Datenbank-Backup gemacht haben (wovon wir Sie dann in Kenntnis setzen), als wäre nichts gewesen. Wir löschen wir Ihre Daten nach bis zu 48 Stunden nach der Kündigung.</p>
 
 <p>Wir garantieren keine 100%ige Uptime. Die Software wird dauerhaft weiterentwickelt ("<a href="https://de.wikipedia.org/wiki/Rolling_Release">Rolling Release</a>"), daher kann es zu kurzen Downtimes kommen. Wir halten sie aber so gering wie möglich.</p>
 
