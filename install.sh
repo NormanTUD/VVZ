@@ -88,6 +88,7 @@ function write_config_file {
 		echo "No new file will be written";
 	else
 		cd /etc
+		git add .
 		git commit -am "Before modifying apache config"
 		cd -
 
@@ -119,8 +120,8 @@ echo "Listen $PORT
 	# modules, e.g.
 	#LogLevel info ssl:warn
 
-	ErrorLog ${APACHE_LOG_DIR}/error.log
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
+	ErrorLog \${APACHE_LOG_DIR}/error.log
+	CustomLog \${APACHE_LOG_DIR}/access.log combined
 
 	# For most configuration files from conf-available/, which are
 	# enabled or disabled at a global level, it is possible to
