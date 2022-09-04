@@ -20,6 +20,10 @@ git config --global credential.helper store
 eval `resize`
 
 INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
+if [ $? == 1 ]; then
+    echo "User selected Cancel."
+    exit
+fi
 while [[ -z "$INSTALL_PATH" ]]; do
 	INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
 	if [ $? == 1 ]; then
