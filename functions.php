@@ -3747,14 +3747,27 @@ WHERE 1
 	
 	/* MySQL-update-Funktionen */
 
-	function update_pruefungsnummer($id, $modul_id, $pruefungsnummer, $pruefungstyp, $bereich, $modulbezeichnung, $zeitraum_id, $pndisabled) {
+	function update_pruefungsnummer($id, $modul_id, $pruefungsnummer, $pruefungstyp_id, $bereich_id, $modulbezeichnung, $zeitraum_id, $disabled) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		if($pndisabled == "Ja") {
-			$pndisabled = "1";
+		if($disabled == "Ja") {
+			$disabled = "1";
 		} else {
-			$pndisabled = "0";
+			$disabled = "0";
 		}
-		$query = 'UPDATE `pruefungsnummer` SET `pruefungsnummer` = '.esc($pruefungsnummer).', `modul_id` = '.esc($modul_id).', `pruefungstyp_id` = '.esc($pruefungstyp).', `bereich_id` = '.esc($bereich).', `modulbezeichnung` = '.esc($modulbezeichnung).', `zeitraum_id` = '.esc($zeitraum_id).', `disabled` = '.esc($pndisabled).' WHERE `id` = '.esc($id);
+
+		eval(check_values(
+			[
+				array("table" => "pruefungsnummer", "col" => "pruefungsnummer", "name" => "Prüfungsnummer"),
+				array("table" => "pruefungsnummer", "col" => "modul_id", "name" => "Modul"),
+				array("table" => "pruefungsnummer", "col" => "pruefungstyp_id", "name" => "Prüfungstyp"),
+				array("table" => "pruefungsnummer", "col" => "bereich_id", "name" => "Bereich"),
+				array("table" => "pruefungsnummer", "col" => "bereich_id", "name" => "Bereich"),
+				array("table" => "pruefungsnummer", "col" => "zeitraum_id", "name" => "Zeitraum"),
+				array("table" => "pruefungsnummer", "col" => "disabled", "name" => "Deaktiviert-Flag"),
+			]
+		));
+
+		$query = 'UPDATE `pruefungsnummer` SET `pruefungsnummer` = '.esc($pruefungsnummer).', `modul_id` = '.esc($modul_id).', `pruefungstyp_id` = '.esc($pruefungstyp_id).', `bereich_id` = '.esc($bereich_id).', `modulbezeichnung` = '.esc($modulbezeichnung).', `zeitraum_id` = '.esc($zeitraum_id).', `disabled` = '.esc($disabled).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Die Prüfungsnummer wurde erfolgreich geändert.', null, 'Die Prüfungsnummer konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
