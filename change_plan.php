@@ -48,9 +48,14 @@
 			$email_ok = 1;
 		}
 
+		if(strlen(get_post("password") > 8)) {
+			$password_error = "Das Passwort muss mindestens 8 Zeichen lang sein";
+		}
+
 		$uni_name_error = "";
 		$email_error = "";
 		$iban_error = "";
+		$password_error = "";
 
 		if(!$iban_ok) {
 			$iban_error = "Keine oder eine ungültige IBAN eingegeben";
@@ -163,6 +168,30 @@
 							?></td>
 					</tr>
 					<tr>
+						<td>Persönliches Administratorpasswort (mindestens 8 Zeichen):</td><td><input type="password" id="password" name="password" placeholder="" value="<?php print htmlentities(get_post("password") ?? ""); ?>" /><?php
+								if($password_error) {
+										print "<br><span class='red_text'>$password_error.</span>";
+									}
+	?>
+								<div class="figure" id="strength_human"></div>
+								<span class="figure" id="strength_score"></span>
+
+								<script nonce="<?php print nonce(); ?>">
+									    $("#password").on("keypress keyup keydown", function() {
+										var pass = $(this).val();
+										if(pass) {
+											$("#strength_human").text(checkPassStrength(pass)).show();
+											$("#strength_score").text("(" + scorePassword(pass) + ")").show();
+										} else {
+
+											$("#strength_human").hide();
+											$("#strength_score").hide();
+										}
+									    });
+								</script>
+							</td>
+					</tr>
+					<tr>
 						<td>Lizenz:</td>
 						<td>Sie akzeptieren unsere <a target="_blank" href="license.php">Lizenzbedingungen</a> (<a target="_blank" href="license_short.php">Kurzversion</a>)</td>
 					</tr>
@@ -225,6 +254,7 @@
 	Sollten Sie eine besondere Anforderung haben, werden wir das Vorlesungsverzeichnis an Ihre Anforderungen anpassen. So etwas wären Exporte nach Excel
 	oder neue Datenfelder. Dies ist in der Pro-Version bereits beinhaltet. Bei der Basic-Version müssen wir uns über die Kosten im Detail absprechen.
 	In der Pro-Version sind Zusatzwünsche bis ca. 1000€ bereits beinhaltet.
+
 <?php
 	}
 
