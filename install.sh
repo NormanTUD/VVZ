@@ -93,7 +93,7 @@ function write_config_file {
 		cd -
 
 		config_file="/etc/apache2/sites-enabled/001-default.conf"
-		i=0
+		i="001"
 		while [ -f $config_file ]; do
 			config_file="/etc/apache2/sites-enabled/001-default.conf"
 			i=$(printf "%03d" $((i+1)))
