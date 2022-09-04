@@ -24,6 +24,7 @@ if [ $? == 1 ]; then
     echo "User selected Cancel."
     exit
 fi
+
 while [[ -z "$INSTALL_PATH" ]]; do
 	INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
 	if [ $? == 1 ]; then
@@ -31,17 +32,6 @@ while [[ -z "$INSTALL_PATH" ]]; do
 	    exit
 	fi
 done
-
-#INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/*$##')
-#if [ -d "$INSTALL_PATH" ]; then
-#	MOVE_TO=$INSTALL_PATH
-#	i=0
-#	while [ -d "${MOVE_TO}" ]; do
-#		i=$((i+1))
-#		MOVE_TO=${INSTALL_PATH}_${i}
-#	done
-#	mv "$INSTALL_PATH" "$MOVE_TO"
-#fi
 
 mkdir -p $INSTALL_PATH
 
@@ -102,39 +92,13 @@ function write_config_file {
 			i=$(printf "%03d" $((i+1)))
 		done
 
-echo "Listen $PORT
-
+		echo "Listen $PORT
 <VirtualHost *:$PORT>
-	# The ServerName directive sets the request scheme, hostname and port that
-	# the server uses to identify itself. This is used when creating
-	# redirection URLs. In the context of virtual hosts, the ServerName
-	# specifies what hostname must appear in the request's Host: header to
-	# match this virtual host. For the default virtual host (this file) this
-	# value is not decisive as it is used as a last resort host regardless.
-	# However, you must set it for any further virtual host explicitly.
-	#ServerName www.example.com
-
 	ServerAdmin webmaster@localhost
 	DocumentRoot /var/www/html
-
-	# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
-	# error, crit, alert, emerg.
-	# It is also possible to configure the loglevel for particular
-	# modules, e.g.
-	#LogLevel info ssl:warn
-
 	ErrorLog \${APACHE_LOG_DIR}/error.log
 	CustomLog \${APACHE_LOG_DIR}/access.log combined
-
-	# For most configuration files from conf-available/, which are
-	# enabled or disabled at a global level, it is possible to
-	# include a line for only one particular virtual host. For example the
-	# following line enables the CGI configuration for this host only
-	# after it has been globally disabled with "a2disconf".
-	#Include conf-available/serve-cgi-bin.conf
 </VirtualHost>
-
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
 " > $config_file
 
 		service apache2 restart
@@ -203,6 +167,7 @@ fi
 
 if [[ $(grep -L "ntpdate" /etc/crontab ) ]]; then
 	echo "*/30 * * * * ntpdate -s time.nist.gov 2>&1 >/dev/null >/dev/null 2>&1" >> /etc/crontab
+fi
 
 systemctl daemon-reload
 systemctl restart apache2
