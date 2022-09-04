@@ -9794,4 +9794,8 @@ order by
 			// Das kann vorkommen, wenn man gerade die Seite erstellt
 		}
 	}
+
+	function get_post_int ($name) {
+		return intval(get_post($name));
+	}
 ?>

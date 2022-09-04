@@ -1075,3 +1075,7 @@ a, a:visited, a:hover, a:active {
 .possible_plan {
 	background-color: #61aa5c;
 }
+
+.display_inline {
+	display: inline;
+}

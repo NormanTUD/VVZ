@@ -291,7 +291,8 @@
 			$plan_id = 5;
 			break;
 		default:
-			die("Unknown plan: >>".htmlentities(get_get("product") ?? "")."<<");
+			#die("Unknown plan: >>".htmlentities(get_get("product") ?? "")."<<");
+			exit(1);
 			break;
 		}
 
@@ -407,7 +408,7 @@
 		return get_single_row_from_query($query);
 	}
 
-	function update_kunde_plan($kunde_id, $plan_id) {
+	function update_kunde_plan ($kunde_id, $plan_id) {
 		$query = "update vvz_global.kundendaten set plan_id = ".esc($plan_id)." where id = ".esc($kunde_id);
 		rquery($query);
 	}
