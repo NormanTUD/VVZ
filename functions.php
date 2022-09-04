@@ -4483,7 +4483,15 @@ INSERT INTO
 	function update_institut ($id, $name, $start_nr) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(preg_match('/^\d+$/', $start_nr)) {
+			eval(check_values(
+				[
+					array("table" => "institut", "col" => "name", "name" => "Name"),
+					array("table" => "institut", "col" => "start_nr", "name" => "Start-Nr.")
+				]
+			));
+
 			$query = 'UPDATE `institut` SET `name` = '.esc($name).', `start_nr` = '.esc($start_nr).' WHERE `id` = '.esc($id);
+
 			return simple_query_success_fail_message($query, 'Das Institut wurde erfolgreich geändert.', null, 'Das Institut konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 		} else {
 			error("Die Startnummer muss eine natürliche Zahl sein");
@@ -4624,7 +4632,16 @@ INSERT INTO
 
 	function update_bereich ($id, $name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "bereich", "col" => "name", "name" => "Name")
+			]
+		));
+
 		$query = 'UPDATE `bereich` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
+
+
 		return simple_query_success_fail_message($query, 'Der Bereich wurde erfolgreich geändert.', null, 'Der Bereich konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
