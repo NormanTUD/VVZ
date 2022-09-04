@@ -3851,6 +3851,16 @@ WHERE 1
 		} else {
 			$ausgeschieden = "0";
 		}
+
+
+		eval(check_values(
+			[
+				array("table" => "dozent", "col" => "first_name", "name" => "Vorname"),
+				array("table" => "dozent", "col" => "last_name", "name" => "Nachname"),
+				array("table" => "dozent", "col" => "ausgeschieden", "name" => "Ausgeschieden")
+			]
+		));
+
 		$query = 'UPDATE `dozent` SET `first_name` = '.esc($first_name).', `last_name` = '.esc($last_name).', `ausgeschieden` = '.esc($ausgeschieden).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Die Daten des Dozenten wurden erfolgreich geändert.', null, 'Die Daten des Dozenten konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
@@ -4007,6 +4017,14 @@ WHERE 1
 		if(!check_function_rights(__FUNCTION__)) {
 			return;
 		}
+
+		eval(check_values(
+			[
+				array("table" => "veranstaltungstyp", "col" => "name", "name" => "Name"),
+				array("table" => "veranstaltungstyp", "col" => "abkuerzung", "name" => "Nachname"),
+			]
+		));
+
 		$query = 'UPDATE `veranstaltungstyp` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Der Veranstaltungstyp wurde erfolgreich geändert.', null, 'Der Veranstaltungstyp konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
@@ -4483,9 +4501,17 @@ INSERT INTO
 		return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich geändert.', null, 'Der Raum konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
-	function update_funktion_rights ($id, $name) {
+	function update_funktion_rights ($id, $function_name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'UPDATE `function_right` SET `function_name` = '.esc($name).' WHERE `id` = '.esc($id);
+
+
+		eval(check_values(
+			[
+				array("table" => "function_right", "col" => "function_name", "name" => "Name der Funktion"),
+			]
+		));
+
+		$query = 'UPDATE `function_right` SET `function_name` = '.esc($function_name).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Das Funktionsrecht wurde erfolgreich geändert.', null, 'Das Funktionsrecht konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
@@ -4824,12 +4850,22 @@ INSERT INTO
 		}
 	}
 
-	function update_titel ($id, $name, $abk) {
+	function update_titel ($id, $name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(isset($id)) {
 			if(isset($name)) {
-				if(isset($abk)){
-					$query = 'UPDATE `titel` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abk).' WHERE `id` = '.esc($id);
+				if(isset($abkuerzung)){
+
+
+					eval(check_values(
+						[
+							array("table" => "titel", "col" => "name", "name" => "Name"),
+							array("table" => "titel", "col" => "abkuerzung", "name" => "Nachname"),
+						]
+					));
+
+
+					$query = 'UPDATE `titel` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
 					return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich geändert.', null, 'Der Titel konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 				} else {
 					error("Leere Abkürzung.");
