@@ -16,7 +16,7 @@
 
 <p>(1) Vertragsgegenstand ist die Überlassung von Software.</p>
 
-<p>(2) Der Anbieter stellt dem Kunden während der Laufzeit dieses Vertrages die Nutzung der Software 'vorlesungsverzeichn.is' zu eigenen Zwecken zur Verfügung.</p>
+<p>(2) Der Anbieter stellt dem Kunden während der Laufzeit dieses Vertrages die Nutzung der Software '<?php print $_SERVER["HTTP_HOST"]; ?>' zu eigenen Zwecken zur Verfügung.</p>
 
 <p>(3) Zugriff und Nutzung der auf Servern des Anbieters gespeicherter Software erfolgen über eine Internetverbindung durch die Verwendung eines Internet-Browsers. Die Software ist über folgende Webseite erreichbar: <?php print htmlentities($_SERVER['HTTP_HOST'] ?? ""); ?></p>
 

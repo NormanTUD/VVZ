@@ -12,7 +12,7 @@
 		print get_demo_expiry_time();
 ?>
 
-<h1>Lizenzbedingungen</h1>
+<h1>Lizenzbedingungen (Kurzversion)</h1>
 
 <p>Die volle Version bekommen Sie <a href="license.php">hier</a>.</p>
 
