@@ -4082,13 +4082,25 @@ WHERE 1
 		}
 	}
 
-	function update_raumplanung($id, $gebaeude, $raum, $meldungsdatum) {
+	function update_raumplanung($id, $gebaeude_id, $raum_id, $meldungsdatum) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		$raummeldung = convert_date($meldungsdatum);
+		$raum_id = get_and_create_raum_id($gebaeude_id, $raum_id, 1);
+
+		eval(check_values(
+			[
+				array("table" => "veranstaltung", "col" => "gebaeude_id", "name" => "Gebäude"),
+				array("table" => "veranstaltung", "col" => "raum_id", "name" => "Raum"),
+				array("table" => "veranstaltung", "col" => "raummeldung", "name" => "Raummeldung")
+			]
+		));
+
 		$query = '
 UPDATE `veranstaltung` SET
-	`gebaeude_id` = '.esc($gebaeude).',
-	`raum_id` = '.esc(get_and_create_raum_id($gebaeude, $raum, 1)).',
-	`raummeldung` = '.esc(convert_date($meldungsdatum)).'
+	`gebaeude_id` = '.esc($gebaeude_id).',
+	`raum_id` = '.esc($raum_id).',
+	`raummeldung` = '.esc($raummeldung).'
 WHERE `id` = '.esc($id);
 
 		$result = rquery($query);
@@ -4621,6 +4633,13 @@ INSERT INTO
 
 	function update_pruefungstyp ($id, $name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "pruefungstyp", "col" => "name", "name" => "Name")
+			]
+		));
+
 		$query = 'UPDATE `pruefungstyp` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich geändert.', null, 'Der Prüfungstyp konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
