@@ -14,6 +14,8 @@ body {
 	margin: 10px 0 0 10px;
 	width: fit-content;
 	min-width: 99%;
+	opacity: 0.95;
+	filter: drop-shadow(5px 5px 5px #000);
 }
 
 a {
