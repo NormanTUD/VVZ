@@ -152,6 +152,7 @@ WHAT_TO_DO=$(
 	"install_apache" "Install Apache2" ON \
 	"install_php" "Install PHP" ON \
 	"install_mariadb" "Install MariaDB" ON \
+	"write_config_file" "Port settings and apache config" ON \
 	"setup_mariadb" "Setup MariaDB" ON \
 	3>&1 1>&2 2>&3
 )
