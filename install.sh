@@ -92,10 +92,10 @@ function write_config_file {
 		git commit -am "Before modifying apache config"
 		cd -
 
-		config_file="/etc/apache2/sites-enabled/001-default.conf"
 		i="001"
+		config_file="/etc/apache2/sites-enabled/$i-default.conf"
 		while [ -f $config_file ]; do
-			config_file="/etc/apache2/sites-enabled/001-default.conf"
+			config_file="/etc/apache2/sites-enabled/$i-default.conf"
 			i=$(printf "%03d" $((i+1)))
 		done
 
