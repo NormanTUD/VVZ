@@ -168,7 +168,9 @@
 							?></td>
 					</tr>
 					<tr>
-						<td>Persönliches Administratorpasswort (mindestens 8 Zeichen):</td><td><input type="password" id="password" name="password" placeholder="" value="<?php print htmlentities(get_post("password") ?? ""); ?>" /><?php
+						<td>
+							<input id="username" type="hidden" autocomplete="username" value="Admin" />
+							Persönliches Administratorpasswort (mindestens 8 Zeichen):</td><td><input type="password" id="password" name="password" placeholder="" value="<?php print htmlentities(get_post("password") ?? ""); ?>" /><?php
 								if($password_error) {
 										print "<br><span class='red_text'>$password_error.</span>";
 									}
