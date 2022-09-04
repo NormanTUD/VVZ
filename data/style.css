@@ -1059,8 +1059,9 @@ a, a:visited, a:hover, a:active {
 .container > div {
 	flex: 1; /*grow*/
 }
+
 .plan_div {
-	border: 1px solid blue;
+	border: 1px solid black;
 }
 
 .buy_button {
@@ -1068,9 +1069,9 @@ a, a:visited, a:hover, a:active {
 }
 
 .chosen_plan {
-	background-color: #6a8aff;
+	background-color: #05aa0b;
 }
 
 .possible_plan {
-	background-color: #fbff00;
+	background-color: #61aa5c;
 }

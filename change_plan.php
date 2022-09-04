@@ -221,7 +221,7 @@
 ?>
 	<div class="container">
 		<div class="plan_div <?php print get_kunde_plan() == "Demo" ? "chosen_plan" : 'possible_plan'; ?>">
-			<p>Demo</p>
+			<h2>Demo</h2>
 			<p>7 Tage kostenlose und unkomplizierte Nutzung zum Testen, danach wird der Nutzer gelöscht</p>
 <?php
 			if($current_plan == "Demo") {
@@ -232,30 +232,32 @@
 ?>
 		</div>
 		<div class="plan_div <?php print preg_match("/Basic/", get_kunde_plan()) ? "chosen_plan" : 'possible_plan'; ?>">
-			<p>Basic</p>
+			<h2>Basic</h2>
 			<p>Erlaubt die Verwaltung von Stundenplänen, Dozenten und Veranstaltung für eine gesamte Fakultät oder Universität</p>
 			<p>Eine Fakultät: <a href="?product=basic_faculty"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("basic_faculty")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("basic_faculty")[1]); ?>€/Jahr</i></button></a></p>
 			<p>Ganze Universität: <a href="?product=basic_university"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("basic_university")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("basic_university")[1]); ?>€/Jahr</i></button></a></p>
+<?php
+			if(preg_match("/Basic/", $current_plan)) {
+?>
+				<p><i>Ihr aktueller Plan</i></p>
+<?php
+			}
+?>
 		</div>
 		<div class="plan_div <?php print preg_match("/Pro/", get_kunde_plan()) ? "chosen_plan" : 'possible_plan'; ?>">
-			<p>Pro</p>
+			<h2>Pro</h2>
 			<p>Alles der Basis-Variante, dazu ein halbautomatischer Stundenplanersteller, um die Anzahl der Anfragen im Erstsemester zur Stundenplanung zu reduzieren und Zusatzwünsche</p>
 			<p>Eine Fakultät: <a href="?product=pro_faculty"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("pro_faculty")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("pro_faculty")[0]); ?>€/Jahr</i></button></a></p>
 			<p>Ganze Universität: <a href="?product=pro_university"><button class="buy_button"><i><?php print htmlentities(get_plan_price_by_name("pro_university")[0]); ?>€/Monat &mdash; oder &mdash; <?php print htmlentities(get_plan_price_by_name("pro_university")[1]); ?>€/Jahr</i></button></a></p>
+<?php
+			if(preg_match("/Pro/", $current_plan)) {
+?>
+				<p><i>Ihr aktueller Plan</i></p>
+<?php
+			}
+?>
 		</div>
 	</div>
-
-	<h2>Ihre Zufriedenheit steht bei uns an erster Stelle</h2>
-
-	Daher besteht jederzeitiges Kündigungsrecht. "Angebrochene" Monate müssen nicht bezahlt werden und Sie haben 6 Monate Zeit, eine Rechnung zu begleichen.
-	Wir werden uns bei Ihnen melden, sollte eine Rechnung nicht bezahlt werden. Antworten Sie darauf nicht, dann haben Sie weiterhin eine Grace Period von 2
-	Monaten, bis wir Ihre Installation löschen, wobei für Sie dabei keinerlei weitere Kosten anfallen.
-
-	<h2>Zusatzwünsche?</h2>
-
-	Sollten Sie eine besondere Anforderung haben, werden wir das Vorlesungsverzeichnis an Ihre Anforderungen anpassen. So etwas wären Exporte nach Excel
-	oder neue Datenfelder. Dies ist in der Pro-Version bereits beinhaltet. Bei der Basic-Version müssen wir uns über die Kosten im Detail absprechen.
-	In der Pro-Version sind Zusatzwünsche bis ca. 1000€ bereits beinhaltet.
 
 <?php
 	}
