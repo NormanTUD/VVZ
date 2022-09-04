@@ -77,6 +77,62 @@ function install_mariadb {
 	apt install mariadb-server mariadb-client -y
 }
 
+function write_config_file {
+	PORT=$(whiptail --inputbox "Port to run on (if 80, which is the default, no new file will be written and the default file will be used.)" $LINES $COLUMNS "80" --title "Custom port" 3>&1 1>&2 2>&3)
+
+	if [[ "$PORT" -eq "80" ]]; then
+		echo "No new file will be written";
+	else
+		cd /etc
+		git commit -am "Before modifying apache config"
+		cd -
+
+		config_file="/etc/apache2/sites-enabled/001-default.conf"
+		i=0
+		while [ -f $config_file ]; do
+			config_file="/etc/apache2/sites-enabled/001-default.conf"
+			i=$(printf "%03d" $(($i+1)))
+		done
+
+echo "Listen $PORT
+
+<VirtualHost *:$PORT>
+	# The ServerName directive sets the request scheme, hostname and port that
+	# the server uses to identify itself. This is used when creating
+	# redirection URLs. In the context of virtual hosts, the ServerName
+	# specifies what hostname must appear in the request's Host: header to
+	# match this virtual host. For the default virtual host (this file) this
+	# value is not decisive as it is used as a last resort host regardless.
+	# However, you must set it for any further virtual host explicitly.
+	#ServerName www.example.com
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html
+
+	# Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+	# error, crit, alert, emerg.
+	# It is also possible to configure the loglevel for particular
+	# modules, e.g.
+	#LogLevel info ssl:warn
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+	# For most configuration files from conf-available/, which are
+	# enabled or disabled at a global level, it is possible to
+	# include a line for only one particular virtual host. For example the
+	# following line enables the CGI configuration for this host only
+	# after it has been globally disabled with "a2disconf".
+	#Include conf-available/serve-cgi-bin.conf
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+" > $config_file
+
+		service apache2 restart
+	fi
+}
+
 function setup_mariadb {
 	mysql -u root <<-EOF
 SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$PASSWORD');
