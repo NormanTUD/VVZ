@@ -473,7 +473,6 @@
 
 			try {
 				if((!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) && ($GLOBALS["dbname"] == "startpage" || preg_match("/^db_vvz_vorlesungsverzeichnis_demo_/", $GLOBALS["dbname"]))) {
-					error_log("Trying to create database...");
 					$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
 					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
 						sleep(1);
