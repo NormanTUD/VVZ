@@ -4521,6 +4521,16 @@ INSERT INTO
 			error('`'.htmlentities($studienordnung).'` ist keine valide URL für die Studienordnung.');
 			$studienordnung = '';
 		}
+
+
+		eval(check_values(
+			[
+				array("table" => "studiengang", "col" => "name", "name" => "Name"),
+				array("table" => "studiengang", "col" => "institut_id", "name" => "Institut"),
+				array("table" => "studiengang", "col" => "studienordnung", "name" => "Studienordnung"),
+			]
+		));
+
 		$query = 'UPDATE `studiengang` SET `name` = '.esc($name).', `institut_id` = '.esc($institut_id).', `studienordnung` = '.esc($studienordnung).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich geändert.', null, 'Der Studiengang konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
