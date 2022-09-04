@@ -32,18 +32,16 @@ while [[ -z "$INSTALL_PATH" ]]; do
 	fi
 done
 
-INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/*$##')
-
-if [ -d "$INSTALL_PATH" ]; then
-	MOVE_TO=$INSTALL_PATH
-	i=0
-	while [ -d "${MOVE_TO}" ]; do
-		i=$((i+1))
-		MOVE_TO=${INSTALL_PATH}_${i}
-	done
-
-	mv "$INSTALL_PATH" "$MOVE_TO"
-fi
+#INSTALL_PATH=$(echo "$INSTALL_PATH" | sed -e 's#/*$##')
+#if [ -d "$INSTALL_PATH" ]; then
+#	MOVE_TO=$INSTALL_PATH
+#	i=0
+#	while [ -d "${MOVE_TO}" ]; do
+#		i=$((i+1))
+#		MOVE_TO=${INSTALL_PATH}_${i}
+#	done
+#	mv "$INSTALL_PATH" "$MOVE_TO"
+#fi
 
 mkdir -p $INSTALL_PATH
 cd $INSTALL_PATH
