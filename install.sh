@@ -57,10 +57,16 @@ while [[ -z "$PASSWORD" ]]; do
 	fi
 done
 
-git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
+cd $INSTALL_PATH
+if [ -d .git ]; then
+	git pull
+else
+	git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
+	git config --global user.name "$(hostname)"
+	git config --global user.email "kochnorman@rocketmail.com"
+fi
+cd -
 
-git config --global user.name "$(hostname)"
-git config --global user.email "kochnorman@rocketmail.com"
 
 function apt_get_upgrade {
 	apt-get upgrade -y
