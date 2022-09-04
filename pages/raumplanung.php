@@ -50,7 +50,7 @@
 					<form class="form" method="get">
 						<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
 						<input type="hidden" value="<?php print $GLOBALS['user_institut_id']; ?>" name="institut" />
-						<input type="hidden" value="<?php print htmlentities(get_get('semester')); ?>" name="semester" />
+						<input type="hidden" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" name="semester" />
 						<input type="submit" value="Nur die Daten meines Institutes anzeigen" />
 					</form>
 <?php
