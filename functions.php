@@ -677,7 +677,16 @@ declare(ticks=1);
 
 
 			if(get_post("customize_value") && get_post("value") && get_post("id")) {
-				$query = "update customizations set val = ".esc(get_post("value") ?? "")." where id = ".esc(get_post("id") ?? "");
+				$val = get_post("value");
+				eval(check_values(
+					[
+						array("table" => "customizations", "col" => "val", "name" => "CSS-Wert"),
+					]
+				));
+
+
+				$query = "update customizations set val = ".esc($val)." where id = ".esc(get_post("id") ?? "");
+
 				$res = rquery($query);
 				if($res) {
 					success("Einstellung wurde gespeichert");
