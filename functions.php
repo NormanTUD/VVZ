@@ -8440,14 +8440,28 @@ SE 1/2 oder BZW
 		return simple_query_success_fail_message($query, "Die Sprache wurde erfolgreich geupdated.", "Die Sprache konnte nicht editiert werden.");
 	}
 
-	function update_semester($id, $erster_termin) {
+	function update_semester($id, $erste_veranstaltung_default) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'update `'.$GLOBALS['dbname'].'`.`semester` SET `erste_veranstaltung_default` = '.esc($erster_termin).' WHERE `id` = '.esc($id);
+
+		eval(check_values(
+			[
+				array("table" => "semester", "col" => "erste_veranstaltung_default", "name" => "Erste Veranstaltung"),
+			]
+		));
+
+		$query = 'update `'.$GLOBALS['dbname'].'`.`semester` SET `erste_veranstaltung_default` = '.esc($erste_veranstaltung_default).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, "Das Erste-Termin-Datum wurde erfolgreich zum Semester hinzugefügt.", "Das Erste-Termin-Datum konnte nicht zum Semester hinzugefügt werden.");
 	}
 
 	function update_dozent_titel ($dozent_id, $titel_id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "dozent", "col" => "titel_id", "name" => "Titel"),
+			]
+		));
+
 		$query = 'update `'.$GLOBALS['dbname'].'`.`dozent` SET `titel_id` = '.esc($titel_id).' WHERE `id` = '.esc($dozent_id);
 		return simple_query_success_fail_message($query, "Der Titel wurde erfolgreich zum Dozenten hinzugefügt.", "Die Titel konnte nicht zum Dozenten hinzugefügt werden.");
 	}
