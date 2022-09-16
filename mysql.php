@@ -2,6 +2,43 @@
 	$GLOBALS["dbh"] = null;
 	include("config.php");
 
+	require_once('php-sql-parser.php');
+
+	if(!function_exists("get_base_expr")) {
+		function get_base_expr ($i) {
+			return $i["base_expr"];
+		}
+	}
+
+	if(!function_exists("parse_sql_get_table_and_cols")) {
+		function parse_sql_get_table_and_cols ($q) {
+			$q = preg_replace('/`/', '', $q);
+			$parser = new PHPSQLParser($q, true);
+
+			$parsed = $parser->parsed;
+
+			if(array_key_exists("INSERT", $parsed)) {
+				$table = $parsed["INSERT"]["table"];
+
+				$cols = array_map("get_base_expr", $parsed["INSERT"]["columns"]);
+
+				/*
+				return array(
+					"table" => $table,
+					"cols" => $cols
+				);
+				 */
+
+				$array = array();
+				foreach ($cols as $col) {
+					$array[] = array("table" => $table, "col" => $col);
+				}
+
+				return $array;
+			}
+		}
+	}
+
 	if(!array_key_exists("no_selftest_force", $GLOBALS)) {
 		$GLOBALS["no_selftest_force"] = 0;
 	}
