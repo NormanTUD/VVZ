@@ -4666,6 +4666,16 @@ INSERT INTO
 		if($parent == "") {
 			$parent = null;
 		}
+
+		eval(check_values(
+			[
+				array("table" => "page", "col" => "name", "name" => "Name"),
+				array("table" => "page", "col" => "file", "name" => "Datei"),
+				array("table" => "page", "col" => "show_in_navigation", "name" => "Zeige in Navigation?"),
+				array("table" => "page", "col" => "parent", "name" => "Parent"),
+			]
+		));
+
 		$query = 'UPDATE `page` SET `name` = '.esc($name).', `file` = '.esc($file).', `show_in_navigation` = '.esc($show_in_navigation).', `parent` = '.esc($parent).' WHERE `id` = '.esc($id);
 		$result = rquery($query);
 		if($result) {
@@ -4692,6 +4702,13 @@ INSERT INTO
 
 	function update_fach ($id, $name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "pruefungsnummer_fach", "col" => "name", "name" => "Name")
+			]
+		));
+
 		$query = 'UPDATE `pruefungsnummer_fach` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Das Fach wurde erfolgreich geändert.', null, 'Das Fach konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
