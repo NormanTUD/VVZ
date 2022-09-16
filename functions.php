@@ -3820,6 +3820,13 @@ WHERE 1
 
 	function update_barrierefrei ($barrierefrei) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "users", "col" => "barrierefrei", "name" => "Barrierefrei")
+			]
+		));
+
 		$query = 'UPDATE `users` SET `barrierefrei` = '.esc($barrierefrei).' WHERE `id` = '.esc($GLOBALS['logged_in_user_id']);
 		return simple_query_success_fail_message($query, 'Die Barrierefreitsoption wurde erfolgreich geändert.', 'Die Barrierefreitsoption wurde nicht geändert.');
 	}
