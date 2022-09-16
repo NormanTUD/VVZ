@@ -3838,7 +3838,7 @@ WHERE 1
 		return simple_query_success_fail_message($query, 'Ihr Passwort wurde erfolgreich geändert.', null, 'Die Benutzerdaten konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
-	function update_user ($name, $id, $password, $role, $dozent, $institut, $enable, $barrierefrei, $accpubdata) {
+	function update_user ($name, $id, $password, $role, $dozent_id, $institut_id, $enable, $barrierefrei, $accepted_public_data) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$salt = get_and_create_salt($id);
 		$enabled = 1;
@@ -3846,10 +3846,35 @@ WHERE 1
 			$enabled = 0;
 		}
 		$query = '';
+
+		$password_sha256 = hash('sha256', $password.$salt);
+
+
 		if($password) {
-			$query = 'UPDATE `users` SET `username` = '.esc($name).', `password_sha256` = '.esc(hash('sha256', $password.$salt)).', `dozent_id` = '.esc($dozent).', `institut_id` = '.esc($institut).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accpubdata).' WHERE `id` = '.esc($id);
+			eval(check_values(
+				[
+					array("table" => "users", "col" => "username", "name" => "Username"),
+					array("table" => "users", "col" => "password_sha256", "name" => "Passwort"),
+					array("table" => "users", "col" => "dozent_id", "name" => "Dozent"),
+					array("table" => "users", "col" => "institut_id", "name" => "Institut"),
+					array("table" => "users", "col" => "enabled", "name" => "Aktiviert"),
+					array("table" => "users", "col" => "barrierefrei", "name" => "Barrierefrei"),
+					array("table" => "users", "col" => "accepted_public_data", "name" => "Datenschutzabfrage akzeptiert")
+				]
+			));
+			$query = 'UPDATE `users` SET `username` = '.esc($name).', `password_sha256` = '.esc($password_sha256).', `dozent_id` = '.esc($dozent_id).', `institut_id` = '.esc($institut_id).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accepted_public_data).' WHERE `id` = '.esc($id);
 		} else {
-			$query = 'UPDATE `users` SET `username` = '.esc($name).', `dozent_id` = '.esc($dozent).', `institut_id` = '.esc($institut).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accpubdata).' WHERE `id` = '.esc($id);
+			eval(check_values(
+				[
+					array("table" => "users", "col" => "username", "name" => "Username"),
+					array("table" => "users", "col" => "dozent_id", "name" => "Dozent"),
+					array("table" => "users", "col" => "institut_id", "name" => "Institut"),
+					array("table" => "users", "col" => "enabled", "name" => "Aktiviert"),
+					array("table" => "users", "col" => "barrierefrei", "name" => "Barrierefrei"),
+					array("table" => "users", "col" => "accepted_public_data", "name" => "Datenschutzabfrage akzeptiert")
+				]
+			));
+			$query = 'UPDATE `users` SET `username` = '.esc($name).', `dozent_id` = '.esc($dozent_id).', `institut_id` = '.esc($institut_id).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accepted_public_data).' WHERE `id` = '.esc($id);
 		}
 		$result = rquery($query);
 		if($result) {
@@ -4810,7 +4835,7 @@ INSERT INTO
 
 		eval(check_values(
 			[
-				array("table" => "studiengang", "col" => "name", "name" => "Name")
+				array("table" => "pruefung_zeitraum", "col" => "name", "name" => "Name")
 			]
 		));
 
