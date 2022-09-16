@@ -4894,7 +4894,9 @@ INSERT INTO
 */
 
 					$query = 'UPDATE `titel` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
+
 					eval(check_values(parse_sql_get_table_and_cols($query)));
+
 					return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich geändert.', null, 'Der Titel konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 				} else {
 					error("Leere Abkürzung.");
