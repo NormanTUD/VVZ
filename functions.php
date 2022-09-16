@@ -4057,17 +4057,33 @@ WHERE 1
 	 */
 	function update_api($auth_code, $email, $ansprechpartner, $grund) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "api_auth_codes", "col" => "email", "name" => "Email"),
+				array("table" => "api_auth_codes", "col" => "ansprechpartner", "name" => "Ansprechpartner"),
+				array("table" => "api_auth_codes", "col" => "grund", "name" => "Grun")
+			]
+		));
+
 		$query = 'UPDATE `api_auth_codes` SET `email` = '.esc($email).', `ansprechpartner` = '.esc($ansprechpartner).', `grund` = '.esc($grund).' WHERE `auth_code` = '.esc($auth_code);
 		return simple_query_success_fail_message($query, 'API-Zugang erfolgreich editiert.', 'API-Zugang konnte nicht editiert werden.');
 	}
 
-	function update_startseitentext ($startseitentext) {
+	function update_startseitentext ($text) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = '';
+
+		eval(check_values(
+			[
+				array("table" => "startseite", "col" => "text", "name" => "Text"),
+			]
+		));
+
 		if(get_startseitentext()) {
-			$query = 'UPDATE `startseite` SET `text` = '.esc($startseitentext);
+			$query = 'UPDATE `startseite` SET `text` = '.esc($text);
 		} else {
-			$query = 'INSERT INTO `startseite` (`text`) VALUES ('.esc($startseitentext).');';
+			$query = 'INSERT INTO `startseite` (`text`) VALUES ('.esc($text).');';
 		}
 		return simple_query_success_fail_message($query, 'Startseitentext erfolgreich editiert.', 'Startseitentext konnte nicht editiert werden.');
 	}
@@ -4319,8 +4335,21 @@ INSERT INTO
 		if($result) {
 			$query = '';
 			if($raumwunsch_id && $gebaeudewunsch_id) {
+				eval(check_values(
+					[
+						array("table" => "veranstaltung", "col" => "gebaeudewunsch_id", "name" => "Gebäudewunsch"),
+						array("table" => "veranstaltung", "col" => "raumwunsch_id", "name" => "Raumwunsch")
+					]
+				));
+
 				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = '.esc($raumwunsch_id).', `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			} elseif ($gebaeudewunsch_id) {
+				eval(check_values(
+					[
+						array("table" => "veranstaltung", "col" => "gebaeudewunsch_id", "name" => "Gebäudewunsch")
+					]
+				));
+
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
@@ -4441,6 +4470,13 @@ INSERT INTO
 			$old_master_niveau = get_single_row_from_query("select master_niveau from veranstaltung where id = ".esc($id));
 			if($old_master_niveau != $master_niveau) {
 				$old_db_status_hash = query_to_status_hash("select master_niveau from veranstaltung where id = ".esc($id));
+
+				eval(check_values(
+					[
+						array("table" => "veranstaltung", "col" => "master_niveau", "name" => "Master-Niveau")
+					]
+				));
+
 				$query = 'UPDATE `veranstaltung` SET `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
 				$new_db_status_hash = query_to_status_hash("select master_niveau from veranstaltung where id = ".esc($id));
 
