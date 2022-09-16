@@ -3500,7 +3500,6 @@ WHERE 1
 		} else {
 			warning("Für Gebäude muss sowohl ein Name als auch eine Abkürzung eingetragen werden.");
 		}
-
 	}
 
 	function create_raum ($gebaeude_id, $raumnummer) {
