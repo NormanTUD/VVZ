@@ -3842,7 +3842,7 @@ WHERE 1
 		return simple_query_success_fail_message($query, 'Ihr Passwort wurde erfolgreich geändert.', null, 'Die Benutzerdaten konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
-	function update_user ($name, $id, $password, $role, $dozent_id, $institut_id, $enable, $barrierefrei, $accepted_public_data) {
+	function update_user ($username, $id, $password, $role, $dozent_id, $institut_id, $enable, $barrierefrei, $accepted_public_data) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$salt = get_and_create_salt($id);
 		$enabled = 1;
@@ -3866,7 +3866,7 @@ WHERE 1
 					array("table" => "users", "col" => "accepted_public_data", "name" => "Datenschutzabfrage akzeptiert")
 				]
 			));
-			$query = 'UPDATE `users` SET `username` = '.esc($name).', `password_sha256` = '.esc($password_sha256).', `dozent_id` = '.esc($dozent_id).', `institut_id` = '.esc($institut_id).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accepted_public_data).' WHERE `id` = '.esc($id);
+			$query = 'UPDATE `users` SET `username` = '.esc($username).', `password_sha256` = '.esc($password_sha256).', `dozent_id` = '.esc($dozent_id).', `institut_id` = '.esc($institut_id).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accepted_public_data).' WHERE `id` = '.esc($id);
 		} else {
 			eval(check_values(
 				[
@@ -3878,7 +3878,7 @@ WHERE 1
 					array("table" => "users", "col" => "accepted_public_data", "name" => "Datenschutzabfrage akzeptiert")
 				]
 			));
-			$query = 'UPDATE `users` SET `username` = '.esc($name).', `dozent_id` = '.esc($dozent_id).', `institut_id` = '.esc($institut_id).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accepted_public_data).' WHERE `id` = '.esc($id);
+			$query = 'UPDATE `users` SET `username` = '.esc($username).', `dozent_id` = '.esc($dozent_id).', `institut_id` = '.esc($institut_id).', `enabled` = '.esc($enabled).', `barrierefrei` = '.esc($barrierefrei).', `accepted_public_data` = '.esc($accepted_public_data).' WHERE `id` = '.esc($id);
 		}
 		$result = rquery($query);
 		if($result) {
@@ -9128,7 +9128,7 @@ SE 1/2 oder BZW
 		return $result;
 	}
 
-	function fill_deletion_global ($post_ids, $dbname, $debugvalues = array()) {
+	function fill_deletion_global ($post_ids, $dbn, $debugvalues = array()) {
 		if(is_array($post_ids)) {
 			$true = 1;
 			foreach ($post_ids as $this_post_id) {
@@ -9139,13 +9139,13 @@ SE 1/2 oder BZW
 			}
 
 			if($true) {
-				$GLOBALS['deletion_db'] = $dbname;
-				return $dbname;
+				$GLOBALS['deletion_db'] = $dbn;
+				return $dbn;
 			}
 		} else {
 			if(get_post($post_ids)) {
-				$GLOBALS['deletion_db'] = $dbname;
-				return $dbname;
+				$GLOBALS['deletion_db'] = $dbn;
+				return $dbn;
 			}
 		}
 	}
