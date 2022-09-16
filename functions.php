@@ -3565,8 +3565,13 @@ WHERE 1
 
 	function create_bereich ($name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `bereich` (`name`) VALUES ('.esc($name).')';
-		return simple_query_success_fail_message($query, 'Der Bereich wurde erfolgreich eingetragen.', 'Der Bereich konnte nicht eingetragen werden.');
+		if(get_single_row_from_query("select count(*) from bereich where name = ".esc($name))) {
+			warning("Der Bereich &raquo;".htmlentities($name ?? "")."&laquo; existierte bereits und wurde nicht neu eingefügt.");
+			return 0;
+		} else {
+			$query = 'INSERT INTO `bereich` (`name`) VALUES ('.esc($name).')';
+			return simple_query_success_fail_message($query, 'Der Bereich wurde erfolgreich eingetragen.', 'Der Bereich konnte nicht eingetragen werden.');
+		}
 	}
 
 	function create_pruefungstyp ($name) {
