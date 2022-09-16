@@ -3795,6 +3795,11 @@ WHERE 1
 			return $result;
 		} else {
 			$salt = generate_random_string(100);
+			eval(check_values(
+				[
+					array("table" => "users", "col" => "salt", "name" => "Salt")
+				]
+			));
 			$query = 'UPDATE `users` SET `salt` = '.esc($salt).' WHERE `id` = '.esc($id);
 			$results = rquery($query);
 
