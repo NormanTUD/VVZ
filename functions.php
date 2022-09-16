@@ -4571,6 +4571,12 @@ INSERT INTO
 
 	function update_page ($id, $name, $file) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+		eval(check_values(
+			[
+				array("table" => "page", "col" => "name", "name" => "Name"),
+				array("table" => "page", "col" => "file", "name" => "Datei"),
+			]
+		));
 		$query = 'UPDATE `page` SET `name` = '.esc($name).', `file` = '.esc($file).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Die Seite wurde erfolgreich geändert.', null, 'Die Seite konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
