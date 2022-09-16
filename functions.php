@@ -4501,12 +4501,28 @@ INSERT INTO
 
 	function update_gebaeude ($id, $name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "gebaeude", "col" => "name", "name" => "Name"),
+				array("table" => "gebaeude", "col" => "abkuerzung", "name" => "Abkürzung")
+			]
+		));
+
 		$query = 'UPDATE `gebaeude` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Das Gebäude wurde erfolgreich geändert.', null, 'Das Gebäude konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_raum ($id, $raum_name, $gebaeude_id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "raum", "col" => "raumnummer", "name" => "Raumnummer"),
+				array("table" => "raum", "col" => "gebaeude_id", "name" => "Gebäude")
+			]
+		));
+
 		$query = 'UPDATE `raum` SET `raumnummer` = '.esc($raum_name).', `gebaeude_id` = '.esc($gebaeude_id).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich geändert.', null, 'Der Raum konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
@@ -4547,6 +4563,15 @@ INSERT INTO
 
 	function update_modul ($id, $name, $studiengang_id, $beschreibung, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+		eval(check_values(
+			[
+				array("table" => "modul", "col" => "studiengang_id", "name" => "Studiengang-ID"),
+				array("table" => "modul", "col" => "name", "name" => "Name"),
+				array("table" => "modul", "col" => "beschreibung", "name" => "Beschreibung"),
+				array("table" => "modul", "col" => "abkuerzung", "name" => "Abkürzung")
+
+			]
+		));
 		$query = 'UPDATE `modul` SET `studiengang_id` = '.esc($studiengang_id).', `name` = '.esc($name).', `beschreibung` = '.esc($beschreibung).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Das Modul wurde erfolgreich geändert.', null, 'Das Modul konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
