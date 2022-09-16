@@ -4710,10 +4710,10 @@ INSERT INTO
 				$query = 'DELETE FROM `'.$GLOBALS['dbname'].'`.`role_to_page` WHERE `page_id` = '.esc($id);
 				$result = rquery($query);
 				if($result) {
-					success("Die Rollen wurden erfolgreich geklärt.");
+					success("Die Rollen wurden erfolgreich geupdated.");
 					$roles_cleared = 1;
 				} else {
-					error("Die Rollen wurden NICHT erfolgreich geklärt.");
+					error("Die Rollen wurden NICHT erfolgreich geupdated.");
 				}
 			}
 
