@@ -208,11 +208,15 @@
 			try {
 				$result = mysqli_query($GLOBALS['dbh'], $internalquery);
 			} catch (\Throwable $e) {
-				if(file_exists("/etc/hardcore_debugging")) {
-					include_once('scripts/SqlFormatter.php');
-					print "<pre>Query:\n".SqlFormatter::highlight($internalquery)."\n\nError:\n";
-					print "$e</pre>";
-					exit(1);
+				if($die) {
+					if(file_exists("/etc/hardcore_debugging")) {
+						include_once('scripts/SqlFormatter.php');
+						print "<pre>Query:\n".SqlFormatter::highlight($internalquery)."\n\nError:\n";
+						print "$e</pre>";
+						exit(1);
+					}
+				} else {
+					throw new Exception("<pre>$e</pre>");
 				}
 
 				warning($e);

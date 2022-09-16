@@ -5218,17 +5218,21 @@ INSERT INTO
 	}
 
 	function simple_query_success_fail_message ($query, $success, $fail = null, $message = null) {
-		$result = rquery($query);
-		if($result) {
-			success($success);
-			return 1;
-		} else {
-			if(is_null($fail) && !is_null($message)) {
-				message($message);
+		try {
+			$result = rquery($query, 0);
+			if($result) {
+				success($success);
+				return 1;
 			} else {
-				error($fail);
+				if(is_null($fail) && !is_null($message)) {
+					message($message);
+				} else {
+					error($fail);
+				}
+				return 0;
 			}
-			return 0;
+		} catch (\Throwable $e) {
+			warning($e);
 		}
 	}
 
