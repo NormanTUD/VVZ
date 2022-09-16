@@ -4,6 +4,12 @@
 
 	require_once('php-sql-parser.php');
 
+	if(!function_exists("get_base_expr_set")) {
+		function get_base_expr_set ($i) {
+			return $i["sub_tree"][0]["base_expr"];
+		}
+	}
+
 	if(!function_exists("get_base_expr")) {
 		function get_base_expr ($i) {
 			return $i["base_expr"];
@@ -17,17 +23,23 @@
 
 			$parsed = $parser->parsed;
 
+			if(array_key_exists("UPDATE", $parsed)) {
+				$table = $parsed["UPDATE"][0]["table"];
+
+				$cols = array_map("get_base_expr_set", $parsed["SET"]);
+
+				$array = array();
+				foreach ($cols as $col) {
+					$array[] = array("table" => $table, "col" => $col);
+				}
+
+				return $array;
+			}
+
 			if(array_key_exists("INSERT", $parsed)) {
 				$table = $parsed["INSERT"]["table"];
 
 				$cols = array_map("get_base_expr", $parsed["INSERT"]["columns"]);
-
-				/*
-				return array(
-					"table" => $table,
-					"cols" => $cols
-				);
-				 */
 
 				$array = array();
 				foreach ($cols as $col) {

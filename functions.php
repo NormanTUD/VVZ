@@ -4213,7 +4213,7 @@ WHERE `id` = '.esc($id);
 			$table = $item["table"];
 			$col = $item["col"];
 			$varname = $item["varname"] ?? $col;
-			$name = $item["name"];
+			$name = array_key_exists("name", $item) ? $item["name"] : $col;
 
 			$this_eval = "
 				$${varname}_check = value_fits_into_db_column('$db', '$table', '${col}', \$$varname, '$name');
@@ -4882,8 +4882,6 @@ INSERT INTO
 		if(isset($id)) {
 			if(isset($name)) {
 				if(isset($abkuerzung)){
-
-/*
 					eval(check_values(
 						[
 							array("table" => "titel", "col" => "name", "name" => "Name"),
@@ -4891,7 +4889,6 @@ INSERT INTO
 						]
 					));
 
-*/
 
 					$query = 'UPDATE `titel` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
 
