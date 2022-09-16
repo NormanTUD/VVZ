@@ -678,12 +678,12 @@ declare(ticks=1);
 
 			if(get_post("customize_value") && get_post("value") && get_post("id")) {
 				$val = get_post("value");
+
 				eval(check_values(
 					[
 						array("table" => "customizations", "col" => "val", "name" => "CSS-Wert"),
 					]
 				));
-
 
 				$query = "update customizations set val = ".esc($val)." where id = ".esc(get_post("id") ?? "");
 
@@ -8416,6 +8416,14 @@ SE 1/2 oder BZW
 
 	function update_language ($id, $name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "languages", "col" => "name", "name" => "Name"),
+				array("table" => "languages", "col" => "abkuerzung", "name" => "Abkürzung"),
+			]
+		));
+
 		$query = 'update `'.$GLOBALS['dbname'].'`.`language` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, "Die Sprache wurde erfolgreich geupdated.", "Die Sprache konnte nicht editiert werden.");
 	}
