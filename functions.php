@@ -4732,12 +4732,34 @@ INSERT INTO
 
 	function update_role ($id, $name, $beschreibung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "role", "col" => "name", "name" => "Name"),
+				array("table" => "role", "col" => "beschreibung", "name" => "Beschreibung")
+			]
+		));
+
 		$query = 'UPDATE `role` SET `name` = '.esc($name).', `beschreibung` = '.esc($beschreibung).' WHERE `id` = '.esc($id);
+
 		return simple_query_success_fail_message($query, 'Die Rolle wurde erfolgreich geändert.', null, 'Die Rolle konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
 	function update_pruefung ($id, $pruefungstyp_id, $veranstaltung_id, $pruefungsnummer, $pruefungsname, $datum, $stunde, $raum) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "pruefungsnummer", "col" => "pruefungsnummer", "name" => "Prüfungsnummer"),
+				array("table" => "pruefungsnummer", "col" => "veranstaltung_id", "name" => "Veranstaltungs-ID"),
+				array("table" => "pruefungsnummer", "col" => "pruefungstyp_id", "name" => "Prüfungstyp-ID"),
+				array("table" => "pruefungsnummer", "col" => "name", "name" => "Name"),
+				array("table" => "pruefungsnummer", "col" => "datum", "name" => "Datum"),
+				array("table" => "pruefungsnummer", "col" => "stunde", "name" => "Stunde"),
+				array("table" => "pruefungsnummer", "col" => "raum_id", "name" => "Raum-ID")
+			]
+		));
+
 		$query = 'UPDATE `pruefung` SET `pruefungsnummer` = '.esc($pruefungsnummer).', `veranstaltung_id` = '.esc($veranstaltung_id).', `pruefungstyp_id` = '.esc($pruefungstyp_id).', `name` = '.esc($pruefungsname).', `datum` = '.esc($datum).', `stunde` = '.esc($stunde).', `raum_id` = '.esc($raum).' WHERE `id` = '.esc($id);
 		$result = rquery($query);
 		if($result) {
@@ -4768,6 +4790,15 @@ INSERT INTO
 			error("Wie oft gestellt muss eine natürliche Zahl sein. Sie wird auf 1 gesetzt statt auf ".htmle($wie_oft_gestellt));
 			$wie_oft_gestellt = 1;
 		}
+
+		eval(check_values(
+			[
+				array("table" => "faq", "col" => "frage", "name" => "Frage"),
+				array("table" => "faq", "col" => "antwort", "name" => "Antwort"),
+				array("table" => "faq", "col" => "wie_oft_gestellt", "name" => "Wie oft gestellt?"),
+			]
+		));
+
 		$query = 'UPDATE `faq` SET `frage` = '.esc($frage).', `antwort` = '.esc($antwort).', `wie_oft_gestellt` = '.esc($wie_oft_gestellt).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Die Frage wurde erfolgreich geändert.', null, 'Die Frage konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
@@ -4888,7 +4919,6 @@ INSERT INTO
 							array("table" => "titel", "col" => "abkuerzung", "name" => "Nachname"),
 						]
 					));
-
 
 					$query = 'UPDATE `titel` SET `name` = '.esc($name).', `abkuerzung` = '.esc($abkuerzung).' WHERE `id` = '.esc($id);
 
