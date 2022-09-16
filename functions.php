@@ -4698,6 +4698,13 @@ INSERT INTO
 
 	function update_pruefungsamt ($id, $name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+
+		eval(check_values(
+			[
+				array("table" => "pruefungsamt", "col" => "name", "name" => "Name")
+			]
+		));
+
 		$query = 'UPDATE `pruefungsamt` SET `name` = '.esc($name).' WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Das Prüfungsamt wurde erfolgreich geändert.', null, 'Das Prüfungsamt konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
