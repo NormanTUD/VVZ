@@ -252,7 +252,7 @@ declare(ticks=1);
 		}
 	}
 
-	update_user_agent_counter();
+	//update_user_agent_counter();
 
 	/* Parameter verarbeiten */
 
