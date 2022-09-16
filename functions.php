@@ -4787,7 +4787,7 @@ INSERT INTO
 		$query = 'UPDATE `page` SET `name` = '.esc($name).', `file` = '.esc($file).', `show_in_navigation` = '.esc($show_in_navigation).', `parent` = '.esc($parent).' WHERE `id` = '.esc($id);
 		$result = rquery($query);
 		if($result) {
-			update_role_to_page_page_info_hinweis ($id, $role_to_page, $beschreibung, $hinweis);
+			update_role_to_page_page_info_hinweis($id, $role_to_page, $beschreibung, $hinweis);
 
 			success('Die Seite wurde erfolgreich geändert.');
 		} else {
