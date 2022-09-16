@@ -2,6 +2,7 @@
 	$GLOBALS["dbh"] = null;
 	include("config.php");
 
+	/*
 	require_once('php-sql-parser.php');
 
 	if(!function_exists("get_base_expr_set")) {
@@ -50,6 +51,7 @@
 			}
 		}
 	}
+	 */
 
 	if(!array_key_exists("no_selftest_force", $GLOBALS)) {
 		$GLOBALS["no_selftest_force"] = 0;
