@@ -89,7 +89,7 @@
 			));
 
 			js(array(
-				"jquery-1.12.4.js",
+				"jquery-3.6.1.min.js",
 				"jquery-ui.js",
 				"jquery-ui-timepicker-addon.js",
 				"mainscript.php",
