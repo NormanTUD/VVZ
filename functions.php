@@ -5097,6 +5097,13 @@ INSERT INTO
 
 	function update_text ($page_id, $text) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
+		eval(check_values(
+			[
+				array("table" => "seitentext", "col" => "page_id", "name" => "Seiten-ID"),
+				array("table" => "seitentext", "col" => "text", "name" => "Text"),
+			]
+		));
+
 		$query = 'INSERT INTO `seitentext` (`page_id`, `text`) VALUES ('.esc($page_id).', '.esc($text).') ON DUPLICATE KEY UPDATE `text` = '.esc($text);
 		return simple_query_success_fail_message($query, 'Der Seitentext wurde erfolgreich geändert.', null, 'Der Seitentext konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
