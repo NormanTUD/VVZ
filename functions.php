@@ -3377,8 +3377,19 @@ WHERE 1
 
 	function create_language ($name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `language` (`name`, `abkuerzung`) VALUES ('.esc($name).', '.esc($abkuerzung).')';
-		return simple_query_success_fail_message($query, 'Die Sprache wurde erfolgreich eingetragen.', 'Die Sprache konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from language where name = ".esc($name)." and abkuerzung = ".esc($abkuerzung))) {
+			eval(check_values(
+				[
+					array("table" => "language", "col" => "name", "name" => "Name"),
+					array("table" => "language", "col" => "abkuerzung", "name" => "Abkürzung")
+				]
+			));
+
+			$query = 'INSERT INTO `language` (`name`, `abkuerzung`) VALUES ('.esc($name).', '.esc($abkuerzung).')';
+			return simple_query_success_fail_message($query, 'Die Sprache wurde erfolgreich eingetragen.', 'Die Sprache konnte nicht eingetragen werden.');
+		} else {
+			warning("Die Sprache ".htmlentities($name ?? "")." mit der Abkürzung ".htmlentities($abkuerzung ?? "")." existierte bereits, sie wird nicht neu angelegt");
+		}
 	}
 
 	function create_api ($email, $ansprechpartner, $grund) {
@@ -8513,8 +8524,8 @@ SE 1/2 oder BZW
 
 		eval(check_values(
 			[
-				array("table" => "languages", "col" => "name", "name" => "Name"),
-				array("table" => "languages", "col" => "abkuerzung", "name" => "Abkürzung"),
+				array("table" => "language", "col" => "name", "name" => "Name"),
+				array("table" => "language", "col" => "abkuerzung", "name" => "Abkürzung"),
 			]
 		));
 
