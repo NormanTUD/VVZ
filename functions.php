@@ -834,7 +834,7 @@ declare(ticks=1);
 			if(get_post('new_function_right')) {
 				$funktion_name = get_post('funktion_name');
 				if($funktion_name) {
-					create_function_right($role_id, $funktion_name);
+					create_function_right($funktion_name);
 				} else {
 					error('Die Funktion konnte nicht angelegt werden, da sie keinen validen Namen zugeordnet bekommen hat.');
 				}
@@ -3592,10 +3592,20 @@ WHERE 1
 		return simple_query_success_fail_message($query, 'Der Zeitraum wurde erfolgreich eingetragen.', 'Der Zeitraum konnte nicht eingetragen werden.');
 	}
 
-	function create_function_right ($role_id, $name) {
+	function create_function_right ($function_name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `function_right` (`function_name`) VALUES ('.esc($name).')';
-		return simple_query_success_fail_message($query, 'Das Funktionsrecht wurde erfolgreich eingetragen.', 'Das Funktionsrecht konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from function_right where function_name = ".esc($function_name))) {
+			eval(check_values(
+				[
+					array("table" => "function_right", "col" => "function_name", "name" => "Funktionsname"),
+				]
+			));
+
+			$query = 'INSERT INTO `function_right` (`function_name`) VALUES ('.esc($function_name).')';
+			return simple_query_success_fail_message($query, 'Das Funktionsrecht wurde erfolgreich eingetragen.', 'Das Funktionsrecht konnte nicht eingetragen werden.');
+		} else {
+			warning("Das Funktionsrecht ");
+		}
 	}
 
 	function create_bereich ($name) {
