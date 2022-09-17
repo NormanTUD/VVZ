@@ -3363,10 +3363,21 @@ WHERE 1
 		}
 	}
 
-	function create_role ($role, $beschreibung) {
+	function create_role ($name, $beschreibung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `role` (`name`, `beschreibung`) VALUES ('.esc($role).', '.esc($beschreibung).')';
-		return simple_query_success_fail_message($query, 'Die Rolle wurde erfolgreich eingetragen.', 'Die Rolle konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from role where name = ".esc($name)." and beschreibung = ".esc($beschreibung))) {
+			eval(check_values(
+				[
+					array("table" => "role", "col" => "name", "name" => "Name"),
+					array("table" => "role", "col" => "beschreibung", "name" => "Beschreibung")
+				]
+			));
+
+			$query = 'INSERT INTO `role` (`name`, `beschreibung`) VALUES ('.esc($name).', '.esc($beschreibung).')';
+			return simple_query_success_fail_message($query, 'Die Rolle wurde erfolgreich eingetragen.', 'Die Rolle konnte nicht eingetragen werden.');
+		} else {
+			warning("Die Rolle ".htmlentities($name ?? "")." (".htmlentities($beschreibung ?? "").") existierte bereits und wird nicht neu angelegt.");
+		}
 	}
 
 	function delete_language ($id) {
