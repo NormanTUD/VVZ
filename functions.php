@@ -3596,10 +3596,23 @@ WHERE 1
 		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich eingetragen.', 'Der Studiengang konnte nicht eingetragen werden.');
 	}
 
-	function create_modul ($modulname, $studiengang_id, $beschreibung, $abkuerzung) {
+	function create_modul ($name, $studiengang_id, $beschreibung, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($modulname).', '.esc($studiengang_id).', '.esc($abkuerzung).', '.esc($beschreibung).')';
-		return simple_query_success_fail_message($query, 'Das Modul wurde erfolgreich eingetragen.', 'Das Modul konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from modul where name = ".esc($name)." and studiengang_id = ".esc($studiengang_id)." and abkuerzung = ".esc($abkuerzung)." and beschreibung = ".esc($beschreibung))) {
+			eval(check_values(
+				[
+					array("table" => "modul", "col" => "name", "name" => "Name"),
+					array("table" => "modul", "col" => "studiengang_id", "name" => "Studiengang-ID"),
+					array("table" => "modul", "col" => "abkuerzung", "name" => "Abkürzung"),
+					array("table" => "modul", "col" => "beschreibung", "name" => "Beschreibung"),
+				]
+			));
+
+			$query = 'INSERT INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($name).', '.esc($studiengang_id).', '.esc($abkuerzung).', '.esc($beschreibung).')';
+			return simple_query_success_fail_message($query, 'Das Modul wurde erfolgreich eingetragen.', 'Das Modul konnte nicht eingetragen werden.');
+		} else {
+			warning("Das Modul ".htmlentities($name ?? "")." existierte bereits und wurde nicht erneut angelegt.");
+		}
 	}
 
 	function create_institut ($name, $start_nr) {
