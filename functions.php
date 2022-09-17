@@ -3626,8 +3626,18 @@ WHERE 1
 
 	function create_pruefungsamt ($name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `pruefungsamt` (`name`) VALUES ('.esc($name).')';
-		return simple_query_success_fail_message($query, 'Das Prüfungsamt wurde erfolgreich eingetragen.', 'Das Prüfungsamt konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from pruefungsamt where name = ".esc($name))) {
+			eval(check_values(
+				[
+					array("table" => "pruefungsamt", "col" => "name", "name" => "Name"),
+				]
+			));
+
+			$query = 'INSERT INTO `pruefungsamt` (`name`) VALUES ('.esc($name).')';
+			return simple_query_success_fail_message($query, 'Das Prüfungsamt wurde erfolgreich eingetragen.', 'Das Prüfungsamt konnte nicht eingetragen werden.');
+		} else {
+			warning("Das Prüfungsamt ".htmlentities($name ?? "")." existierte bereits und wurde nicht neu angelegt");
+		}
 	}
 
 	function create_pruefung_zeitraum ($name) {
