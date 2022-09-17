@@ -3373,7 +3373,6 @@ WHERE 1
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$query = 'DELETE FROM `language` WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Die Sprache wurde erfolgreich gelöscht.', 'Die Sprache konnte nicht gelöscht werden.');
-
 	}
 
 	function create_language ($name, $abkuerzung) {
@@ -3385,7 +3384,11 @@ WHERE 1
 	function create_api ($email, $ansprechpartner, $grund) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		$auth_code = generate_random_string(30);
-		$query = 'INSERT IGNORE INTO `api_auth_codes` (`auth_code`, `email`, `ansprechpartner`, `grund`, `user_id`) VALUES ('.multiple_esc_join(array($auth_code, $email, $ansprechpartner, $grund, $GLOBALS['logged_in_user_id'])).')';
+		while (get_single_row_from_query("select count(*) from api_auth_codes where auth_code = ".esc($auth_code))) {
+			$auth_code = generate_random_string(30);
+		}
+
+		$query = 'INSERT INTO `api_auth_codes` (`auth_code`, `email`, `ansprechpartner`, `grund`, `user_id`) VALUES ('.multiple_esc_join(array($auth_code, $email, $ansprechpartner, $grund, $GLOBALS['logged_in_user_id'])).') on duplicate key update auth_code=values(auth_code), email=values(email), ansprechpartner=values(ansprechpartner), grund=values(grund), user_id=values(user_id)';
 		return simple_query_success_fail_message($query, 'Der API-Zugang wurde erfolgreich eingetragen.', 'Die API-Zugang konnte nicht eingetragen werden.');
 	}
 
