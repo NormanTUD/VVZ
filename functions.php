@@ -8872,7 +8872,7 @@ SE 1/2 oder BZW
 		$str .= "CALSCALE:GREGORIAN\n";
 		$str .= "METHOD:PUBLISH\n";
 		$str .= "CHARSET:utf8\n";
-		$str .= "X-WR-CALNAME: ".$GLOBALS["calname"]."\n";
+		$str .= "X-WR-CALNAME: Vorlesungsverzeichnis\n";
 		$str .= "TZID:".$GLOBALS['timezone_name']."\n";
 		$str .= "X-LIC-LOCATION:".$GLOBALS['timezone_name']."\n";
 
