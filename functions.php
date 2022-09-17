@@ -3520,8 +3520,19 @@ WHERE 1
 	function create_gebaeude ($name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if($abkuerzung && $name) {
-			$query = 'INSERT IGNORE INTO `gebaeude` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
-			return simple_query_success_fail_message($query, 'Das Gebäude wurde erfolgreich eingetragen.', 'Das Gebäude konnte nicht eingetragen werden.');
+			if(!get_single_row_from_query("select count(*) from gebaeude where name = ".esc($name)." and abkuerzung = ".esc($abkuerzung))) {
+				eval(check_values(
+					[
+						array("table" => "gebaeude", "col" => "name", "name" => "Name"),
+						array("table" => "gebaeude", "col" => "abkuerzung", "name" => "Abkürzung")
+					]
+				));
+
+				$query = 'INSERT IGNORE INTO `gebaeude` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
+				return simple_query_success_fail_message($query, 'Das Gebäude wurde erfolgreich eingetragen.', 'Das Gebäude konnte nicht eingetragen werden.');
+			} else {
+				warning("Das Gebäude ".htmlentities($name ?? "")." existierte bereits und wird nicht neu angelegt");
+			}
 		} else {
 			warning("Für Gebäude muss sowohl ein Name als auch eine Abkürzung eingetragen werden.");
 		}
