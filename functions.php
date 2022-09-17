@@ -3496,8 +3496,19 @@ WHERE 1
 
 	function create_dozent ($first_name, $last_name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `dozent` (`first_name`, `last_name`) VALUES ('.esc($first_name).', '.esc($last_name).')';
-		return simple_query_success_fail_message($query, 'Der Dozent wurde erfolgreich eingetragen.', 'Der Dozent konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from dozent where last_name = ".esc($last_name)." and first_name = ".esc($first_name))) {
+			eval(check_values(
+				[
+					array("table" => "dozent", "col" => "first_name", "name" => "Vorname"),
+					array("table" => "dozent", "col" => "last_name", "name" => "Nacname")
+				]
+			));
+
+			$query = 'INSERT INTO `dozent` (`first_name`, `last_name`) VALUES ('.esc($first_name).', '.esc($last_name).')';
+			return simple_query_success_fail_message($query, 'Der Dozent wurde erfolgreich eingetragen.', 'Der Dozent konnte nicht eingetragen werden.');
+		} else {
+			warning("Der Dozent ".htmlentities($first_name ?? "")." ".htmlentities($last_name ?? "")." existierte bereits, er wird nicht neu angelegt.");
+		}
 	}
 
 	function create_veranstaltungstyp ($name, $abkuerzung) {
