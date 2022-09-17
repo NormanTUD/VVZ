@@ -3632,8 +3632,18 @@ WHERE 1
 
 	function create_pruefung_zeitraum ($name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `pruefung_zeitraum` (`name`) VALUES ('.esc($name).')';
-		return simple_query_success_fail_message($query, 'Der Zeitraum wurde erfolgreich eingetragen.', 'Der Zeitraum konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from pruefung_zeitraum where name = ".esc($name))) {
+			eval(check_values(
+				[
+					array("table" => "pruefung_zeitraum", "col" => "name", "name" => "Name"),
+				]
+			));
+
+			$query = 'INSERT INTO `pruefung_zeitraum` (`name`) VALUES ('.esc($name).')';
+			return simple_query_success_fail_message($query, 'Der Zeitraum wurde erfolgreich eingetragen.', 'Der Zeitraum konnte nicht eingetragen werden.');
+		} else {
+			warning("Der Prüfungszeitraum ".htmlentities($name ?? "")." existierte bereits und wurde nicht neu eingefügt.");
+		}
 	}
 
 	function create_function_right ($function_name) {
