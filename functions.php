@@ -3488,8 +3488,19 @@ WHERE 1
 
 	function create_veranstaltungstyp ($name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `veranstaltungstyp` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
-		return simple_query_success_fail_message($query, 'Der Veranstaltungstyp wurde erfolgreich eingetragen.', 'Der Veranstaltungstyp konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from veranstaltungstyp where name = ".esc($name)." and abkuerzung = ".esc($abkuerzung))) {
+			eval(check_values(
+				[
+					array("table" => "veranstaltungstyp", "col" => "name", "name" => "Name"),
+					array("table" => "veranstaltungstyp", "col" => "abkuerzung", "name" => "Abkürzung")
+				]
+			));
+
+			$query = 'INSERT IGNORE INTO `veranstaltungstyp` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
+			return simple_query_success_fail_message($query, 'Der Veranstaltungstyp wurde erfolgreich eingetragen.', 'Der Veranstaltungstyp konnte nicht eingetragen werden.');
+		} else {
+			warning("Der Veranstaltungstyp ".htmlentities($name ?? "")." (Abkürzung: ".htmlentities($abkuerzung ?? "")." existierte bereits und wurde nicht neu angelegt");
+		}
 	}
 
 	function create_gebaeude ($name, $abkuerzung) {
