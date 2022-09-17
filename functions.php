@@ -9229,7 +9229,7 @@ SE 1/2 oder BZW
 
 	function create_veranstaltung_pruefung_tabelle ($pruefungen) {
 ?>
-		<table class="font_size_10px">
+		<table class="">
 <?php
 		$i = 0;
 		$last_modul_name = '';

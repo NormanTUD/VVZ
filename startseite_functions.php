@@ -682,7 +682,7 @@
 				print $raum_gebaeude;
 			} else {
 				if($hinweis) {
-					print '<i class="font_size_10px">Kein&nbsp;Raum, evtl. siehe&nbsp;Details</i>';
+					print '<i class="">Kein&nbsp;Raum, evtl. siehe&nbsp;Details</i>';
 				} else {
 					print '<i>Kein Raum</i>';
 				}
