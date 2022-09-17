@@ -3591,8 +3591,19 @@ WHERE 1
 
 	function create_institut ($name, $start_nr) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `institut` (`name`, `start_nr`) VALUES ('.esc($name).', '.esc($start_nr).')';
-		return simple_query_success_fail_message($query, 'Die Institut wurde erfolgreich eingetragen.', 'Die Institut konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from institut where name = ".esc($name))) {
+			eval(check_values(
+				[
+					array("table" => "institut", "col" => "name", "name" => "Name"),
+					array("table" => "institut", "col" => "start_nr", "name" => "Startnummer"),
+				]
+			));
+
+			$query = 'INSERT INTO `institut` (`name`, `start_nr`) VALUES ('.esc($name).', '.esc($start_nr).')';
+			return simple_query_success_fail_message($query, 'Die Institut wurde erfolgreich eingetragen.', 'Die Institut konnte nicht eingetragen werden.');
+		} else {
+			warning("Das Institut ".htmlentities($name ?? "")." existierte bereits und wurde nicht neu angelegt");
+		}
 	}
 
 	function create_fach ($name) {
