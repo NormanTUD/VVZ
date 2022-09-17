@@ -3600,7 +3600,7 @@ WHERE 1
 			]
 		));
 
-		$query = 'INSERT INTO `studiengang` (`name`, `institut_id`, `studienordnung`) VALUES ('.esc($name).', '.esc($institut_id).', '.esc($studienordnung).') on duplicatey key update name=values(name), institut_id=values(institut_id), studienordnung=values(studienordnung)';
+		$query = 'INSERT INTO `studiengang` (`name`, `institut_id`, `studienordnung`) VALUES ('.esc($name).', '.esc($institut_id).', '.esc($studienordnung).') on duplicate key update name=values(name), institut_id=values(institut_id), studienordnung=values(studienordnung)';
 		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich eingetragen.', 'Der Studiengang konnte nicht eingetragen werden.');
 	}
 
