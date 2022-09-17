@@ -2752,7 +2752,14 @@ declare(ticks=1);
 				if($result) {
 					return $result;
 				} else {
-					$query = 'INSERT IGNORE INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($name).')';
+					eval(check_values(
+						[
+							array("table" => "raum", "col" => "gebaeude_id", "name" => "Gebäude"),
+							array("table" => "raum", "col" => "raumnummer", "name" => "Raumnummer"),
+						]
+					));
+
+					$query = 'INSERT INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($name).')';
 					$results = rquery($query);
 
 					if($results) {
