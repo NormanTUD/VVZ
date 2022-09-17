@@ -3597,8 +3597,17 @@ WHERE 1
 
 	function create_fach ($name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `pruefungsnummer_fach` (`name`) VALUES ('.esc($name).')';
-		return simple_query_success_fail_message($query, 'Das Fach wurde erfolgreich eingetragen.', 'Das Fach konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from pruefungsnummer_fach where name = ".esc($name))) {
+			eval(check_values(
+				[
+					array("table" => "pruefungsnummer_fach", "col" => "name", "name" => "Name"),
+				]
+			));
+			$query = 'INSERT INTO `pruefungsnummer_fach` (`name`) VALUES ('.esc($name).')';
+			return simple_query_success_fail_message($query, 'Das Fach wurde erfolgreich eingetragen.', 'Das Fach konnte nicht eingetragen werden.');
+		} else {
+			warning("Das Fach ".htmlentities($name ?? "")." existierte bereits und wurde nicht neu angelegt.");
+		}
 	}
 
 	function delete_titel ($id) {
