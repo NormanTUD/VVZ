@@ -324,7 +324,7 @@
 ?>
 											<tr>
 
-												<td><?php print htmle($this_modul[1]); ?></td>
+												<td class="linebreak_anywhere"><?php print htmle($this_modul[1]); ?></td>
 												<td class="text_align_left">
 <?php
 												foreach ($pruefungsnummern[$this_modul[0]] as $this_pruefungsnummer) {
