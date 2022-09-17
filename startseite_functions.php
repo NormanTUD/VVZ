@@ -738,7 +738,7 @@
 
 	function show_veranstaltungsbox_header($id, $stunde, $woche, $row, $hinweis) {
 ?>
-		<span class="font_size_13px">
+		<span class="">
 <?php
 			$GLOBALS['shown_etwa'] = show_stunde_header($id, $stunde, $woche);
 ?>
