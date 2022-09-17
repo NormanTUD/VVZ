@@ -6194,7 +6194,7 @@ INSERT INTO
 					if($veranstaltung_name != $row[3]) {
 						$v_name = get_veranstaltungsname_by_id($row[3]);
 						$str .= "\t<tr>\n";
-						$str .= "\t\t<th class='width_100_break_word background_color_003377_color_white' colspan='3'>Veranstaltung: &raquo;<i>".htmlentities($v_name)."</i>&laquo;".(strlen($row[4]) ? ' (Abgabe der Prüfungsleistungen bis zum bzw. am '.$row[4].')' : '').(strlen($row[6].$row[7]) ? htmlentities(" [Dozent: $row[6] $row[7]]") : '').":</th>\n";
+						$str .= "\t\t<th class='width_100_break_word background_color_003377_color_white' colspan='3'>Veranstaltung: &raquo;<i>".htmlentities($v_name)."</i>&laquo;".(strlen($row[4] ?? "") ? ' (Abgabe der Prüfungsleistungen bis zum bzw. am '.$row[4].')' : '').(strlen($row[6].$row[7]) ? htmlentities(" [Dozent: $row[6] $row[7]]") : '').":</th>\n";
 						$str .= "\t</tr>\n";
 
 						$veranstaltung_name = $row[3];
