@@ -1592,7 +1592,7 @@
 	}
 
 	function show_studiengaenge_uebersicht () {
-		$width_determining_class = "medium-6";
+		$width_determining_class = "";
 		$rows = create_studiengaenge_mit_veranstaltungen_array($GLOBALS['this_semester'][0], isset($GLOBALS['this_institut']) ? $GLOBALS['this_institut'] : null);
 		if(count($rows)) {
 ?>
