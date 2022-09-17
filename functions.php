@@ -3607,10 +3607,21 @@ WHERE 1
 		return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich gelöscht.', 'Der Titel konnte nicht gelöscht werden.');
 	}
 
-	function create_title ($name, $abk) {
+	function create_title ($name, $abkuerzung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `titel` (`name`, `abkuerzung`) VALUES ('.esc(array($name, $abk)).')';
-		return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich eingetragen.', 'Der Titel konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from titel where name = ".esc($name)." and abkuerzung = ".esc($abkuerzung))) {
+			eval(check_values(
+				[
+					array("table" => "titel", "col" => "name", "name" => "Name"),
+					array("table" => "titel", "col" => "abkuerzung", "name" => "Abkürzung"),
+				]
+			));
+
+			$query = 'INSERT INTO `titel` (`name`, `abkuerzung`) VALUES ('.esc(array($name, $abkuerzung)).')';
+			return simple_query_success_fail_message($query, 'Der Titel wurde erfolgreich eingetragen.', 'Der Titel konnte nicht eingetragen werden.');
+		} else {
+			warning("Der Titel ".htmlentities($name ?? "")." mit der Abkürzung ".htmlentities($abkuerzung ?? "")." existierte bereits und wurde nicht neu eingefügt");
+		}
 	}
 
 	function create_pruefungsamt ($name) {
