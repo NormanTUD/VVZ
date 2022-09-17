@@ -8450,7 +8450,7 @@ SE 1/2 oder BZW
 		if(get_single_row_from_query("select count(*) from role_to_page where page_id = ".esc($page_id)." and role_id = ".esc($role_id))) {
 			warning("Die Kombination aus Rollen-ID und Seiten-ID existierte bereits und wird nicht erneut eingefügt");
 		} else {
-			$query = 'INSERT IGNORE INTO `role_to_page` (`role_id`, `page_id`) VALUES ('.esc($role_id).', '.esc($page_id).')';
+			$query = 'INSERT INTO `role_to_page` (`role_id`, `page_id`) VALUES ('.esc($role_id).', '.esc($page_id).')';
 			$result = rquery($query);
 			if($result) {
 				success("Die Seite wurde erfolgreich zur Rolle hinzugefügt.");
