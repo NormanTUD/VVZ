@@ -2670,17 +2670,23 @@ declare(ticks=1);
 		}
 	}
 
-	function get_and_create_pruefungstyp ($pruefungstyp_name) {
-		$result = get_pruefungstyp_id($pruefungstyp_name);
+	function get_and_create_pruefungstyp ($name) {
+		$result = get_pruefungstyp_id($name);
 
 		if($result) {
 			return $result;
 		} else {
-			$query = 'INSERT IGNORE INTO `pruefungstyp` (`name`) VALUES ('.esc($pruefungstyp_name).')';
+			eval(check_values(
+				[
+					array("table" => "pruefungstyp", "col" => "name", "name" => "Name"),
+				]
+			));
+
+			$query = 'INSERT INTO `pruefungstyp` (`name`) VALUES ('.esc($name).')';
 			$results = rquery($query);
 
 			if($results) {
-				$result = get_pruefungstyp_id($pruefungstyp_name);
+				$result = get_pruefungstyp_id($name);
 				if($result) {
 					success('Prüfungstyp eingefügt.');
 					return $result;
