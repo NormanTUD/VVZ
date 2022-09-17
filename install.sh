@@ -45,14 +45,10 @@ while [[ -z "$PASSWORD" ]]; do
 done
 
 cd $INSTALL_PATH
-if [ -d "$INSTALL_PATH/../.git" ]; then
-	git pull
-else
-	git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
-	git config --global user.name "$(hostname)"
-	git config --global user.email "kochnorman@rocketmail.com"
-	git config pull.rebase false
-fi
+git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
+git config --global user.name "$(hostname)"
+git config --global user.email "kochnorman@rocketmail.com"
+git config pull.rebase false
 cd -
 
 
