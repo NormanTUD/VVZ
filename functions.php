@@ -8505,8 +8505,12 @@ SE 1/2 oder BZW
 
 	function update_user_role ($user_id, $role_id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `role_to_user` (`role_id`, `user_id`) VALUES ('.esc($role_id).', '.esc($user_id).') ON DUPLICATE KEY UPDATE `role_id` = VALUES(`role_id`)';
-		return simple_query_success_fail_message($query, "Die Rolle wurde erfolgreich zum User hinzugefügt.", "Die Rolle konnte nicht zum User hinzugefügt werden.");
+		if(get_single_row_from_query("select count(*) from role_to_user where role_id = ".esc($role_id)." and user_id = ".esc($user_id))) {
+			warning("Die gewählte Kombination aus Benutzer-ID und Rollen-ID existierte bereits. Sie wurde nicht erneut eingefügt.");
+		} else {
+			$query = 'INSERT INTO `role_to_user` (`role_id`, `user_id`) VALUES ('.esc($role_id).', '.esc($user_id).') ON DUPLICATE KEY UPDATE `role_id` = VALUES(`role_id`)';
+			return simple_query_success_fail_message($query, "Die Rolle wurde erfolgreich zum User hinzugefügt.", "Die Rolle konnte nicht zum User hinzugefügt werden.");
+		}
 	}
 
 	function create_hour_from_to ($from, $to, $array = 0) {
