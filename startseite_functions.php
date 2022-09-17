@@ -845,7 +845,7 @@
 	function show_veranstaltung_box ($id, $name, $abgabe_pruefungsleistungen, $related_veranstaltung, $stunde, $woche, $row, $hinweis, $veranstaltungstyp, $raum_gebaeude, $dozent, $relevante_module_string, $master_niveau, $erster_termin, $opal, $pruefungen) {
 ?>
 		<div class="row">
-			<div class="medium-4">
+			<div class="">
 				<div class="callout">
 <?php
 					show_veranstaltungsbox_full_header($id, $stunde, $woche, $row, $hinweis, $veranstaltungstyp, $raum_gebaeude);
