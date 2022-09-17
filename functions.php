@@ -2750,6 +2750,8 @@ declare(ticks=1);
 				if($result) {
 					return $result;
 				} else {
+					$is_in_db = 0;
+
 					eval(check_values(
 						[
 							array("table" => "raum", "col" => "gebaeude_id", "name" => "Gebäude"),
@@ -2757,10 +2759,17 @@ declare(ticks=1);
 						]
 					));
 
-					$query = 'INSERT INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
-					$results = rquery($query);
+					if(!get_single_row_from_query("select count(*) from raum where gebaeude_id = ".esc($gebaeude_id)." and raumnummer = ".esc($raumnummer))) {
+						$query = 'INSERT INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
+						$results = rquery($query);
+						if($results) {
+							$is_in_db;
+						}
+					} else {
+						$is_in_db = 1;
+					}
 
-					if($results) {
+					if($is_in_db) {
 						$id = get_raum_id($gebaeude_id, $raumnummer);
 						if($id) {
 							success('Raum eingefügt.');
