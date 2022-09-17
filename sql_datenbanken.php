@@ -545,51 +545,6 @@
   CONSTRAINT `modul_id_key` FOREIGN KEY (`modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
-'ua_os' => 'create table if not exists `ua_os` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
-
-'ua_specific_os' => 'create table if not exists `ua_specific_os` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name_id` int(10) unsigned DEFAULT NULL,
-  `version` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name_version` (`name_id`,`version`),
-  CONSTRAINT `ua_specific_os_ibfk_1` FOREIGN KEY (`name_id`) REFERENCES `ua_os` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
-
-'ua_call' => 'create table if not exists `ua_call` (
-  `specific_os_id` int unsigned NOT NULL DEFAULT 0,
-  `specific_browser_id` int unsigned NOT NULL DEFAULT 0,
-  `c` int unsigned DEFAULT NULL,
-  `month` int unsigned NOT NULL,
-  `year` int unsigned NOT NULL,
-  `day` int unsigned DEFAULT NULL,
-  PRIMARY KEY (`specific_os_id`,`specific_browser_id`,`month`,`year`),
-  KEY `specific_browser_id` (`specific_browser_id`),
-  CONSTRAINT `ua_call_ibfk_1` FOREIGN KEY (`specific_os_id`) REFERENCES `ua_specific_os` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `ua_call_ibfk_2` FOREIGN KEY (`specific_browser_id`) REFERENCES `ua_specific_browser` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
-
-'ua_browser' => 'create table if not exists `ua_browser` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
-
-'ua_specific_browser' => 'create table if not exists `ua_specific_browser` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name_id` int unsigned DEFAULT NULL,
-  `version` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name_version` (`name_id`,`version`),
-  CONSTRAINT `ua_specific_browser_ibfk_1` FOREIGN KEY (`name_id`) REFERENCES `ua_browser` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
-
 'customizations' => 'create table if not exists customizations (id int unsigned primary key AUTO_INCREMENT, humanname varchar(100), classname varchar(100), property varchar(100), val varchar(100), default_val varchar(100))',
 
 'initialized_db' => 'create table if not exists initialized_db (id int unsigned primary key AUTO_INCREMENT, name varchar(200) unique)'
@@ -601,8 +556,6 @@
 		"view_veranstaltung_nach_modul" => "create view if not exists `view_veranstaltung_nach_modul` AS select `m`.`name` AS `modulname`,`m`.`id` AS `modul_id`,`v`.`id` AS `veranstaltung_id`,`v`.`name` AS `name`,`m`.`studiengang_id` AS `veranstaltung_name` from ((`pruefungsnummer` `pn` left join (`veranstaltung` `v` join `pruefung` `p` on(`v`.`id` = `p`.`veranstaltung_id`)) on(`pn`.`id` = `p`.`pruefungsnummer_id`)) join `modul` `m` on(`pn`.`modul_id` = `m`.`id`)) where 1;",
 
 		"view_veranstaltung_nach_studiengang" => "create view if not exists `view_veranstaltung_nach_studiengang` AS select `vm`.`veranstaltung_id` AS `veranstaltung_id`,`vm`.`modul_id` AS `modul_id`,`m`.`studiengang_id` AS `studiengang_id`,`s`.`name` AS `studiengang_name` from ((`view_veranstaltung_nach_modul` `vm` left join `modul` `m` on(`m`.`id` = `vm`.`modul_id`)) join `studiengang` `s` on(`m`.`studiengang_id` = `s`.`id`));",
-
-		"ua_overview" => "create view if not exists `ua_overview` AS select `o`.`name` AS `os_name`,`so`.`version` AS `os_version`,`b`.`name` AS `browser_name`,`sb`.`version` AS `browser_version`,`c`.`c` AS `c`,`c`.`year` AS `year`,`c`.`month` AS `month`,`c`.`day` AS `day` from ((((`ua_call` `c` left join `ua_specific_browser` `sb` on(`sb`.`id` = `c`.`specific_browser_id`)) left join `ua_browser` `b` on(`b`.`id` = `sb`.`name_id`)) left join `ua_specific_os` `so` on(`so`.`id` = `c`.`specific_os_id`)) left join `ua_os` `o` on(`o`.`id` = `so`.`name_id`));",
 
 		"view_account_to_role_pages" => "create view if not exists `view_account_to_role_pages` AS select `p`.`id` AS `page_id`,`p`.`name` AS `name`,`p`.`file` AS `file`,`ru`.`user_id` AS `user_id`,`p`.`show_in_navigation` AS `show_in_navigation`,`p`.`parent` AS `parent` from ((`role_to_user` `ru` join `role_to_page` `rp` on(`rp`.`role_id` = `ru`.`role_id`)) join `page` `p` on(`p`.`id` = `rp`.`page_id`));",
 
