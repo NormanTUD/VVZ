@@ -4754,7 +4754,7 @@ INSERT INTO
 			$id = get_single_row_from_query($idquery);
 
 			if($id) {
-				update_role_to_page_page_info_hinweis ($id, $role_to_page, $beschreibung, $hinweis);
+				update_role_to_page_page_info_hinweis($id, $role_to_page, $beschreibung, $hinweis);
 
 				success('Die Seite wurde erfolgreich hinzugefügt.');
 			} else {
