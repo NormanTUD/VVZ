@@ -4736,7 +4736,17 @@ INSERT INTO
 		if($parent == "") {
 			$parent = null;
 		}
-		$query = 'INSERT IGNORE INTO `'.$GLOBALS['dbname'].'`.`page` (`name`, `file`, `show_in_navigation`, `parent` ) VALUES ('.esc(array($name, $file, $show_in_navigation, $parent)).')';
+
+		eval(check_values(
+			[
+				array("table" => "page", "col" => "name", "name" => "Name"),
+				array("table" => "page", "col" => "file", "name" => "Datei"),
+				array("table" => "page", "col" => "show_in_navigation", "name" => "Zeige in Navigation"),
+				array("table" => "page", "col" => "parent", "name" => "Parent")
+			]
+		));
+
+		$query = 'INSERT INTO `'.$GLOBALS['dbname'].'`.`page` (`name`, `file`, `show_in_navigation`, `parent`) VALUES ('.esc(array($name, $file, $show_in_navigation, $parent)).') on duplicate key update file=values(file), show_in_navigation=values(show_in_navigation), parent=values(parent)';
 		$result = rquery($query);
 		if($result) {
 			$idquery = 'SELECT LAST_INSERT_ID()';
