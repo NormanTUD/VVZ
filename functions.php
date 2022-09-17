@@ -3528,7 +3528,7 @@ WHERE 1
 					]
 				));
 
-				$query = 'INSERT IGNORE INTO `gebaeude` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
+				$query = 'INSERT INTO `gebaeude` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
 				return simple_query_success_fail_message($query, 'Das Gebäude wurde erfolgreich eingetragen.', 'Das Gebäude konnte nicht eingetragen werden.');
 			} else {
 				warning("Das Gebäude ".htmlentities($name ?? "")." existierte bereits und wird nicht neu angelegt");
