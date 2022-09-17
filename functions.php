@@ -3575,8 +3575,18 @@ WHERE 1
 
 	function create_pruefungstyp ($name) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `pruefungstyp` (`name`) VALUES ('.esc($name).')';
-		return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich eingetragen.', 'Der Prüfungstyp konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from pruefungstyp where name = ".esc($name))) {
+			eval(check_values(
+				[
+					array("table" => "pruefungstyp", "col" => "name", "name" => "Name"),
+				]
+			));
+
+			$query = 'INSERT IGNORE INTO `pruefungstyp` (`name`) VALUES ('.esc($name).')';
+			return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich eingetragen.', 'Der Prüfungstyp konnte nicht eingetragen werden.');
+		} else {
+			warning("Der Prüfungstyp ".htmlentities($name)." existierte bereits. Er wird nicht neu angelegt");
+		}
 	}
 
 	function create_pruefung ($pruefungstyp_id, $veranstaltung_id, $name, $pruefungsnummer, $datum, $stunde, $raum) {
