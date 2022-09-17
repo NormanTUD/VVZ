@@ -4810,7 +4810,7 @@ INSERT INTO
 				foreach ($role_to_page as $trole) {
 					$rname = get_role_name($trole);
 					if($rname) {
-						$query = 'INSERT IGNORE INTO `'.$GLOBALS['dbname'].'`.`role_to_page` (`role_id`, `page_id`) VALUES ('.esc($trole).', '.esc($id).')';
+						$query = 'INSERT IGNORE INTO `role_to_page` (`role_id`, `page_id`) VALUES ('.esc($trole).', '.esc($id).')';
 						return simple_query_success_fail_message($query, "Die Rolle $rname wurde erfolgreich hinzugefügt.", "Die Rolle $rname konnte nicht eingefügt werden.");
 					} else {
 						error("Die Rolle mit der ID $trole existiert nicht.");
