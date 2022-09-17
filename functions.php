@@ -3592,7 +3592,15 @@ WHERE 1
 
 	function create_studiengang ($name, $institut_id, $studienordnung) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `studiengang` (`name`, `institut_id`, `studienordnung`) VALUES ('.esc($name).', '.esc($institut_id).', '.esc($studienordnung).')';
+		eval(check_values(
+			[
+				array("table" => "studiengang", "col" => "name", "name" => "Name"),
+				array("table" => "studiengang", "col" => "institut_id", "name" => "Institut-ID"),
+				array("table" => "studiengang", "col" => "studienordnung", "name" => "Studienordnung")
+			]
+		));
+
+		$query = 'INSERT INTO `studiengang` (`name`, `institut_id`, `studienordnung`) VALUES ('.esc($name).', '.esc($institut_id).', '.esc($studienordnung).') on duplicatey key update name=values(name), institut_id=values(institut_id), studienordnung=values(studienordnung)';
 		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich eingetragen.', 'Der Studiengang konnte nicht eingetragen werden.');
 	}
 
