@@ -1454,7 +1454,7 @@
 					}
 				}
 ?>
-				<script type="text/javascript">update_pruefungsleistung_cookies(0);</script>
+				<script nonce="<?php print nonce(); ?>" type="text/javascript">update_pruefungsleistung_cookies(0);</script>
 <?php
 			}
 ?>
