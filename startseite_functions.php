@@ -535,7 +535,7 @@
 					}
 ?>
 					<tr>
-						<td colspan="3" class="<?php print $bgc; ?>">Modul: <i><?php print htmle(get_modul_name($this_metadata_id)); ?></i></td>
+						<td colspan="3" class="<?php print $bgc; ?>">Modul: <i class="linebreak_anywhere"><?php print htmle(get_modul_name($this_metadata_id)); ?></i></td>
 					</tr>
 <?php
 					foreach ($this_metadata as $veranstaltungstyp_id => $veranstaltungen_anzahl) {
@@ -754,27 +754,25 @@
 ?>
 		<div class="row">
 			<div class="small-9 columns">
-				<p>
 <?php
-					if($stunde) {
-						$checked = 0;
-						if(get_cookie('additiver_stundenplan')) {
-							$addstd = get_cookie('additiver_stundenplan');
-							$data = explode(',', $addstd);
-							if(in_array($id, $data)) {
-								$checked = 1;
-							}
+				if($stunde) {
+					$checked = 0;
+					if(get_cookie('additiver_stundenplan')) {
+						$addstd = get_cookie('additiver_stundenplan');
+						$data = explode(',', $addstd);
+						if(in_array($id, $data)) {
+							$checked = 1;
 						}
-?>
-						<input <?php if($checked) { print "checked='checked'"; } ?> aria-labelledby="title_vorlesung_id_<?php print $id; ?>" id="checkbox_veranstaltung_<?php print $id; ?>" type="checkbox" name="veranstaltung[]" value="<?php print $id; ?>" />
-<?php
-						$GLOBALS['auswaehlbare_veranstaltungen_counter']++;
 					}
-					$GLOBALS['shown_etwa'] = show_veranstaltungsbox_header($id, $stunde, $woche, $row, $hinweis);
-
-					show_veranstaltungstyp_mdash_if_stunde($veranstaltungstyp, $stunde)
 ?>
-					</p>
+					<input <?php if($checked) { print "checked='checked'"; } ?> aria-labelledby="title_vorlesung_id_<?php print $id; ?>" id="checkbox_veranstaltung_<?php print $id; ?>" type="checkbox" name="veranstaltung[]" value="<?php print $id; ?>" />
+<?php
+					$GLOBALS['auswaehlbare_veranstaltungen_counter']++;
+				}
+				$GLOBALS['shown_etwa'] = show_veranstaltungsbox_header($id, $stunde, $woche, $row, $hinweis);
+
+				show_veranstaltungstyp_mdash_if_stunde($veranstaltungstyp, $stunde)
+?>
 			</div>
 <?php
 			show_raum_gebaeude($raum_gebaeude, $hinweis, $id);
@@ -1440,7 +1438,10 @@
 							}
 ?>
 							<tr>
-								<th>Modul: &raquo;<i><?php print htmle($this_modul[1]); ?></i>&laquo;</th>
+								<th>
+									Modul:
+									&raquo;<i class="linebreak_anywhere"><?php print htmle($this_modul[1]); ?></i>&laquo;
+								</th>
 							</tr>
 <?php
 							show_regelstudienzeitinfo_tabelle($this_modul, $modul_infos);

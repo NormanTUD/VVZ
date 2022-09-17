@@ -6203,7 +6203,7 @@ INSERT INTO
 
 					if($modul_name != $row[2]) {
 						$str .= "\t<tr>\n";
-						$str .= "\t\t<th class='background_color_225599_color_white' colspan='3'>Modul: <i>".htmlentities($row[2])."</i></th>\n";
+						$str .= "\t\t<th class='background_color_225599_color_white' colspan='3'>Modul: <i class='linebreak_anywhere'>".htmlentities($row[2])."</i></th>\n";
 						$str .= "\t</tr>\n";
 
 						$modul_name = $row[2];
@@ -9321,7 +9321,7 @@ SE 1/2 oder BZW
 #dier($this_pruefung);
 ?>
 				<tr>
-					<td class="<?php print $bgc; ?>" colspan="4"><?php print "Studiengang: <i>".htmlentities($studiengang)."</i><br />\nModul: <i>".htmlentities(get_modul_name($this_pruefung[6]))."</i>"; ?>:</td>
+					<td class="<?php print $bgc; ?>" colspan="4"><?php print "Studiengang: <i>".htmlentities($studiengang)."</i><br />\nModul: <i class='linebreak_anywhere'>".htmlentities(get_modul_name($this_pruefung[6]))."</i>"; ?></td>
 				</tr>
 <?php
 				$last_modul_name = $this_modul_id;

@@ -1078,3 +1078,7 @@ a, a:visited, a:hover, a:active {
 .display_inline {
 	display: inline;
 }
+
+.linebreak_anywhere {
+	line-break: anywhere;
+}
