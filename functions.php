@@ -3434,9 +3434,21 @@ WHERE 1
 		return simple_query_success_fail_message($query, 'Der API-Zugang wurde erfolgreich eingetragen.', 'Die API-Zugang konnte nicht eingetragen werden.');
 	}
 
-	function create_pruefungsnummer($modul, $pruefungsnummer, $pruefungstyp, $bereich, $modulbezeichnung, $zeitraum_id) {
+	function create_pruefungsnummer($modul, $pruefungsnummer, $pruefungstyp, $bereich_id, $modulbezeichnung, $zeitraum_id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `bereich_id`, `modulbezeichnung`, `zeitraum_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul).', '.esc($pruefungstyp).', '.esc($bereich).', '.esc($modulbezeichnung).', '.esc($zeitraum_id).')';
+		eval(check_values(
+			[
+				array("table" => "pruefungsnummer", "col" => "pruefungsnummer", "name" => "Prüfungsnummer"),
+				array("table" => "pruefungsnummer", "col" => "modul_id", "name" => "Modul-ID"),
+				array("table" => "pruefungsnummer", "col" => "pruefungstyp_id", "name" => "Prüfungstyp-ID"),
+				array("table" => "pruefungsnummer", "col" => "bereich_id", "name" => "Bereich-ID"),
+				array("table" => "pruefungsnummer", "col" => "modulbezeichnung", "name" => "Modulbezeichnung"),
+				array("table" => "pruefungsnummer", "col" => "zeitraum_id", "name" => "Zeitraum-ID"),
+			]
+		));
+
+
+		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `bereich_id`, `modulbezeichnung`, `zeitraum_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul).', '.esc($pruefungstyp).', '.esc($bereich_id).', '.esc($modulbezeichnung).', '.esc($zeitraum_id).')';
 		$result = rquery($query);
 		if($result) {
 			if(mysqli_affected_rows($GLOBALS['dbh'])) {
@@ -3486,6 +3498,14 @@ WHERE 1
 		if(!preg_match("/^\d+$/", $wie_oft_gestellt)) {
 			$wie_oft_gestellt = 0;
 		}
+
+		eval(check_values(
+			[
+				array("table" => "faq", "col" => "frage", "name" => "Frage"),
+				array("table" => "faq", "col" => "antwort", "name" => "Antwort"),
+				array("table" => "faq", "col" => "wie_oft_gestellt", "name" => "Wie oft gestellt"),
+			]
+		));
 
 		$query = 'INSERT INTO `faq` (`frage`, `antwort`, `wie_oft_gestellt`) VALUES ('.esc($frage).', '.esc($antwort).', '.esc($wie_oft_gestellt).')';
 		return simple_query_success_fail_message($query, 'Der FAQ-Eintrag wurde erfolgreich eingefügt.', 'Der FAQ-Eintrag konnte nicht eingefügt werden.');
@@ -3739,6 +3759,12 @@ WHERE 1
 			warning("Der Bereich &raquo;".htmlentities($name ?? "")."&laquo; existierte bereits und wurde nicht neu eingefügt.");
 			return 0;
 		} else {
+			eval(check_values(
+				[
+					array("table" => "bereich", "col" => "name", "name" => "Name"),
+				]
+			));
+
 			$query = 'INSERT INTO `bereich` (`name`) VALUES ('.esc($name).')';
 			return simple_query_success_fail_message($query, 'Der Bereich wurde erfolgreich eingetragen.', 'Der Bereich konnte nicht eingetragen werden.');
 		}
