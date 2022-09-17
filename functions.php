@@ -3512,7 +3512,7 @@ WHERE 1
 				]
 			));		
 
-			$query = 'INSERT IGNORE INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
+			$query = 'INSERT INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
 			return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich eingetragen.', 'Der Raum konnte nicht eingetragen werden.');
 		} else {
 			warning("Der Raum ".htmlentities($raumnummer ?? "")." im Gebäude mit der ID ".htmlentities($gebaeude_id ?? "")." existierte bereits und wird nicht neu angelegt");
