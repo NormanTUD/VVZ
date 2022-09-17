@@ -118,125 +118,125 @@
 						</tr>
 						<tr>
 							<td>Einheitliche Verwaltung von Dozenten, Vorlesungen und Prüfungsleistungen</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Weniger Fragen von Studenten, weil alle nötigen Infos zentralisiert sind</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 
 						<tr>
 							<td>Automatische Dokumentenerstellung für Prüfungsämter</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Rollenverwaltung (Dozent, Administrator, Raumplaner, ...)</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Funktioniert auch auf älteren Rechnern oder Smartphones</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Dozenten können ihre Veranstaltungen selbst eintragen und verwalten</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Einheitliche Raumplanung</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>FAQ-Unterseite, um häufige Studentenfragen schneller zu beantworten</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Ihre eigene URL der Form <?php print htmlentities($_SERVER['HTTP_HOST'] ?? ""); ?>/v/name_ihrer_uni</td>
-							<td>&#10060;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Unterstützung bei technischen Problemen</td>
-							<td>&#10060;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Automatische tägliche Backups</td>
-							<td>&#10060;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Monatlich Änderungswünsche bis zum Wert von 1000 € inkludiert</td>
-							<td>&#10060;</td>
-							<td>&#10060;</td>
-							<td>&#10060;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 
 						<tr>
 							<td>JSON-API</td>
-							<td>&#9989;</td>
-							<td>&#10060;</td>
-							<td>&#10060;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Halbautomatischer Stundenplanersteller für Studenten</td>
-							<td>&#9989;</td>
-							<td>&#10060;</td>
-							<td>&#10060;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Priorisierter Support</td>
-							<td>&#10060;</td>
-							<td>&#10060;</td>
-							<td>&#10060;</td>
-							<td>&#9989;</td>
-							<td>&#9989;</td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_red_cross_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
+							<td><?php print_checkbox_symbol(); ?></td>
 						</tr>
 						<tr>
 							<td>Einrichtungsgebühr</td>
