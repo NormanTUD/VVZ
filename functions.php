@@ -5261,6 +5261,13 @@ INSERT INTO
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if(get_page_name_by_id($page_id)) {
 			if($hinweis) {
+				eval(check_values(
+					[
+						array("table" => "hinweise", "col" => "page_id", "name" => "Seiten-ID"),
+						array("table" => "hinweise", "col" => "hinweis", "name" => "Hinweis"),
+					]
+				));
+
 				$query = 'INSERT INTO `hinweise` (`page_id`, `hinweis`) VALUES ('.esc($page_id).', '.esc($hinweis).') ON DUPLICATE KEY UPDATE `hinweis` = '.esc($hinweis);
 				return simple_query_success_fail_message($query, 'Der neue Hinweis wurde erfolgreich geändert.', null, 'Der Hinweis konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 			} else {
