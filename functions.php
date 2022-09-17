@@ -3504,8 +3504,19 @@ WHERE 1
 
 	function create_raum ($gebaeude_id, $raumnummer) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		$query = 'INSERT IGNORE INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
-		return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich eingetragen.', 'Der Raum konnte nicht eingetragen werden.');
+		if(!get_single_row_from_query("select count(*) from raum where gebaeude_id = ".esc($gebaeude_id)." and raumnummer = ".esc($raumnummer))) {
+			eval(check_values(
+				[
+					array("table" => "raum", "col" => "gebaeude_id", "name" => "Gebäude"),
+					array("table" => "raum", "col" => "raumnummer", "name" => "Raumnummer")
+				]
+			));		
+
+			$query = 'INSERT IGNORE INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
+			return simple_query_success_fail_message($query, 'Der Raum wurde erfolgreich eingetragen.', 'Der Raum konnte nicht eingetragen werden.');
+		} else {
+			warning("Der Raum ".htmlentities($raumnummer ?? "")." im Gebäude mit der ID ".htmlentities($gebaeude_id ?? "")." existierte bereits und wird nicht neu angelegt");
+		}
 	}
 
 	function create_studiengang ($name, $institut_id, $studienordnung) {
@@ -3582,7 +3593,7 @@ WHERE 1
 				]
 			));
 
-			$query = 'INSERT IGNORE INTO `pruefungstyp` (`name`) VALUES ('.esc($name).')';
+			$query = 'INSERT INTO `pruefungstyp` (`name`) VALUES ('.esc($name).')';
 			return simple_query_success_fail_message($query, 'Der Prüfungstyp wurde erfolgreich eingetragen.', 'Der Prüfungstyp konnte nicht eingetragen werden.');
 		} else {
 			warning("Der Prüfungstyp ".htmlentities($name)." existierte bereits. Er wird nicht neu angelegt");
