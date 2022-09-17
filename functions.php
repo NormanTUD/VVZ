@@ -3496,7 +3496,7 @@ WHERE 1
 				]
 			));
 
-			$query = 'INSERT IGNORE INTO `veranstaltungstyp` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
+			$query = 'INSERT INTO `veranstaltungstyp` (`abkuerzung`, `name`) VALUES ('.esc($abkuerzung).', '.esc($name).')';
 			return simple_query_success_fail_message($query, 'Der Veranstaltungstyp wurde erfolgreich eingetragen.', 'Der Veranstaltungstyp konnte nicht eingetragen werden.');
 		} else {
 			warning("Der Veranstaltungstyp ".htmlentities($name ?? "")." (Abkürzung: ".htmlentities($abkuerzung ?? "")." existierte bereits und wurde nicht neu angelegt");
