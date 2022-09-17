@@ -17,7 +17,7 @@
 ?>
 			<form method="get" action="admin">
 				<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
-				Studiengang: <?php create_select(create_studiengang_array_by_institut_id_str(), $studiengang, 'studiengang'); ?>
+				Studiengang: <?php create_select(create_studiengang_array_by_institut_id_str(), $studiengang, 'studiengang', 0, 1); ?>
 				<input type="submit" value="Filtern" />
 			</form>
 			<br />
