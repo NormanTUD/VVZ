@@ -90,7 +90,7 @@
 'raum' => 'create table if not exists `raum` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `gebaeude_id` int(10) unsigned NOT NULL,
-  `raumnummer` varchar(10) NOT NULL,
+  `raumnummer` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `gebaeude_raum` (`gebaeude_id`,`raumnummer`),
   CONSTRAINT `raum_ibfk_1` FOREIGN KEY (`gebaeude_id`) REFERENCES `gebaeude` (`id`) ON DELETE CASCADE
