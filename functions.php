@@ -2735,7 +2735,7 @@ declare(ticks=1);
 		}
 	}
 
-	function get_and_create_raum_id ($gebaeude_id, $name, $raumplanung = 0) {
+	function get_and_create_raum_id ($gebaeude_id, $raumnummer, $raumplanung = 0) {
 		if(!preg_match('/^\d+$/', $gebaeude_id)) {
 			$tmessage = 'Gebäude-ID wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt. ';
 			if($raumplanung) {
@@ -2744,8 +2744,8 @@ declare(ticks=1);
 				error($tmessage);
 			}
 		} else {
-			if($name) {
-				$result = get_raum_id($gebaeude_id, $name);
+			if($raumnummer) {
+				$result = get_raum_id($gebaeude_id, $raumnummer);
 
 				if($result) {
 					return $result;
@@ -2757,11 +2757,11 @@ declare(ticks=1);
 						]
 					));
 
-					$query = 'INSERT INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($name).')';
+					$query = 'INSERT INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
 					$results = rquery($query);
 
 					if($results) {
-						$id = get_raum_id($gebaeude_id, $name);
+						$id = get_raum_id($gebaeude_id, $raumnummer);
 						if($id) {
 							success('Raum eingefügt.');
 							return $id;
