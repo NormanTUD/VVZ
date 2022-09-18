@@ -121,7 +121,6 @@
 
 	function get_write_icon () {
 		return '<i class="fa fa-pencil" aria-hidden="true"></i>';
-		return "&#x270D;";
 	}
 
 	function print_write_icon () {
@@ -129,7 +128,7 @@
 	}
 
 	function get_warning_icon () {
-		return "&#x26a0;";
+		return '<i class="fa fa-exclamation-triangle yellow_text" aria-hidden="true"></i>';
 	}
 
 	function print_warning_icon () {
