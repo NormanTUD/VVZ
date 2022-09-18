@@ -72,7 +72,7 @@
 	}
 
 	function get_lightning_icon () {
-		return "&#9889;";
+		return '<i class="fa fa-bolt yellow_text" aria-hidden="true"></i>';
 	}
 
 	function print_lightning_icon () {

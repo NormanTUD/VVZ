@@ -542,6 +542,11 @@ a, a:visited, a:hover, a:active {
 	color: green;
 }
 
+.yellow_text {
+	color: yellow;
+}
+
+
 .red_text {
 	color: red;
 }
