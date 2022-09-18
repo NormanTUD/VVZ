@@ -1,6 +1,10 @@
 <?php
+	function get_checkbox_symbol () {
+		return "&#9989;";
+	}
+
 	function print_checkbox_symbol () {
-		print "&#9989;";
+		print get_checkbox_symbol();
 	}
 
 	function print_red_cross_symbol () {

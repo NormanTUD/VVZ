@@ -6749,7 +6749,7 @@ INSERT INTO
 	}
 
 	function html_checked () {
-		return '<span title="Erledigte Prüfung" class="green_large">&#10003;</span>';
+		return '<span title="Erledigte Prüfung" class="green_large">'.get_checkbox_symbol().'</span>';
 	}
 
 	function html_chosen () {
