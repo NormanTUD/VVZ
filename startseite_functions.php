@@ -1673,7 +1673,6 @@
 			<noscript><span class="red_large">Bitte aktivieren Sie JavaScript in Ihrem Browser, um diese Seite vollständig nutzen zu können.</span></noscript> 
 			<div class="row">
 				<div class="medium-2 columns margin_top_margin_bottom_1_rem">
-				<!--<div id="backbutton" class="visibility_hidden"><a onclick="history.back(-1)">&#8630;</i>&nbsp; zurück</a></div>-->
 				</div>
 				<div class="medium-8 columns">
 <?php
