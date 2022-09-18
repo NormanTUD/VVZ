@@ -104,7 +104,7 @@
 	}
 
 	function get_male_teacher_icon () {
-		return "&#x1F9D1;&#x200D;&#x1F3EB;";
+		return '<i class="fa fa-users" aria-hidden="true"></i>';
 	}
 
 	function print_male_teacher_icon () {
@@ -112,7 +112,7 @@
 	}
 
 	function get_female_teacher_icon () {
-		return "&#x1f469;&#x200d;&#x1f3eb;";
+		return '<i class="fa fa-users" aria-hidden="true"></i>';
 	}
 
 	function print_female_teacher_icon () {
