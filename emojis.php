@@ -126,4 +126,12 @@
 	function print_write_icon () {
 		print get_write_icon();
 	}
+
+	function get_warning_icon () {
+		return "&#x26a0;";
+	}
+
+	function print_warning_icon () {
+		print get_warning_icon();
+	}
 ?>

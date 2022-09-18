@@ -9392,7 +9392,7 @@ SE 1/2 oder BZW
 		}
 		$text = preg_replace('/LaTeX/', '<img width="45px" alt="LaTeX" src="'.$base_url.'i/LaTeX.svg">', $text);
 		$text = preg_replace('/\\\\git/', '<img width="45px" alt="git" src="'.$base_url.'i/git.svg">', $text);
-		$text = preg_replace('/\b(warnung|achtung|vorsicht)\b/i', '&#x26a0; \1', $text);
+		$text = preg_replace('/\b(warnung|achtung|vorsicht)\b/i', get_warning_icon().' \1', $text);
 		return $text;
 	}
 

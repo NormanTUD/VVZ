@@ -670,7 +670,7 @@
 
 	function warn_if_attention_match ($hinweis) {
 		if(preg_match('/(warnung|achtung|vorsicht)/i', $hinweis ?? "", $founds)) {
-			print "<span class='calendarlarge' alt='Im Hinweis kommt das Wort ".$founds[1]." vor'>&#x26a0;</span>";
+			print "<span class='calendarlarge' alt='Im Hinweis kommt das Wort ".$founds[1]." vor'>".get_warning_icon()."</span>";
 		}
 	}
 
