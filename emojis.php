@@ -166,4 +166,12 @@
 	function print_building_icon () {
 		print get_building_icon();
 	}
+
+	function get_email_icon () {
+		return '<i class="fa fa-envelope" aria-hidden="true"></i>';
+	}
+
+	function print_email_icon () {
+		print get_email_icon();
+	}
 ?>
