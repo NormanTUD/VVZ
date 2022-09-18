@@ -853,7 +853,7 @@
 					<div class="accordion" data-accordion data-allow-all-closed="true" data-multi-expand="true">
 						<div class="accordion-item" data-accordion-item>
 							<a tabindex="0" id="toggle_details_<?php print $id; ?>" class="toggle_details accordion-title">Details</a>
-							<div id="details_<?php print $id; ?>">
+							<div class="details_class" id="details_<?php print $id; ?>">
 <?php
 							show_hinweis($hinweis);
 							show_abgabe_pruefungsleistungen($abgabe_pruefungsleistungen);

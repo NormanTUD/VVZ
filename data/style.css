@@ -1099,3 +1099,7 @@ a, a:visited, a:hover, a:active {
 .linebreak_anywhere {
 	line-break: anywhere;
 }
+
+.details_class {
+	background-color: #f7f7f7;
+}
