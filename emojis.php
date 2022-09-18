@@ -182,4 +182,12 @@
 	function print_book_icon () {
 		print get_book_icon();
 	}
+
+	function get_edit_icon () {
+		return '<i class="fa fa-pencil-square-o" aria-hidden="true"></i>';
+	}
+
+	function print_edit_icon () {
+		print get_edit_icon();
+	}
 ?>

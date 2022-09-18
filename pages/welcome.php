@@ -57,7 +57,7 @@
 
 				if(check_page_rights(get_page_id_by_filename("anpassen.php"))) {
 ?>
-					<li><a href="admin?page=<?php print get_page_id_by_filename("anpassen.php"); ?>"><span class="utf8symbol">&#127912;</span> Vorlesungverzeichnis personalieren</a></li>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("anpassen.php"); ?>"><span class="utf8symbol"><?php print_edit_icon(); ?></span> Vorlesungverzeichnis personalieren</a></li>
 <?php
 				}
 
