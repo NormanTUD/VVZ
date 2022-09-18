@@ -16,7 +16,7 @@
 	}
 
 	function get_calendar_icon () {
-		return "&#128197;";
+		return '<i class="fa fa-calendar" aria-hidden="true"></i>';
 	}
 
 	function print_calendar_icon () {
