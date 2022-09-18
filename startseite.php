@@ -20,7 +20,8 @@
 			"startseite.css",
 			"bootstrap-tour-standalone.css",
 			"jquery-ui-timepicker-addon.css",
-			"custom.php"
+			"custom.php",
+			"font-awesome.min.css"
 		));
 ?>
 

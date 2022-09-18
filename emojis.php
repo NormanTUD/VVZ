@@ -1,6 +1,6 @@
 <?php
 	function get_checkbox_symbol () {
-		return "&#9989;";
+		return '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
 	}
 
 	function print_checkbox_symbol () {
