@@ -24,7 +24,7 @@
 	}
 
 	function get_search_icon () {
-		return "&#128269;";
+		return '<i class="fa fa-search" aria-hidden="true"></i>';
 	}
 
 	function print_search_icon () {
