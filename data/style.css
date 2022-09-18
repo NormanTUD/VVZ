@@ -538,6 +538,10 @@ a, a:visited, a:hover, a:active {
 	display: none;
 }
 
+.blue_text {
+	color: blue;
+}
+
 .green_text {
 	color: green;
 }
