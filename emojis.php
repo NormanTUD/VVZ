@@ -8,7 +8,7 @@
 	}
 
 	function get_red_cross_symbol () {
-		return "&#10060;";
+		return '<i class="fa-solid fa-xmark"></i>';
 	}
 
 	function print_red_cross_symbol () {
