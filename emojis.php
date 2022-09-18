@@ -32,7 +32,7 @@
 	}
 
 	function get_double_arrow_down_icon () {
-		return "&#8650;";
+		return '<i class="fa fa-angle-double-down" aria-hidden="true"></i>';
 	}
 
 	function print_double_arrow_down_icon () {
