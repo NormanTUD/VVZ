@@ -142,4 +142,12 @@
 	function print_wheelchair_icon () {
 		print get_wheelchair_icon();
 	}
+
+	function get_person_icon () {
+		return '<i class="fa fa-address-card green_text" aria-hidden="true"></i>';
+	}
+
+	function print_person_icon () {
+		print get_person_icon();
+	}
 ?>
