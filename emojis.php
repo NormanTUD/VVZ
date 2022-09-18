@@ -8,7 +8,7 @@
 	}
 
 	function get_red_cross_symbol () {
-		return '<i class="fa-solid fa-xmark red_text"></i>';
+		return '<i class="fa fa-times red_text" aria-hidden="true"></i>';
 	}
 
 	function print_red_cross_symbol () {
