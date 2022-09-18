@@ -7,10 +7,13 @@
 		print get_checkbox_symbol();
 	}
 
-	function print_red_cross_symbol () {
-		print "&#10060;";
+	function get_red_cross_symbol () {
+		return "&#10060;";
 	}
 
+	function print_red_cross_symbol () {
+		print get_red_cross_symbol();
+	}
 
 	function get_calendar_icon () {
 		return "&#128197;";
