@@ -39,4 +39,12 @@
 	function print_worldmap_icon () {
 		print get_worldmap_icon();
 	}
+
+	function get_wrench_icon () {
+		return "&#128295;";
+	}
+
+	function print_wrench_icon () {
+		print get_wrench_icon();
+	}
 ?>

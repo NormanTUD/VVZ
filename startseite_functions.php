@@ -1646,7 +1646,7 @@
 					<a href="startseite?studiengang=<?php print $this_studiengang_id; ?>&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
 						<div class="callout primary"><?php print $GLOBALS['linkicon']; ?><h4><?php
 							if($this_studiengang_name[1] == "Werkstatt Philosophie") {
-								print "&#128295; ";
+								print_wrench_icon();
 							}
 							print htmlentities($this_studiengang_name[1]);
 ?></h4>
