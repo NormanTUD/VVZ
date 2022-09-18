@@ -67,4 +67,12 @@
 	function print_camera_icon () {
 		print get_camera_icon();
 	}
+
+	function get_lightning_icon () {
+		return "&#9889;";
+	}
+
+	function print_lightning_icon () {
+		print get_lightning_icon();
+	}
 ?>

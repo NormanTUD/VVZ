@@ -8207,7 +8207,7 @@ SE 1/2 oder BZW
 								$updated = '';
 								if($j == 1) {
 									if(veranstaltung_raumplanungsrelevante_daten_geupdatet($veranstaltung_id)) {
-										$updated = '<span class="largelightning">&#9889;</span>';
+										$updated = '<span class="largelightning">'.get_lightning_icon().'</span>';
 									}
 
 									print "<td>".htmle(get_typ_abkuerzung_by_veranstaltung_id($veranstaltung_id))."</td>"; # TODO
