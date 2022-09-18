@@ -48,7 +48,7 @@
 	}
 
 	function get_wrench_icon () {
-		return "&#128295;";
+		return '<i class="fa fa-wrench" aria-hidden="true"></i>';
 	}
 
 	function print_wrench_icon () {

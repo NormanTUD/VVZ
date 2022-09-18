@@ -4828,7 +4828,6 @@ INSERT INTO
 			$studienordnung = '';
 		}
 
-
 		eval(check_values(
 			[
 				array("table" => "studiengang", "col" => "name", "name" => "Name"),
@@ -4837,8 +4836,12 @@ INSERT INTO
 			]
 		));
 
-		$query = 'UPDATE `studiengang` SET `name` = '.esc($name).', `institut_id` = '.esc($institut_id).', `studienordnung` = '.esc($studienordnung).' WHERE `id` = '.esc($id);
-		return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich geändert.', null, 'Der Studiengang konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
+		if(!get_single_row_from_query("select count(*) from studiengang where name = ".esc($name)." and institut_id = ".esc($institut_id))) {
+			$query = 'UPDATE `studiengang` SET `name` = '.esc($name).', `institut_id` = '.esc($institut_id).', `studienordnung` = '.esc($studienordnung).' WHERE `id` = '.esc($id);
+			return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich geändert.', null, 'Der Studiengang konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
+		} else {
+			warning("Der Studiengang existierte bereits und wurde nicht neu eingetragen.");
+		}
 	}
 
 	function update_modul ($id, $name, $studiengang_id, $beschreibung, $abkuerzung) {
