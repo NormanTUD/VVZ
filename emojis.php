@@ -102,4 +102,20 @@
 	function print_german_flag () {
 		print get_german_flag();
 	}
+
+	function get_male_teacher_icon () {
+		return "&#x1F9D1;&#x200D;&#x1F3EB;";
+	}
+
+	function print_male_teacher_icon () {
+		return get_male_teacher_icon();
+	}
+
+	function get_female_teacher_icon () {
+		return "&#x1f469;&#x200d;&#x1f3eb;";
+	}
+
+	function print_female_teacher_icon () {
+		print get_female_teacher_icon();
+	}
 ?>

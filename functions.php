@@ -10150,7 +10150,7 @@ order by
 	#dier(parse_csv("a,b,c\nd,e, f\n\ng, h, i", ","));
 
 	function teacher_icon() {
-		$teachers = ["&#x1F9D1;&#x200D;&#x1F3EB;", "&#x1f469;&#x200d;&#x1f3eb;"];
+		$teachers = [get_male_teacher_icon(), get_female_teacher_icon()];
 		$teacher = $teachers[array_rand($teachers, 1)];
 		return '<span class="utf8symbol">'.$teacher.'</span>';
 	}
