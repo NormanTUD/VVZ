@@ -64,7 +64,7 @@
 	}
 
 	function get_camera_icon () {
-		return '<i class="fa fa-camera"></i>';
+		return '<i class="fa fa-video-camera"></i>';
 	}
 
 	function print_camera_icon () {
