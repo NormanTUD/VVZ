@@ -1,4 +1,6 @@
 <?php
+	include_once("emojis.php");
+
 	$flags = array(
 		array("always_accept_public_data" => "Automatisch die Datenschutzabfrage akzeptieren (NUR FÜR DEVELOPER!)"),
 		array("api_debug", "Debugging für die API"),
@@ -25,7 +27,7 @@
 				<tr>
 					<td>/etc/<?php print $row[0]; ?></td>
 					<td><?php print $row[1]; ?></td>
-					<td><?php print file_exists("/etc/".$row[0]) ? '&#9989;' : '&#10060;'; ?></td>
+					<td><?php file_exists("/etc/".$row[0]) ? print_checkbox_symbol() : print_red_cross_symbol(); ?></td>
 				</tr>
 <?php
 			}

@@ -1,5 +1,6 @@
 <?php
 	include_once("kundenkram.php");
+	include_once("emojis.php");
 
 /*
 register_tick_function(function() {
@@ -10210,13 +10211,5 @@ order by
 
 	function get_post_int ($name) {
 		return intval(get_post($name));
-	}
-
-	function print_checkbox_symbol () {
-		print "&#9989;";
-	}
-
-	function print_red_cross_symbol () {
-		print "&#10060;";
 	}
 ?>
