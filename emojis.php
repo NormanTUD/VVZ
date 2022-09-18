@@ -190,4 +190,12 @@
 	function print_edit_icon () {
 		print get_edit_icon();
 	}
+
+	function get_logout_icon () {
+		return '<i class="fa fa-sign-out" aria-hidden="true"></i>';
+	}
+
+	function print_logout_icon () {
+		print get_logout_icon();
+	}
 ?>

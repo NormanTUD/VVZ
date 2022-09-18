@@ -186,7 +186,7 @@
 				</td>
 				<td valign="middle" class="invisiblebg">
 					Willkommen, <?php print htmlentities($dozent_name ?? ""); ?>!
-					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden</a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden <?php print_logout_icon(); ?></a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
 				</td>
 			</tr>
 		</table>

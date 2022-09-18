@@ -1732,7 +1732,7 @@
 				dier($GLOBALS["user_role_id"]);
 			}
 	?>
-			<br />Willkommen, <?php print $dozent_name; ?>! &mdash; <a class="red_large" href="logout.php">Abmelden</a>
+			<br />Willkommen, <?php print $dozent_name; ?>! &mdash; <a class="red_large" href="logout.php">Abmelden <?php print_logout_icon(); ?></a>
 <?php
 		}
 	}
