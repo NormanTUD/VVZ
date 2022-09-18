@@ -134,4 +134,12 @@
 	function print_warning_icon () {
 		print get_warning_icon();
 	}
+
+	function get_wheelchair_icon () {
+		return '<i class="fa fa-wheelchair" aria-hidden="true"></i>';
+	}
+
+	function print_wheelchair_icon () {
+		print get_wheelchair_icon();
+	}
 ?>
