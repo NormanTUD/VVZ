@@ -80,7 +80,7 @@
 	}
 
 	function get_uk_flag () {
-		return "&#127468;&#127463;";
+		return "<img width=32 src='data/uk_flag.svg' />";
 	}
 
 	function print_uk_flag () {
@@ -88,7 +88,7 @@
 	}
 
 	function get_french_flag () {
-		return "&#127467;&#127479;";
+		return "<img width=32 src='data/france_flag.svg' />";
 	}
 
 	function print_french_flag () {
@@ -96,7 +96,7 @@
 	}
 
 	function get_german_flag () {
-		return "&#x1F1E9;&#x1F1EA;";
+		return "<img width=32 src='data/germany_flag.svg' />";
 	}
 
 	function print_german_flag () {
