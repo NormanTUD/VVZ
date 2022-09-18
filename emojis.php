@@ -47,4 +47,12 @@
 	function print_wrench_icon () {
 		print get_wrench_icon();
 	}
+
+	function get_document_icon () {
+		return "&#128196;";
+	}
+
+	function print_document_icon () {
+		print get_document_icon();
+	}
 ?>

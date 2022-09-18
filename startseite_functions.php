@@ -61,7 +61,7 @@
 
 		if ($studienordnung_url) {
 ?>
-			&mdash; <a href="<?php print $studienordnung_url; ?>" id="studienordnung_link" >&#128196;&nbsp;Studienordnung</a>
+		&mdash; <a href="<?php print $studienordnung_url; ?>" id="studienordnung_link" ><?php print_document_icon(); ?>&nbsp;Studienordnung</a>
 <?php
 		}
 	}
