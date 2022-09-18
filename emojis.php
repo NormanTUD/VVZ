@@ -120,6 +120,7 @@
 	}
 
 	function get_write_icon () {
+		return '<i class="fa fa-pencil" aria-hidden="true"></i>';
 		return "&#x270D;";
 	}
 
