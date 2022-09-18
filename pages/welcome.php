@@ -44,7 +44,7 @@
 
 				if(check_page_rights(get_page_id_by_filename("veranstaltungen.php"))) {
 ?>
-					<li><a href="admin?page=<?php print get_page_id_by_filename("veranstaltungen.php"); ?>"><span class="utf8symbol">&#128214;</span> Veranstaltungen bearbeiten</a></li>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("veranstaltungen.php"); ?>"><span class="utf8symbol"><?php print_book_icon(); ?></span> Veranstaltungen bearbeiten</a></li>
 <?php
 				}
 

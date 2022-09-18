@@ -174,4 +174,12 @@
 	function print_email_icon () {
 		print get_email_icon();
 	}
+
+	function get_book_icon () {
+		return '<i class="fa fa-book" aria-hidden="true"></i>';
+	}
+
+	function print_book_icon () {
+		print get_book_icon();
+	}
 ?>
