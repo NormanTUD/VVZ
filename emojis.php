@@ -78,4 +78,28 @@
 	function print_lightning_icon () {
 		print get_lightning_icon();
 	}
+
+	function get_uk_flag () {
+		return "&#127468;&#127463;";
+	}
+
+	function print_uk_flag () {
+		print get_uk_flag();
+	}
+
+	function get_french_flag () {
+		return "&#127467;&#127479;";
+	}
+
+	function print_french_flag () {
+		print get_french_flag();
+	}
+
+	function get_german_flag () {
+		return "&#x1F1E9;&#x1F1EA;";
+	}
+
+	function print_german_flag () {
+		print get_german_flag();
+	}
 ?>
