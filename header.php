@@ -95,13 +95,6 @@
 				"mainscript.php",
 				"bootstrap-tour-standalone.js"
 			));
-
-			/*
-			if(!file_exists('/etc/x11test')) {
-				css("snake.css");
-				js("snake.js");
-			}
-			 */
 		?>
 <?php
 		if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id']) {
@@ -116,9 +109,7 @@
 				js("merlin.js");
 			}
 		}
-		if($GLOBALS['show_snow']) {
-			js(array("snowflakes.min.js", "snowflakesinit.js"));
-		}
+
 		if(basename($_SERVER['SCRIPT_NAME']) == 'api.php') {
 			js(array("Chart.bundle.js", "utils.js"));
 		}

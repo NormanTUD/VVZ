@@ -134,17 +134,12 @@ declare(ticks=1);
 
 	$GLOBALS['memoize'] = array();
 
-	$GLOBALS['show_snow'] = 0;
 	$GLOBALS['show_comic_sans'] = 0;
 
 	$GLOBALS['datadir'] = './data/';
 
 	if((date('d') == 1 && date('m') == 4 && 0) || get_get('show_comic_sans') || get_get('comic_sans') || file_exists('/etc/vvz_comic_sans')) {
 		$GLOBALS['show_comic_sans'] = 1;
-	}
-
-	if((date('d') == 24 || date('d') == 25 || date('d') == 26) && date('m') == 12 || get_get('snow') || file_exists('/etc/vvz_snow')) {
-		$GLOBALS['show_snow'] = 1;
 	}
 
 	include('mysql.php');

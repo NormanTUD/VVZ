@@ -239,8 +239,6 @@
 				$installation_age = get_single_row_from_query("select now() - installation_date from ".get_kunden_db_name().".instance_config");
 				$ablauftimer = seconds2human((86400 * 7) - $installation_age);
 				$str = "<span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiben noch ".$ablauftimer." zum Testen.<br>Sie können die Adresse in der Adresszeile mit Ihren Kollegen teilen.<br>Der Standardnutzer ist <tt>Admin</tt>/<tt>test</tt></span><br>";
-				//$str .= "<a onclick='start_tour();'>&#129497;&#8205;&#9794;&#65039; Tour</a>"; // TODO
-
 				return $str;
 			}
 		} catch (\Throwable $e) {
