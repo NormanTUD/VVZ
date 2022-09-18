@@ -31,7 +31,7 @@
 				if(isset($aktuelles_semester) && isset($GLOBALS['user_dozent_id'])) {
 ?>
 				
-					<li><a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>"><span class="utf8symbol">&#128467;</span> Eigenen Stundenplan für das aktuelle Semester anzeigen</a></li>
+				<li><a href="startseite?create_stundenplan=1&semester=<?php print $aktuelles_semester; ?>&dozent[]=<?php print $GLOBALS['user_dozent_id']; ?>"><span class="utf8symbol"><?php print_calendar_icon(); ?></span> Eigenen Stundenplan für das aktuelle Semester anzeigen</a></li>
 <?php
 				}
 ?>

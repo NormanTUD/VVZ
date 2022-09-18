@@ -6722,9 +6722,9 @@ INSERT INTO
 		$first = $GLOBALS['shown_help_ids']['calendar'];
 		if($first) {
 			$GLOBALS['shown_help_ids']['calendar'] = 1;
-			return '<span class="calendarlarge" id="ical_item" title="iCal-Kalendardatei">&#128467;</span>';
+			return '<span class="calendarlarge" id="ical_item" title="iCal-Kalendardatei">'.get_calendar_icon().'</span>';
 		} else {
-			return '<span class="calendarlarge" title="iCal-Kalendardatei">&#128467;</span>';
+			return '<span class="calendarlarge" title="iCal-Kalendardatei">'.get_calendar_icon().'</span>';
 		}
 	}
 
