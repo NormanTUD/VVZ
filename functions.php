@@ -6753,7 +6753,7 @@ INSERT INTO
 	}
 
 	function html_chosen () {
-		return '<span title="Geplante Prüfung" class="blue_large">&#x1f58a;</span>';
+		return '<span title="Geplante Prüfung" class="blue_large">'.get_write_icon().'</span>';
 	}
 
 	function create_pruefungsnummern_array_by_modul_id ($modul_id = '', $show_disabled = 0) {
