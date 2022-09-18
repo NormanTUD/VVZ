@@ -150,4 +150,20 @@
 	function print_person_icon () {
 		print get_person_icon();
 	}
+
+	function get_person_add_icon () {
+		return '<i class="fa fa-user-plus" aria-hidden="true"></i>';
+	}
+
+	function print_person_add_icon () {
+		print get_person_add_icon();
+	}
+
+	function get_building_icon () {
+		return '<i class="fa fa-building" aria-hidden="true"></i>';
+	}
+
+	function print_building_icon () {
+		print get_building_icon();
+	}
 ?>

@@ -38,7 +38,7 @@
 <?php
 				if(check_page_rights(get_page_id_by_filename("neuerdozent.php"))) {
 ?>
-					<li><a href="admin?page=<?php print get_page_id_by_filename("neuerdozent.php"); ?>"><span class='utf8symbol'><?php print_person_icon(); ?></span> Dozenten hinzufügen</a></li>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("neuerdozent.php"); ?>"><span class='utf8symbol'><?php print_person_add_icon(); ?></span> Dozenten hinzufügen</a></li>
 <?php
 				}
 
@@ -51,7 +51,7 @@
 
 				if(check_page_rights(get_page_id_by_filename("raumplanung.php"))) {
 ?>
-					<li><a href="admin?page=<?php print get_page_id_by_filename("raumplanung.php"); ?>"><span class="utf8symbol">&#x1f3e2;</span> Raumplanung</a></li>
+					<li><a href="admin?page=<?php print get_page_id_by_filename("raumplanung.php"); ?>"><span class="utf8symbol"><?php print get_building_icon(); ?></span> Raumplanung</a></li>
 <?php
 				}
 
