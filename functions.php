@@ -3430,7 +3430,7 @@ WHERE 1
 		return simple_query_success_fail_message($query, 'Der API-Zugang wurde erfolgreich eingetragen.', 'Die API-Zugang konnte nicht eingetragen werden.');
 	}
 
-	function create_pruefungsnummer($modul, $pruefungsnummer, $pruefungstyp, $bereich_id, $modulbezeichnung, $zeitraum_id) {
+	function create_pruefungsnummer($modul_id, $pruefungsnummer, $pruefungstyp_id, $bereich_id, $modulbezeichnung, $zeitraum_id) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		eval(check_values(
 			[
@@ -3444,7 +3444,7 @@ WHERE 1
 		));
 
 
-		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `bereich_id`, `modulbezeichnung`, `zeitraum_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul).', '.esc($pruefungstyp).', '.esc($bereich_id).', '.esc($modulbezeichnung).', '.esc($zeitraum_id).')';
+		$query = 'INSERT IGNORE INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `bereich_id`, `modulbezeichnung`, `zeitraum_id`) VALUES ('.esc($pruefungsnummer).', '.esc($modul_id).', '.esc($pruefungstyp_id).', '.esc($bereich_id).', '.esc($modulbezeichnung).', '.esc($zeitraum_id).')';
 		$result = rquery($query);
 		if($result) {
 			if(mysqli_affected_rows($GLOBALS['dbh'])) {
