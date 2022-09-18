@@ -40,7 +40,7 @@
 	}
 
 	function get_worldmap_icon () {
-		return "&#128506;";
+		return '<i class="fa fa-globe" aria-hidden="true"></i>';
 	}
 
 	function print_worldmap_icon () {
