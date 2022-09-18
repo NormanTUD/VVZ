@@ -6135,7 +6135,7 @@ INSERT INTO
 						$alt_text = preg_replace("/\n/", "<br />", $alt_text);
 						$veranstaltung_text = $alt_text;
 					}
-					$str .= '<td class="stundenplan_td"><div class="display_none" id="edit_veranstaltung_'.$id.'_div"><textarea class="autoExpand display_none" id="edit_veranstaltung_'.$id.'">'.my_strip_tags($veranstaltung_text).'</textarea></div><span id="original_veranstaltung_text_'.$id.'">'.$veranstaltung_text."</span><a id='click_to_edit_veranstaltung_$id'>&#x270D;</a></td>\n";
+					$str .= '<td class="stundenplan_td"><div class="display_none" id="edit_veranstaltung_'.$id.'_div"><textarea class="autoExpand display_none" id="edit_veranstaltung_'.$id.'">'.my_strip_tags($veranstaltung_text).'</textarea></div><span id="original_veranstaltung_text_'.$id.'">'.$veranstaltung_text."</span><a id='click_to_edit_veranstaltung_$id'>".get_write_icon()."</a></td>\n";
 				}
 				$str .= "</tr>\n";
 			}

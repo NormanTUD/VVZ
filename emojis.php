@@ -118,4 +118,12 @@
 	function print_female_teacher_icon () {
 		print get_female_teacher_icon();
 	}
+
+	function get_write_icon () {
+		return "&#x270D;";
+	}
+
+	function print_write_icon () {
+		print get_write_icon();
+	}
 ?>
