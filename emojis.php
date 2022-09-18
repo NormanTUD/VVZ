@@ -56,7 +56,7 @@
 	}
 
 	function get_document_icon () {
-		return "&#128196;";
+		return '<i class="fa fa-file light_gray_text" aria-hidden="true"></i>';
 	}
 
 	function print_document_icon () {

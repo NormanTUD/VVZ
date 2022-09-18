@@ -542,6 +542,10 @@ a, a:visited, a:hover, a:active {
 	color: green;
 }
 
+.light_gray_text {
+	color: #BEBEBE;
+}
+
 .yellow_text {
 	color: yellow;
 }

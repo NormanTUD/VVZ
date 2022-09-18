@@ -8,7 +8,7 @@
 	<div id="mainindex" class="mainindex_faq">
 <?php
 	ob_start();
-	system('cat emojis.php | grep "function print" | sed -e "s/.*function //" | sed -e "s/ .*//" | sort | sed -e "s/$/();/"');
+	system("cat emojis.php | grep 'function get_' | sed -e 's/.*function //' | sed -e 's/ .*//' | sort | sed -e 's/$/().\"<br>\";/' | sed -e 's/^/print /'");
 	$x = ob_get_clean();
 	eval($x);
 ?>
