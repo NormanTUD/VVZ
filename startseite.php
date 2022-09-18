@@ -21,8 +21,10 @@
 			"bootstrap-tour-standalone.css",
 			"jquery-ui-timepicker-addon.css",
 			"custom.php",
-			"font-awesome.min.css"
+			//"font-awesome.min.css"
 		));
+
+		js("f87f2e7625.js");
 ?>
 
 		<!-- Container element -->
