@@ -15,4 +15,12 @@
 	function print_calendar_icon () {
 		print get_calendar_icon();
 	}
+
+	function get_search_icon () {
+		return "&#128269;";
+	}
+
+	function print_search_icon () {
+		print get_search_icon();
+	}
 ?>

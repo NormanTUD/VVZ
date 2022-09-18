@@ -1033,7 +1033,7 @@
 	function show_veranstaltungsuebersicht_header () {
 ?>
 		<div class="font20px">
-			<a id="filter_toggle">&#128269;&nbsp;Filter</a> &mdash;
+			<a id="filter_toggle"><?php print_search_icon(); ?>&nbsp;Filter</a> &mdash;
 			<a id="toggle_all_details">&#8650;&nbsp;Details anzeigen/ausblenden</a>
 <?php
 			stundenplanerstellung_link();
