@@ -82,7 +82,7 @@
 					print '&institut='.htmlentities(get_get('institut'));
 				}
 
-			?>">&#128197;&nbsp;Stundenplanerstellung</a>
+			?>"><?php print_calendar_icon(); ?>&nbsp;Stundenplanerstellung</a>
 <?php
 		}
 	}

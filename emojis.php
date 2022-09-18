@@ -9,7 +9,7 @@
 
 
 	function get_calendar_icon () {
-		return "&#128467;";
+		return "&#128197;";
 	}
 
 	function print_calendar_icon () {
