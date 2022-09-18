@@ -23,4 +23,12 @@
 	function print_search_icon () {
 		print get_search_icon();
 	}
+
+	function get_double_arrow_down_icon () {
+		return "&#8650;";
+	}
+
+	function print_double_arrow_down_icon () {
+		print get_double_arrow_down_icon();
+	}
 ?>

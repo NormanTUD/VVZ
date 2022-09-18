@@ -1034,7 +1034,7 @@
 ?>
 		<div class="font20px">
 			<a id="filter_toggle"><?php print_search_icon(); ?>&nbsp;Filter</a> &mdash;
-			<a id="toggle_all_details">&#8650;&nbsp;Details anzeigen/ausblenden</a>
+			<a id="toggle_all_details"><?php print_double_arrow_down_icon(); ?>&nbsp;Details anzeigen/ausblenden</a>
 <?php
 			stundenplanerstellung_link();
 			studienordnung_link();
