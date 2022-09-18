@@ -1,6 +1,6 @@
 <?php
 	function get_checkbox_symbol () {
-		return '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+		return '<i class="fa fa-check-square-o green_text" aria-hidden="true"></i>';
 	}
 
 	function print_checkbox_symbol () {
@@ -8,7 +8,7 @@
 	}
 
 	function get_red_cross_symbol () {
-		return '<i class="fa-solid fa-xmark"></i>';
+		return '<i class="fa-solid fa-xmark red_text"></i>';
 	}
 
 	function print_red_cross_symbol () {
