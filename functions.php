@@ -10008,7 +10008,7 @@ order by
 		$query = 'select videolink from veranstaltung_metadaten where veranstaltung_id = '.esc($v_id);
 		$row = get_single_row_from_query($query);
 		if($row) {
-			return "&nbsp;<a target='_blank' href='".htmlentities($row)."'>&#128249;</a>";
+			return "&nbsp;<a target='_blank' href='".htmlentities($row)."'>".get_camera_icon()."</a>";
 		}
 		return "";
 	}

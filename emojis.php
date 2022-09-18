@@ -55,4 +55,12 @@
 	function print_document_icon () {
 		print get_document_icon();
 	}
+
+	function get_camera_icon () {
+		return "&#128249;";
+	}
+
+	function print_camera_icon () {
+		print get_camera_icon();
+	}
 ?>
