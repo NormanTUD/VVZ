@@ -31,4 +31,12 @@
 	function print_double_arrow_down_icon () {
 		print get_double_arrow_down_icon();
 	}
+
+	function get_worldmap_icon () {
+		return "&#128506;";
+	}
+
+	function print_worldmap_icon () {
+		print get_worldmap_icon();
+	}
 ?>

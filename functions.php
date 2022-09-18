@@ -6739,10 +6739,9 @@ INSERT INTO
 			$url = "https://www.openstreetmap.org/?mlat=$lat&mlon=$lon&zoom=18'";
 			if($first) {
 				$GLOBALS['shown_help_ids']['google_maps_icon'] = 1;
-				#return "<a class='calendarlarge' id='google_maps_icon' href='http://maps.google.com/maps?q=$lat,$lon'>&#128506;</a>";
-				return "<a class='calendarlarge' id='google_maps_icon' href='$url>&#128506;</a>";
+				return "<a class='calendarlarge' id='google_maps_icon' href='$url>".get_worldmap_icon()."</a>";
 			} else {
-				return "<a class='calendarlarge' href='$url'>&#128506;</a>";
+				return "<a class='calendarlarge' href='$url'>".get_worldmap_icon()."</a>";
 			}
 		} else {
 			return '';
