@@ -20,13 +20,17 @@
 <!DOCTYPE html>
 <html lang="de">
 	<head>
-		<meta http-equiv="Content-Security-Policy" content="<?php print $GLOBALS["csp_string"]; ?>">
+<?php
+		#<meta http-equiv="Content-Security-Policy" content="<?php print $GLOBALS["csp_string"]; ? >">
+?>
 		<meta charset="UTF-8" />
 		<!-- Hey, wenn du die Daten dieser Seite brauchst, dann guck doch einfach in die API! Dann brauchst du hier nicht versuchen, HTML mit Regexen zu parsen... -->
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link nonce="<?php print nonce(); ?>" rel="icon" href="favicon.ico" type="image/x-icon" />
 
-		<meta http-equiv="X-WebKit-CSP" content="<?php print $GLOBALS['csp_string']; ?>">
+<?php
+		#<meta http-equiv="X-WebKit-CSP" content="<?php print $GLOBALS['csp_string']; ? >">
+?>
 
 		<meta name="description" content="Vorlesungsverzeichnis">
 		<meta name="keywords" content="Vorlesungsverzeichnis, <?php print $GLOBALS['university_name']; ?>">

@@ -51,6 +51,7 @@ declare(ticks=1);
 		$GLOBALS["auto_login_id"] = null;
 	}
 
+/*
 	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "img-src 'self' data: 'nonce-".nonce()."' ; ";
@@ -58,6 +59,7 @@ declare(ticks=1);
 	header("Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("X-Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("WebKit-CSP: \"default-src 'self'\"");
+*/
 
 	// Definition globaler Variablen
 	$GLOBALS['backtraces'] = array();

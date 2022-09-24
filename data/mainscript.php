@@ -621,6 +621,26 @@ $(document).ready(function() {
 
 	$(".reset_value_button").on("click", reset_value);
 	$("#toggle_ok").on("click", toggle_ok);
+
+
+		$( "#globalsearch" ).autocomplete({
+			source: function( request, response ) {
+				$.ajax( {
+					url: "search.php",
+					dataType: "jsonp",
+					data: {
+						term: request.term
+					},
+					success: function( data ) {
+						response( data );
+					}
+				} );
+			},
+			minLength: 1,
+			select: function( event, ui ) {
+				log( "Selected: " + ui.item.value + " aka " + ui.item.id );
+			}
+		} );
 });
 
 
