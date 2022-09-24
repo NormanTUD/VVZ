@@ -351,10 +351,6 @@
 	if(get_get("institut") && preg_match('/^\d+$/', get_get('institut'))) {
 		$GLOBALS['this_institut'] = get_get('institut');
 	} else {
-		if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
-			$GLOBALS['this_institut'] = $GLOBALS['institute'][keys($GLOBALS["institute"])][0];
-		}
-		
 		if(!$GLOBALS['this_institut']) {
 			if(count($GLOBALS['institute'])) {
 				if(array_key_exists(0, $GLOBALS['institute']) && array_key_exists(0, $GLOBALS['institute'][0])) {
