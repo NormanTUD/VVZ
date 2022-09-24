@@ -28,7 +28,7 @@
 				$push_label = $thispage[1];
 
 				if(preg_match("/$t/i", $push_label)) {
-					$data[] = array("id" => $push_id, "label" => $push_label, "value" => $push_label);
+					$data[] = array("id" => $push_id, "label" => rarr($push_label), "value" => $push_label);
 				}
 			}
 		}

@@ -10453,4 +10453,8 @@ order by
 
 		return query_to_json($query);	
 	}
+
+	function rarr ($str) {
+		return preg_replace("/&rarr;/", '→', $str);
+	}
 ?>
