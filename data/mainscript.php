@@ -622,3 +622,9 @@ $(document).ready(function() {
 	$(".reset_value_button").on("click", reset_value);
 });
 
+
+function log(...msgs) {
+	for (var i = 0; i < msgs.length; i++) {
+		console.log(msgs[i]);
+	}
+}

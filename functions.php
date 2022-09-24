@@ -7109,16 +7109,19 @@ WHERE 1
 		}
 	}
 
-	function show_output ($name, $color) {
+	function show_output ($name, $color, $nogui=0) {
 		if(global_exists($name)) {
 			#print "<div class='square ".get_output_class($name)."'>\n";
-			print "<div class='square'>\n";
-			print "<div class='one'>\n";
-			if(file_exists("./i/$name.svg")) {
-				print "<img height='60' src='./i/$name.svg' />\n";
+			if(!$nogui) {
+				print "<div class='square'>\n";
+				print "<div class='one'>\n";
+				if(file_exists("./i/$name.svg")) {
+					print "<img height='60' src='./i/$name.svg' />\n";
+				}
+				print "</div>\n";
+				print "<div class='two'>\n";
 			}
-			print "</div>\n";
-			print "<div class='two'>\n";
+
 			$this_output = $GLOBALS[$name];
 			$this_output = array_unique($this_output);
 			if($color) {
@@ -7139,9 +7142,11 @@ WHERE 1
 					print "</ul>\n";
 				}
 			}
-			print "</div>\n";
-			print "</div>\n";
-			print "<div class='clear_both' /><br />\n";
+			if(!$nogui) {
+				print "</div>\n";
+				print "</div>\n";
+				print "<div class='clear_both' /><br />\n";
+			}
 		}
 	}
 
