@@ -157,7 +157,7 @@
 	}
 
 	if(!function_exists("query_to_json")) {
-		function query_to_json($query, $skip_array) {
+		function query_to_json($query, $skip_array=array()) {
 			$result = rquery($query);
 
 			$rows = array();

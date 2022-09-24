@@ -10446,4 +10446,11 @@ order by
 			}
 		}
 	}
+
+	function search_veranstaltung ($term) {
+		$veranstaltung_page = get_page_id_by_filename("veranstaltung.php");
+		$query = 'select concat("goto_page=admin?page='.$veranstaltung_page.'&id=", v.id) as id, concat(v.name, " (", s.typ, " ", s.jahr, ")") as label, concat(v.name, " (", s.typ, " ", s.jahr, ")") as value from veranstaltung v left join semester s on v.semester_id = s.id where name like '.esc("%$term%");
+
+		return query_to_json($query);	
+	}
 ?>
