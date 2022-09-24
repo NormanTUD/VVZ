@@ -7162,6 +7162,7 @@ WHERE 1
 				print "</div>\n";
 				print "<div class='clear_both' /><br />\n";
 			}
+			$GLOBALS[$name] = array();
 		}
 	}
 
