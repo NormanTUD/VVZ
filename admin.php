@@ -434,6 +434,20 @@ if(!$GLOBALS['logged_in']) {
 ?>
 
 			</div>
+
+			<script nonce=<?php print($GLOBALS['nonce']); ?> >
+				document.onkeypress = function (e) {
+					e = e || window.event;
+
+					if(document.activeElement == $("body")[0]) {
+						var keycode =  e.keyCode;
+						if(keycode >= 97 && keycode <= 122) {
+							$("#globalsearch").val($("#globalsearch").val() + String.fromCharCode(e.keyCode));
+							$("#globalsearch").focus();
+						}
+					}
+				};
+			</script>
 <?php
 		}
 		include("footer.php");
