@@ -3665,6 +3665,7 @@ WHERE 1
 			return simple_query_success_fail_message($query, 'Die Institut wurde erfolgreich eingetragen.', 'Die Institut konnte nicht eingetragen werden.');
 		} else {
 			warning("Das Institut ".htmlentities($name ?? "")." existierte bereits und wurde nicht neu angelegt");
+			return get_single_row_from_query("select id from institut where name = ".esc($name));
 		}
 	}
 
@@ -10354,13 +10355,11 @@ order by
 			if(count($status)) {
 				if($line == 0 && $column == 0) {
 					$str .= "\t\t<th>Line</th>\n";
-					$str .= "\t\t<th>Import Kunde Ok?</th>\n";
-					$str .= "\t\t<th>Import Anlage Ok?</th>\n";
+					$str .= "\t\t<th>Import Studiengang Ok?</th>\n";
 				} else {
 					if(array_key_exists($line, $status)) {
 						$str .= "\t<td>".$line."</td>\n";
-						//$str .= "\t<td>".$status[$line]['kunde']."</td>\n";
-						//$str .= "\t<td>".$status[$line]['anlage']."</td>\n";
+						$str .= "\t<td>".$status[$line]['studiengang']."</td>\n";
 					}
 				}
 			}
@@ -10369,9 +10368,11 @@ order by
 				if($line == 0) {
 					$str .= "\t\t<th>".escape($cell)."</th>\n";
 				} else {
+					/*
 					if($column + 1 == 7 || $column + 1 == 11) {
 						$cell = fucked_up_date_to_real_date($cell);
 					}
+					 */
 					$cell = escape($cell);
 					if(array_key_exists($line, $error_lines) && array_key_exists($column, $error_lines[$line])) {
 						if(empty($cell) || preg_match('/^\s*$/', $cell)) {
@@ -10399,7 +10400,7 @@ order by
 		$str .= '<span class="corrected_td">Automatisch korrigiert</span>, hier sind Daten, die falsch waren oder fehlen, aber die aber automatisch korrigiert werden konnten<br>';
 		$str .= '<span class="info_td">Info</span>, weitere Infos aus dem Importprozess<br>';
 
-		$str .= '<br><br><span class="underline" onclick="$(\'.line_was_ok\').toggle();">Nur Zeilen ausblenden/anzeigen, in denen etwas fehlgeschlagen ist</span><br><br>';
+		$str .= '<br><br><span id="toggle_ok" class="underline">Nur Zeilen ausblenden/anzeigen, in denen etwas fehlgeschlagen ist</span><br><br>';
 		return $str;
 	}
 
@@ -10409,5 +10410,36 @@ order by
 
 	function print_line_link ($line) {
 		return '<a href="#line_'.$line.'">'.$line.'</a>';
+	}
+
+	function fucked_up_date_to_real_date ($excel_date, $is_csv = 0) {
+		$min_plausible_year = 1950;
+		if($is_csv) {
+			if(preg_match('/(\d{2})\s*[\/\.-]\s*(\d{4})/', $excel_date, $matches)) {
+				if($matches[2] > $min_plausible_year) {
+					return $matches[2].'-'.$matches[1].'-15';
+				} else {
+					return null;
+				}
+			} else if(preg_match('/(\d{4})\s*[\/\.-]\s*(\d{2})/', $excel_date, $matches)) {
+				if($matches[2] > $min_plausible_year) {
+					return $matches[1].'-'.$matches[2].'-15';
+				} else {
+					return null;
+				}
+			} else {
+				return $excel_date;
+			}
+		} else {
+			if(!preg_match('/^\d+(?:\.\d+)?$/', $excel_date) || $excel_date < 1000) {
+				return $excel_date;
+			} else {
+				$unix_date = ($excel_date - 25569) * 86400;
+				$excel_date = 25569 + ($unix_date / 86400);
+				$unix_date = ($excel_date - 25569) * 86400;
+
+				return gmdate("Y-m-d", $unix_date);
+			}
+		}
 	}
 ?>

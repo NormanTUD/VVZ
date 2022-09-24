@@ -613,13 +613,14 @@ function checkPassStrength(pass) {
 
 
 $(document).ready(function() {
-    $('.accordion-title').on('keydown', function(e) {
-	if(e.keyCode === 13){
-	    $(this).click();
-	}
-    });
+	$('.accordion-title').on('keydown', function(e) {
+		if(e.keyCode === 13){
+			$(this).click();
+		}
+	});
 
 	$(".reset_value_button").on("click", reset_value);
+	$("#toggle_ok").on("click", toggle_ok);
 });
 
 
@@ -627,4 +628,8 @@ function log(...msgs) {
 	for (var i = 0; i < msgs.length; i++) {
 		console.log(msgs[i]);
 	}
+}
+
+function toggle_ok () {
+	$('.line_was_ok').toggle();
 }

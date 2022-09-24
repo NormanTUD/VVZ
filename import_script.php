@@ -126,11 +126,11 @@
 					$studiengang_id = create_studiengang($studiengang, $institut_id, $studienordnung);
 
 					if(is_null($studiengang_id)) {
-						$status[$line]['kunde'] = "<span class='red_text'>&#x2717;</span>";
+						$status[$line]['studiengang'] = "<span class='red_text'>&#x2717;</span>";
 						$failed_studiengaenge = $failed_studiengaenge + 1;
 						$status[$line]['something_failed'] = 1;
 					} else {
-						$status[$line]['kunde'] = "<span class='green_text'>&#9989;</span>";
+						$status[$line]['studiengang'] = "<span class='green_text'>&#9989;</span>";
 						$ok_studiengaenge = $ok_studiengaenge + 1;
 					}
 
