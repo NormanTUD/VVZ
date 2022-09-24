@@ -194,8 +194,7 @@
   `name` varchar(100) DEFAULT NULL,
   `start_nr` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `start_nr` (`start_nr`)
+  UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'language' => 'create table if not exists `language` (

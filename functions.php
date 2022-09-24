@@ -10301,32 +10301,36 @@ order by
                 return $config;
         }
 
-	        function get_spalte($name, $spaltennummern, $anlage, $alternative = null, $alternative_2 = null) {
-                if(array_key_exists($name, $spaltennummern)) {
-                        $nr = $spaltennummern[$name]["nr"];
-                        $optional = $spaltennummern[$name]["optional"];
-                        if(is_null($nr)) {
-                                if(!$optional) {
-                                        if($alternative) {
-                                                return $alternative;
-                                        } else {
-                                                if($alternative_2) {
-                                                        return $alternative_2;
-                                                } else {
-                                                        die("Missing non optional column $name");
-                                                }
-                                        }
-                                } else {
-                                        return null;
-                                }
-                        } else {
-                                $value = $anlage[$nr];
-                                return $value;
-                        }
-                } else {
-                        dier("Unknown column name: $name");
-                }
-        }
+	function get_spalte($name, $spaltennummern, $col, $alternative = null, $alternative_2 = null) {
+		if(array_key_exists($name, $spaltennummern)) {
+			$nr = $spaltennummern[$name]["nr"];
+			$optional = $spaltennummern[$name]["optional"];
+			if(is_null($nr)) {
+				if(!$optional) {
+					if($alternative) {
+						return $alternative;
+					} else {
+						if($alternative_2) {
+							return $alternative_2;
+						} else {
+							die("Missing non optional column $name");
+						}
+					}
+				} else {
+					return null;
+				}
+			} else {
+				if(array_key_exists($nr, $col)) {
+					$value = $col[$nr];
+					return $value;
+				} else {
+					return null;
+				}
+			}
+		} else {
+			dier("Unknown column name: $name");
+		}
+	}
 
 	function array2Table($data, $status = array(), $error_lines = array()) {
 		$str = "<table>\n";
@@ -10401,5 +10405,9 @@ order by
 
 	function escape ($t) {
 		return htmlentities($t ?? "");
+	}
+
+	function print_line_link ($line) {
+		return '<a href="#line_'.$line.'">'.$line.'</a>';
 	}
 ?>

@@ -108,37 +108,36 @@
 			$ok_anlagen_mit_turnus = 0;
 			$anzeige_tabelle = 0;
 
-			$anlage_ohne_name_nr = 1;
-
 			foreach (array_slice($data, 1) as $l) {
-				print_r($l);
-				$studiengang = get_spalte("studiengang", $spaltennummern, $l);
-				$institut = get_spalte("institut", $spaltennummern, $l);
-				$studienordnung = get_spalte("studienordnung", $spaltennummern, $l);
+				try {
+					$studiengang = get_spalte("studiengang", $spaltennummern, $l);
+					$institut = get_spalte("institut", $spaltennummern, $l);
+					$studienordnung = get_spalte("studienordnung", $spaltennummern, $l);
 
-				if(!preg_match('/[a-zA-ZäöüÖÄÜß]/', $studiengang ?? "")) {
-					$error_lines[$line][$spaltennummern["ort"]["nr"]] = 'warning';
-					warning("In Zeile ".print_line_link($line)." beinhaltet der Studiengangsname keine Buchstaben");
+					if(!preg_match('/[a-zA-ZäöüÖÄÜß]/', $studiengang ?? "")) {
+						$error_lines[$line][$spaltennummern["studiengang"]["nr"]] = 'warning';
+						warning("In Zeile ".print_line_link($line)." beinhaltet der Studiengangsname keine Buchstaben");
+					}
+
+					$status[$line]['something_failed'] = 0;
+
+					$institut_id = create_institut($institut, 1);
+
+					$studiengang_id = create_studiengang($studiengang, $institut_id, $studienordnung);
+
+					if(is_null($studiengang_id)) {
+						$status[$line]['kunde'] = "<span class='red_text'>&#x2717;</span>";
+						$failed_studiengaenge = $failed_studiengaenge + 1;
+						$status[$line]['something_failed'] = 1;
+					} else {
+						$status[$line]['kunde'] = "<span class='green_text'>&#9989;</span>";
+						$ok_studiengaenge = $ok_studiengaenge + 1;
+					}
+
+					$line++;
+				} catch (\Throwable $e) {
+					dier($e);
 				}
-
-				die("A");
-
-				$status[$line]['something_failed'] = 0;
-
-				$institut_id = create_institut($institut, 1);
-
-				$studiengang_id = create_studiengang($name, $institut_id, $studienordnung);
-
-				if(is_null($studiengang_id)) {
-					$status[$line]['kunde'] = "<span class='red_text'>&#x2717;</span>";
-					$failed_studiengaenge = $failed_studiengaenge + 1;
-					$status[$line]['something_failed'] = 1;
-				} else {
-					$status[$line]['kunde'] = "<span class='green_text'>&#9989;</span>";
-					$ok_studiengaenge = $ok_studiengaenge + 1;
-				}
-
-				$line++;
 			}
 
 /*

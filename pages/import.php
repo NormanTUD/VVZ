@@ -22,8 +22,6 @@
 <?php
 			if($GLOBALS['import_table']) {
 				echo $GLOBALS['import_table'];
-
-				echo "<iframe class='display_none' width='0' height='0' src='admin?page=".get_page_id_by_filename('wartungstermine2.php')."&jahreplus=5'></iframe>";
 			}
 		} else {
 ?>
