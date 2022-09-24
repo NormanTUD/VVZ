@@ -1,7 +1,7 @@
 <?php
-	function import_csv ($content = null) {
-		$GLOBALS['return_null_if_anlage_creation_failed'] = 0;
+	include("functions.php");
 
+	function import_csv ($content = null) {
 		$data = array();
 		$is_csv = 1;
 
@@ -452,7 +452,5 @@
 		return $error_occured;
 	}
 
-	if(get_post('start_import')) {
-		import_csv();
-	}
+	import_csv("hallo,welt\n1,2");
 ?>
