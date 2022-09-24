@@ -10280,17 +10280,17 @@ order by
 
 	function get_setting_default ($name) {
 		$query = 'select default_value from config where name = '.esc($name);
-		return get_single_value_from_query($query);
+		return get_single_row_from_query($query);
 	}
 
 	function get_setting_desc ($name) {
 		$query = 'select description from config where name = '.esc($name);
-		return get_single_value_from_query($query);
+		return get_single_row_from_query($query);
 	}
 
 	function get_setting_category ($name) {
 		$query = 'select category from config where name = '.esc($name);
-		return get_single_value_from_query($query);
+		return get_single_row_from_query($query);
 	}
 
         function get_config () {
@@ -10407,7 +10407,7 @@ order by
 	}
 
 	function escape ($t) {
-		return htmlentities($t ?? "");
+		return $t;
 	}
 
 	function print_line_link ($line) {

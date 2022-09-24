@@ -118,8 +118,15 @@
 					$institut = get_spalte("institut", $spaltennummern, $l);
 					$studienordnung = get_spalte("studienordnung", $spaltennummern, $l);
 
+					if(!preg_match('/[a-zA-ZäöüÖÄÜß1-9]/', $institut?? "")) {
+						$error_lines[$line][$spaltennummern["institut"]["nr"]] = 'warning';
+						$data[$line][$spaltennummern["institut"]["nr"]] .= "<br><span class='warning_td'>Enthält keine Buchstaben</span>";
+						warning("In Zeile ".print_line_link($line)." beinhaltet der Institutsname keine Buchstaben");
+					}
+
 					if(!preg_match('/[a-zA-ZäöüÖÄÜß1-9]/', $studiengang ?? "")) {
 						$error_lines[$line][$spaltennummern["studiengang"]["nr"]] = 'warning';
+						$data[$line][$spaltennummern["studiengang"]["nr"]] .= "<br><span class='warning_td'>Enthält keine Buchstaben</span>";
 						warning("In Zeile ".print_line_link($line)." beinhaltet der Studiengangsname keine Buchstaben");
 					}
 
@@ -131,6 +138,7 @@
 
 					if(is_null($studiengang_id)) {
 						$status[$line]['studiengang'] = "<span class='red_text'>&#x2717;</span>";
+						$data[$line][$spaltennummern["studiengang"]["nr"]] .= "<br><span class='error_td'>Fehlgeschlagen</span>";
 						$failed_studiengaenge = $failed_studiengaenge + 1;
 						$status[$line]['something_failed'] = 1;
 					} else {

@@ -1119,3 +1119,43 @@ a, a:visited, a:hover, a:active {
 .display_none {
 	display: none;
 }
+
+
+.warning_td {
+	font-color: orange;
+	color: orange;
+	text-decoration: underline dotted #FFCC00;
+	min-width: 40px;
+	font-size: 20px;
+}
+
+.corrected_td {
+	font-color: green;
+	color: green;
+	text-decoration: underline dotted green;
+	min-width: 40px;
+	font-size: 20px;
+}
+
+.info_td {
+	font-color: purple;
+	color: purple;
+	text-decoration: underline dotted purple;
+	min-width: 80px;
+}
+
+.error_td {
+	font-color: red;
+	color: red;
+	text-decoration: underline dotted red;
+	min-width: 40px;
+	font-size: 20px;
+}
+
+.hr_wartungstabelle {
+         border: none;
+         border-top-color: blue;
+         border-top-style: dashed;
+         border-top-width: 3px
+}
+

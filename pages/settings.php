@@ -61,14 +61,6 @@
 ?>
 							<td><input data-jscolor="{hash:true}" type="text" class="jscolor" name="value" value="<?php print $setting; ?>" /></td>
 <?php
-						} else if(preg_match('/status/', $name)) {
-?>
-							<td>
-<?php
-								print create_select_for_status(0, "value", 0, $setting);
-?>
-							</td>
-<?php
 						} else {
 ?>
 							<td><input style="width: 350px;" type="text" name="value" value="<?php print $setting; ?>" /></td>
