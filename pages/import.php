@@ -13,7 +13,7 @@
 				include("import_script.php");
 			}
 ?>
-			<form method="post" enctype="multipart/form-data" action="index.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+			<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 				<input noautosubmit="1" type="hidden" name="start_import" value="1" />
 				<input noautosubmit="1" type="file" name="excelfile" />
 				<input noautosubmit="1" type="hidden" name="XDEBUG_PROFILE" value="1" />
@@ -23,7 +23,7 @@
 			if($GLOBALS['import_table']) {
 				echo $GLOBALS['import_table'];
 
-				echo "<iframe style='display: none;' width='0' height='0' src='index.php?page=".get_page_id_by_filename('wartungstermine2.php')."&jahreplus=5'></iframe>";
+				echo "<iframe class='display_none' width='0' height='0' src='admin?page=".get_page_id_by_filename('wartungstermine2.php')."&jahreplus=5'></iframe>";
 			}
 		} else {
 ?>
@@ -31,4 +31,17 @@
 <?php
 		}
 	}
+
+	foreach (array(
+			array("hint", "blue"),
+			array("error", "red"),
+			array("right_issue", "red"),
+			array("warning", "orange"),
+			array("message", "blue"),
+			array("easter_egg", "hotpink"),
+			array("success", "green")
+		) as $msg) {
+		show_output($msg[0], $msg[1]);
+	}
+
 ?>

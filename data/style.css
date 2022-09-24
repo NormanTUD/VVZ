@@ -1107,3 +1107,15 @@ a, a:visited, a:hover, a:active {
 .toast {
     opacity: 1 !important;
 }
+
+.high_z_index {
+	z-index: 300;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+.display_none {
+	display: none;
+}

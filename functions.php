@@ -10300,4 +10300,105 @@ order by
                 return $config;
         }
 
+	        function get_spalte($name, $spaltennummern, $anlage, $alternative = null, $alternative_2 = null) {
+                if(array_key_exists($name, $spaltennummern)) {
+                        $nr = $spaltennummern[$name]["nr"];
+                        $optional = $spaltennummern[$name]["optional"];
+                        if(is_null($nr)) {
+                                if(!$optional) {
+                                        if($alternative) {
+                                                return $alternative;
+                                        } else {
+                                                if($alternative_2) {
+                                                        return $alternative_2;
+                                                } else {
+                                                        die("Missing non optional column $name");
+                                                }
+                                        }
+                                } else {
+                                        return null;
+                                }
+                        } else {
+                                $value = $anlage[$nr];
+                                return $value;
+                        }
+                } else {
+                        dier("Unknown column name: $name");
+                }
+        }
+
+	function array2Table($data, $status = array(), $error_lines = array()) {
+		$str = "<table>\n";
+		$line = 0;
+		foreach($data as $row) {
+			$column = 0;
+			if($line == 0) {
+				print '<thead class="high_z_index" id="wartungstabelle_thead">';
+			}
+
+			$tr_class = '';
+			if($line >= 1) {
+				$tr_class = 'line_was_ok';
+				if(array_key_exists("something_failed", $status[$line]) && $status[$line]['something_failed']) {
+					$tr_class = 'line_was_not_ok';
+				}
+			}
+
+			$str .= "\t<tr id='line_".$line."' class='".$tr_class."'>\n";
+
+			if(count($status)) {
+				if($line == 0 && $column == 0) {
+					$str .= "\t\t<th>Line</th>\n";
+					$str .= "\t\t<th>Import Kunde Ok?</th>\n";
+					$str .= "\t\t<th>Import Anlage Ok?</th>\n";
+				} else {
+					if(array_key_exists($line, $status)) {
+						$str .= "\t<td>".$line."</td>\n";
+						//$str .= "\t<td>".$status[$line]['kunde']."</td>\n";
+						//$str .= "\t<td>".$status[$line]['anlage']."</td>\n";
+					}
+				}
+			}
+
+			foreach($row as $cell) {
+				if($line == 0) {
+					$str .= "\t\t<th>".escape($cell)."</th>\n";
+				} else {
+					if($column + 1 == 7 || $column + 1 == 11) {
+						$cell = fucked_up_date_to_real_date($cell);
+					}
+					$cell = escape($cell);
+					if(array_key_exists($line, $error_lines) && array_key_exists($column, $error_lines[$line])) {
+						if(empty($cell) || preg_match('/^\s*$/', $cell)) {
+							$cell = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+						}
+						$str .= "\t\t<td><div class='".$error_lines[$line][$column]."_td'>".$cell."</div></td>\n";
+					} else {
+						$str .= "\t\t<td>".escape($cell)."</td>\n";
+					}
+				}
+				$column++;
+			}
+			$str .= "\t</tr>\n";
+
+			if($line == 0) {
+				print '<thead class="high_z_index" id="wartungstabelle_thead">';
+			}
+
+			$line = $line + 1;
+		}
+		$str .= '</table><br />';
+
+		$str .= '<span class="error_td">Fehlerhafter Eintrag</span>, wegen diesem Eintrag schlägt das Importieren fehl<br>';
+		$str .= '<span class="warning_td">Eintrag mit Warnung</span>, dieser Eintrag sorgt nicht dafür, dass das Importieren fehlschlägt, aber er könnte falsche Daten beinhalten<br>';
+		$str .= '<span class="corrected_td">Automatisch korrigiert</span>, hier sind Daten, die falsch waren oder fehlen, aber die aber automatisch korrigiert werden konnten<br>';
+		$str .= '<span class="info_td">Info</span>, weitere Infos aus dem Importprozess<br>';
+
+		$str .= '<br><br><span class="underline" onclick="$(\'.line_was_ok\').toggle();">Nur Zeilen ausblenden/anzeigen, in denen etwas fehlgeschlagen ist</span><br><br>';
+		return $str;
+	}
+
+	function escape ($t) {
+		return htmlentities($t ?? "");
+	}
 ?>
