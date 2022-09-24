@@ -1687,7 +1687,7 @@
 					}
 
 ?>
-					<h2 class="text-center"><?php print isset($GLOBALS['this_institut']) ? htmlentities(get_institut_name($GLOBALS['this_institut'])) : ''; ?></h2>
+					<h2 class="text-center"><?php print isset($GLOBALS['this_institut']) ? htmlentities(get_institut_name($GLOBALS['this_institut']) ?? "") : ''; ?></h2>
 					<h3 class="text-center"><?php 
 						print table_exists($GLOBALS["dbname"], "semester") ? add_next_year_to_wintersemester($GLOBALS['this_semester'][1], $GLOBALS['this_semester'][2]) : ''; 
 					?></h3>
