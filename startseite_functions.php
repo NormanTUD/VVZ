@@ -1480,10 +1480,6 @@
 	}
 
 	function show_institute_selector() {
-		if(!count($GLOBALS['institute'])) {
-			print "<h2 class='class_red'>Es konnten keine Institute gefunden werden. Bitten Sie die Administratoren darum, dies zu erledigen.</h2>";
-		}
-
 		if(count($GLOBALS['institute']) >= 2) {
 ?>
 			<form method="get">
