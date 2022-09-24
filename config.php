@@ -32,7 +32,10 @@
 	if(!function_exists("dier")) {
 		function dier ($data, $sql=0, $show_error=1) {
 			$stacktrace_data = debug_backtrace()[0];
-			$stacktrace = 'Aufgerufen von <b>'.debug_backtrace()[1]['file'].'</b>::<i>'.debug_backtrace()[1]['function'].'</i>, line '.htmlentities($stacktrace_data['line'])."<br />\n";
+			$stacktrace = "";
+			if(isset($debug_backtrace[0])) {
+				$stacktrace = 'Aufgerufen von <b>'.debug_backtrace()[1]['file'].'</b>::<i>'.debug_backtrace()[1]['function'].'</i>, line '.htmlentities($stacktrace_data['line'])."<br />\n";
+			}
 
 			if(is_dir("debuglogs")) {
 				if(is_writeable("debuglogs")) {

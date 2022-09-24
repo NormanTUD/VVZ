@@ -2,6 +2,7 @@
 	include_once("kundenkram.php");
 	include_once("emojis.php");
 
+	$GLOBALS["deletion_db"] = array();
 	$GLOBALS['settings_cache'] = array();
 	$GLOBALS["import_table"] = "";
 

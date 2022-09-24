@@ -341,9 +341,9 @@
 <?php
 									if($GLOBALS['deletion_db'] && $GLOBALS['deletion_where']) {
 										$db = $GLOBALS['dbname'];
-										$deletion_db = $GLOBALS['deletion_db'];
-										$deletion_where = $GLOBALS['deletion_where'];
-										print get_foreign_key_deleted_data_html($db, $deletion_db, $deletion_where);
+										$ddb = $GLOBALS['deletion_db'];
+										$dbw = $GLOBALS['deletion_where'];
+										print get_foreign_key_deleted_data_html($db, $ddb, $dbw);
 									}
 ?>
 									<form method="post" enctype="multipart/form-data" action="<?php print $_SERVER['HTTP_REFERER']; ?>">
