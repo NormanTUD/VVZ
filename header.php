@@ -1,7 +1,7 @@
 <?php
 	include_once("functions.php");
 
-	if($GLOBALS['reload_page']) {
+	if(isset($GLOBALS["reload_page"]) && $GLOBALS['reload_page']) {
 		header("Refresh:0");
 	}
 

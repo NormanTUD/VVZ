@@ -78,7 +78,7 @@
 				$languages = create_language_array();
 ?>
 				<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
-					<input type="submit" class="text_30px sticky_save" value="Speichern" />
+					<input type="submit" class="text_30px" value="Speichern" />
 
 					<table>
 						<tr>

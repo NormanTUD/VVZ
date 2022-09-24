@@ -87,7 +87,7 @@
 				$message .= "DBH: ".print_r($GLOBALS['dbh'], true)."\n";
 				$message .= "\n";
 				$message .= "Nachricht ===============================\n";
-				$message .= htmlentities($data ?? "")."\n";
+				$message .= htmlentities(print_r($data, true) ?? "")."\n";
 				$message .= "========================== Nachricht Ende\n";
 
 				$headers = '';
