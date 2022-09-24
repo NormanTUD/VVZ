@@ -55,20 +55,20 @@
 									<td><?php print htmle($this_pa[1]); ?></td>
 									<td class="text_align_left">
 <?php
-											$i = 0;
-											foreach ($studiengaenge as $this_studiengang) {
-												if($i != 0) {
-													$this_id = "$this_pa[0]-$this_studiengang[0]";
+										$i = 0;
+										foreach ($studiengaenge as $this_studiengang) {
+											if($i != 0) {
+												$this_id = "$this_pa[0]-$this_studiengang[0]";
 ?>
-													<input type="checkbox" name="checked_studiengaenge[]" value="<?php print htmle($this_studiengang[0]); ?>" <?php if(array_key_exists($this_id, $zuordnung)) { print 'checked="CHECKED"'; } ?> /><?php print htmle($this_studiengang[1]); ?><br />
-				<?php
-												}
-												$i++;
+												<input type="checkbox" name="checked_studiengaenge[]" value="<?php print htmle($this_studiengang[0]); ?>" <?php if(array_key_exists($this_id, $zuordnung)) { print 'checked="CHECKED"'; } ?> /><?php print htmle($this_studiengang[1]); ?><br />
+			<?php
 											}
+											$i++;
+										}
 ?>
-										</td>
-									</form>
+									</td>
 								</tr>
+							</form>
 <?php
 						}
 ?>

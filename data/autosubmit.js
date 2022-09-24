@@ -1,13 +1,4 @@
 $(document).ready(function(){
-	function show_info (message, time) {
-		if($('.info').is(':visible')) {
-			$("<div class='info'>" + message + "</div>").appendTo("body").delay(time).hide(0);;
-		} else {
-			$("<div class='info'>" + message + "</div>").appendTo("body").delay(time).hide(0);;
-		}
-
-	}
-
 	$(".form_autosubmit, :input").each(function (index) {
 		if(!$(this).attr('noautosubmit')) {
 			$(this).change(function (index) {
@@ -18,14 +9,15 @@ $(document).ready(function(){
 					url : submitfile,
 					type: "POST",
 					data: $(this.form).serialize(),
-					success: function (data) {
-						show_info(data, 2000);
+					success: function (response) {
+						success("OK", response);
 						if($(".auto_reload_stylesheets").length != 0) {
 							reloadStylesheets();
 						}
 					},
-					error: function (jXHR, textStatus, errorThrown) {
-						show_info(errorThrown, 10000);
+					error: function (response, textStatus, errorThrown) {
+						log(response);
+						error("FEHLER", response.responseText);
 					}
 				});
 			});

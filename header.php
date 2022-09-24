@@ -93,7 +93,9 @@
 				"jquery-ui.js",
 				"jquery-ui-timepicker-addon.js",
 				"mainscript.php",
-				"bootstrap-tour-standalone.js"
+				"bootstrap-tour-standalone.js",
+				"toastr.js",
+				"msgs.php"
 			));
 		?>
 <?php
@@ -124,6 +126,7 @@
 		#file_get_contents("$actual_link/data/custom.php");
 
 		css("custom.php");
+		css("toastr.min.css");
 
 		js(array("color-hash.js"));
 ?>

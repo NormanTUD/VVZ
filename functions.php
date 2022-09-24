@@ -2,6 +2,8 @@
 	include_once("kundenkram.php");
 	include_once("emojis.php");
 
+
+
 /*
 register_tick_function(function() {
     $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
@@ -47,7 +49,7 @@ declare(ticks=1);
 
 	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' ; ";
-	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."' ; ";
+	$GLOBALS['csp_string'] .= "img-src 'self' data: 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "style-src 'self'; ";
 	header("Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("X-Content-Security-Policy: ".$GLOBALS['csp_string']);
@@ -2735,7 +2737,7 @@ declare(ticks=1);
 		if(!preg_match('/^\d+$/', $gebaeude_id)) {
 			$tmessage = 'Gebäude-ID wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt. ';
 			if($raumplanung) {
-				warning($tmessage);
+				//warning($tmessage);
 			} else {
 				error($tmessage);
 			}
@@ -2777,7 +2779,7 @@ declare(ticks=1);
 					}
 				}
 			} else {
-				error('Raumname wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt.');
+				//error('Raumname wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt.');
 			}
 		}
 	}
@@ -3177,12 +3179,12 @@ WHERE 1
 			return create_hour_from_to($stunde, $stunde, $array);
 		} else {
 			switch($stunde) {
-				case '*':
-					return '<i>Siehe Hinweise</i>';
-				case 'Ganztägig':
-					return 'Ganztägig';
-				default:
-					return 'ERROR';
+			case '*':
+				return '<i>Siehe Hinweise</i>';
+			case 'Ganztägig':
+				return 'Ganztägig';
+			default:
+				return 'ERROR';
 			}
 		}
 
@@ -3272,7 +3274,7 @@ WHERE 1
 
 	function get_and_create_studiengang ($name, $institut, $bereich) {
 		$id = get_studiengang_id_by_name($name);
-		
+
 		if($id) {
 			return $id;
 		} else {
@@ -3960,7 +3962,7 @@ WHERE 1
 		$query = 'DELETE FROM `institut` WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Das Institut wurde erfolgreich gelöscht.', 'Das Institut konnte nicht gelöscht werden.');
 	}
-	
+
 	/* MySQL-update-Funktionen */
 
 	function update_pruefungsnummer($id, $modul_id, $pruefungsnummer, $pruefungstyp_id, $bereich_id, $modulbezeichnung, $zeitraum_id, $disabled) {
@@ -4209,7 +4211,11 @@ WHERE 1
 						if(preg_match("/^\d{4}-\d{1,2}-\d{1,2}$/", $value ?? "")) {
 							return array("ok" => 1, "value" => $value);
 						}
-						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Muss dem Datumsformat YYYY-MM-DD folgen.");
+						if($can_be_null && ($value == "" || !$value)) {
+							return array("ok" => 1, "value" => null);
+						} else {
+							return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Muss dem Datumsformat YYYY-MM-DD folgen.");
+						}
 					} else if(preg_match("/^enum\((.*)\)/", $type, $matches)) {
 						$enums = explode(",", $matches[1]);
 						$enums = preg_replace("/(?:^'|'$)/", "", $enums);
@@ -4511,7 +4517,7 @@ WHERE `id` = '.esc($id);
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
-	
+
 		eval(check_values(
 			[
 				array("table" => "veranstaltung_metadaten", "col" => "abgabe_pruefungsleistungen", "name" => "Abgabe Prüfungsleistungen"),
@@ -4587,6 +4593,7 @@ INSERT INTO
 				));
 
 				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = '.esc($raumwunsch_id).', `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
+
 			} elseif ($gebaeudewunsch_id) {
 				eval(check_values(
 					[
@@ -4597,10 +4604,10 @@ INSERT INTO
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
+
 			if($query) {
 				if(rquery($query)) {
-					success('Die Details zur Veranstaltung wurden erfolgreich geändert.');
-
+					success('Gespeichert!');
 				} else {
 					message('Die Details zur Veranstaltung wurden erfolgreich geändert. Aber der Raumwunsch konnte nicht gespeichert werden.');
 				}
@@ -7109,16 +7116,20 @@ WHERE 1
 		}
 	}
 
-	function show_output ($name, $color) {
+	function show_output ($name, $color, $nogui=0) {
 		if(global_exists($name)) {
 			#print "<div class='square ".get_output_class($name)."'>\n";
-			print "<div class='square'>\n";
-			print "<div class='one'>\n";
-			if(file_exists("./i/$name.svg")) {
-				print "<img height='60' src='./i/$name.svg' />\n";
+			if(!$nogui) {
+				print "<div class='square'>\n";
+				print "<div class='one'>\n";
+				if(file_exists("./i/$name.svg")) {
+					print "<img width=60 src='./i/$name.svg' />\n";
+				}
+				print "</div>\n";
+
+				print "<div class='two'>\n";
 			}
-			print "</div>\n";
-			print "<div class='two'>\n";
+
 			$this_output = $GLOBALS[$name];
 			$this_output = array_unique($this_output);
 			if($color) {
@@ -7130,7 +7141,11 @@ WHERE 1
 					if(count($this_output) > 1) {
 						print "<li>\n";
 					}
-					print "<span class='message_text'>".$this_output_item."</span>\n";
+					if(!$nogui) {
+						print "<span class='message_text'>".$this_output_item."</span>\n";
+					} else {
+						print "<span>".$this_output_item."</span>\n";
+					}
 					if(count($this_output) > 1) {
 						print "</li>\n";
 					}
@@ -7139,9 +7154,11 @@ WHERE 1
 					print "</ul>\n";
 				}
 			}
-			print "</div>\n";
-			print "</div>\n";
-			print "<div class='clear_both' /><br />\n";
+			if(!$nogui) {
+				print "</div>\n";
+				print "</div>\n";
+				print "<div class='clear_both' /><br />\n";
+			}
 		}
 	}
 

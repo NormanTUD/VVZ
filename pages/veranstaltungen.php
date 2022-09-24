@@ -162,7 +162,6 @@
 							}
 ?>
 							<th>Typ</th>
-							<th>Speichern</th>
 							<th>Details</th>
 							<th>Anzahl Prüfungen</th>
 							<!--<th>Letztes Update</th>-->
@@ -221,7 +220,7 @@
 						}
 ?>
 							<tr>
-								<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?><?php
+								<form class="form_autosubmit" method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?><?php
 										if(isset($GLOBALS['user_dozent_id']) && get_get('dozent_id')) {
 											print '&dozent_id='.$GLOBALS['user_dozent_id'];
 										}
@@ -254,7 +253,6 @@
 									}
 ?>
 									<td><?php create_select($veranstaltungstypen, $row[1], 'veranstaltungstyp'); ?></td>
-									<td><input type="submit" name="speichern" class="save_buttons" value="Speichern" /></td>
 									<td><input type="submit" name="speichern_metainfos" class="edit_buttons" value="Bearbeiten" /></td>
 									<td><?php print array_key_exists($row[0], $pruefungen) ? $pruefungen[$row[0]] : '<span class="class_red">!!! 0 !!!</span>'; ?></td>
 									<!--<td>Etwa <?php print(htmlentities(sprintf("%0.1f", $row[14] / 86400))); ?> Tage her</td>-->
@@ -284,13 +282,13 @@
 									<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
 									<input type="hidden" value="" name="id" />
 									<input type="hidden" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" name="semester" />
-									<input type="hidden" value="1" name="neue_veranstaltung" />
-									<td><textarea class="veranstaltungen_textarea" name="name"></textarea></td>
-									<td><?php create_select($semester, $chosen_semester, 'semester'); ?></td>
+									<input type="hidden" value="1" name="neue_veranstaltung" noautosubmit=1"  />
+									<td><textarea noautosubmit=1 class="veranstaltungen_textarea" name="name"></textarea></td>
+									<td><?php create_select($semester, $chosen_semester, 'semester', 0, 1); ?></td>
 <?php
 									if($user_role_id == 1 || ($is_superdozent && count($dozenten) > 1)) {
 ?>
-										<td><?php create_select($dozenten, $GLOBALS['user_dozent_id'], 'dozent'); ?></td>
+										<td><?php create_select($dozenten, $GLOBALS['user_dozent_id'], 'dozent', 0, 1); ?></td>
 <?php
 									} else {
 ?>
@@ -299,7 +297,7 @@
 									}
 									if($user_role_id == 1 && count($institute) >= 2) {
 ?>
-										<td><?php create_select($institute, '', 'institut'); ?></td>
+										<td><?php create_select($institute, '', 'institut', 0, 1); ?></td>
 <?php
 									} else {
 ?>
@@ -307,9 +305,8 @@
 <?php
 									}
 ?>
-									<td><?php create_select($veranstaltungstypen, null, 'veranstaltungstyp'); ?></td>
-									<td><input type="submit" name="speichern" class="save_buttons" value="Speichern" /></td>
-									<td><input type="submit" name="speichern_und_bearbeiten" class="save_buttons" value="Speichern und bearbeiten" /></td>
+									<td><?php create_select($veranstaltungstypen, null, 'veranstaltungstyp', 0, 1); ?></td>
+									<td><input type="submit" name="speichern_und_bearbeiten" class="save_buttons" value="Eintragen" /></td>
 									<td>&uarr;&sum; = <?php print $anzahl_pruefungen; ?></td>
 									<td>&mdash;</td>
 								</form>
@@ -333,4 +330,5 @@
 				}
 			}
 		}
+		js(array("autosubmit.js"));
 ?>
