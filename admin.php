@@ -189,7 +189,10 @@ if(!$GLOBALS['logged_in']) {
 					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden <?php print_logout_icon(); ?></a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
 				</td>
 				<td class="float_right display_inline width_200px_whitespace_nowrap">
-					<?php print_search_icon("float_left"); ?><input type="text" id="globalsearch" name="search" />
+					<div class="ui-widget">
+						<label for="birds"><?php print_search_icon("float_left"); ?></label>
+						<input type="text" id="globalsearch" name="search" />
+					</div>
 				</td>
 			</tr>
 		</table>

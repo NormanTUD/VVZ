@@ -96,10 +96,10 @@
 				"jquery-3.6.1.min.js",
 				"jquery-ui.js",
 				"jquery-ui-timepicker-addon.js",
-				"mainscript.php",
 				"bootstrap-tour-standalone.js",
 				"toastr.js",
-				"msgs.php"
+				"msgs.php",
+				"mainscript.php"
 			));
 		?>
 <?php

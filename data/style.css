@@ -1170,3 +1170,7 @@ a, a:visited, a:hover, a:active {
 #globalsearch {
 	width: 150px;
 }
+
+.ui-autocomplete {
+	z-index: 1000000;
+}
