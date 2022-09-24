@@ -2,6 +2,8 @@
 	include_once("kundenkram.php");
 	include_once("emojis.php");
 
+	$GLOBALS["import_table"] = "";
+
 
 
 /*
