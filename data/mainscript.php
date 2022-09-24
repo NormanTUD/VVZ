@@ -1,9 +1,9 @@
-"use strict";
-
 <?php
 	header('Content-Type: application/javascript');
 	include_once("../config.php");
 ?>
+
+"use strict";
 var tour;
 function toggle_details (id) {
 	$("#details_" + id).toggle();
@@ -621,3 +621,4 @@ $(document).ready(function() {
 
 	$(".reset_value_button").on("click", reset_value);
 });
+
