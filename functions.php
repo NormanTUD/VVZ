@@ -6505,12 +6505,18 @@ INSERT INTO
 		return $pruefungsamt;
 	}
 
-	function create_institute_array () {
+	function get_number_of_veranstaltungen_by_institut_and_semester_id ($institut_id, $semester_id) {
+		return get_single_row_from_query("select count(*) from veranstaltung v where v.semester_id = ".esc($institut_id)." and institut_id = ".esc($semester_id));
+	}
+
+	function create_institute_array ($semester_id=null) {
 		$institute = array();
 		$query = 'SELECT `id`, `name` FROM `institut`';
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
-			$institute[$row[0]] = array($row[0], "$row[1]");
+			if(is_null($semester_id) || get_number_of_veranstaltungen_by_institut_and_semester_id($row[0], $semester_id)) {
+				$institute[$row[0]] = array($row[0], "$row[1]");
+			}
 		}
 		return $institute;
 	}
