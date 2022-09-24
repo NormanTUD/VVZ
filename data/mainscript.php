@@ -98,7 +98,6 @@ function filter_array(test_array) {
 }
 
 $(document).ready(function() {
-	safariIFrameWarning();
 	if (history.length >= 2) {
 		$("#backbutton").css('visibility', 'visible');
 	}
@@ -496,14 +495,6 @@ $(document).on("focus", ".datetimepicker", function(){
 		timeFormat: 'HH:mm:ss'
 	});
 });
-
-function safariIFrameWarning () {
-	var isInIframe = (window.location != window.parent.location) ? true : false;
-	if (isInIframe && /^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
-		$(".iframewarning").html("Achtung: öffnen Sie die Seite bitte in einem eigenen Fenster, sonst funktioniert sie eventuell nicht! <a href='http://<?php print $GLOBALS['vvz_base_url'];?>/' target='_blank'>Klicken Sie dazu hier.</a>");
-		$(".iframewarning").addClass("red_giant");
-	}
-}
 
 function toc () {
     var toc = "";

@@ -40,7 +40,6 @@ declare(ticks=1);
 	include_once("config.php");
 
 	header_remove("X-Powered-By"); // Serverinfos entfernen
-	header("X-Frame-Options: ALLOW-FROM ".$GLOBALS['university_page_url']); // Gegen Clickjacking
 	if(file_exists("/etc/no_cache")) {
 		header("Cache-Control: no-cache, must-revalidate");
 	}
@@ -7676,10 +7675,6 @@ $ret_string .= '</table>';
 			if(preg_match('/^\d+$/', get_get('institut') ?? "")) {
 				$this_institut = get_get('institut');
 			} else {
-				if($_SERVER['HTTP_HOST'] == $GLOBALS['vvz_base_url']) {
-					$this_institut = $institute[keys($institute)][0];
-				}
-				
 				if(!$this_institut) {
 					if(count($institute)) {
 						if(array_key_exists(0, $institute) && array_key_exists(0, $institute[0])) {
@@ -9414,11 +9409,8 @@ SE 1/2 oder BZW
 <?php
 	}
 
-	function replace_hinweis_with_graphics ($text, $show_base_url = 0) {
+	function replace_hinweis_with_graphics ($text) {
 		$base_url = '';
-		if($show_base_url) {
-			$base_url = $GLOBALS['vvz_base_url'];
-		}
 		$text = preg_replace('/LaTeX/', '<img width="45px" alt="LaTeX" src="'.$base_url.'i/LaTeX.svg">', $text);
 		$text = preg_replace('/\\\\git/', '<img width="45px" alt="git" src="'.$base_url.'i/git.svg">', $text);
 		$text = preg_replace('/\b(warnung|achtung|vorsicht)\b/i', get_warning_icon().' \1', $text);

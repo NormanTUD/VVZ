@@ -98,7 +98,7 @@
 						}
 
 
-						$row[9] = replace_hinweis_with_graphics($row[9], 1);
+						$row[9] = replace_hinweis_with_graphics($row[9]);
 						$row[10] = nice_einzelne_veranstaltung_by_id($row[10]);
 						$data[] = $row;
 					}

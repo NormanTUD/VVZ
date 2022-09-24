@@ -149,10 +149,7 @@
 	$GLOBALS["selftest_already_done"] = 0;
 	$GLOBALS['university_name'] = "TU Dresden";
 	$GLOBALS['impressum_university_page'] = "https://tu-dresden.de/impressum";
-	$GLOBALS['institut'] = "Institut für Philosophie";
-	$GLOBALS['faculty'] = "Fakultät für Philosophie";
 	$GLOBALS['vvz_base_url'] = "vvz.phil.tu-dresden.de";
-	$GLOBALS['university_page_url'] = "https://tu-dresden.de/";
 	$GLOBALS["calname"] = "Philosophie";
 	$GLOBALS['timezone_name'] = "Europe/Berlin";
 
