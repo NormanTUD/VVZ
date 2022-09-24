@@ -46,7 +46,7 @@
 						$filename = "debuglogs/$i.log";
 					}
 
-					$string  = "MESSAGE >>>>>>>>>>>>>>>>\n\n$data\n\n<<<<<<<<<<<<<<<<\n\nStacktrace:\n\n$stacktrace";
+					$string  = "MESSAGE >>>>>>>>>>>>>>>>\n\n".print_r($data, true)."\n\n<<<<<<<<<<<<<<<<\n\nStacktrace:\n\n$stacktrace";
 
 					file_put_contents($filename, $string);
 				} else {

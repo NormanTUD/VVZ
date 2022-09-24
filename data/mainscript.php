@@ -642,6 +642,11 @@ $(document).ready(function() {
 		minLength: 1,
 		select: function( event, ui ) {
 			log( "Selected: " + ui.item.value + " aka " + ui.item.id );
+			var goto_page_regex = /goto_page=(.*)/;
+			var goto_page_matches = goto_page_regex.exec(ui.item.id);
+			if(goto_page_matches.length) {
+				window.location.href = goto_page_matches[1];
+			}
 		}
 	} );
 });
