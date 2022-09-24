@@ -23,12 +23,15 @@
 		print get_calendar_icon();
 	}
 
-	function get_search_icon () {
+	function get_search_icon ($class="") {
+		if($class) {
+			return '<i class="fa fa-search '.$class.'" aria-hidden="true"></i>';
+		}
 		return '<i class="fa fa-search" aria-hidden="true"></i>';
 	}
 
-	function print_search_icon () {
-		print get_search_icon();
+	function print_search_icon ($class="") {
+		print get_search_icon($class);
 	}
 
 	function get_double_arrow_down_icon () {

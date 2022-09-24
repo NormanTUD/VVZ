@@ -625,6 +625,10 @@ a, a:visited, a:hover, a:active {
 	display: none;
 }
 
+.width_200px_whitespace_nowrap {
+	width: 200px; white-space: nowrap;
+}
+
 .width_100_whitespace_nowrap {
 	width: 100%; white-space: nowrap;
 }
@@ -1159,3 +1163,10 @@ a, a:visited, a:hover, a:active {
          border-top-width: 3px
 }
 
+.fullwidth {
+	width: 100%;
+}
+
+#globalsearch {
+	width: 150px;
+}

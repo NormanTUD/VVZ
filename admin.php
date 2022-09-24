@@ -1,15 +1,15 @@
 <?php
-	$php_start = microtime(true);
-	include_once("config.php");
-	include_once("mysql.php");
-	include_once("functions.php");
-	$filename = 'admin';
-	$GLOBALS['adminpage'] = 1;
-	$page_title = $GLOBALS['university_name']." | Administration";
-	include("header.php");
-	include_once("selftest.php");
+$php_start = microtime(true);
+include_once("config.php");
+include_once("mysql.php");
+include_once("functions.php");
+$filename = 'admin';
+$GLOBALS['adminpage'] = 1;
+$page_title = $GLOBALS['university_name']." | Administration";
+include("header.php");
+include_once("selftest.php");
 
-	if(!$GLOBALS['logged_in']) {
+if(!$GLOBALS['logged_in']) {
 ?>
 		<div class="blurbox">
 		<div id="main">
@@ -17,19 +17,19 @@
 			<div id="wrapper" class="text_align_center">
 			<div class="login_admin">
 <?php
-				print get_demo_expiry_time();
-				if($GLOBALS['logged_in_was_tried']) {
-					if(get_post('username') || get_post('password')) {
-						sleep(5);
+	print get_demo_expiry_time();
+	if($GLOBALS['logged_in_was_tried']) {
+		if(get_post('username') || get_post('password')) {
+			sleep(5);
 ?>
 						<span class="red_text">Benutzername oder Passwort falsch</span><br />
 <?php
-					} else {
+		} else {
 ?>
 						<span class="red_text">Benutzername und Passwort dürfen nicht leer sein.</span><br />
 <?php
-					}
-				}
+		}
+	}
 ?>
 				<form method="post">
 					<input type="hidden" name="try_login" value="1" />
@@ -43,150 +43,153 @@
 			</div>
 			</div>
 <?php
-			$GLOBALS['end_html'] = 0;
+	$GLOBALS['end_html'] = 0;
 ?>
 		</body>
 	</html>
 <?php
-	} else {
-		$chosen_institut = get_get('institut');
-		$institute = create_institute_array();
-		if(count($institute) == 0) {
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				error("Keine Institute vorhanden. <a href='admin?page=".get_page_id_by_filename("institute.php")."'>Legen Sie hier welche an</a>.");
-			} else {
-				error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen.");
-			}
-		}
-
-		if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id']) && get_institut_name($GLOBALS["user_institut_id"])) {
-			$chosen_institut = $GLOBALS['user_institut_id'];
-		}
-		
-		if (!isset($chosen_institut) && count($institute) == 1) {
-			$chosen_institut = $institute;
-			foreach ($institute as $key => $value) {
-				$chosen_institut = $value[0];
-			}
-		}
-
-		#die(">>$chosen_institut<<");
-
-		$studiengaenge = create_studiengaenge_array($chosen_institut);
-		$zeitraum = create_zeitraum_array();
-		if(!count($studiengaenge)) {
-			$fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut) ?? "!!! Institutsfehler: es existiert kein Institut !!!")."&laquo; sind noch keine Studiengänge vorhanden. ";
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
-			} else {
-				$fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
-			}
-			message($fehler);
-		}
-
-		$veranstaltungstypen = create_veranstaltungstyp_array();
-		if(!count($veranstaltungstypen)) {
-			$fehler = "Es sind keine Veranstaltungstypen vorhanden. ";
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin?page=".get_page_id_by_filename("veranstaltungstypen.php")."'>Hier können Sie welche hinzufügen.</a>";
-			} else {
-				$fehler .= "Bitten Sie einen Administrator, Veranstaltungstypen hinzuzufügen.";
-			}
-			message($fehler);
-		}
-
-		$pruefungstypen = create_pruefungstypen_array();
-		if(!count($pruefungstypen)) {
-			$fehler = "Es sind keine Prüfungstypen vorhanden. ";
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin?page=".get_page_id_by_filename("pruefungstypen.php")."'>Hier können Sie welche hinzufügen.</a>";
-			} else {
-				$fehler .= "Bitten Sie einen Administrator, Prüfungstypen hinzuzufügen.";
-			}
-			message($fehler);
-		}
-
-		$bereiche = create_bereiche_array();
-		if(!count($bereiche)) {
-			$fehler = "Es sind keine Bereiche vorhanden. ";
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin?page=".get_page_id_by_filename("bereiche.php")."'>Hier können Sie welche hinzufügen.</a>";
-			} else {
-				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
-			}
-			message($fehler);
-		}
-
-		$module = create_modul_array();
-		if(!count($module)) {
-			$fehler = "Es sind keine Module vorhanden. ";
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin?page=".get_page_id_by_filename("modul.php")."'>Hier können Sie welche hinzufügen.</a>";
-			} else {
-				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
-			}
-			message($fehler);
-		}
-
-		$gebaeude = create_gebaeude_array();
-		if(!count($gebaeude)) {
-			$fehler = "Es sind keine Gebäude vorhanden. ";
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin?page=".get_page_id_by_filename("gebaeude.php")."'>Hier können Sie welche hinzufügen.</a>";
-			} else {
-				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
-			}
-			message($fehler);
-		}
-
-		$pruefungsnummern = create_pruefungsnummern_array();
-		if(!count($pruefungsnummern)) {
-			$fehler = "Es sind keine Prüfungsnummern vorhanden. ";
-			if(user_is_admin($GLOBALS['logged_in_user_id'])) {
-				$fehler .= "<a href='admin?page=".get_page_id_by_filename("pruefungsnummern.php")."'>Hier können Sie welche hinzufügen.</a>";
-			} else {
-				$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
-			}
-			message($fehler);
-		}
-
-		if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
-			$datestring = md5(date('Y-m-d H'));
-			if (get_get('iamsure') == $datestring) {
-				make_all_foreign_keys_on_delete_cascade();
-			} else {
-				warning("<span class='red_text text_30px'>Lasse make_all_foreign_keys_on_delete_cascade() laufen, wenn der Parameter &iamsure=$datestring eingegeben wird. ICH HOFFE DU HAST EIN BACKUP DER DATENBANK!</span>\n");
-			}
-		}
-		$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]));
-		if(!user_is_verwalter($GLOBALS['logged_in_user_id'])) {
-			if(!preg_match('/\w{2,}/', $dozent_name)) {
-				$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! !!!</span>';
-			}
+} else {
+	$chosen_institut = get_get('institut');
+	$institute = create_institute_array();
+	if(count($institute) == 0) {
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			error("Keine Institute vorhanden. <a href='admin?page=".get_page_id_by_filename("institute.php")."'>Legen Sie hier welche an</a>.");
 		} else {
-			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]);
+			error("Keine Institute vorhanden. Bitten Sie den Administrator, Institute anzulegen.");
 		}
-		if(!$GLOBALS['user_role_id'][0]) {
-			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account hat keine ihm zugeordnete Rolle! !!!</span>';
+	}
+
+	if(!isset($chosen_institut) && isset($GLOBALS['user_institut_id']) && get_institut_name($GLOBALS["user_institut_id"])) {
+		$chosen_institut = $GLOBALS['user_institut_id'];
+	}
+
+	if (!isset($chosen_institut) && count($institute) == 1) {
+		$chosen_institut = $institute;
+		foreach ($institute as $key => $value) {
+			$chosen_institut = $value[0];
 		}
+	}
+
+	#die(">>$chosen_institut<<");
+
+	$studiengaenge = create_studiengaenge_array($chosen_institut);
+	$zeitraum = create_zeitraum_array();
+	if(!count($studiengaenge)) {
+		$fehler = "Für das Institut &raquo;".htmlentities(get_institut_name($chosen_institut) ?? "!!! Institutsfehler: es existiert kein Institut !!!")."&laquo; sind noch keine Studiengänge vorhanden. ";
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			$fehler .= "<a href='admin?page=".get_page_id_by_filename("studiengang.php")."'>Hier können Sie welche hinzufügen.</a>";
+		} else {
+			$fehler .= "Bitten Sie einen Administrator, Studiengänge hinzuzufügen.";
+		}
+		message($fehler);
+	}
+
+	$veranstaltungstypen = create_veranstaltungstyp_array();
+	if(!count($veranstaltungstypen)) {
+		$fehler = "Es sind keine Veranstaltungstypen vorhanden. ";
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			$fehler .= "<a href='admin?page=".get_page_id_by_filename("veranstaltungstypen.php")."'>Hier können Sie welche hinzufügen.</a>";
+		} else {
+			$fehler .= "Bitten Sie einen Administrator, Veranstaltungstypen hinzuzufügen.";
+		}
+		message($fehler);
+	}
+
+	$pruefungstypen = create_pruefungstypen_array();
+	if(!count($pruefungstypen)) {
+		$fehler = "Es sind keine Prüfungstypen vorhanden. ";
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			$fehler .= "<a href='admin?page=".get_page_id_by_filename("pruefungstypen.php")."'>Hier können Sie welche hinzufügen.</a>";
+		} else {
+			$fehler .= "Bitten Sie einen Administrator, Prüfungstypen hinzuzufügen.";
+		}
+		message($fehler);
+	}
+
+	$bereiche = create_bereiche_array();
+	if(!count($bereiche)) {
+		$fehler = "Es sind keine Bereiche vorhanden. ";
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			$fehler .= "<a href='admin?page=".get_page_id_by_filename("bereiche.php")."'>Hier können Sie welche hinzufügen.</a>";
+		} else {
+			$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+		}
+		message($fehler);
+	}
+
+	$module = create_modul_array();
+	if(!count($module)) {
+		$fehler = "Es sind keine Module vorhanden. ";
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			$fehler .= "<a href='admin?page=".get_page_id_by_filename("modul.php")."'>Hier können Sie welche hinzufügen.</a>";
+		} else {
+			$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+		}
+		message($fehler);
+	}
+
+	$gebaeude = create_gebaeude_array();
+	if(!count($gebaeude)) {
+		$fehler = "Es sind keine Gebäude vorhanden. ";
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			$fehler .= "<a href='admin?page=".get_page_id_by_filename("gebaeude.php")."'>Hier können Sie welche hinzufügen.</a>";
+		} else {
+			$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+		}
+		message($fehler);
+	}
+
+	$pruefungsnummern = create_pruefungsnummern_array();
+	if(!count($pruefungsnummern)) {
+		$fehler = "Es sind keine Prüfungsnummern vorhanden. ";
+		if(user_is_admin($GLOBALS['logged_in_user_id'])) {
+			$fehler .= "<a href='admin?page=".get_page_id_by_filename("pruefungsnummern.php")."'>Hier können Sie welche hinzufügen.</a>";
+		} else {
+			$fehler .= "Bitten Sie einen Administrator, Module hinzuzufügen.";
+		}
+		message($fehler);
+	}
+
+	if(get_get('make_all_foreign_keys_on_delete_cascade') == 1) {
+		$datestring = md5(date('Y-m-d H'));
+		if (get_get('iamsure') == $datestring) {
+			make_all_foreign_keys_on_delete_cascade();
+		} else {
+			warning("<span class='red_text text_30px'>Lasse make_all_foreign_keys_on_delete_cascade() laufen, wenn der Parameter &iamsure=$datestring eingegeben wird. ICH HOFFE DU HAST EIN BACKUP DER DATENBANK!</span>\n");
+		}
+	}
+	$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]));
+	if(!user_is_verwalter($GLOBALS['logged_in_user_id'])) {
+		if(!preg_match('/\w{2,}/', $dozent_name)) {
+			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! !!!</span>';
+		}
+	} else {
+		$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]);
+	}
+	if(!$GLOBALS['user_role_id'][0]) {
+		$dozent_name = htmlentities($GLOBALS['logged_in_data'][1]).' <span class="class_red">!!! Ihr Account hat keine ihm zugeordnete Rolle! !!!</span>';
+	}
 ?>
 		<div class="blurbox">
 		<div id="main">
 
-		<table class="invisiblebg">
+		<table class="invisiblebg fullwidth">
 			<tr class="invisiblebg">
 				<td class="invisiblebg">
 <?php
-					if(!file_exists('/etc/x11test')) {
+	if(!file_exists('/etc/x11test')) {
 ?>
 						<a href="admin" border="0"><?php print_uni_logo(); ?></a>
 <?php
-					}
+	}
 ?>
 				</td>
 				<td valign="middle" class="invisiblebg">
 					Willkommen, <?php print htmlentities($dozent_name ?? ""); ?>!
 					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden <?php print_logout_icon(); ?></a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+				</td>
+				<td class="float_right display_inline width_200px_whitespace_nowrap">
+					<?php print_search_icon("float_left"); ?><input type="text" id="globalsearch" name="search" />
 				</td>
 			</tr>
 		</table>
