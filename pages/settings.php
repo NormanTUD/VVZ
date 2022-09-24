@@ -10,15 +10,6 @@
 		$rollen = create_rollen_array();
 ?>
 	<div id="accounts">
-		<table class="invisible_table">
-			<tr>
-				<td class="invisible_td"><img src="i/wrench.svg"></td>
-				<td class="invisible_td">&nbsp;Hier kannst du die Einstellungen ALLER Benutzer ändern.</td>
-				<td class="invisible_td"><img class="skull" src="i/skull.svg"/></td>
-			</tr>
-		</table>
-
-
 		<?php print get_seitentext(); ?>
 <?php
 		include_once('hinweise.php');

@@ -2,6 +2,7 @@
 	include_once("kundenkram.php");
 	include_once("emojis.php");
 
+	$GLOBALS['settings_cache'] = array();
 	$GLOBALS["import_table"] = "";
 
 
@@ -10228,4 +10229,75 @@ order by
 	function get_post_int ($name) {
 		return intval(get_post($name));
 	}
+
+	function get_setting ($name) {
+		if(!array_key_exists($name, $GLOBALS['settings_cache'])) {
+			if(table_exists($GLOBALS["dbname"], "config")) {
+				$query = 'select name, setting from config';
+				$res = rquery($query);
+				while ($row = mysqli_fetch_row($res)) {
+					$GLOBALS['settings_cache'][$row[0]] = $row[1];
+				}
+				$res->free();
+			} else {
+				$GLOBALS['settings_cache'][$name] = array();
+			}
+		}
+
+		if(array_key_exists($name, $GLOBALS['settings_cache'])) {
+			return $GLOBALS['settings_cache'][$name];
+		} else {
+			error("Setting named `$name` could not be found!!!");
+			return null;
+		}
+	}
+
+	function reset_setting ($name) {
+		$default_setting = get_setting_default($name);
+		$description = get_setting_desc($name);
+		$query = "insert into config (name, setting, description) values (".esc($name).", ".esc($default_setting).", ".esc($description).") on duplicate key update setting=values(setting), description=values(description);";
+		if(rquery($query)) {
+			$GLOBALS['settings_cache'] = array();
+			return success("Die Einstellung $name wurde auf $default_setting resettet.");
+		} else {
+			return error("Die Einstellung $name konnte nicht resettet werden");
+		}
+	}
+
+	function set_setting ($name, $setting, $description) {
+		$query = "insert into config (name, setting) values (".esc($name).", ".esc($setting).") on duplicate key update setting=values(setting);";
+		if(rquery($query)) {
+			$GLOBALS['settings_cache'] = array();
+			return success("Die Einstellung $name wurde auf $setting gesetzt.");
+		} else {
+			return error("Die Einstellung $name konnte nicht gesetzt werden.");
+		}
+	}
+
+	function get_setting_default ($name) {
+		$query = 'select default_value from config where name = '.esc($name);
+		return get_single_value_from_query($query);
+	}
+
+	function get_setting_desc ($name) {
+		$query = 'select description from config where name = '.esc($name);
+		return get_single_value_from_query($query);
+	}
+
+	function get_setting_category ($name) {
+		$query = 'select category from config where name = '.esc($name);
+		return get_single_value_from_query($query);
+	}
+
+        function get_config () {
+                $query = 'select name, setting, category from config order by category, name';
+                $result = rquery($query);
+                $config = array();
+                while ($row = mysqli_fetch_row($result)) {
+                        $config[$row[0]] = $row[1];
+                }
+                $result->free();
+                return $config;
+        }
+
 ?>

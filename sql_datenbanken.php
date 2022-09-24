@@ -547,7 +547,18 @@
 
 'customizations' => 'create table if not exists customizations (id int unsigned primary key AUTO_INCREMENT, humanname varchar(100), classname varchar(100), property varchar(100), val varchar(100), default_val varchar(100))',
 
-'initialized_db' => 'create table if not exists initialized_db (id int unsigned primary key AUTO_INCREMENT, name varchar(200) unique)'
+'initialized_db' => 'create table if not exists initialized_db (id int unsigned primary key AUTO_INCREMENT, name varchar(200) unique)',
+
+"config" => "CREATE TABLE `config` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) DEFAULT NULL,
+  `setting` varchar(100) DEFAULT NULL,
+  `default_value` varchar(100) DEFAULT NULL,
+  `description` varchar(100) DEFAULT NULL,
+ category varchar(50),
+ PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4"
 		);
 
 	$GLOBALS['views'] = array(
