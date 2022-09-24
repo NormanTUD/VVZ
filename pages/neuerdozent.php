@@ -34,7 +34,7 @@
 				<tr>
 					<td>Titel</td>
 					<td><?php create_select($titelarray, null, 'titel_id', 1); ?></td>
-					<td rowspan="5"><input type="submit" value="Neuen Dozenten&Account anlegen"></td>
+					<td rowspan="6"><input type="submit" value="Neuen Dozenten&Account anlegen"></td>
 				</tr>
 <?php
 				if(count($instituten) > 1) {

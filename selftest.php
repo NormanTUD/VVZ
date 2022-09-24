@@ -283,7 +283,7 @@
 					(42,'Titel','titel.php','1',28, 0),
 					(43,'Neue Seite','newpage.php','1',25, 0),
 					(44,'Kontakt','../kontakt.php','1',NULL, 1),
-					(45,'Funktionen','funktionen.php','1',25, 1),
+					(45,'Funktionen','funktionen.php','0',25, 0),
 					(46,'Stundenpläne','stundenplaene.php','1',28, 0),
 					(47,'Semester','semester.php','1',28, 0),
 					(48,'Sprachen','sprachen.php','1',28, 0),
