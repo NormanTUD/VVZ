@@ -31,6 +31,29 @@
 
 	if(!function_exists("dier")) {
 		function dier ($data, $sql=0, $show_error=1) {
+			$stacktrace_data = debug_backtrace()[0];
+			$stacktrace = 'Aufgerufen von <b>'.debug_backtrace()[1]['file'].'</b>::<i>'.debug_backtrace()[1]['function'].'</i>, line '.htmlentities($stacktrace_data['line'])."<br />\n";
+
+			if(is_dir("debuglogs")) {
+				if(is_writeable("debuglogs")) {
+					$i = 0;
+					$filename = "debuglogs/$i.log";
+					while (file_exists($filename)) {
+						$i++;
+						$filename = "debuglogs/$i.log";
+					}
+
+					$string  = "MESSAGE >>>>>>>>>>>>>>>>\n\n$data\n\n<<<<<<<<<<<<<<<<\n\nStacktrace:\n\n$stacktrace";
+
+					file_put_contents($filename, $string);
+				} else {
+					stderrw("debug logs not writable");
+				}
+			} else {
+				stderrw("debug logs is no dir");
+			}
+
+			http_response_code(500);
 			if(might_be_query($data)) {
 				$sql = 1;
 			}
@@ -81,11 +104,9 @@
 				if(!file_exists("/etc/vvz_debug_query")) {
 					print "FEHLER!";
 				}
-				$source_data = debug_backtrace()[0];
 				if(array_key_exists(1, debug_backtrace())) {
-					$source = 'Aufgerufen von <b>'.debug_backtrace()[1]['file'].'</b>::<i>'.debug_backtrace()[1]['function'].'</i>, line '.htmlentities($source_data['line'])."<br />\n";
 					if($GLOBALS['logged_in_user_id'] || $show_error) {
-						print $source;
+						print $stacktrace;
 					}
 				}
 				print "<pre>\n";

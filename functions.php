@@ -2,6 +2,8 @@
 	include_once("kundenkram.php");
 	include_once("emojis.php");
 
+
+
 /*
 register_tick_function(function() {
     $bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
@@ -4600,13 +4602,8 @@ INSERT INTO
 
 
 			if($query) {
-				$check_query = "select * from veranstaltung where id = ".esc($id)." order by id";
-				$old_db_status_hash = query_to_status_hash($check_query, array("id", "gebaeudewunsch_id", "raumwunsch_id", "gebaeudewunsch_id"));
 				if(rquery($query)) {
-					$new_db_status_hash = query_to_status_hash($check_query, array("id", "gebaeudewunsch_id", "raumwunsch_id", "gebaeudewunsch_id"));
-					if($new_db_status_hash != $old_db_status_hash) {
-						success('Die Details zur Veranstaltung wurden erfolgreich geändert.');
-					}
+					success('Gespeichert!');
 				} else {
 					message('Die Details zur Veranstaltung wurden erfolgreich geändert. Aber der Raumwunsch konnte nicht gespeichert werden.');
 				}
