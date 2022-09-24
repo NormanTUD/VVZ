@@ -10,7 +10,7 @@ if ! command -v apt 2>&1 > /dev/null; then
 	exit
 fi
 
-INSTALL_PATH=/var/www/html
+INSTALL_PATH="/var/www/html"
 
 apt-get update
 apt-get install xterm whiptail curl git etckeeper ntpdate -y
@@ -19,21 +19,21 @@ git config --global credential.helper store
 
 eval `resize`
 
-INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
+INSTALL_PATH="$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)"
 if [ $? == 1 ]; then
     echo "User selected Cancel."
     exit
 fi
 
 while [[ -z "$INSTALL_PATH" ]]; do
-	INSTALL_PATH=$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)
+	INSTALL_PATH="$(whiptail --inputbox "What is the path where the VVZ should be installed to?" $LINES $COLUMNS "$INSTALL_PATH" --title "Custom install path" 3>&1 1>&2 2>&3)"
 	if [ $? == 1 ]; then
 	    echo "User selected Cancel."
 	    exit
 	fi
 done
 
-mkdir -p $INSTALL_PATH
+mkdir -p "$INSTALL_PATH"
 
 PASSWORD=""
 while [[ -z "$PASSWORD" ]]; do
@@ -44,11 +44,16 @@ while [[ -z "$PASSWORD" ]]; do
 	fi
 done
 
-cd $INSTALL_PATH
+cd "$INSTALL_PATH"
 git clone --depth 1 https://github.com/NormanTUD/VVZ.git .
 git config --global user.name "$(hostname)"
 git config --global user.email "kochnorman@rocketmail.com"
 git config pull.rebase false
+
+mkdir debuglogs
+chmod -R 770 debuglogs
+chown www-data:root debuglogs
+
 cd -
 
 
