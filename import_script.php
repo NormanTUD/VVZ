@@ -16,8 +16,10 @@
 
 			$file = fopen($filename, 'r');
 			while (($line = fgetcsv($file, 0, $delimiter)) !== FALSE) {
-				$data[$i] = $line;
-				$i++;
+				if(!preg_match("/^\s*$/", join("", $line))) {
+					$data[$i] = $line;
+					$i++;
+				}
 			}
 
 			fclose($file);
@@ -26,8 +28,10 @@
 			fwrite($stream, $content);
 			rewind($stream);
 			while (($line = fgetcsv($stream, 0, $delimiter)) !== FALSE) {
-				$data[$i] = $line;
-				$i++;
+				if(!preg_match("/^\s*$/", join("", $line))) {
+					$data[$i] = $line;
+					$i++;
+				}
 			}
 		}
 
@@ -114,7 +118,7 @@
 					$institut = get_spalte("institut", $spaltennummern, $l);
 					$studienordnung = get_spalte("studienordnung", $spaltennummern, $l);
 
-					if(!preg_match('/[a-zA-ZäöüÖÄÜß]/', $studiengang ?? "")) {
+					if(!preg_match('/[a-zA-ZäöüÖÄÜß1-9]/', $studiengang ?? "")) {
 						$error_lines[$line][$spaltennummern["studiengang"]["nr"]] = 'warning';
 						warning("In Zeile ".print_line_link($line)." beinhaltet der Studiengangsname keine Buchstaben");
 					}
