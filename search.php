@@ -33,8 +33,10 @@
 			}
 		}
 
-		$data = json_decode(search_veranstaltung("B"));
-
+		$data_veranstaltung = json_decode(search_veranstaltung($t), true);
+		foreach ($data_veranstaltung as $dv) {
+			$data[] = $dv;
+		}
 	} else {
 		$data["error"] = "No term defined";
 	}
