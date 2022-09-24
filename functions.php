@@ -2737,7 +2737,7 @@ declare(ticks=1);
 		if(!preg_match('/^\d+$/', $gebaeude_id)) {
 			$tmessage = 'Gebäude-ID wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt. ';
 			if($raumplanung) {
-				warning($tmessage);
+				//warning($tmessage);
 			} else {
 				error($tmessage);
 			}
@@ -2779,7 +2779,7 @@ declare(ticks=1);
 					}
 				}
 			} else {
-				error('Raumname wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt.');
+				//error('Raumname wurde nicht definiert. Der Raum wird nicht angezeigt bzw. angelegt.');
 			}
 		}
 	}
@@ -3179,12 +3179,12 @@ WHERE 1
 			return create_hour_from_to($stunde, $stunde, $array);
 		} else {
 			switch($stunde) {
-				case '*':
-					return '<i>Siehe Hinweise</i>';
-				case 'Ganztägig':
-					return 'Ganztägig';
-				default:
-					return 'ERROR';
+			case '*':
+				return '<i>Siehe Hinweise</i>';
+			case 'Ganztägig':
+				return 'Ganztägig';
+			default:
+				return 'ERROR';
 			}
 		}
 
@@ -3274,7 +3274,7 @@ WHERE 1
 
 	function get_and_create_studiengang ($name, $institut, $bereich) {
 		$id = get_studiengang_id_by_name($name);
-		
+
 		if($id) {
 			return $id;
 		} else {
@@ -3962,7 +3962,7 @@ WHERE 1
 		$query = 'DELETE FROM `institut` WHERE `id` = '.esc($id);
 		return simple_query_success_fail_message($query, 'Das Institut wurde erfolgreich gelöscht.', 'Das Institut konnte nicht gelöscht werden.');
 	}
-	
+
 	/* MySQL-update-Funktionen */
 
 	function update_pruefungsnummer($id, $modul_id, $pruefungsnummer, $pruefungstyp_id, $bereich_id, $modulbezeichnung, $zeitraum_id, $disabled) {
@@ -4211,7 +4211,11 @@ WHERE 1
 						if(preg_match("/^\d{4}-\d{1,2}-\d{1,2}$/", $value ?? "")) {
 							return array("ok" => 1, "value" => $value);
 						}
-						return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Muss dem Datumsformat YYYY-MM-DD folgen.");
+						if($can_be_null && ($value == "" || !$value)) {
+							return array("ok" => 1, "value" => null);
+						} else {
+							return array("ok" => 0, "value" => $value, "warning" => "$wertname konnte nicht eingefügt werden. Muss dem Datumsformat YYYY-MM-DD folgen.");
+						}
 					} else if(preg_match("/^enum\((.*)\)/", $type, $matches)) {
 						$enums = explode(",", $matches[1]);
 						$enums = preg_replace("/(?:^'|'$)/", "", $enums);
@@ -4513,7 +4517,7 @@ WHERE `id` = '.esc($id);
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
-	
+
 		eval(check_values(
 			[
 				array("table" => "veranstaltung_metadaten", "col" => "abgabe_pruefungsleistungen", "name" => "Abgabe Prüfungsleistungen"),

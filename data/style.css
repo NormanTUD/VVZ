@@ -1103,3 +1103,7 @@ a, a:visited, a:hover, a:active {
 .details_class {
 	background-color: #f7f7f7;
 }
+
+.toast {
+    opacity: 1 !important;
+}
