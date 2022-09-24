@@ -178,7 +178,7 @@
 		#}
 	}
 
-	function seconds2human($ss) {
+	function seconds2human($ss, $sloppy=0) {
 		$s = $ss%60;
 		$m = floor(($ss%3600)/60);
 		$h = floor(($ss%86400)/3600);
@@ -205,7 +205,11 @@
 			if($d == 1) {
 				return "$d Tag, $h Stunden";
 			}
-			return "$d Tage, $h Stunden";
+			if($sloppy && $d > 2) {
+				return "$d Tage";
+			} else {
+				return "$d Tage, $h Stunden";
+			}
 		}
 
 		if($h) {
@@ -236,13 +240,17 @@
 	function get_demo_expiry_time() {
 		try {
 			if(is_demo()) {
-				$installation_age = get_single_row_from_query("select now() - installation_date from ".get_kunden_db_name().".instance_config");
-				$ablauftimer = seconds2human((86400 * 7) - $installation_age);
-				$str = "<span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiben noch ".$ablauftimer." zum Testen.<br>Sie können die Adresse in der Adresszeile mit Ihren Kollegen teilen.<br>Der Standardnutzer ist <tt>Admin</tt>/<tt>test</tt></span><br>";
+				$installation_ts = get_single_row_from_query("select unix_timestamp(installation_date) from ".get_kunden_db_name().".instance_config");
+				if($installation_ts + (7 * 86400) > time()) {
+					$ablauftimer = seconds2human(time() - $installation_ts + (86400 * 7), true);
+					$str = "<span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiben noch ".$ablauftimer." zum Testen.<br>Sie können die Adresse in der Adresszeile mit Ihren Kollegen teilen.<br>Der Standardnutzer ist <tt>Admin</tt>/<tt>test</tt></span><br>";
+				} else {
+					$str = "Ihre Demo ist abgelaufen.";
+				}
 				return $str;
 			}
 		} catch (\Throwable $e) {
-
+			dier($e);
 		}
 		return "";
 	}
