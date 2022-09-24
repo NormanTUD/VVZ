@@ -4603,7 +4603,6 @@ INSERT INTO
 
 			if($query) {
 				if(rquery($query)) {
-					dier("ERROR");
 					success('Gespeichert!');
 				} else {
 					message('Die Details zur Veranstaltung wurden erfolgreich geändert. Aber der Raumwunsch konnte nicht gespeichert werden.');
@@ -10223,5 +10222,4 @@ order by
 	function get_post_int ($name) {
 		return intval(get_post($name));
 	}
-	dier(">4605<");
 ?>
