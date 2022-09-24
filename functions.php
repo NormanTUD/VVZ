@@ -47,7 +47,7 @@ declare(ticks=1);
 
 	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' ; ";
-	$GLOBALS['csp_string'] .= "img-src 'self' 'nonce-".nonce()."' ; ";
+	$GLOBALS['csp_string'] .= "img-src 'self' data: 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "style-src 'self'; ";
 	header("Content-Security-Policy: ".$GLOBALS['csp_string']);
 	header("X-Content-Security-Policy: ".$GLOBALS['csp_string']);
@@ -7116,9 +7116,10 @@ WHERE 1
 				print "<div class='square'>\n";
 				print "<div class='one'>\n";
 				if(file_exists("./i/$name.svg")) {
-					print "<img height='60' src='./i/$name.svg' />\n";
+					print "<img width=60 src='./i/$name.svg' />\n";
 				}
 				print "</div>\n";
+
 				print "<div class='two'>\n";
 			}
 
@@ -7133,7 +7134,11 @@ WHERE 1
 					if(count($this_output) > 1) {
 						print "<li>\n";
 					}
-					print "<span class='message_text'>".$this_output_item."</span>\n";
+					if(!$nogui) {
+						print "<span class='message_text'>".$this_output_item."</span>\n";
+					} else {
+						print "<span>".$this_output_item."</span>\n";
+					}
 					if(count($this_output) > 1) {
 						print "</li>\n";
 					}
