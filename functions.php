@@ -4587,6 +4587,7 @@ INSERT INTO
 				));
 
 				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = '.esc($raumwunsch_id).', `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
+
 			} elseif ($gebaeudewunsch_id) {
 				eval(check_values(
 					[
@@ -4597,10 +4598,15 @@ INSERT INTO
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
-			if($query) {
-				if(rquery($query)) {
-					success('Die Details zur Veranstaltung wurden erfolgreich geändert.');
 
+			if($query) {
+				$check_query = "select * from veranstaltung where id = ".esc($id)." order by id";
+				$old_db_status_hash = query_to_status_hash($check_query, array("id", "gebaeudewunsch_id", "raumwunsch_id", "gebaeudewunsch_id"));
+				if(rquery($query)) {
+					$new_db_status_hash = query_to_status_hash($check_query, array("id", "gebaeudewunsch_id", "raumwunsch_id", "gebaeudewunsch_id"));
+					if($new_db_status_hash != $old_db_status_hash) {
+						success('Die Details zur Veranstaltung wurden erfolgreich geändert.');
+					}
 				} else {
 					message('Die Details zur Veranstaltung wurden erfolgreich geändert. Aber der Raumwunsch konnte nicht gespeichert werden.');
 				}
