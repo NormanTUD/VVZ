@@ -301,6 +301,7 @@ declare(ticks=1);
 				fill_deletion_global(array("update_bereich", "id"), "bereich");
 				fill_deletion_global(array("update_fach", "id"), "pruefungsnummer_fach");
 				fill_deletion_global(array("update_veranstaltungstyp", "id"), "veranstaltungstyp");
+				fill_deletion_global(array("create_institut", "id"), "institut");
 			} else {
 				## UPDATE_DATA
 
