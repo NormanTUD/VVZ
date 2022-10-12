@@ -3,6 +3,11 @@ RewriteEngine On
 RewriteBase /
 AddDefaultCharset UTF-8
 
+<Files "reset.php">
+	Order Allow,Deny
+	Deny from all
+</Files>
+
 <IfModule mod_rewrite.c>
 	DirectoryIndex startseite.php
 	RewriteEngine On

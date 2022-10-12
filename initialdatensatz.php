@@ -1,5 +1,5 @@
 <?php
-if(is_demo()) {
+if(is_demo() && user_is_admin($GLOBALS["logged_in_user_id"])) {
 	$first_date = date("Y-m-d");
 	$dozenten_query = "INSERT ignore INTO `dozent` VALUES (3,'Donald','Duck',3,'0'),(2,'Dagobert','Duck',3,'0')";
 	rquery($dozenten_query);
