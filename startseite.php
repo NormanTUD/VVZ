@@ -9,7 +9,7 @@
 
 	include_once("selftest.php");
 
-	if(get_kunden_db_name() == "startpage") {
+	if(get_kunden_db_name() == "startpage" && !file_exists("/etc/vvztud")) {
 ?>
 		<title>Vorlesungsverzeichnisse</title>
 		<meta name="description" content="Online-Vorlesungsverzeichnisse als Service" />
