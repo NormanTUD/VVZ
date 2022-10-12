@@ -11,16 +11,21 @@
 		$id = get_get("kunde_id");
 	}
 
-	if($id) {
-		$query = "select img from vvz_global.logos where kunde_id = ".esc($id);
-		$result = get_single_row_from_query($query);
+	if(file_exists("/etc/vvztud")) {
+		header('Content-type: image/svg+xml');
+		readfile("tudlogo.svg");
+	} else {
+		if($id) {
+			$query = "select img from vvz_global.logos where kunde_id = ".esc($id);
+			$result = get_single_row_from_query($query);
 
-		if($result) {
-			print $result;
+			if($result) {
+				print $result;
+			} else {
+				readfile("default_logo.png");
+			}
 		} else {
 			readfile("default_logo.png");
 		}
-	} else {
-		readfile("default_logo.png");
 	}
 ?>

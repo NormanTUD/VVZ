@@ -10109,7 +10109,11 @@ order by
 
 	function print_uni_logo() {
 		$kunde_db_name = get_kunden_db_name();
-		print '<img alt="Logo, Link zur Startseite" src="logo.php" />';
+		if(file_exists("/etc/vvztud")) {
+			print '<img alt="Logo, Link zur Startseite" width=300 src="logo.php" />';
+		} else {
+			print '<img alt="Logo, Link zur Startseite" src="logo.php" />';
+		}
 	}
 
 	function delete_demo() {
