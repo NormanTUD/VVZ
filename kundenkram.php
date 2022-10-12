@@ -143,6 +143,10 @@
 	#die(get_nonexisting_db_name());
 
 	function get_kunden_db_name() {
+		if(file_exists("/etc/vvztud")) {
+			return "vvztud";
+		}
+
 		if(array_key_exists("REDIRECT_URL", $_SERVER)) {
 			$url = $_SERVER["REDIRECT_URL"];
 
@@ -152,7 +156,6 @@
 		}
 
 		return $GLOBALS["dbname"] ?? "startpage";
-		return "startpage";
 	}
 
 	function get_kunde_db_name() {
