@@ -60,6 +60,8 @@
 			$page_str .= "<br>";
 			$page_str .= "Man muss nie mehr Informationen zwei Mal eingeben. Alles, was gespeichert werden muss, wird zentral an einer Stelle gespeichert. Wenn jemand heiratet, reicht es aus, seinen Namen in einer Zeile zu ändern, dann ist es überall anders.<br>";
 			$page_str .= "<br>";
+			$page_str .= "Inklusion ist uns wichtig, daher erfüllen wir die Standards zum User-Interface-Design für Menschen mit Behinderungen.<br>";
+			$page_str .= "<br>";
 			$page_str .= "Das Beste: die Dozenten verwalten sich selbst. Jeder Dozent kann sehr einfach seine Veranstaltungen erstellen und bearbeiten, und alle Änderungen sind sofort live.<br>";
 			$page_str .= "Und das allerbeste? Sie können in weniger als 2 Minuten loslegen.<br>";
 			$page_str .= "<br>";
