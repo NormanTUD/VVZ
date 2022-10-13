@@ -151,7 +151,9 @@
 			}
 		}
 
-		return $GLOBALS["dbname"] ?? "startpage";
+		if(!file_exists("/etc/vvztud")) {
+			return $GLOBALS["dbname"] ?? "startpage";
+		}
 	}
 
 	function get_kunde_db_name() {
