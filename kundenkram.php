@@ -152,7 +152,6 @@
 		}
 
 		return $GLOBALS["dbname"] ?? "startpage";
-		return "startpage";
 	}
 
 	function get_kunde_db_name() {
