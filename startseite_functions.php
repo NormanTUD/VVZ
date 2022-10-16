@@ -1509,7 +1509,7 @@
 		if(count($semester_array) >= 2) {
 ?>
 			<form method="get">
-				<p class="text-center"><?php create_select($semester_array, $GLOBALS['this_semester'][0], 'semester', 0, 0, "semester-input"); ?></p>
+				<p class="text-center"><?php create_select($semester_array, $GLOBALS['this_semester'][0], 'semester', 0, 0, "semester-input", 1); ?></p>
 <?php
 				if(array_key_exists('studiengang', $_GET)) {
 ?>
@@ -1523,7 +1523,6 @@
 <?php
 				}
 ?>
-				<input type="submit" id="semester-input" value="Semester auswählen" />
 			</form>
 <?php
 		}

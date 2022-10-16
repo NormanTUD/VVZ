@@ -5694,14 +5694,20 @@ INSERT INTO
 <?php
 	}
 
-	function create_select ($data, $chosen, $name, $allow_empty = 0, $noautosubmit = 0, $aria_labelledby = null) {
+	function create_select ($data, $chosen, $name, $allow_empty = 0, $noautosubmit = 0, $aria_labelledby = null, $submit_on_change=0) {
 		if(!is_null($aria_labelledby)) {
-			$aria_labelledby = 'aria-labelledby="'.htmle($aria_labelledby).'"';
+			$aria_labelledby = ' aria-labelledby="'.htmle($aria_labelledby).'" ';
 		} else {
 			$aria_labelledby = '';
 		}
+
+		if($submit_on_change) {
+			$submit_on_change = ' onchange="this.form.submit()" ';
+		} else {
+			$submit_on_change = "";
+		}
 ?>
-		<select <?php print $aria_labelledby; ?> name="<?php print htmlentities($name); ?>"<?php print ($noautosubmit == 1 ? ' noautosubmit="1"' : ''); ?>>
+		<select <?php print $submit_on_change; print $aria_labelledby; ?> name="<?php print htmlentities($name); ?>"<?php print ($noautosubmit == 1 ? ' noautosubmit="1"' : ''); ?>>
 <?php
 			if($allow_empty) {
 ?>
