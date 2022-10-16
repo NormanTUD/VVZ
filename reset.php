@@ -6,6 +6,7 @@
 	}
 
 	if(isCommandLineInterface()) {
+		rquery('SET foreign_key_checks = 0');
 		$query = "show databases like 'db_vvz_%'";
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
@@ -15,12 +16,14 @@
 
 		try {
 			print "Dropping 'startpage'\n";
-			rquery("drop database startpage;");
+			rquery("drop database if exists startpage;");
 		} catch (\Throwable $e) {
 			print $e;
 		}
+
 		rquery("drop database vvz_global;");
 		rquery("drop database vvztud;");
+		rquery('SET foreign_key_checks = 1');
 	} else {
 		die("Can only be called from the CLI.");
 	}
