@@ -4,7 +4,7 @@
 	include_once("functions.php");
 	include_once("selftest.php");
 
-	#header("Content-type: image/png");
+	header("Content-type: image/png");
 
 	$id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 	if(get_get("kunde_id")) {
