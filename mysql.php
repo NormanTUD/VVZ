@@ -1,4 +1,7 @@
 <?php
+	if(file_exists("/etc/wartungsarbeiten")) {
+		die("Aktuell führen wir Wartungsarbeiten durch. Bitte warten Sie kurz.");
+	}
 	$GLOBALS["dbh"] = null;
 	include("config.php");
 

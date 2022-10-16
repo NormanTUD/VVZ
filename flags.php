@@ -11,6 +11,7 @@
 		array("x11test", "Deaktiviert einige Sachen, um automatisches X11-Testen einfacher zu machen."),
 		array("fill_form_by_default", "Fuellt die change plan seite mit default daten aus (NUR FÜR DEVELOPER)"),
 		array("no_cache", "Zwingt dazu, KEINEN Cache anzulegen"),
+		array("wartungsarbeiten", "Wenn Wartungsarbeiten dran sind (Seite kurzzeitig deaktiviert).")
 		array("vvztud", "Für die Philosophen der TUD, keine Startseite, direkt VVZ")
 	);
 ?>
