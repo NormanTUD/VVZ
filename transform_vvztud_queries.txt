@@ -1,0 +1,1 @@
+alter table page add column `disable_in_demo` int(1) unsigned not null default 0;
