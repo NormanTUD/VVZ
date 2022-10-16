@@ -714,7 +714,9 @@
 
 
 		if(is_demo($GLOBALS["dbname"]) && !$GLOBALS["logged_in_user_id"]) {
-			set_session_id(1);
+			if(!file_exists("/etc/vvztud")) {
+				set_session_id(1);
+			}
 		}
         }
 
