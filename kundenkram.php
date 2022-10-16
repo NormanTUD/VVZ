@@ -325,6 +325,10 @@
 
 
 	function is_demo () {
+		if(file_exists("/etc/vvztud")) {
+			return false;
+		}
+
 		if(get_kunde_plan() == "Demo") {
 			return true;
 		}
@@ -332,6 +336,10 @@
 	}
 
 	function db_is_demo ($db, $cache=1) {
+		if(file_exists("/etc/vvztud")) {
+			return false;
+		}
+
 		if(!array_key_exists($db, $GLOBALS["is_demo"]) && $cache) {
 			if(database_exists($db) && table_exists($db, "instance_config") && table_exists($db, "plan")) {
 				$query = "select p.name from vvz_global.kundendaten k left join vvz_global.plan p on k.plan_id = p.id";
