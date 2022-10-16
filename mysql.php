@@ -527,8 +527,7 @@
 			}
 
 			try {
-				dier("if((!".array_key_exists("no_selftest_force", $GLOBALS) ".|| ."!$GLOBALS["no_selftest"])."&& (".$GLOBALS["dbname"]." == 'startpage' || ".preg_match("/^db_vvz_vorlesungsverzeichnis_demo_/", $GLOBALS["dbname"]."))) {");
-				if((!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) && ($GLOBALS["dbname"] == "startpage" || preg_match("/^db_vvz_vorlesungsverzeichnis_demo_/", $GLOBALS["dbname"]))) {
+				if((!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) && ($GLOBALS["dbname"] == "startpage" || (preg_match("/^db_vvz_vorlesungsverzeichnis_demo_/", $GLOBALS["dbname"]) || preg_match("/^vvztud/", $GLOBALS["dbname"])) )) {
 					$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
 					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
 						sleep(1);
