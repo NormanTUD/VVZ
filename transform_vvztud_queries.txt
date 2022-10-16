@@ -1,1 +1,7 @@
 alter table page add column `disable_in_demo` int(1) unsigned not null default 0;
+alter table page add column `show_in_startpage` int(1) unsigned not null default 0;
+
+insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) values  (55, 'Rechnungen', 'rechnungen.php', '1', null, 0);
+insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) values (56, 'Anpassen', 'anpassen.php', '1', NULL, 1);
+insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) values (57, 'Importer', 'import.php', '1', 25, 1);
+insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) values (58, 'Einstellungen', 'settings.php', '1', 25, 1);
