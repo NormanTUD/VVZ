@@ -1596,14 +1596,14 @@
 ?>
 			<div class="row">
 				<div class="<?php print $width_determining_class; ?> medium-centered columns">
-				<a href="startseite?studiengang=alle&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
+				<a href="startseite?studiengang=alle&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut'] ?? ""); ?>">
 						<div id="alle_lehrveranstaltungen" class="callout text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Lehrveranstaltungen</h4></div>
 					</a>
 				</div>
 			</div>
 			<div class="row">
 				<div class="<?php print $width_determining_class; ?> medium-centered columns">
-				<a href="startseite?alle_pruefungsnummern=1&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
+				<a href="startseite?alle_pruefungsnummern=1&semester=<?php if(is_array($GLOBALS['this_semester'])) { print $GLOBALS['this_semester'][0]; } else { print $GLOBALS['this_semester']; }; ?>&institut=<?php print htmlentities($GLOBALS['this_institut'] ?? ""); ?>">
 						<div id="alle_pruefungsleistungen_anzeigen" class="callout allepls text-center"><?php print $GLOBALS['linkicon']; ?><h4>Alle Prüfungsleistungen anzeigen</h4></div>
 					</a>
 				</div>
@@ -1639,7 +1639,7 @@
 ?>
 			<div class="row">
 				<div <?php print $divid ? "id='$divid'" : ''; ?> class="<?php print $width_determining_class; ?> medium-centered columns text-center">
-					<a href="startseite?studiengang=<?php print $this_studiengang_id; ?>&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut']); ?>">
+					<a href="startseite?studiengang=<?php print $this_studiengang_id; ?>&semester=<?php print htmlentities($GLOBALS['this_semester'][0]); ?>&institut=<?php print htmlentities($GLOBALS['this_institut'] ?? ""); ?>">
 						<div class="callout primary"><?php print $GLOBALS['linkicon']; ?><h4><?php
 							if($this_studiengang_name[1] == "Werkstatt Philosophie") {
 								print_wrench_icon();

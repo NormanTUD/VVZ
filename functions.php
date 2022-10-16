@@ -10117,6 +10117,9 @@ order by
 	}
 
 	function delete_demo() {
+		if(file_exists("/etc/vvztud")) {
+			return;
+		}
 		try {
 			$query = "show databases like 'db_vvz_%'";
 			$result = rquery($query);
