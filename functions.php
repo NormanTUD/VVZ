@@ -6150,7 +6150,7 @@ INSERT INTO
 					try {
 						$veranstaltung_text = $stundenplan[$tag][$stunde_key];
 					} catch (\Throwable $e) {
-						//
+						$veranstaltung_text = $stundenplan[$tag]["Ganztägig"];
 					}
 					$alt_text = get_get('alternative_text_veranstaltung_'.$id);
 					if($alt_text && strlen($alt_text) >= 2) {
