@@ -10458,6 +10458,14 @@ order by
 	function search_veranstaltung ($term) {
 		$veranstaltung_page = get_page_id_by_filename("veranstaltung.php");
 		$query = 'select concat("goto_page=admin?page='.$veranstaltung_page.'&id=", v.id) as id, concat(v.name, " (", s.typ, " ", s.jahr, ")") as label, concat(v.name, " (", s.typ, " ", s.jahr, ")") as value from veranstaltung v left join semester s on v.semester_id = s.id where name like '.esc("%$term%");
+		if(!user_is_admin($GLOBALS["logged_in_user_id"])) {
+			$allowed_dozenten = array(get_dozent_id_by_user_id($GLOBALS["logged_in_user_id"]));
+			foreach (get_user_per_superdozent($GLOBALS["logged_in_user_id"]) as $nr => $dt) {
+				$allowed_dozenten[] = $dt[0];
+			}
+			$query .= " and dozent_id in (".join(", ", $allowed_dozenten).")";
+		}
+		$query .= " order by s.id desc";
 
 		return query_to_json($query);	
 	}
