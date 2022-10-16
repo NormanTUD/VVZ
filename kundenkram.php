@@ -241,6 +241,10 @@
 	}
 
 	function get_demo_expiry_time() {
+		if($GLOBALS["dbname"] == "vvztud") {
+			return "";
+		}
+
 		try {
 			if(is_demo()) {
 				$installation_ts = get_single_row_from_query("select unix_timestamp(installation_date) from ".get_kunden_db_name().".instance_config");

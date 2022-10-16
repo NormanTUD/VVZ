@@ -20,6 +20,7 @@
 			print $e;
 		}
 		rquery("drop database vvz_global;");
+		rquery("drop database vvztud;");
 	} else {
 		die("Can only be called from the CLI.");
 	}
