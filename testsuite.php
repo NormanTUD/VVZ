@@ -105,6 +105,6 @@
 	is_equal("weekday_to_wochentag('hallo')", weekday_to_wochentag("hallo"), array("ERROR", "Fehler beim Bestimmen des Tages"));
 	is_equal("weekday_to_wochentag(null)", weekday_to_wochentag(null), array("ERROR", "Fehler beim Bestimmen des Tages"));
 
-	is_equal("nonce()", strlen(nonce()), 10);
+	is_equal("strlen(nonce()) = 10", strlen(nonce()), 10);
 	is_equal("nonce() == nonce()", nonce(), nonce());
 ?>
