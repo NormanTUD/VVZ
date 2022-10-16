@@ -346,7 +346,7 @@
 
 	$GLOBALS['shown_etwa'] = 0;
 
-	$GLOBALS['institute'] = table_exists($GLOBALS["dbname"], "institut") ? create_institute_array($GLOBALS["this_semester"][0]) : Array();
+	$GLOBALS['institute'] = table_exists($GLOBALS["dbname"], "institut") == 1 ? create_institute_array($GLOBALS["this_semester"][0], 1) : Array();
 
 	$GLOBALS['this_institut'] = null;
 

@@ -6510,12 +6510,12 @@ INSERT INTO
 		return get_single_row_from_query("select count(*) from veranstaltung v where v.semester_id = ".esc($institut_id)." and institut_id = ".esc($semester_id));
 	}
 
-	function create_institute_array ($semester_id=null) {
+	function create_institute_array ($semester_id=null, $allow_without_veranstaltungen=0) {
 		$institute = array();
 		$query = 'SELECT `id`, `name` FROM `institut`';
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
-			if(is_null($semester_id) || get_number_of_veranstaltungen_by_institut_and_semester_id($row[0], $semester_id)) {
+			if(is_null($semester_id) || (get_number_of_veranstaltungen_by_institut_and_semester_id($row[0], $semester_id) || $allow_without_veranstaltungen)) {
 				$institute[$row[0]] = array($row[0], "$row[1]");
 			}
 		}
