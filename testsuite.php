@@ -23,7 +23,7 @@
 	is_equal("htmle('Philosophie')", htmle("Philosophie"), 'Philosophie');
 	is_equal("htmle('Philosophie', 1)", htmle("Philosophie", 1), 'Phi&shy;lo&shy;so&shy;phie');
 
-	is_equal("table_exists('uni', 'users')", table_exists("uni", "users"), 1);
+	is_equal("table_exists(".$GLOBALS['dbname'].", 'users')", table_exists($GLOBALS["dbname"], "users"), 1);
 	is_equal("table_exists('asdasaas', '33rfwsd')", table_exists("asdasaas", "33rfwsd"), 0);
 
 	is_equal("is_valid_auth_code(null)", is_valid_auth_code(null), 0);
@@ -68,13 +68,13 @@
 
 	is_equal("user_braucht_barrierefreien_zugang(2)", user_braucht_barrierefreien_zugang(2), array());
 
-	is_equal("table_exists('uni', 'users')", table_exists("uni", "users"), 1);
-	is_equal("table_exists('uni', 'IDONOTEXIST')", table_exists("uni", "IDONOTEXIST"), 0);
+	is_equal("table_exists(".$GLOBALS['dbname'].", 'users')", table_exists($GLOBALS["dbname"], "users"), 1);
+	is_equal("table_exists(".$GLOBALS['dbname'].", 'IDONOTEXIST')", table_exists($GLOBALS["dbname"], "IDONOTEXIST"), 0);
 	is_equal("array_value_or_null(array('a' => 5), 'a')", array_value_or_null(array('a' => 5), 'a'), 5);
 	is_equal("array_value_or_null(array('a' => 5), 'b')", array_value_or_null(array('a' => 5), 'b'), null);
 	is_equal("mask_module('hallo')", mask_module("hallo"), "<i>hallo</i>");
 
-	is_equal("get_language_name(1)", get_language_name(1), "&#x1F1E9;&#x1F1EA; deutsch");
+	is_equal("get_language_name(1)", get_language_name(1), "<img width=32 src='data/germany_flag.svg' />&nbsp;deutsch");
 	is_equal("get_language_name(9999)", get_language_name(9999), '');
 
 	is_equal("might_be_query('select 1 dual')", might_be_query('select 1 from dual'), 1);
