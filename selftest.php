@@ -563,7 +563,7 @@
 			#$result = rquery($query);
 
 			if(!table_exists_and_has_entries("bereiche") && !already_initialized("bereich")) {
-				$bereiche_query = "INSERT IGNORE INTO `bereich` VALUES (1, '-');";
+				$bereiche_query = "INSERT IGNORE INTO `bereich` (id, name) VALUES (1, '-');";
 				rquery($bereiche_query);
 				initialized("bereich");
 			}
