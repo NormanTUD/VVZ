@@ -6284,9 +6284,9 @@ INSERT INTO
 					}
 
 					$str .= "\t<tr>\n";
-					$str .= "\t\t".'<td class="stundenplan_td">'.htmlentities($row[0]).pruefung_symbole($row[0])."</td>\n";
-					$str .= "\t\t".'<td class="stundenplan_td colorhashme">'.htmlentities($row[1])."</td>\n";
-					$str .= "\t\t".'<td class="stundenplan_td">'.htmlentities($row[5])."</td>\n";
+					$str .= "\t\t".'<td class="stundenplan_td">'.htmlentities($row[0] ?? "").pruefung_symbole($row[0])."</td>\n";
+					$str .= "\t\t".'<td class="stundenplan_td colorhashme">'.htmlentities($row[1] ?? "")."</td>\n";
+					$str .= "\t\t".'<td class="stundenplan_td">'.htmlentities($row[5] ?? "")."</td>\n";
 					$str .= "\t</tr>\n";
 					$c++;
 				}
