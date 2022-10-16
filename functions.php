@@ -6146,7 +6146,11 @@ INSERT INTO
 					$id = urlencode("$tag-$stunde_value");
 					$id = preg_replace("/mdash;/", '', $id);
 					$id = preg_replace("/[^A-Za-z0-9 ]/", '', $id);
-					$veranstaltung_text = $stundenplan[$tag][$stunde_key];
+					try {
+						$veranstaltung_text = $stundenplan[$tag][$stunde_key];
+					} catch (\Throwable $e) {
+						//
+					}
 					$alt_text = get_get('alternative_text_veranstaltung_'.$id);
 					if($alt_text && strlen($alt_text) >= 2) {
 						$alt_text = htmlentities($alt_text);
