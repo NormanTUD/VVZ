@@ -6353,16 +6353,13 @@ INSERT INTO
 		$query1 = 'SHOW COLUMNS FROM '.$table;
 		$result1 = rquery($query1);
 
-		$has_mergeable_structure = 1;
 		while ($row1 = mysqli_fetch_row($result1)) {
 			if($row1[0] == 'id' || $row1[0] == 'name' || $row1[0] == 'abkuerzung' || $row1[0] == 'studiengang_id') {
-				# OK
-			} else {
-				$has_mergeable_structure = 0;
+				return 1;
 			}
 		}
 
-		return $has_mergeable_structure;
+		return 0;
 	}
 
 	function get_father_page ($id) {
