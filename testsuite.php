@@ -1,5 +1,5 @@
 <?php
-	include("testing.php");
+	include_once("testing.php");
 
 	$number_regex = "/^[1-9][0-9]*$/";
 

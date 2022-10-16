@@ -1,5 +1,5 @@
 <?php
-	include("functions.php");
+	include_once("functions.php");
 
 	$GLOBALS['started_tests'] = 0;
 	function print_diffs ($name, $a, $b) {
