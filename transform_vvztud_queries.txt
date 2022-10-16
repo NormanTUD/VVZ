@@ -1,3 +1,4 @@
+-- ssh service@imageseg.scads.de 'ssh root@vvz.phil.tu-dresden.de "mysqldump --no-create-info --complete-insert -hvvz.phil.tu-dresden.de -uroot -pholm uni"' | grep -v 'Dump completed on' > backup.sql
 alter table page add column `disable_in_demo` int(1) unsigned not null default 0;
 alter table page add column `show_in_startpage` int(1) unsigned not null default 0;
 

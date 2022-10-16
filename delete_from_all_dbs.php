@@ -10,7 +10,7 @@
 		$query = "show tables from vvztud";
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
-			if(!preg_match("/^view_/", $row[0])) {
+			if(!preg_match("/^view_/", $row[0]) && $row[0] != "ua_overview") {
 				print "Deleting all from '$row[0]'\n";
 				try {
 					rquery("delete from $row[0];");

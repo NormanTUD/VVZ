@@ -10485,5 +10485,5 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 		}
 	}
 
-	add_system_versioning();
+	#add_system_versioning();
 ?>
