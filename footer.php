@@ -21,11 +21,13 @@
 		'zeitraster' => array("name" => "Zeitraster", "id" => "zeitraster", 'admin_only' => 0),
 		'faq' => array("name" => 'FAQ', "id" => 'faq_link', 'admin_only' => 0),
 		'front.pdf' => array("name" => 'Dokumentation', "id" => 'doku_link', 'admin_only' => 0),
-		'admin' => array("name" => 'Administration', "id" => 'admin_link', 'admin_only' => 0),
-		"change_plan" => array("name" => "Business-Plan ändern", "id" => "change_plan", 'admin_only' => 1),
-		'kontakt' => array("name" => 'Kontakt', "id" => 'kontakt_link', 'admin_only' => 0),
-		'impressum' => array("name" => 'Impressum', "id" => 'impressum_link', 'admin_only' => 0)
+		'admin' => array("name" => 'Administration', "id" => 'admin_link', 'admin_only' => 0)
 	);
+	if(!file_exists("/etc/vvztud")) {
+		$sites["change_plan"] = array("name" => "Business-Plan ändern", "id" => "change_plan", 'admin_only' => 1);
+	}
+	$sites['kontakt'] = array("name" => 'Kontakt', "id" => 'kontakt_link', 'admin_only' => 0);
+	$sites['impressum'] = array("name" => 'Impressum', "id" => 'impressum_link', 'admin_only' => 0);
 ?>
 	<i>
 <?php
