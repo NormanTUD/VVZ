@@ -151,6 +151,7 @@ declare(ticks=1);
 
 	include('mysql.php');
 
+	rquery("SET @@system_versioning_alter_history = 0;");
 	selftest_startpage();
 
 	if(database_exists($GLOBALS["dbname"])) {
@@ -10462,4 +10463,25 @@ order by
 	function rarr ($str) {
 		return preg_replace("/&rarr;/", '→', $str);
 	}
+
+	function add_system_versioning () {
+		$tables_res = rquery("show full tables where Table_Type != 'VIEW'");
+		while ($row = mysqli_fetch_row($tables_res)) {
+			$query = '
+ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START,
+              ADD COLUMN te TIMESTAMP(6) GENERATED ALWAYS AS ROW END,
+              ADD PERIOD FOR SYSTEM_TIME(ts, te),
+              ADD SYSTEM VERSIONING;
+';
+			try {
+				rquery("SET @@system_versioning_alter_history = 1;");
+				rquery($query, 0);
+			} catch (\Throwable $e) {
+				//
+			}
+			rquery("SET @@system_versioning_alter_history = 0;");
+		}
+	}
+
+	add_system_versioning();
 ?>
