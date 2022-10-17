@@ -199,7 +199,7 @@
 			print "Dieses Tool soll Ihnen helfen, Dokumente automatisch zu erstellen. Mit einem Klick auf das jeweilige Dokument können Sie die Felder eintragen und das fertige Dokument ausdrucken. Das Tool hilft, indem es Daten, die im Vorlesungsverzeichnis gespeichert sind (wie z.B. Modul- und Prüfungstypen aus der Prüfungsnummer), automatisch einträgt. Die eingetragenen Daten werden <i><b>nicht</b></i> auf dem Server gespeichert.<br />";
 			print "<ul>\n";
 			foreach ($dokumente as $dokument_id => $dokument_data) {
-				print "<li><a href='dokumente.php?id=".$dokument_id."'>".$dokument_data['title']."</a></li>\n";
+				print "<li><a href='docs?id=".$dokument_id."'>".$dokument_data['title']."</a></li>\n";
 			}
 			print "</ul>\n";
 		}

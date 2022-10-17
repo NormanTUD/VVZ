@@ -17,7 +17,7 @@
 	$sites = array(
 		'startseite' => array("name" => 'Startseite', "id" => 'startseite_link', 'admin_only' => 0),
 		'api' => array("name" => 'API', "id" => 'api_link', 'admin_only' => 0),
-		'dokumente' => array("name" => 'Dokumente', "id" => 'dokumente_link', 'admin_only' => 0),
+		'docs' => array("name" => 'Dokumente', "id" => 'dokumente_link', 'admin_only' => 0),
 		'zeitraster' => array("name" => "Zeitraster", "id" => "zeitraster", 'admin_only' => 0),
 		'faq' => array("name" => 'FAQ', "id" => 'faq_link', 'admin_only' => 0),
 		'front.pdf' => array("name" => 'Dokumentation', "id" => 'doku_link', 'admin_only' => 0),
