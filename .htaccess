@@ -23,6 +23,7 @@ AddDefaultCharset UTF-8
 	RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
 	RewriteRule ^admin$ admin.php [L]
 	RewriteRule ^impressum$ impressum.php [L]
+	RewriteRule ^dokumente$ dokumente.php [L]
 	RewriteRule ^faq$ faq.php [L]
 	RewriteRule ^api$ api.php [L]
 	RewriteRule ^zeitraster$ zeitraster.php [L]
