@@ -104,7 +104,7 @@
 			$title = $dokument['title'];
 			$fields = $dokument['fields'];
 			$master = $dokument['master'];
-			$master_file = './dokumente/'.$master;
+			$master_file = './d/'.$master;
 
 			if(file_exists($master_file)) {
 				if(get_get('generate')) {
@@ -133,7 +133,7 @@
 							$black = imagecolorallocate($im, 0, 0, 0);
 							$fontsize = 70;
 							$angle = 0;
-							$font = './dokumente/FreeSans.ttf';
+							$font = './d/FreeSans.ttf';
 							imagettftext($im, $fontsize, $angle, $x, $y, $black, $font, $value);
 						}
 					}
