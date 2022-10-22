@@ -223,7 +223,7 @@
   `name` varchar(100) DEFAULT NULL,
   `institut_id` int(10) unsigned NOT NULL,
   `studienordnung` varchar(1000) DEFAULT NULL,
-  `order_key` int(10) default null,
+  `order_key` int(10) default 999999,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `institut_id` (`institut_id`),

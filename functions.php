@@ -6412,7 +6412,7 @@ INSERT INTO
 			$query .= ' AND `v`.`institut_id` = '.esc($institut);
 		}
 
-		$query .= ' GROUP BY `id` ORDER BY `s`.`name` ASC';
+		$query .= ' GROUP BY `id` ORDER BY `s`.`order_key` DESC, `s`.`name` ASC';
 
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
