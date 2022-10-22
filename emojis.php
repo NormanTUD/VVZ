@@ -201,4 +201,12 @@
 	function print_logout_icon () {
 		print get_logout_icon();
 	}
+
+	function get_hike_icon () {
+		return '<i class="fa-solid fa-person-hiking"></i>';
+	}
+
+	function print_hike_icon () {
+		print get_hike_icon();
+	}
 ?>

@@ -736,6 +736,12 @@
 		}
 	}
 
+	function veranstaltung_has_bezug_to_exkursion($id) {
+		$query = 'select count(*) from veranstaltung_nach_bezuegetypen vt left join veranstaltung_bezuege b on vt.bezuegetyp_id = b.id where b.name like "%xkursion%" and veranstaltung_id = '.esc($id);
+
+		return !!get_single_row_from_query($query);
+	}
+
 	function show_veranstaltungsbox_header($id, $stunde, $woche, $row, $hinweis) {
 ?>
 		<span class="">
@@ -745,6 +751,11 @@
 			<?php print html_map(null, null, $row[1]); ?></a>
 <?php
 			warn_if_attention_match($hinweis);
+
+
+			if(veranstaltung_has_bezug_to_exkursion($id)) {
+				print "<span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine Exkursion'>".get_hike_icon()."</span>";
+			}
 ?>
 		</span>
 <?php
