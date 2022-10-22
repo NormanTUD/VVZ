@@ -15,9 +15,11 @@ if(!$GLOBALS['logged_in']) {
 		<div id="main">
 			<a href="admin" border="0"><?php print_uni_logo(); ?></a>
 			<div id="wrapper" class="text_align_center">
+<?php
+			print get_demo_expiry_time();
+?>
 			<div class="login_admin">
 <?php
-	print get_demo_expiry_time();
 	if($GLOBALS['logged_in_was_tried']) {
 		if(get_post('username') || get_post('password')) {
 			sleep(5);
