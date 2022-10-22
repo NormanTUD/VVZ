@@ -34,7 +34,7 @@ Betreiber:<br>
 </p>
 
 <p>
-Konzeption, techn. Realisierung:<br>
+Konzeption:<br>
 Norman Koch<br>
 E-Mail: <i><a href="kontakt.php">über das Kontaktformular</a></i><br>
 </p>
