@@ -148,7 +148,7 @@
  */
 	$GLOBALS["selftest_already_done"] = 0;
 	$GLOBALS['university_name'] = "TU Dresden";
-	$GLOBALS['impressum_university_page'] = "https://tu-dresden.de/impressum";
+	$GLOBALS['impressum_university_page'] = "http://www.omni-concept.com/v1024/Pages/impressum.htm";
 	$GLOBALS["calname"] = "Philosophie";
 	$GLOBALS['timezone_name'] = "Europe/Berlin";
 
@@ -198,5 +198,6 @@
 		$GLOBALS["default_plz"] = "01062";
 		$GLOBALS["default_strasse"] = "Nöthnitzer Straße 43";
 		$GLOBALS["default_email"] = "norbert.engemaier@tu-dresden.de";
+		$GLOBALS['impressum_university_page'] = "https://tu-dresden.de/impressum";
 	}
 ?>
