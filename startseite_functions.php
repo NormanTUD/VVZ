@@ -1,6 +1,8 @@
 <?php
 	include_once("config.php");
 
+
+
 	function einzelne_termine ($id) {
 		$einzelne_termine = get_einzelne_termine_by_veranstaltung_id($id);
 
@@ -737,8 +739,9 @@
 		}
 	}
 
-	function veranstaltung_has_bezug_to_exkursion($id) {
-		$query = 'select count(*) from veranstaltung_nach_bezuegetypen vt left join veranstaltung_bezuege b on vt.bezuegetyp_id = b.id where b.name like "%xkursion%" and veranstaltung_id = '.esc($id);
+
+	function veranstaltung_has_bezug_to($id, $w) {
+		$query = 'select count(*) from veranstaltung_nach_bezuegetypen vt left join veranstaltung_bezuege b on vt.bezuegetyp_id = b.id where b.name like '.esc($w).' and veranstaltung_id = '.esc($id);
 
 		return !!get_single_row_from_query($query);
 	}
@@ -754,8 +757,12 @@
 			warn_if_attention_match($hinweis);
 
 
-			if(veranstaltung_has_bezug_to_exkursion($id)) {
-				print "<span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine Exkursion'>".get_hike_icon()."</span>";
+			if(veranstaltung_has_bezug_to($id, "%xkursion")) {
+				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine Exkursion'>".get_hike_icon()."</span>";
+			}
+
+			if(veranstaltung_has_bezug_to($id, "%eruf%")) {
+				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine berufspraktische Bezüge'>".get_work_icon()."</span>";
 			}
 ?>
 		</span>

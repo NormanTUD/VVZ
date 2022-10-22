@@ -209,4 +209,12 @@
 	function print_hike_icon () {
 		print get_hike_icon();
 	}
+
+	function get_work_icon () {
+		return '<i class="fa-solid fa-briefcase"></i>';
+	}
+
+	function print_work_icon () {
+		print get_work_icon();
+	}
 ?>
