@@ -27,13 +27,13 @@
 
 		<!-- Container element -->
 		<div class="parallax">
-		<div id="startseite_header">
-			<a href="#vvz" class="header_link">Das Vorlesungsverzeichnis</a> |
-			<a href="#kunden" class="header_link">Aktuelle Kunden</a> |
-			<a href="#uebersicht" class="header_link">Übersicht</a> |
-			<a href="http://www.omni-concept.com/v1024/Pages/impressum.htm" target="_blank" class="header_link">Impressum</a> |
-			<a href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm" target="_blank" class="header_link">Datenschutzerklärung</a>
-		</div>
+			<div id="startseite_header">
+				<a href="#vvz" class="header_link">Das Vorlesungsverzeichnis</a> |
+				<a href="#kunden" class="header_link">Aktuelle Kunden</a> |
+				<a href="#uebersicht" class="header_link">Übersicht</a> |
+				<a href="http://www.omni-concept.com/v1024/Pages/impressum.htm" target="_blank" class="header_link">Impressum</a> |
+				<a href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm" target="_blank" class="header_link">Datenschutzerklärung</a>
+			</div>
 
 <?php
 			$query = "select urlname, universitaet, plan_id, external_url, id from vvz_global.kundendaten where urlname is not null and (external_url is not null or id in (select kunde_id from vvz_global.logos)) order by external_url desc, urlname asc";
