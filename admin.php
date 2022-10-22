@@ -198,9 +198,11 @@ if(!$GLOBALS['logged_in']) {
 			</tr>
 		</table>
 <?php
-			if(get_post('password') == 'test' && get_post('try_login')) {
+			if(get_post('password') == 'test' && get_post('try_login') && !db_is_demo($GLOBALS["dbname"], 1)) {
 ?>
-				<script type="text/javascript">alert("Bitte ändern Sie Ihr Passwort! Dies können Sie unter dem Menüpunkt 'Eigene Daten ändern' machen. Diese Meldung wird bei jedem Anmelden kommen, solange Sie Ihr Passwort nicht geändert haben.");</script>
+				<script type="text/javascript">
+					alert("Bitte ändern Sie Ihr Passwort! Dies können Sie unter dem Menüpunkt 'Eigene Daten ändern' machen. Diese Meldung wird bei jedem Anmelden kommen, solange Sie Ihr Passwort nicht geändert haben.");
+				</script>
 <?php
 			}
 			if(!file_exists('/etc/x11test')) {
