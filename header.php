@@ -77,10 +77,8 @@
 		//css(array("font-awesome.min.css"));
 
 		css(
-			"css/fontawesome.css",
-			"css/brands.css",
-			"css/solid.css",
-			"css/v4-font-face.css"
+			"css/all.css",
+			"css/v4-shims.css"
 		);
 
 		if(array_key_exists("SCRIPT_NAME", $_SERVER) && !($_SERVER["SCRIPT_NAME"] == "/admin" || $_SERVER["SCRIPT_NAME"] == "/admin.php")) {
@@ -107,7 +105,7 @@
 				"toastr.js",
 				"msgs.php",
 				"mainscript.php",
-				"js/fontawesome.js"
+				"js/all.js"
 			));
 		?>
 <?php
