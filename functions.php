@@ -467,7 +467,7 @@ declare(ticks=1);
 					if(get_post('delete')) {
 						delete_studiengang($this_id);
 					} else {
-						update_studiengang($this_id, get_post('studiengang'), get_post('institut_id'), get_post('studienordnung'));
+						update_studiengang($this_id, get_post('studiengang'), get_post('institut_id'), get_post('studienordnung'), get_post("order_key"));
 					}
 				}
 
@@ -3630,13 +3630,14 @@ WHERE 1
 		}
 	}
 
-	function create_studiengang ($name, $institut_id, $studienordnung) {
+	function create_studiengang ($name, $institut_id, $studienordnung, $order_key) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		eval(check_values(
 			[
 				array("table" => "studiengang", "col" => "name", "name" => "Name"),
 				array("table" => "studiengang", "col" => "institut_id", "name" => "Institut-ID"),
-				array("table" => "studiengang", "col" => "studienordnung", "name" => "Studienordnung")
+				array("table" => "studiengang", "col" => "studienordnung", "name" => "Studienordnung"),
+				array("table" => "studiengang", "col" => "order_key", "name" => "Order-Key")
 			]
 		));
 
@@ -4844,7 +4845,7 @@ INSERT INTO
 		return simple_query_success_fail_message($query, 'Das Funktionsrecht wurde erfolgreich geändert.', null, 'Das Funktionsrecht konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 	}
 
-	function update_studiengang ($id, $name, $institut_id, $studienordnung) {
+	function update_studiengang ($id, $name, $institut_id, $studienordnung, $order_key) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 		if ($studienordnung && filter_var($studienordnung, FILTER_VALIDATE_URL) === FALSE) {
 			error('`'.htmlentities($studienordnung).'` ist keine valide URL für die Studienordnung.');
@@ -4860,8 +4861,8 @@ INSERT INTO
 			]
 		));
 
-		if(!get_single_row_from_query("select count(*) from studiengang where name = ".esc($name)." and institut_id = ".esc($institut_id))) {
-			$query = 'UPDATE `studiengang` SET `name` = '.esc($name).', `institut_id` = '.esc($institut_id).', `studienordnung` = '.esc($studienordnung).' WHERE `id` = '.esc($id);
+		if(!get_single_row_from_query("select count(*) from studiengang where name = ".esc($name)." and institut_id = ".esc($institut_id))." and order_key = ".esc($order_key)) {
+			$query = 'UPDATE `studiengang` SET `name` = '.esc($name).', `institut_id` = '.esc($institut_id).', `studienordnung` = '.esc($studienordnung).', order_key = '.esc($order_key).' WHERE `id` = '.esc($id);
 			return simple_query_success_fail_message($query, 'Der Studiengang wurde erfolgreich geändert.', null, 'Der Studiengang konnte nicht geändert werden oder es waren keine Änderungen notwendig.');
 		} else {
 			warning("Der Studiengang existierte bereits und wurde nicht neu eingetragen.");
@@ -5806,6 +5807,12 @@ INSERT INTO
 						<td><input type="text" class="width500px" name="abkuerzung" value="<?php print htmlentities($row[4] ?? ""); ?>" /></td>
 <?php
 					}
+
+					if(in_array('order_key', $columnnames)) {
+?>
+						<td><input type="text" class="width500px" name="order_key" value="<?php print htmlentities($row[4] ?? ""); ?>" /></td>
+<?php
+					}
 ?>
 					<td><input type="submit" class="submit" value="Speichern" /></td>
 					<td><input type="submit" name="delete" value="Löschen" /></td>
@@ -5841,6 +5848,12 @@ INSERT INTO
 					if(in_array('abkuerzung', $columnnames)) {
 ?>
 						<td><input type="text" class="width500px" name="abkuerzung" value="" /></td>
+<?php
+					}
+
+					if(in_array('order_key', $columnnames)) {
+?>
+						<td><input type="text" class="width500px" name="order_key" value="" /></td>
 <?php
 					}
 ?>
