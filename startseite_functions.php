@@ -835,7 +835,7 @@
 			)
 		) {
 ?>
-			<a href="admin.php?page=<?php print htmlentities(get_page_id_by_filename('veranstaltung.php')); ?>&id=<?php print htmlentities($id); ?>"><i><?php print_edit_icon(); ?> Diese Veranstaltung bearbeiten</i></a>
+			<a href="admin?page=<?php print htmlentities(get_page_id_by_filename('veranstaltung.php')); ?>&id=<?php print htmlentities($id); ?>"><i><?php print_edit_icon(); ?> Diese Veranstaltung bearbeiten</i></a>
 <?php
 		}
 	}

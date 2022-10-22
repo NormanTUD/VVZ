@@ -136,7 +136,7 @@ JOIN
 							}
 ?>
 							<tr class="bg_<?php print $bgcolor; ?>">
-							<form class="form form_autosubmit" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number'] ?? "") ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
+							<form class="form form_autosubmit" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number'] ?? "") ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
 									<input type="hidden" value="update_pruefungsnummer" name="update_pruefungsnummer" />
 									<input type="hidden" value="<?php print $row[4]; ?>" name="modul_id" />
 									<input type="hidden" value="<?php print $row[5]; ?>" name="id" />
@@ -175,7 +175,7 @@ JOIN
 							$j++;
 						}
 ?>
-							<form class="form" method="post" action="admin.php?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
+							<form class="form" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
 							<input data-id="noautosubmit" type="hidden" value="neue_pruefungsnummer" name="neue_pruefungsnummer" />
 							<td><?php create_select($module, '', 'modul', 0, 1); ?></td>
 							<td><?php create_select($bereiche, '', 'bereich', 0, 1); ?></td>
@@ -206,7 +206,7 @@ JOIN
 <?php
 				}
 			} else {
-				print("Bisher existieren keine Studiengänge. <a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Bitte fügen Sie hier welche hinzu.</a>");
+				print("Bisher existieren keine Studiengänge. <a href='admin?page=".get_page_id_by_filename("studiengang.php")."'>Bitte fügen Sie hier welche hinzu.</a>");
 			}
 		} else {
 ?>

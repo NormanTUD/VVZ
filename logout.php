@@ -23,11 +23,11 @@
 	
 	$protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === true ? 'https://' : 'http://';
 	
-	$header = $_SERVER['HTTP_HOST'].'/'.dirname($_SERVER['REQUEST_URI']).'/admin.php';
+	$header = $_SERVER['HTTP_HOST'].'/'.dirname($_SERVER['REQUEST_URI']).'/startseite';
 	$header = preg_replace('/\/{2,}/', '/', $header);
 	$header = "Location: $protocol".$header;
 
 	header($header);
 
-	print "Du wirst auf die Startseite umgeleitet...";
+	print "Sie werden auf die Startseite umgeleitet...";
 ?>

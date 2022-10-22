@@ -17,13 +17,13 @@
 		include_once('hinweise.php');
 
 ?>
-		<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
+		<form action="admin?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
 			Logo hochladen: <input type="file" name="neues_logo" noautosubmit=1 id="neues_logo">
 			<input type="submit" noautosubmit=1 value="Neues Logo hochladen" name="submit"><br>
 			<i>Sie haben selbst Verantwortung über das Logo. Mit dem Hochladen akzeptieren Sie, dass Sie für das Logo rechtlich verantwortlich sind und gegen keine Gesetze verstoßen.</i>
 		</form>
 
-		<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
+		<form action="admin?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
 			<input type="hidden" noautosubmit=1 value="1" name="delete_logo" />
 			<button>Logo löschen</button>
 		</form>
@@ -54,7 +54,7 @@
 
 						if(preg_match("/color/", $row["property"])) {
 ?>
-							<form action="admin.php?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
+							<form action="admin?page=<?php print htmlentities(get_get("page") ?? ""); ?>" method="post" enctype="multipart/form-data">
 								<input type="hidden" value="<?php print htmlentities($row["id"] ?? ""); ?>" name="id" />
 								<input type="hidden" value="1" name="customize_value" />
 								<tr>

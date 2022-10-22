@@ -16,7 +16,7 @@
 			if(count($studiengaenge)) {
 				create_table_one_dependency($studiengaenge, array('studiengang_id', 'name', 'beschreibung', 'abkuerzung'), array('Studiengang', 'Name', 'Beschreibung', 'Abkuerzung', 'Speichern', 'Löschen'), 'modul', $GLOBALS['this_page_number'], 'studiengang_id', 'module');
 			} else {
-				print("Bisher existieren keine Studiengänge. <a href='admin.php?page=".get_page_id_by_filename("studiengang.php")."'>Bitte fügen Sie hier welche hinzu.</a>");
+				print("Bisher existieren keine Studiengänge. <a href='admin?page=".get_page_id_by_filename("studiengang.php")."'>Bitte fügen Sie hier welche hinzu.</a>");
 			}
 ?>
 		</div>

@@ -24,7 +24,7 @@
 			$pid = $thispage[0];
 			if(in_array($pid, $page_rights_data)) {
 				#print "<li class='margin_10px_0'>&raquo;<b><a href='admin?$linkname=$pid'>".$thispage[1]."</a></b>&laquo; &mdash; ".$thispage[3];
-				$push_id = "goto_page=admin.php?page=$pid";
+				$push_id = "goto_page=admin?page=$pid";
 				$push_label = $thispage[1];
 
 				if(preg_match("/$t/i", $push_label)) {

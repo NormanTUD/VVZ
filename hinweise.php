@@ -22,7 +22,7 @@
 
 	if(!$chosen_page) {
 		$filename = basename($_SERVER['SCRIPT_NAME']);
-		if($filename == 'admin.php') {
+		if($filename == 'admin.php' || $filename == "admin") {
 			$chosen_page = get_page_id_by_filename('welcome.php');
 		}
 	}

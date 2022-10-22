@@ -16,7 +16,7 @@
 		$titelarray = create_titel_abk_array();
 		$instituten = create_institute_array();
 ?>
-		<form method="post" enctype="multipart/form-data" action="admin.php?page=<?php print $GLOBALS['this_page_number']; ?>">
+		<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>">
 			<input type="hidden" name="dozent_wizard" value="1" />
 <?php
 			if(count($instituten) == 1) {
