@@ -30,6 +30,7 @@
 			<div id="startseite_header">
 				<a href="#vvz" class="header_link">Das Vorlesungsverzeichnis</a> |
 				<a href="#kunden" class="header_link">Aktuelle Kunden</a> |
+				<a href="#testimonies" class="header_link">Testimonies</a> |
 				<a href="#uebersicht" class="header_link">Übersicht</a> |
 				<a href="http://www.omni-concept.com/v1024/Pages/impressum.htm" target="_blank" class="header_link">Impressum</a> |
 				<a href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm" target="_blank" class="header_link">Datenschutzerklärung</a>
@@ -103,6 +104,12 @@
 					$str_contents .= "<li class='display_inline'><a target='_blank' href='$urlname/'>$desc</a></li>";
 				}
 			}
+
+			$page_str .= "<center><h2 id='testimonies'>Testimonies:</h2></center>";
+			$page_str .= "<img src='norbert_engemaier.jpg' /><br>";
+			$page_str .= "&raquo;<i>Das Vorlesungsverzeichnis ist für uns nicht nur die Schnittstelle zu den Studierenden sondern ermöglicht uns auch die automatische Übertragung unserer Lehrveranstaltungsdaten in andere Systeme. Das war händisch oder per Copy/Paste vorher eine Qual.</i>&laquo;<br>";
+			$page_str .= "&mdash; Norbert Engemaier";
+			$page_str .= "<br>";
 
 			if($str_contents) {
 				print '<div class="startseite_div_content" id="startseite_text"><div class="startseite_div">';
