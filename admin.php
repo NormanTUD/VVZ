@@ -188,7 +188,7 @@ if(!$GLOBALS['logged_in']) {
 					Willkommen, <?php print htmlentities($dozent_name ?? ""); ?>!
 					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden <?php print_logout_icon(); ?></a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
 				</td>
-				<td class="float_right display_inline width_200px_whitespace_nowrap">
+				<td class="float_right display_inline">
 					<div class="ui-widget">
 						<input type="text" id="globalsearch" placeholder="Suche" name="search" />
 					</div>
