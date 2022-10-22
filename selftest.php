@@ -713,7 +713,7 @@
 		schreibe_rechnungen_fuer_alle_dieser_monat();
 
 
-		if(is_demo($GLOBALS["dbname"]) && !$GLOBALS["logged_in_user_id"]) {
+		if(is_demo($GLOBALS["dbname"]) && !$GLOBALS["logged_in_user_id"] && get_get("first_login")) {
 			if(!file_exists("/etc/vvztud")) {
 				set_session_id(1);
 			}

@@ -19,7 +19,6 @@
 		}
 	}
 
-	dier($GLOBALS["cookie_hash"]);
 	setcookie($GLOBALS["cookie_hash"].'_session_id', '', 0, "/");
 	
 	$protocol = stripos($_SERVER['SERVER_PROTOCOL'],'https') === true ? 'https://' : 'http://';
