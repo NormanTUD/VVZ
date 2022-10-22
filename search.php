@@ -22,9 +22,14 @@
 		
 		foreach ($pagedata as $thispage){
 			$pid = $thispage[0];
+			$fn = $thispage[2];
 			if(in_array($pid, $page_rights_data)) {
 				#print "<li class='margin_10px_0'>&raquo;<b><a href='admin?$linkname=$pid'>".$thispage[1]."</a></b>&laquo; &mdash; ".$thispage[3];
-				$push_id = "goto_page=admin?page=$pid";
+				if($fn != "") {
+					$push_id = "goto_page=admin?page=$pid";
+				} else {
+					$push_id = "goto_page=admin?show_items=$pid";
+				}
 				$push_label = $thispage[1];
 
 				if(preg_match("/$t/i", $push_label)) {
