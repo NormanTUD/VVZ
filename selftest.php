@@ -62,6 +62,24 @@
 		return 0;
 	}
 
+	function add_system_versioning () {
+		$tables_res = rquery("show full tables where Table_Type != 'VIEW'");
+		while ($row = mysqli_fetch_row($tables_res)) {
+			$query = '
+ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START,
+              ADD COLUMN te TIMESTAMP(6) GENERATED ALWAYS AS ROW END,
+              ADD PERIOD FOR SYSTEM_TIME(ts, te),
+              ADD SYSTEM VERSIONING;
+';
+			try {
+				rquery("SET @@system_versioning_alter_history = 1;");
+				rquery($query, 0);
+			} catch (\Throwable $e) {
+				//
+			}
+			rquery("SET @@system_versioning_alter_history = 0;");
+		}
+	}
 
 	function selftest () {
 		if(array_key_exists("no_selftest_force", $GLOBALS) || $GLOBALS["no_selftest"]) {
@@ -695,6 +713,8 @@
 			}
 
 			rquery('set FOREIGN_KEY_CHECKS=1');
+
+			add_system_versioning();
 		} catch (\Throwable $e) {
 			stderrw($e);
 
