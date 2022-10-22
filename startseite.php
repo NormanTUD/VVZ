@@ -95,7 +95,7 @@
 
 				if($plan_name != "Demo") {
 					if($external_url) {
-						$desc = "<img height=100 src='tudlogo.svg' />";
+						$desc = "<img height=100 src='tudlogo.png' />";
 					} else {
 						$desc = "<img height=100 src='logo.php?kunde_id=".htmlentities($kunde_id)."' />";
 					}
