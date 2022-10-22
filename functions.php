@@ -6719,6 +6719,12 @@ INSERT INTO
 		return !!$res;
 	}
 
+	function veranstaltung_has_bezug ($v_id, $l_id) {
+		$query = 'select count(*) from veranstaltung_nach_bezuegetypen where veranstaltung_id = '.esc($v_id).' and bezuegetyp_id = '.esc($l_id);
+		$res = get_single_row_from_query($query);
+		return !!$res;
+	}
+
 	function veranstaltung_has_language ($v_id, $l_id) {
 		$query = 'select count(*) from veranstaltung_to_language where veranstaltung_id = '.esc($v_id).' and language_id = '.esc($l_id);
 		$res = get_single_row_from_query($query);
@@ -6732,9 +6738,20 @@ INSERT INTO
 		while ($row = mysqli_fetch_row($result)) {
 			$typen[$row[0]] = array($row[0], $row[1]);
 		}
-		$GLOBALS['create_praesenztypen_array_cache'] = $typen;
 		return $typen;
 	}
+
+	function create_bezuege_array () {
+		$query = 'SELECT `id`, `name` FROM `veranstaltung_bezuege`';
+		dier($query);
+		$result = rquery($query);
+		$bezuege = array();
+		while ($row = mysqli_fetch_row($result)) {
+			$bezuege[$row[0]] = array($row[0], $row[1]);
+		}
+		return $bezuege;
+	}
+
 
 	function create_language_array () {
 		$query = 'SELECT `id`, `name` FROM `language`';
@@ -6743,8 +6760,7 @@ INSERT INTO
 		while ($row = mysqli_fetch_row($result)) {
 			$languages[$row[0]] = array($row[0], $row[1]);
 		}
-		$GLOBALS['create_language_array_cache'] = $languages;
-		return $languages;	
+		return $languages;
 	}
 
 	function create_studiengang_array_by_institut_id_str ($institut_id = null, $studiengaenge = array()) {

@@ -76,6 +76,7 @@
 <?php
 				include_once('hinweise.php');
 				$languages = create_language_array();
+				$bezuege = create_bezuege_array();
 ?>
 				<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
 					<input type="submit" class="text_30px" value="Speichern" />
@@ -86,6 +87,12 @@
 							if(count($languages)) {
 ?>
 								<th>Sprache (optional)</th>
+<?php
+							}
+
+							if(count($bezuege)) {
+?>
+								<th>Bezüge (optional)</th>
 <?php
 							}
 ?>
@@ -137,7 +144,27 @@
 											$checked = ' checked="checked" ';
 										}
 ?>
-										<input type="checkbox" name="language[]" value="<?php print htmlentities($praesenz_id); ?>" <?php print $checked; ?> /> <?php print htmlentities($language_name); ?><br />
+										<input type="checkbox" name="language[]" value="<?php print htmlentities($praesenz_id); ?>" <?php print $checked; ?> /> <?php print htmlentities($language_name ?? ""); ?><br />
+<?php
+									}
+								?></td>
+<?php
+							}
+
+							if(count($bezuege)) {
+?>
+								<td class="text_align_left_nowrap"><?php
+									foreach ($bezuege as $this_bezug) {
+										$bezug_id = $this_bezug[0];
+										$bezug_name = $this_bezug[1];
+
+										$checked = '';
+
+										if(veranstaltung_has_bezug($veranstaltung_id, $bezug_id)) {
+											$checked = ' checked="checked" ';
+										}
+?>
+										<input type="checkbox" name="bezug[]" value="<?php print htmlentities($bezug_id); ?>" <?php print $checked; ?> /> <?php print htmlentities($bezug_name ?? ""); ?><br />
 <?php
 									}
 								?></td>
