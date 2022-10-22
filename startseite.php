@@ -76,9 +76,16 @@
 			$page_str .= "<br>";
 			$page_str .= '<a target="_blank" href="?new_demo_uni=1"><button>Kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>';
 
+			$page_str .= "<center><h2 id='testimonies'>Testimonies:</h2></center>";
+			$page_str .= "<img style='width: 50%; max-width: 250px' src='norbert_engemaier.jpg' /><br>";
+			$page_str .= "&raquo;<i>Das Vorlesungsverzeichnis ist für uns nicht nur die Schnittstelle zu den Studierenden sondern ermöglicht uns auch die automatische Übertragung unserer Lehrveranstaltungsdaten in andere Systeme. Das war händisch oder per Copy/Paste vorher eine Qual.</i>&laquo;<br>";
+			$page_str .= "&mdash; Norbert Engemaier";
+			$page_str .= "<br>";
 
 			$page_str .= "<center><h2 id='kunden'>Aktuelle Kunden:</h2></center>";
 			$page_str .= "<ul class='side_by_side list_style_none display_inline'>";
+
+
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
 				$urlname = $row[0];
@@ -104,12 +111,6 @@
 					$str_contents .= "<li class='display_inline'><a target='_blank' href='$urlname/'>$desc</a></li>";
 				}
 			}
-
-			$page_str .= "<center><h2 id='testimonies'>Testimonies:</h2></center>";
-			$page_str .= "<img src='norbert_engemaier.jpg' /><br>";
-			$page_str .= "&raquo;<i>Das Vorlesungsverzeichnis ist für uns nicht nur die Schnittstelle zu den Studierenden sondern ermöglicht uns auch die automatische Übertragung unserer Lehrveranstaltungsdaten in andere Systeme. Das war händisch oder per Copy/Paste vorher eine Qual.</i>&laquo;<br>";
-			$page_str .= "&mdash; Norbert Engemaier";
-			$page_str .= "<br>";
 
 			if($str_contents) {
 				print '<div class="startseite_div_content" id="startseite_text"><div class="startseite_div">';
