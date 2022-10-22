@@ -628,16 +628,11 @@
 						]
 					),
 
-					".menu_link" => array(
-						"name" => "Eintrag in der Navigationsleiste",
-						"values" => array(
-							[ "background-color", "006092" ]
-						)
-					),
 
 					".topnav" => array(
 						"name" => "Navigationsleiste",
 						"values" => array(
+							[ "background-color", "006092" ],
 							[ "overflow", "hidden" ],
 							[ "padding-left", "0px" ]
 						)
