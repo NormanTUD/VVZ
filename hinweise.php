@@ -32,16 +32,16 @@
 			print_hinweis_for_page($chosen_page);
 		} else if (preg_match('/^\d+$/', get_get('page'))) {
 			if(!headers_sent()) {
-				header('Location: admin.php?page='.htmlentities(get_get('page')));
+				header('Location: admin?page='.htmlentities(get_get('page')));
 			}
 		} else {
 			if(!headers_sent()) {
-				header('Location: admin.php');
+				header('Location: admin');
 			}
 		}
 	} else {
 		if(!headers_sent()) {
-			header('Location: admin.php');
+			header('Location: admin');
 		}
 	}
 ?>

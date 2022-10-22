@@ -76,7 +76,7 @@
 
 		css(array("font-awesome.min.css"));
 
-		if(array_key_exists("SCRIPT_NAME", $_SERVER) && $_SERVER["SCRIPT_NAME"] != "/admin.php") {
+		if(array_key_exists("SCRIPT_NAME", $_SERVER) && ($_SERVER["SCRIPT_NAME"] != "/admin" || $_SERVER["SCRIPT_NAME"] != "/admin.php")) {
 			css(array("foundation.min.css"));
 		} else {
 			css(array("admin.css"));

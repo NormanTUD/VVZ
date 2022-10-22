@@ -213,7 +213,7 @@ declare(ticks=1);
 		}
 	}
 
-	if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id'] && basename($_SERVER['SCRIPT_NAME']) == 'admin.php') {
+	if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id'] && (basename($_SERVER['SCRIPT_NAME']) == 'admin.php') || basename($_SERVER['SCRIPT_NAME']) == 'admin')) {
 		$query = 'SELECT `name`, `file`, `page_id`, `show_in_navigation`, `parent` FROM `view_account_to_role_pages` WHERE `user_id` = '.esc($GLOBALS['logged_in_user_id']).' ORDER BY `parent`, `name`';
 		$result = rquery($query);
 
@@ -672,7 +672,7 @@ declare(ticks=1);
 				$neue_veranstaltung_id = create_veranstaltung($name, $dozent, $veranstaltungstyp, $institut, $semester, $language, $related_veranstaltung, $praesenztyp);
 
 				if(get_post("speichern_und_bearbeiten") && $neue_veranstaltung_id) {
-					print '<meta http-equiv="refresh" content="0; url=admin.php?page='.get_page_id_by_filename("veranstaltung.php").'&id='.htmlentities($neue_veranstaltung_id ?? "").'" />';
+					print '<meta http-equiv="refresh" content="0; url=admin?page='.get_page_id_by_filename("veranstaltung.php").'&id='.htmlentities($neue_veranstaltung_id ?? "").'" />';
 				}
 			} else if (get_post('neue_veranstaltung')) {
 				error('Für eine Veranstaltung muss ein Name, ein Dozent, der Typ der Institut und ein Veranstaltungstyp definiert sein. Sofern Sie kein Administrator sind, muss Ihrem Account zum Erstellen von Veranstaltungen ein Dozent zugewiesen sein. Bitte kontaktieren Sie die <a href="kontakt.php">Administratoren</a>, damit Ihr Account diese Zuordnung bekommt.');
