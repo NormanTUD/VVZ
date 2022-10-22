@@ -6734,6 +6734,7 @@ INSERT INTO
 		if(!is_null($institut_id) && $institut_id) {
 			$query .= ' WHERE `institut_id` = '.esc($institut_id);
 		}
+		$query .= ' ORDER BY `order_key` ASC, `name` ASC';
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
 			$studiengaenge[$row[0]] = array($row[0], $row[1]);
