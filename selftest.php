@@ -297,7 +297,7 @@
 					(57, 'Importer', 'import.php', '1', 25, 1),
 					(58, 'Einstellungen', 'settings.php', '1', 25, 1)"
 				);
-				rquery("update page set disable_in_demo = 1 where id in (21, 23, 24, 31, 55)");
+				rquery("update page set disable_in_demo = 1 where id in (23, 24, 31, 55)");
 				initialized("page");
 			}
 
