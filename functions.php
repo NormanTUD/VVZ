@@ -9451,6 +9451,10 @@ SE 1/2 oder BZW
 		return join(' -> ', $stack).";\n";
 	} 
 
+	function get_pruefung_zeitraum ($pid) {
+		return get_single_row_from_query("select z.name from pruefungsnummer pn left join pruefung_zeitraum z on z.id = pn.zeitraum_id where pn.id = ".esc($pid));
+	}
+
 	function create_veranstaltung_pruefung_tabelle ($pruefungen) {
 ?>
 		<table class="">
@@ -9466,6 +9470,7 @@ SE 1/2 oder BZW
 					<th>Prü&shy;fungs&shy;num&shy;mer</th> <!-- Prüfungsnummer -->
 					<th>Prü&shy;fungs&shy;typ</th> <!-- Prüfungstyp -->
 					<th>Bereich</th>	<!-- Bereich/Studiengang -->
+					<th>Zeitraum</th>	<!-- Zeitraum -->
 				</tr>
 <?php
 			}
@@ -9491,11 +9496,14 @@ SE 1/2 oder BZW
 <?php
 				$last_modul_name = $this_modul_id;
 			}
+
+			$this_pruefung_zeitraum = get_pruefung_zeitraum($this_pruefung[8]);
 ?>
 			<tr>
 				<td><?php print htmle($this_pruefung[0]); print pruefung_symbole($this_pruefung[0]); ?></td>
 				<td><?php print htmle($this_pruefung[2]); ?></td>
 				<td><?php print htmle($this_pruefung[3]); ?></td>
+				<td><?php print htmle($this_pruefung_zeitraum); ?></td>
 			</tr>
 <?php
 			$i++;
