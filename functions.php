@@ -1106,6 +1106,14 @@ declare(ticks=1);
 					rquery($query);
 				}
 			}
+
+			if(get_post('update_setting')) {
+				if(get_post('reset_setting')) {
+					reset_setting(get_post('name'));
+				} else {
+					set_setting(get_post('name'), get_post('value'), get_post("description"));
+				}
+			}
 		}
 	}
 
