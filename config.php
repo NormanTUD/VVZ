@@ -190,4 +190,13 @@
 	$GLOBALS["default_strasse"] = "Robert-Koch-Str. 2";
 	$GLOBALS["default_email"] = "noack@omni-concept.com";
 	$GLOBALS["default_zahlungszyklus_monate"] = "1";
+
+	if(file_exists("/etc/vvztud")) {
+		$GLOBALS["default_universitaet"] = "Technische Universität Dresden";
+		$GLOBALS["default_name"] = "Norbert Engemaier";
+		$GLOBALS["default_ort"] = "Dresden";
+		$GLOBALS["default_plz"] = "01062";
+		$GLOBALS["default_strasse"] = "Nöthnitzer Straße 43";
+		$GLOBALS["default_email"] = "norbert.engemaier@tu-dresden.de";
+	}
 ?>
