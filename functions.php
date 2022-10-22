@@ -9195,7 +9195,7 @@ SE 1/2 oder BZW
 
 	function single_css ($name) {
 		$file = $name;
-		if(!preg_match("/^css/\/", $name)) {
+		if(!preg_match("/^css\//", $name)) {
 			$file = $GLOBALS['datadir'].$name;
 		}
 
@@ -9223,7 +9223,10 @@ SE 1/2 oder BZW
 	}
 
 	function single_js ($name) {
-		$file = $GLOBALS['datadir'].$name;
+		$file = $name;
+		if(!preg_match("/^js\//", $name)) {
+			$file = $GLOBALS['datadir'].$name;
+		}
 
 		$path = $file;
 		if(preg_match('/^https?:\/\//', $name)) {
