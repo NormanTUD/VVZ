@@ -290,7 +290,7 @@
 						</tr>
 					</table>
 
-					* Es können weitere Lizenzen für Institute dazugebucht werden. Schreiben Sie uns dazu einfach eine Email.
+					<span class="white_text">* Es können weitere Lizenzen für Institute dazugebucht werden. Schreiben Sie uns dazu einfach eine Email.</span>
 					</center>
 				</div></div>
 			</div>
