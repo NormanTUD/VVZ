@@ -716,8 +716,11 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 
 			if(!table_exists_and_has_entries("veranstaltung_bezuege") && !already_initialized("veranstaltung_bezuege")) {
 				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Bezug zu einem Forschungsprojekt');";
+				rquery($bereiche_query);
 				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Berufspraktische Bezüge');";
+				rquery($bereiche_query);
 				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Interdisziplinäre Bezüge');";
+				rquery($bereiche_query);
 				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Beinhaltet eine Exkursion');";
 				rquery($bereiche_query);
 				initialized("bereich");

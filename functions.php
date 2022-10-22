@@ -651,9 +651,10 @@ declare(ticks=1);
 					$fester_bbb_raum = get_post("fester_bbb_raum");
 					$videolink = get_post("videolink");
 
+					$bezuege = get_post("bezug");
 
 								#	1	2	3	4	5		6		7	8		9	10				11		12		13				14
-					update_veranstaltung_metadata($this_id, $tag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, get_post('pruefungsnummer'), $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink);
+					update_veranstaltung_metadata($this_id, $tag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch, $gebaeudewunsch, get_post('pruefungsnummer'), $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink, $bezuege);
 				}
 
 			// ist keine Id gegeben, sind es neue Daten. Aufgrund der Parameternamen wird dann entschieden, was wo einzutragen ist.
@@ -3550,7 +3551,9 @@ WHERE 1
 			$videolink = get_post("videolink");
 			$einzelne_termine = get_einzelne_termine_from_post();
 
-			update_veranstaltung_metadata($inserted_id, null, null, $woche, null, null, null, null, null, null, null, null, null, null, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink);
+			$bezuege = get_post("bezug");
+
+			update_veranstaltung_metadata($inserted_id, null, null, $woche, null, null, null, null, null, null, null, null, null, null, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink, array());
 			success('Die Veranstaltung wurde erfolgreich eingetragen.');
 			return $inserted_id;
 		} else {
@@ -4530,7 +4533,7 @@ WHERE `id` = '.esc($id);
 
 	# 					1	2	   3	   4		5		6	    7		8	9		10			11
 # 12		    13
-	function update_veranstaltung_metadata ($id, $wochentag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch_id, $gebaeudewunsch_id, $pruefungsnummern, $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink) {
+	function update_veranstaltung_metadata ($id, $wochentag, $stunde, $woche, $erster_termin, $anzahl_hoerer, $wunsch, $hinweis, $opal_link, $abgabe_pruefungsleistungen, $raumwunsch_id, $gebaeudewunsch_id, $pruefungsnummern, $master_niveau, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink, $bezuege) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		$alte_daten = get_raumplanung_relevante_daten($id);
@@ -4621,6 +4624,27 @@ INSERT INTO
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
+			if(is_array($bezuege) && count($bezuege)) {
+				start_transaction();
+				rquery("delete from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id));
+				$errors = 0;
+				foreach ($bezuege as $bid => $bval) {
+					$query = "insert into veranstaltung_nach_bezuegetypen (veranstaltung_id, bezuegetyp_id) values (".esc($id).", ".esc($bval).")";
+					try {
+						rquery($query);
+					} catch (\Throwable $e) {
+						$errors++;
+					}
+				}
+
+				if($errors) {
+					error("Etwas lief schief beim Speichern der Bezügezuordnungen.");
+					rollback();
+				} else {
+					success("Bezüge wurden gespeichert.");
+					commit();
+				}
+			}
 
 			if($query) {
 				if(rquery($query)) {

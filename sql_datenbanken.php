@@ -536,7 +536,7 @@
   CONSTRAINT `modul_nach_semester_veranstaltungstypen_anzahl_ibfk_2` FOREIGN KEY (`veranstaltungstyp_id`) REFERENCES `veranstaltungstyp` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
-'veranstaltung_bezuegetypen' => 'create table if not exists `veranstaltung_bezuege` (
+'veranstaltung_bezuege' => 'create table if not exists `veranstaltung_bezuege` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -547,7 +547,7 @@
   `bezuegetyp_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`veranstaltung_id`, `bezuegetyp_id`),
   CONSTRAINT `vbezkey1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `vbezkey2` FOREIGN KEY (`bezuegetyp_id`) REFERENCES `veranstaltung_bezuegetypen` (`id`) ON DELETE CASCADE
+  CONSTRAINT `vbezkey2` FOREIGN KEY (`bezuegetyp_id`) REFERENCES `veranstaltung_bezuege` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'modul_nach_semester_metadata' => 'create table if not exists `modul_nach_semester_metadata` (
