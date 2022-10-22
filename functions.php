@@ -50,6 +50,7 @@ declare(ticks=1);
 		$GLOBALS["auto_login_id"] = null;
 	}
 
+	// TODO!!! Wieder einfügen und fixen für Grafiken in HTML Code (toastr zB)
 /*
 	$GLOBALS['csp_string'] =  "default-src 'self' 'nonce-".nonce()."' ; ";
 	$GLOBALS['csp_string'] .= "script-src 'self' 'nonce-".nonce()."' ; ";
