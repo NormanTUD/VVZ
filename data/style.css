@@ -1174,3 +1174,13 @@ a, a:visited, a:hover, a:active {
 .ui-autocomplete {
 	z-index: 1000000;
 }
+
+#startseite_header {
+	background-color: black;
+	color: white;
+	position: sticky;
+	top: 0px;
+	z-index: 9999;
+	width: 100%;
+	text-align: center;
+}

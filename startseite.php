@@ -27,6 +27,14 @@
 
 		<!-- Container element -->
 		<div class="parallax">
+		<div id="startseite_header">
+			<a href="#vvz" class="header_link">Das Vorlesungsverzeichnis</a> |
+			<a href="#kunden" class="header_link">Aktuelle Kunden</a> |
+			<a href="#uebersicht" class="header_link">Übersicht</a> |
+			<a href="http://www.omni-concept.com/v1024/Pages/impressum.htm" target="_blank" class="header_link">Impressum</a> |
+			<a href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm" target="_blank" class="header_link">Datenschutzerklärung</a>
+		</div>
+
 <?php
 			$query = "select urlname, universitaet, plan_id, external_url, id from vvz_global.kundendaten where urlname is not null and (external_url is not null or id in (select kunde_id from vvz_global.logos)) order by external_url desc, urlname asc";
 			$result = rquery($query);
@@ -44,7 +52,7 @@
 			$page_str .= "omni-concept ist Ihr kreativer Ansprechpartner, wenn es um innovative Lösungen im Bereich Verwaltungsautomatisierung, Internet, Datenbanken und Printdesign geht. ";
 			$page_str .= "omni-concept wurde Anfang 2000 gegründet. ";
 
-			$page_str .= "<center><h2>Das Vorlesungsverzeichnis:</h2></center>";
+			$page_str .= "<center><h2 id='vvz'>Das Vorlesungsverzeichnis:</h2></center>";
 			$page_str .= "Sind Sie auf der Suche nach einer Software, die sowohl für Sie als auch Ihre Studierenden zeitsparend ist? Möchten Sie nicht mehr manuell Excel-Dateien herumsenden, um Vorlesungen und Prüfung zu verwalten die man dann mühsam zusammenfügen muss? Würden Sie gerne die angebotenen Prüfungen an das Prüfungsamt melden, diese fordern es im Excel-Format?<br>";
 			$page_str .= "<br>";
 			$page_str .= "Auch der Raumplanungsprozess und die Abstimmungen mit den Raumplanungsdezernaten ist hier abgebildet und einfach, aus dem Browser heraus, möglich.<br>";
@@ -68,7 +76,7 @@
 			$page_str .= '<a target="_blank" href="?new_demo_uni=1"><button>Kostenlose Demo ohne Verpflichtungen ausprobieren</button></a>';
 
 
-			$page_str .= "<center><h2>Aktuelle Kunden:</h2></center>";
+			$page_str .= "<center><h2 id='kunden'>Aktuelle Kunden:</h2></center>";
 			$page_str .= "<ul class='side_by_side list_style_none display_inline'>";
 			$str_contents = "";
 			while ($row = mysqli_fetch_row($result)) {
@@ -107,7 +115,7 @@
 			<div class="bgimg-2">
 				<div class="startseite_div_content"><div class="startseite_div">
 					<center>
-						<h2>Übersicht:</h2>
+						<h2 id="uebersicht">Übersicht:</h2>
 					</center>
 					<center>
 					<table>
