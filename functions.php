@@ -6237,7 +6237,7 @@ INSERT INTO
 			$str .= "<p><i>Stand: $datum ($uhrzeit)</i></p>";
 
 			if($number_of_veranstaltungen) {
-				$str .= '<a href="event_file.php?veranstaltung[]='.join('&veranstaltung[]=', $got_veranstaltungen).'">'.html_calendar().'In meinen Kalendar eintragen</a>'."\n";
+				$str .= '<a class="no_link" href="event_file.php?veranstaltung[]='.join('&veranstaltung[]=', $got_veranstaltungen).'">'.html_calendar().'In meinen Kalendar eintragen</a>'."\n";
 			}
 			#$str .= '<a id="create_tinyurl">TinyURL-Link dieses Stundenplanes generieren</a><br><div id="created_tinyurl"></div>';
 
@@ -10126,7 +10126,7 @@ order by
 		$query = 'select videolink from veranstaltung_metadaten where veranstaltung_id = '.esc($v_id);
 		$row = get_single_row_from_query($query);
 		if($row) {
-			return "&nbsp;<a target='_blank' href='".htmlentities($row)."'>".get_camera_icon()."</a>";
+			return "&nbsp;<a class='no_link' target='_blank' href='".htmlentities($row)."'>".get_camera_icon()."</a>";
 		}
 		return "";
 	}

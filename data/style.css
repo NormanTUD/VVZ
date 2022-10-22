@@ -1197,3 +1197,8 @@ a, a:visited, a:hover, a:active {
 	max-width: 300px;
 	max-height: 200px;
 }
+
+.no_link {
+	color: inherit;
+	text-decoration: inherit;
+}

@@ -687,6 +687,7 @@
 					print '<i>Kein Raum</i>';
 				}
 			}
+
 			print video_conference_link($id);
 ?>
 		</p></div>
@@ -724,7 +725,7 @@
 			<?php print htmle($stunde); ?>. DS (<?php print get_zeiten($stunde); ?><?php 
 				show_sws($stunde, $woche);
 			?>)
-			<a href="event_file.php?veranstaltung[]=<?php print $id; ?>"><?php print html_calendar(); ?></a>
+			<a class="no_link" href="event_file.php?veranstaltung[]=<?php print $id; ?>"><?php print html_calendar(); ?></a>
 <?php
 		} else {
 ?>
