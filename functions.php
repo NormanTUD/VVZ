@@ -10119,9 +10119,9 @@ order by
 	function print_uni_logo() {
 		$kunde_db_name = get_kunden_db_name();
 		if(file_exists("/etc/vvztud")) {
-			print '<img alt="Logo, Link zur Startseite" width=300 src="logo.png" />';
+			print '<img alt="Logo, Link zur Startseite" width=300 src="logo" />';
 		} else {
-			print '<img alt="Logo, Link zur Startseite" src="logo.png" />';
+			print '<img alt="Logo, Link zur Startseite" src="logo" />';
 		}
 	}
 
@@ -10503,9 +10503,10 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 	#add_system_versioning();
 
 	function get_logo_filename ($only_fn=0) {
-		$id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 		if(get_get("kunde_id")) {
 			$id = get_get("kunde_id");
+		} else {
+			$id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
 		}
 
 		if($id) {
@@ -10514,9 +10515,9 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 
 			if($result) {
 				if($only_fn) {
-					print $result;
-				} else {
 					return "custom";
+				} else {
+					print $result;
 				}
 			} else {
 				if(file_exists("/etc/vvztud")) {
