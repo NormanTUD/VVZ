@@ -4625,6 +4625,9 @@ INSERT INTO
 			}
 
 			if(is_array($bezuege)) {
+				$check_query = "select veranstaltung_id, bezuegetyp_id from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id)." order by veranstaltung_id";
+				$old_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
+
 				start_transaction();
 				$q = "delete from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id);
 				rquery($q);
@@ -4642,7 +4645,10 @@ INSERT INTO
 					error("Etwas lief schief beim Speichern der Bezügezuordnungen.");
 					rollback();
 				} else {
-					success("Bezüge wurden gespeichert.");
+					$new_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
+					if($new_db_status_hash != $old_db_status_hash) {
+						success("Bezüge wurden gespeichert.");
+					}
 					commit();
 				}
 			}
@@ -4795,7 +4801,7 @@ INSERT INTO
 		if(!check_function_rights(__FUNCTION__)) { return; }
 
 		if(is_array($pruefungsnummer)) {
-			$check_query = "select * from pruefung where veranstaltung_id = ".esc($id)." order by id";
+			$check_query = "select veranstaltung_id, pruefungsnummer_id from pruefung where veranstaltung_id = ".esc($id)." order by id";
 			$old_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
 			start_transaction();
 			rquery('DELETE FROM pruefung where veranstaltung_id = '.esc($id));
