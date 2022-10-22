@@ -4624,12 +4624,13 @@ INSERT INTO
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
-			if(is_array($bezuege) && count($bezuege)) {
+			if(is_array($bezuege)) {
 				start_transaction();
-				rquery("delete from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id));
+				$q = "delete from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id);
+				rquery($q);
 				$errors = 0;
 				foreach ($bezuege as $bid => $bval) {
-					$query = "insert into veranstaltung_nach_bezuegetypen (veranstaltung_id, bezuegetyp_id) values (".esc($id).", ".esc($bval).")";
+					$query = "insert into veranstaltung_nach_bezuegetypen (veranstaltung_id, bezuegetyp_id) values (".esc($id).", ".esc($bval).") on duplicate key update bezuegetyp_id=values(bezuegetyp_id)";
 					try {
 						rquery($query);
 					} catch (\Throwable $e) {
