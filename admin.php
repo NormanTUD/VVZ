@@ -441,6 +441,7 @@ if(!$GLOBALS['logged_in']) {
 					if(document.activeElement == $("body")[0]) {
 						var keycode =  e.keyCode;
 						if(keycode >= 97 && keycode <= 122) {
+							$("#globalsearch").val("");
 							$("#globalsearch").val($("#globalsearch").val() + String.fromCharCode(e.keyCode));
 							$("#globalsearch").focus();
 						}
