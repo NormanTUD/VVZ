@@ -9194,7 +9194,9 @@ SE 1/2 oder BZW
 	}
 
 	function single_css ($name) {
-		$file = $GLOBALS['datadir'].$name;
+		if(!preg_match("/^css/\/", $file)) {
+			$file = $GLOBALS['datadir'].$name;
+		}
 
 		if(file_exists($file)) {
 			if(nonce() !== null) {
