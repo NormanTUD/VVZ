@@ -3553,7 +3553,7 @@ WHERE 1
 
 			$bezuege = get_post("bezug");
 
-			update_veranstaltung_metadata($inserted_id, null, null, $woche, null, null, null, null, null, null, null, null, null, null, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink, array());
+			update_veranstaltung_metadata($inserted_id, null, null, $woche, null, null, null, null, null, null, null, null, null, null, $language, $related_veranstaltung, $einzelne_termine, $praesenztyp, $fester_bbb_raum, $videolink, $bezuege);
 			success('Die Veranstaltung wurde erfolgreich eingetragen.');
 			return $inserted_id;
 		} else {
@@ -4624,14 +4624,16 @@ INSERT INTO
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
-			if(is_array($bezuege)) {
-				$check_query = "select veranstaltung_id, bezuegetyp_id from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id)." order by veranstaltung_id";
-				$old_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
+			$check_query = "select veranstaltung_id, bezuegetyp_id from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id)." order by veranstaltung_id";
+			$old_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
 
-				start_transaction();
-				$q = "delete from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id);
-				rquery($q);
-				$errors = 0;
+			start_transaction();
+
+			$q = "delete from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id);
+			rquery($q);
+
+			$errors = 0;
+			if(is_array($bezuege)) {
 				foreach ($bezuege as $bid => $bval) {
 					$query = "insert into veranstaltung_nach_bezuegetypen (veranstaltung_id, bezuegetyp_id) values (".esc($id).", ".esc($bval).") on duplicate key update bezuegetyp_id=values(bezuegetyp_id)";
 					try {
@@ -4640,17 +4642,17 @@ INSERT INTO
 						$errors++;
 					}
 				}
+			}
 
-				if($errors) {
-					error("Etwas lief schief beim Speichern der Bezügezuordnungen.");
-					rollback();
-				} else {
-					$new_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
-					if($new_db_status_hash != $old_db_status_hash) {
-						success("Bezüge wurden gespeichert.");
-					}
-					commit();
+			if($errors) {
+				error("Etwas lief schief beim Speichern der Bezügezuordnungen.");
+				rollback();
+			} else {
+				$new_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
+				if($new_db_status_hash != $old_db_status_hash) {
+					success("Bezüge wurden gespeichert.");
 				}
+				commit();
 			}
 
 			if($query) {
