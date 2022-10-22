@@ -1,0 +1,48 @@
+  * Könntest du in der Studierendensicht des VVZ in der Detailansicht
+    der Prüfungsleistungen (wo alle aufgelistet werden) den
+    Anmeldezeitraum ("Anmeldezeitraum 1" oder "Anmeldezeitraum 2") mit
+    einblenden?
+  * Könnte die Raumplanungstabelle
+    (https://vvz.phil.tu-dresden.de/admin.php?page=7
+    <https://vvz.phil.tu-dresden.de/admin.php?page=7>) auch
+    standardmäßig das Standardsemester benutzen? (muss ich dort jedes
+    Mal auswählen)
+  * Könnte die Raumplanungstablle anzeigen ob eine LV Digital, hybrid
+    oder Präsenz stattfindet?
+  * Könnte man den Studiengängen ein zusätzliches Attribut geben, mit
+    dem ich deren Anzeige auf der Startseite
+    (https://vvz.phil.tu-dresden.de/
+    <https://vvz.phil.tu-dresden.de/>) und beim Ankreuzen der
+    Prüfungsleistungen
+    (https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551
+    <https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551>) ordnen
+    kann? (Ich würde gern die Studiengänge nach Bedeutsamkeit
+    sortieren und Lehramt, Fachstudiengänge und Angebote für andere
+    Studiengänge besser separieren).
+  * Auf der Seite, auf der wir die Prüfungsnummern
+    ankreuzen(https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551
+    <https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551>), wird
+    die Anzahl von Modulen/Studiengängen, die vollständig ausgeblendet
+    sind, größer - statt denen taucht da jetzt z.B. auf "Leider keine
+    eingetragenen Prüfungsnummern für das Modul »Praktische
+    Philosophie« (Master Lehramt)" Wenn das mit der Sortierung des
+    letzten Punkts klappt ist das nicht störend, ansonsten könnte man
+    sehen ob man das noch zusammenfassen kann.
+  * Könntest du redundante Datensätze der Prüfungstypen
+    "verschmelzen"? Also dass "Nachweis Schulprakt. Studien" und
+    "Nachweis SPS" zu einem Prüfungstyp werden, ohne das eine der
+    bisherigen Zuordnungen verlorengeht? (Gilt auch für: "mdl.
+    Prüfung" / "Mündliche Prüfung")
+  * Wäre es möglich, dass jede Vorlesung eine Art abrufbare
+    Veränderungshistorie enthält, der man entnehmen kann, wann sie
+    erstellt wurde wann der Wochentag geändert oder ein Raum
+    zugewiesen wurde? (Lehrende, die Ihre LV verschieben nachdem ein
+    Raum zugeteilt wurde, dann aber nicht Bescheid geben, lassen grüßen.)
+  * Könnte bei der Lehrveranstaltungsmeldung oben Kästchen ergänzt
+    werden für "Lehrveranstaltung hat: [ ] Bezug zu einem
+    Forschungsprojekt, [ ] Berufspraktische Bezüge [ ]
+    interdisziplinäre Bezüge, [ ] Beinhaltet eine Exkursion. Im
+    Idealfall wäre das dann in den Details der Studierendensicht
+    erkennbar und in irgendeinem Export enthalten (Die Uni will
+    Berichte, wie viele unserer Seminare das jeweils sind... wozu auch
+    immer. 
