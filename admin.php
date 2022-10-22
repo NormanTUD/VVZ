@@ -190,8 +190,7 @@ if(!$GLOBALS['logged_in']) {
 				</td>
 				<td class="float_right display_inline width_200px_whitespace_nowrap">
 					<div class="ui-widget">
-						<label for="birds"><?php print_search_icon("float_left"); ?></label>
-						<input type="text" id="globalsearch" name="search" />
+						<input type="text" id="globalsearch" placeholder="Suche" name="search" />
 					</div>
 				</td>
 			</tr>
