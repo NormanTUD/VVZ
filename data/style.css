@@ -1198,7 +1198,11 @@ a, a:visited, a:hover, a:active {
 	max-height: 200px;
 }
 
-.no_link {
+.no_link, .no_link:visited, .no_link:active {
 	color: inherit;
 	text-decoration: inherit;
+}
+
+.no_link:hover {
+	color: blue;
 }
