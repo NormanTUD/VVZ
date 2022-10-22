@@ -1109,7 +1109,7 @@ a, a:visited, a:hover, a:active {
 }
 
 .toast {
-    opacity: 1 !important;
+	opacity: 1 !important;
 }
 
 .high_z_index {
@@ -1183,4 +1183,5 @@ a, a:visited, a:hover, a:active {
 	z-index: 9999;
 	width: 100%;
 	text-align: center;
+	opacity: 0.8;
 }
