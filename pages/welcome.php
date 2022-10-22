@@ -12,11 +12,7 @@
 		<div id="welcome">
 <?php
 			include_once('hinweise.php');
-			if ($GLOBALS['user_role_id'] == 1) {
-?>
-				Nur für Administratoren: <a href="admin?page=<?php print get_page_id_by_filename('edit_page_info.php'); ?>">Seiteninformationen bearbeiten.</a>
-<?php
-			}
+
 			if(!file_exists('/etc/x11test')) {
 				print get_seitentext(1);
 			}
