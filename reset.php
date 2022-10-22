@@ -21,8 +21,13 @@
 			print $e;
 		}
 
-		rquery("drop database vvz_global;");
-		rquery("drop database vvztud;");
+		if(database_exists("vvz_global")) {
+			rquery("drop database vvz_global;");
+		}
+		if(database_exists("vvztud")) {
+			rquery("drop database vvztud;");
+		}
+
 		rquery('SET foreign_key_checks = 1');
 	} else {
 		die("Can only be called from the CLI.");

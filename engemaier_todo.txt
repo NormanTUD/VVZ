@@ -12,17 +12,6 @@
   * Könnte die Raumplanungstabelle anzeigen ob eine LV Digital, hybrid
     oder Präsenz stattfindet?
 
-  * Könnte man den Studiengängen ein zusätzliches Attribut geben, mit
-    dem ich deren Anzeige auf der Startseite
-    (https://vvz.phil.tu-dresden.de/
-    <https://vvz.phil.tu-dresden.de/>) und beim Ankreuzen der
-    Prüfungsleistungen
-    (https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551
-    <https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551>) ordnen
-    kann? (Ich würde gern die Studiengänge nach Bedeutsamkeit
-    sortieren und Lehramt, Fachstudiengänge und Angebote für andere
-    Studiengänge besser separieren).
-
   * Auf der Seite, auf der wir die Prüfungsnummern
     ankreuzen(https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551
     <https://vvz.phil.tu-dresden.de/admin.php?page=13&id=551>), wird
@@ -32,12 +21,6 @@
     Philosophie« (Master Lehramt)" Wenn das mit der Sortierung des
     letzten Punkts klappt ist das nicht störend, ansonsten könnte man
     sehen ob man das noch zusammenfassen kann.
-
-  * Könntest du redundante Datensätze der Prüfungstypen
-    "verschmelzen"? Also dass "Nachweis Schulprakt. Studien" und
-    "Nachweis SPS" zu einem Prüfungstyp werden, ohne das eine der
-    bisherigen Zuordnungen verlorengeht? (Gilt auch für: "mdl.
-    Prüfung" / "Mündliche Prüfung")
 
   * Wäre es möglich, dass jede Vorlesung eine Art abrufbare
     Veränderungshistorie enthält, der man entnehmen kann, wann sie
