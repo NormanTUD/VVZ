@@ -10501,4 +10501,36 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 	}
 
 	#add_system_versioning();
+
+	function get_logo_filename ($only_fn=0) {
+		$id = get_kunde_id_by_db_name($GLOBALS["dbname"]);
+		if(get_get("kunde_id")) {
+			$id = get_get("kunde_id");
+		}
+
+		if($id) {
+			$query = "select img from vvz_global.logos where kunde_id = ".esc($id);
+			$result = get_single_row_from_query($query);
+
+			if($result) {
+				if($only_fn) {
+					print $result;
+				} else {
+					return "custom";
+				}
+			} else {
+				if(file_exists("/etc/vvztud")) {
+					return "tudlogo.svg";
+				} else {
+					return "default_logo.png";
+				}
+			}
+		} else {
+			if(file_exists("/etc/vvztud")) {
+				return "tudlogo.svg";
+			} else {
+				return "default_logo.png";
+			}
+		}
+	}
 ?>
