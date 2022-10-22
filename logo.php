@@ -7,14 +7,10 @@
 
 	$fn = get_logo_filename();
 
-	if($fn == "tudlogo.svg") {
-		header('Content-type: image/svg+xml');
-		readfile($fn);
-	} else if($fn == "default_logo.png") {
-		header("Content-type: image/png");
+	header("Content-type: image/png");
+	if($fn == "tudlogo.png" || $fn == "default_logo.png") {
 		readfile($fn);
 	} else {
-		header("Content-type: image/png");
 		print $fn;
 	}
 ?>

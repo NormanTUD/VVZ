@@ -10529,14 +10529,14 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 				}
 			} else {
 				if(file_exists("/etc/vvztud")) {
-					return "tudlogo.svg";
+					return "tudlogo.png";
 				} else {
 					return "default_logo.png";
 				}
 			}
 		} else {
 			if(file_exists("/etc/vvztud")) {
-				return "tudlogo.svg";
+				return "tudlogo.png";
 			} else {
 				return "default_logo.png";
 			}
