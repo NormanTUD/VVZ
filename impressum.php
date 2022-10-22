@@ -5,6 +5,9 @@
 	$filename = 'startseite';
 	include("header.php");
 
+	if($GLOBALS["dbname"] == "startpage") {
+		exit(0);
+	}
 ?>
 	<div id="mainindex">
 		<a href="startseite" border="0"><?php print_uni_logo(); ?></a><br>
