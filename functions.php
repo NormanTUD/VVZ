@@ -213,7 +213,7 @@ declare(ticks=1);
 		}
 	}
 
-	if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id'] && (basename($_SERVER['SCRIPT_NAME']) == 'admin.php') || basename($_SERVER['SCRIPT_NAME']) == 'admin')) {
+	if(array_key_exists("logged_in_user_id", $GLOBALS) && $GLOBALS['logged_in_user_id'] && (basename($_SERVER['SCRIPT_NAME']) == 'admin.php' || basename($_SERVER['SCRIPT_NAME']) == 'admin')) {
 		$query = 'SELECT `name`, `file`, `page_id`, `show_in_navigation`, `parent` FROM `view_account_to_role_pages` WHERE `user_id` = '.esc($GLOBALS['logged_in_user_id']).' ORDER BY `parent`, `name`';
 		$result = rquery($query);
 
