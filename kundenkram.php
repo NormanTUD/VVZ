@@ -251,7 +251,7 @@
 				if($installation_ts + ((7 * 86400) + 3600) > time()) {
 					$seconds_left = -time() + $installation_ts + (86400 * 7) + 3600;
 					$ablauftimer = seconds2human($seconds_left, true);
-					$str = "<span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht.<br>Ihnen verbleiben noch ".$ablauftimer." zum Testen.<br>Sie können die Adresse in der Adresszeile mit Ihren Kollegen teilen.<br>Der Standardnutzer ist <tt>Admin</tt>/<tt>test</tt></span><br>";
+					$str = "<span class='demo_string'>Diese Installation ist eine Demo. Das heißt: sie wird nach 7 Tagen gelöscht. Ihnen verbleiben noch ".$ablauftimer." zum Testen. Sie können die Adresse in der Adresszeile mit Ihren Kollegen teilen.<br>Der Standardnutzer ist <tt>Admin</tt>/<tt>test</tt></span><br>";
 				} else {
 					$str = "Ihre Demo ist abgelaufen.";
 				}
