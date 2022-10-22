@@ -29,6 +29,7 @@ AddDefaultCharset UTF-8
 	RewriteRule ^zeitraster$ zeitraster.php [L]
 	RewriteRule ^kontakt$ kontakt.php [L]
 	RewriteRule ^startseite$ startseite.php [L]
+	RewriteRule ^logo.png$ logo.php [L]
 
 	RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
 	Redirect 301 ^/v/$ /

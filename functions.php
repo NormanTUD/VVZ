@@ -10119,9 +10119,9 @@ order by
 	function print_uni_logo() {
 		$kunde_db_name = get_kunden_db_name();
 		if(file_exists("/etc/vvztud")) {
-			print '<img alt="Logo, Link zur Startseite" width=300 src="logo.php" />';
+			print '<img alt="Logo, Link zur Startseite" width=300 src="logo.png" />';
 		} else {
-			print '<img alt="Logo, Link zur Startseite" src="logo.php" />';
+			print '<img alt="Logo, Link zur Startseite" src="logo.png" />';
 		}
 	}
 
