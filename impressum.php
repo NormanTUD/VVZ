@@ -35,7 +35,7 @@ Betreiber:<br>
 
 <p>
 Konzeption, techn. Realisierung:<br>
-Norman Koch, omni-concept<br>
+Norman Koch<br>
 E-Mail: <i><a href="kontakt.php">über das Kontaktformular</a></i><br>
 </p>
 <?php
