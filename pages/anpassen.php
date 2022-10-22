@@ -70,17 +70,6 @@
 									<td>
 										<button type="button" class="reset_value_button" data-gui-id="<?php print $gui_id; ?>" data-reset="<?php print htmlentities($row["default_val"] ?? ""); ?>">Zurücksetzen</button>
 									</td>
-<?php
-									/*
-									if($i == 0) {
-?>
-										<td class="td_iframe" rowspan="<?php print count($whole); ?>">
-											<iframe id="iframe_reloader" class="full_height_iframe" src="startseite">Ihr Browser unterstützt leider keine IFrames</iframe>
-										</td>
-<?php
-									}
-									*/
-?>
 								</tr>
 							</form>
 <?php
