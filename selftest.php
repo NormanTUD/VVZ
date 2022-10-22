@@ -121,6 +121,7 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 					$GLOBALS['settings_cache'] = array();
 				}
 			}
+
 			if($done_sth) {
 				sleep(1);
 			}
@@ -713,11 +714,11 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 				initialized("customizations");
 			}
 
-			if(!table_exists_and_has_entries("veranstaltung_bezuegetypen") && !already_initialized("veranstaltung_bezuegetypen")) {
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuegetypen` (id, name) VALUES (1, 'Bezug zu einem Forschungsprojekt');";
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuegetypen` (id, name) VALUES (2, 'Berufspraktische Bezüge');";
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuegetypen` (id, name) VALUES (3, 'Interdisziplinäre Bezüge');";
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuegetypen` (id, name) VALUES (4, 'Beinhaltet eine Exkursion');";
+			if(!table_exists_and_has_entries("veranstaltung_bezuege") && !already_initialized("veranstaltung_bezuege")) {
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (1, 'Bezug zu einem Forschungsprojekt');";
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (2, 'Berufspraktische Bezüge');";
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (3, 'Interdisziplinäre Bezüge');";
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (4, 'Beinhaltet eine Exkursion');";
 				rquery($bereiche_query);
 				initialized("bereich");
 			}
