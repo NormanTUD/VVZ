@@ -406,13 +406,15 @@
 											</tr>
 <?php
 										} else {
+											if(get_setting("show_empty_modules_in_veranstaltung")) {
 ?>
-											<tr>
-												<td colspan="2">
-													<i>Leider keine eingetragenen Prüfungsnummern für das Modul &raquo;<?php print $this_modul[1]; ?>&laquo; (<?php print $this_studiengang[1]; ?>)</i>
-												</td>
-											</tr>
+												<tr>
+													<td colspan="2">
+														<i>Leider keine eingetragenen Prüfungsnummern für das Modul &raquo;<?php print $this_modul[1]; ?>&laquo; (<?php print $this_studiengang[1]; ?>)</i>
+													</td>
+												</tr>
 <?php
+											}
 										}
 									}
 								}

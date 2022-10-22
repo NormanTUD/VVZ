@@ -14,7 +14,8 @@
 	if(!function_exists("insert_settings")) {
 	function insert_settings ($errormsg = array()) {
 		$settings = array(
-			"x11_debugging_mode" => array("setting" => "0", "default_value" => "0", "description" => "Deaktiviert Dinge, die im randomisiertem X11-Test Probleme machen (1 ja, 0 nein)", "category" => "Debug")
+			"x11_debugging_mode" => array("setting" => "0", "default_value" => "0", "description" => "Deaktiviert Dinge, die im randomisiertem X11-Test Probleme machen (1 ja, 0 nein)", "category" => "Debug"),
+			"show_empty_modules_in_veranstaltung" => array("setting" => "0", "default_value" => "0", "description" => "Zeige leere Module in der Veranstaltungsseite an (1 ja, 0 nein)", "category" => "Veranstaltung")
 		);
 				$GLOBALS['settings_cache'] = array();
 
