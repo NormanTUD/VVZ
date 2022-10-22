@@ -6743,7 +6743,6 @@ INSERT INTO
 
 	function create_bezuege_array () {
 		$query = 'SELECT `id`, `name` FROM `veranstaltung_bezuege`';
-		dier($query);
 		$result = rquery($query);
 		$bezuege = array();
 		while ($row = mysqli_fetch_row($result)) {

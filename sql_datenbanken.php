@@ -537,7 +537,7 @@
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'veranstaltung_bezuegetypen' => 'create table if not exists `veranstaltung_bezuege` (
-  `id` int(10) unsigned NOT NULL,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',

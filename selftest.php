@@ -715,10 +715,10 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 			}
 
 			if(!table_exists_and_has_entries("veranstaltung_bezuege") && !already_initialized("veranstaltung_bezuege")) {
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (1, 'Bezug zu einem Forschungsprojekt');";
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (2, 'Berufspraktische Bezüge');";
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (3, 'Interdisziplinäre Bezüge');";
-				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (id, name) VALUES (4, 'Beinhaltet eine Exkursion');";
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Bezug zu einem Forschungsprojekt');";
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Berufspraktische Bezüge');";
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Interdisziplinäre Bezüge');";
+				$bereiche_query = "INSERT IGNORE INTO `veranstaltung_bezuege` (name) VALUES ('Beinhaltet eine Exkursion');";
 				rquery($bereiche_query);
 				initialized("bereich");
 			}
