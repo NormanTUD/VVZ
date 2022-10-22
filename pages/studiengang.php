@@ -39,7 +39,21 @@
 				if(get_get('institut')) {
 					$where = ' WHERE `institut_id` = '.esc(get_get('institut'));
 				}
-				create_table_one_dependency($institute, array('institut_id', 'name', 'studienordnung'), array('Institut', 'Name', '<div class="tooltip">Studienordnung-URL<span class="tooltiptext">Sofern hier eine URL eingegeben wird, wird sie im Vorlesungsverzeichnis für den jeweiligen Studiengang eingeblendet und ermöglicht es, ohne großes Suchen direkt auf die Studienordnung zu gelangen.</span></div>', 'Speichern', 'Löschen'), 'studiengang', $GLOBALS['this_page_number'], 'institut_id', 'studiengang', $where);
+
+				$studienordnung = '<div class="tooltip">Studienordnung-URL<span class="tooltiptext">Sofern hier eine URL eingegeben wird, wird sie im Vorlesungsverzeichnis für den jeweiligen Studiengang eingeblendet und ermöglicht es, ohne großes Suchen direkt auf die Studienordnung zu gelangen.</span></div>';
+
+				//function create_table_one_dependency ($data, $columnnames, $headlines, $table, $page, $select_name, $dataname, $where = null) {
+				create_table_one_dependency(
+					$institute,
+					array('institut_id', 'name', 'studienordnung', 'order_key'), 
+					array('Institut', 'Name', $studienordnung, 'Order-Key', 'Speichern', 'Löschen'), 
+					'studiengang', 
+					$GLOBALS['this_page_number'], 
+					'institut_id', 
+					'studiengang', 
+					$where,
+					"order by order_key asc, name asc"
+				);
 			} else {
 				print "Keine Institute. Bitte fügen Sie zuerst ein Institut hinzu.";
 			}

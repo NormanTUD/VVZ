@@ -9,6 +9,11 @@ $page_title = $GLOBALS['university_name']." | Administration";
 include("header.php");
 include_once("selftest.php");
 
+if(get_kunden_db_name() == "startpage") {
+	print "Not allowed";
+	exit(0);
+}
+
 if(!$GLOBALS['logged_in']) {
 ?>
 		<div class="blurbox">

@@ -4856,6 +4856,7 @@ INSERT INTO
 				array("table" => "studiengang", "col" => "name", "name" => "Name"),
 				array("table" => "studiengang", "col" => "institut_id", "name" => "Institut"),
 				array("table" => "studiengang", "col" => "studienordnung", "name" => "Studienordnung"),
+				array("table" => "studiengang", "col" => "order_key", "name" => "Order-Key")
 			]
 		));
 
@@ -5738,7 +5739,7 @@ INSERT INTO
 <?php
 	}
 
-	function create_table_one_dependency ($data, $columnnames, $headlines, $table, $page, $select_name, $dataname, $where = null) {
+	function create_table_one_dependency ($data, $columnnames, $headlines, $table, $page, $select_name, $dataname, $where = null, $order_by = null) {
 ?>
 		<table>
 			<tr>
@@ -5755,7 +5756,11 @@ INSERT INTO
 		if(isset($where) && $where) {
 			$query .= $where;
 		}
-		$query .= 'ORDER BY `'.join('`, `', $columnnames).'` ';
+		if(!$order_by) {
+			$query .= 'ORDER BY `'.join('`, `', $columnnames).'` ';
+		} else {
+			$query .= " $order_by ";
+		}
 
 		$result = rquery($query);
 		$bereiche = array();
