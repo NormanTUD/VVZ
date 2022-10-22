@@ -1192,3 +1192,8 @@ a, a:visited, a:hover, a:active {
 .white_text {
 	color: white;
 }
+
+.logo_limits {
+	max-width: 300px;
+	max-height: 200px;
+}
