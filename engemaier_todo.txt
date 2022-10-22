@@ -9,7 +9,7 @@
     standardmäßig das Standardsemester benutzen? (muss ich dort jedes
     Mal auswählen)
 
-  * Könnte die Raumplanungstablle anzeigen ob eine LV Digital, hybrid
+  * Könnte die Raumplanungstabelle anzeigen ob eine LV Digital, hybrid
     oder Präsenz stattfindet?
 
   * Könnte man den Studiengängen ein zusätzliches Attribut geben, mit
