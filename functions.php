@@ -9792,7 +9792,7 @@ order by
 			$number++;
 			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, "Ansprechpartner:");
 			$letter = "B";
-			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $dozent_name );
+			$objPHPExcel->getActiveSheet()->SetCellValue($letter.$number, $dozent_name);
 			$letter = "A";
 
 			$number++;
