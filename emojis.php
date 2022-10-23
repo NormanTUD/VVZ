@@ -210,6 +210,15 @@
 		print get_hike_icon();
 	}
 
+
+	function get_delete_icon () {
+		return '<i class="fa-solid fa-circle-xmark"></i>';
+	}
+
+	function print_delete_icon () {
+		print get_delete_icon();
+	}
+
 	function get_work_icon () {
 		return '<i class="fa-solid fa-briefcase"></i>';
 	}

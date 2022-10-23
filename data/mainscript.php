@@ -466,7 +466,7 @@ function add_new_row_to_einzelne_termine () {
 		'<td><input type="text" name="einzelner_termin_ende[]" class="datetimepicker" /></td>' + "\n" +
 		'<td>' + gebaeude_selection + '</td>' + "\n" +
 		'<td><input type="text" name="einzelner_termin_raum[]" /></td>' + "\n" +
-		'<td><span class="remove_this_tr"><img src="./i/remove.svg" alt="Zeile entfernen" width="30" /></span></td>' + "\n" +
+		'<td><span class="remove_this_tr"><i class="fa-solid fa-circle-xmark"></i></span></td>' + "\n" +
 		'</tr>'
 );
 }
