@@ -462,10 +462,11 @@ if(!$GLOBALS['logged_in']) {
 						e = e || window.event;
 
 						if(document.activeElement == $("body")[0]) {
-							var keycode =  e.keyCode;
+							var keycode = e.keyCode;
 							if(keycode >= 97 && keycode <= 122) {
+								e.preventDefault();
 								$("#globalsearch").val("");
-								$("#globalsearch").val($("#globalsearch").val() + String.fromCharCode(e.keyCode));
+								$("#globalsearch").val(String.fromCharCode(e.keyCode));
 								$("#globalsearch").focus();
 							}
 						}
