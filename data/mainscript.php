@@ -468,7 +468,9 @@ function add_new_row_to_einzelne_termine () {
 		'<td><input type="text" name="einzelner_termin_raum[]" /></td>' + "\n" +
 		'<td><span class="remove_this_tr"><i class="fa-solid fa-circle-xmark"></i></span></td>' + "\n" +
 		'</tr>'
-);
+	);
+
+	autosubmit();
 }
 
 $(document).on("focus", ".datetimepicker", function(){

@@ -1,4 +1,4 @@
-$(document).ready(function(){
+function autosubmit () {
 	$(".form_autosubmit, :input").each(function (index) {
 		if(!$(this).attr('noautosubmit')) {
 			$(this).change(function (index) {
@@ -23,4 +23,9 @@ $(document).ready(function(){
 			});
 		}
 	});
+
+}
+
+$(document).ready(function(){
+	autosubmit();
 });
