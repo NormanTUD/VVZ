@@ -193,7 +193,13 @@ if(!$GLOBALS['logged_in']) {
 				</td>
 				<td valign="middle" class="invisiblebg">
 					Willkommen, <?php print htmlentities($dozent_name ?? ""); ?>!
-					<div class="tooltip"><a class="red_large" href="logout.php">Abmelden <?php print_logout_icon(); ?></a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+<?php
+					if(!get_setting("x11_debugging_mode")) {
+?>
+						<div class="tooltip"><a class="red_large" href="logout.php">Abmelden <?php print_logout_icon(); ?></a><span class="tooltiptext">Meldet alle angemeldeten Geräte ab</span></div>
+<?php
+					}
+?>
 				</td>
 				<td class="float_right display_inline">
 					<div class="ui-widget">
