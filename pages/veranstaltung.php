@@ -79,7 +79,7 @@
 				$bezuege = create_bezuege_array();
 ?>
 				<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
-					<input type="submit" class="text_30px" value="Speichern" />
+					<button type="submit" disabled style="display: none" aria-hidden="true"></button>
 
 					<table>
 						<tr>
@@ -456,7 +456,7 @@
 
 								create_select($veranstaltungen, get_post('kopieren_von'), 'kopieren_von');
 ?>
-								<p>Sollen dabei die bisher zu dieser Veranstaltung gespeichert Daten überschrieben werden? <input type="checkbox" value="1" name="delete_old_data" /></p>
+								<p>Sollen dabei die bisher zu dieser Veranstaltung gespeichert Daten überschrieben werden? <input type="checkbox" value="1" name="delete_old_data" noautosubmit=1 /></p>
 								<input type="submit" name="pruefungen_kopieren" value="Prüfungen von der ausgewählten Veranstaltung kopieren" />
 						</form>
 <?php
