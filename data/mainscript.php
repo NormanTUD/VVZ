@@ -158,8 +158,6 @@ function get_modul_via_pruefungs_id (pn) {
 }
 
 function update_pruefungsleistung_cookies (reload) {
-log("===================================");
-log("update_pruefungsleistung_cookies");
 	save_absolvierte_pruefungsleistungen();
 	save_geplante_pruefungsleistungen();
 
@@ -218,7 +216,6 @@ log("update_pruefungsleistung_cookies");
 }
 
 function save_absolvierte_pruefungsleistungen () {
-log("save_absolvierte_pruefungsleistungen");
 	var cname = "absolviertepruefungsleistungen";
 	var pruefungsnummern = new Array();
 	setCookie(cname, "", 0);
