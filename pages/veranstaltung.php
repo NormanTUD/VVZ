@@ -435,18 +435,11 @@
 							<br />
 						</form>
 					<form method="get">
-						<input type="hidden" value="1" name="all_semesters_copy" />
 						<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
 						<input type="hidden" value="<?php print $veranstaltung_id; ?>" name="id" />
-						<input type="submit" value="Zum Kopieren von Prüfungsleistungen Veranstaltungen aus allen Semestern anzeigen" />
 					</form>
 <?php
-						$veranstaltungen = array();
-						if(get_get('all_semesters_copy')) {
-							$veranstaltungen = create_veranstaltungen_array($GLOBALS['user_role_id'] == 1 ? '' : $valid_to_edit_dozenten, get_get('id'), 80, null, $this_institut_id);
-						} else {
-							$veranstaltungen = create_veranstaltungen_array($GLOBALS['user_role_id'] == 1 ? '' : $valid_to_edit_dozenten, get_get('id'), 80, get_veranstaltung_semester(get_get('id')), $this_institut_id);
-						}
+						$veranstaltungen = create_veranstaltungen_array($GLOBALS['user_role_id'] == 1 ? '' : $valid_to_edit_dozenten, get_get('id'), 80, null, $this_institut_id);
 						if(count($veranstaltungen)) {
 ?>
 						<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
@@ -462,10 +455,6 @@
 								<p>Sollen dabei die bisher zu dieser Veranstaltung gespeichert Daten überschrieben werden? <input type="checkbox" value="1" name="delete_old_data" noautosubmit=1 /></p>
 								<input type="submit" name="pruefungen_kopieren" value="Prüfungen von der ausgewählten Veranstaltung kopieren" />
 						</form>
-<?php
-						} else if (get_get('all_semesters_copy')) {
-?>
-							<i class="class_red">Aktuell existieren noch keine Veranstaltungen, aus denen etwas kopiert werden kann (sie müssen am gleichen Institut sein, wie diese Veranstaltung!).</i>
 <?php
 						}
 					} else {
