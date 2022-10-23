@@ -201,11 +201,17 @@ if(!$GLOBALS['logged_in']) {
 					}
 ?>
 				</td>
-				<td class="float_right display_inline">
-					<div class="ui-widget">
-						<input type="text" id="globalsearch" placeholder="Suche" name="search" />
-					</div>
-				</td>
+<?php
+				if(!get_setting("x11_debugging_mode")) {
+?>
+					<td class="float_right display_inline">
+						<div class="ui-widget">
+							<input type="text" id="globalsearch" noautosubmit="1" placeholder="Suche" name="search" />
+						</div>
+					</td>
+<?php
+				}
+?>
 			</tr>
 		</table>
 <?php
@@ -448,22 +454,25 @@ if(!$GLOBALS['logged_in']) {
 ?>
 
 			</div>
-
-			<script nonce=<?php print($GLOBALS['nonce']); ?> >
-				document.onkeypress = function (e) {
-					e = e || window.event;
-
-					if(document.activeElement == $("body")[0]) {
-						var keycode =  e.keyCode;
-						if(keycode >= 97 && keycode <= 122) {
-							$("#globalsearch").val("");
-							$("#globalsearch").val($("#globalsearch").val() + String.fromCharCode(e.keyCode));
-							$("#globalsearch").focus();
-						}
-					}
-				};
-			</script>
 <?php
+			if(!get_setting("x11_debugging_mode")) {
+?>
+				<script nonce=<?php print($GLOBALS['nonce']); ?> >
+					document.onkeypress = function (e) {
+						e = e || window.event;
+
+						if(document.activeElement == $("body")[0]) {
+							var keycode =  e.keyCode;
+							if(keycode >= 97 && keycode <= 122) {
+								$("#globalsearch").val("");
+								$("#globalsearch").val($("#globalsearch").val() + String.fromCharCode(e.keyCode));
+								$("#globalsearch").focus();
+							}
+						}
+					};
+				</script>
+<?php
+			}
 		}
 		include("footer.php");
 ?>
