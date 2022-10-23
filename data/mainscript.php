@@ -200,11 +200,23 @@ function update_pruefungsleistung_cookies (reload) {
 
 			var gesamtfortschritt_absolviert = Math.floor(((parseInt(counter_done)) / parseInt(summe_benoetigte_pruefungen)) * 100);
 			$("#absolvierte_pruefungen_modul_" + modul).html(counter_done + " (" + gesamtfortschritt_absolviert + "%)");
+			if(gesamtfortschritt_absolviert > 100) {
+				$("#absolvierte_pruefungen_modul_" + modul).css("background-color", "red");
+			} else {
+				$("#absolvierte_pruefungen_modul_" + modul).css("background-color", "inherit");
+			}
+
 			$("#geplante_pruefungen_modul_" + modul).html(counter_geplant);
 
 			var sum_counter = parseInt(counter_done) + parseInt(counter_geplant);
 			var gesamtfortschritt = Math.floor(((parseInt(counter_done) + parseInt(counter_geplant)) / parseInt(summe_benoetigte_pruefungen)) * 100);
 			$("#geplante_absolvierte_pruefungen_modul_" + modul).html(sum_counter + " (" + gesamtfortschritt + "%)");
+
+			if(gesamtfortschritt > 100) {
+				$("#geplante_absolvierte_pruefungen_modul_" + modul).css("background-color", "red");
+			} else {
+				$("#geplante_absolvierte_pruefungen_modul_" + modul).css("background-color", "inherit");
+			}
 		}
 	});
 
