@@ -4681,14 +4681,13 @@ INSERT INTO
 							$raum_id = get_and_create_raum_id($gebaeude_id, $raum);
 
 							if($start && $ende) {
-								$query = 'insert ignore into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($ende).', '.esc($raum_id).')';
+								$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($ende).', '.esc($raum_id).')';
 								$res = rquery($query);
 								if(!$res) {
 									$error = 1;
 								}
 							}
 						}
-
 					}
 
 					if($error) {
