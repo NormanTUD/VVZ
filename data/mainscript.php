@@ -656,3 +656,7 @@ function log(...msgs) {
 function toggle_ok () {
 	$('.line_was_ok').toggle();
 }
+
+function help () {
+	alert("help");
+}

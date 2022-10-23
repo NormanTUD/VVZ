@@ -142,3 +142,6 @@
 ?>
 	</head>
 <body>
+<span id="help_icon">
+	<span onclick="help()"><?php print_help_icon(); ?></span>
+</span>

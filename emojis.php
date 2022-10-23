@@ -250,4 +250,12 @@
 	function print_research_icon () {
 		print get_research_icon();
 	}
+
+	function get_help_icon () {
+		return '<i class="fa-solid fa-question"></i>';
+	}
+
+	function print_help_icon () {
+		print get_help_icon();
+	}
 ?>

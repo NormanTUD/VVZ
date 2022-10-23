@@ -1206,3 +1206,12 @@ a, a:visited, a:hover, a:active {
 .no_link:hover {
 	color: blue;
 }
+
+#help_icon {
+	position: fixed;
+	right: 10px;
+	top: 10px;
+	font-size: 20px;
+	color: blue;
+	//display: none;
+}
