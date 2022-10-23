@@ -51,7 +51,7 @@
   `veranstaltung_id` int(10) unsigned NOT NULL DEFAULT 0,
   `start` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `end` datetime NULL DEFAULT CURRENT_TIMESTAMP,
-  `raum_id` int(10) unsigned DEFAULT NULL,
+  `raum_id` int(10) unsigned NULL DEFAULT NULL,
   PRIMARY KEY (`veranstaltung_id`, `start`, `end`, `raum_id`),
   CONSTRAINT `einzelne_termine_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
   CONSTRAINT `einzelne_termine_ibfk_2` FOREIGN KEY (`raum_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE

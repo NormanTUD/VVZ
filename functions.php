@@ -2778,7 +2778,7 @@ declare(ticks=1);
 						$query = 'INSERT INTO `raum` (`gebaeude_id`, `raumnummer`) VALUES ('.esc($gebaeude_id).', '.esc($raumnummer).')';
 						$results = rquery($query);
 						if($results) {
-							$is_in_db;
+							$is_in_db = 1;
 						}
 					} else {
 						$is_in_db = 1;
@@ -4678,22 +4678,24 @@ INSERT INTO
 							$end = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_ende']);
 							$gebaeude_id = $einzelner_termin['einzelner_termin_gebaeude'];
 							$raum = $einzelner_termin['einzelner_termin_raum'];
-							$raum_id = get_and_create_raum_id($gebaeude_id, $raum);
+
 
 							$veranstaltung_id = $id;
 
-							eval(check_values(
-								[
-									array("table" => "einzelne_termine", "col" => "veranstaltung_id", "name" => "Veranstaltungs-ID"),
-									array("table" => "einzelne_termine", "col" => "start", "name" => "Start"),
-									array("table" => "einzelne_termine", "col" => "end", "name" => "Ende"),
-									array("table" => "einzelne_termine", "col" => "raum_id", "name" => "Raum"),
-								]
-							));
 
 							if($start && $end) {
 								if($gebaeude_id) {
+									$raum_id = get_and_create_raum_id($gebaeude_id, $raum);
 									if($raum_id) {
+										eval(check_values(
+											[
+												array("table" => "einzelne_termine", "col" => "veranstaltung_id", "name" => "Veranstaltungs-ID"),
+												array("table" => "einzelne_termine", "col" => "start", "name" => "Start"),
+												array("table" => "einzelne_termine", "col" => "end", "name" => "Ende"),
+												array("table" => "einzelne_termine", "col" => "raum_id", "name" => "Raum"),
+											]
+										));
+
 										$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
 										$res = rquery($query);
 										if(!$res) {
