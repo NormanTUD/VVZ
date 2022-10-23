@@ -4428,14 +4428,16 @@ WHERE `id` = '.esc($id);
 		}
 	}
 
-	function add_missing_seconds_to_datetime ($dt) {
+	function add_missing_seconds_to_datetime ($dt, $noerror=0) {
 		# 2018-09-07 00:00
 		if(preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $dt)) {
 			return $dt;
 		} else if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $dt)) {
 			return "$dt:00";
 		} else {
-			error("Ungültiges Datetime-Format. Muss YYYY-MM-DD HH:MM oder YYYY-MM-DD HH:MM:SS sein!");
+			if(!$noerror) {
+				error("Ungültiges Datetime-Format. Muss YYYY-MM-DD HH:MM oder YYYY-MM-DD HH:MM:SS sein!");
+			}
 			return null;
 		}
 	}
@@ -4674,17 +4676,17 @@ INSERT INTO
 					$error = 0;
 					foreach ($einzelne_termine as $einzelner_termin) {
 						if(!$error) {
-							$start = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_start']);
-							$end = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_ende']);
+							$start = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_start'], 1);
+							$end = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_ende'], 1);
 							$gebaeude_id = $einzelner_termin['einzelner_termin_gebaeude'];
 							$raum = $einzelner_termin['einzelner_termin_raum'];
 
 
 							$veranstaltung_id = $id;
 
+							$date_regex = "/^\d{4}-\d\d-\d\d\s+\d\d:\d\d:\d\d$/";
 
-							if($start && $end) {
-								if($gebaeude_id) {
+							if(preg_match($date_regex, $start ?? "") && preg_match($date_regex, $end ?? "") && $gebaeude_id && $raum) {
 									$raum_id = get_and_create_raum_id($gebaeude_id, $raum);
 									if($raum_id) {
 										eval(check_values(
@@ -4696,7 +4698,7 @@ INSERT INTO
 											]
 										));
 
-										$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
+										$query = 'insert ignore into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
 										$res = rquery($query);
 										if(!$res) {
 											$error = 1;
@@ -4705,11 +4707,12 @@ INSERT INTO
 										error("Kein Raum definiert");
 										$error++;
 									}
-								} else {
-									error("Kein Gebäude definiert");
-									$error++;
-								}
+							} else {
+								warning("Termine müssen ein Start- und Enddatum und ein Gebäude und einen Raum haben, um eingetragen zu werden");
+								$error++;
 							}
+						} else {
+							warning("Mindestens ein Termin konnte nicht gespeichert werden.");
 						}
 					}
 

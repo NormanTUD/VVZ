@@ -1,5 +1,5 @@
-function autosubmit () {
-	$(".form_autosubmit, :input").each(function (index) {
+function autosubmit (identifier=".form_autosubmit, :input") {
+	$(identifier).each(function (index) {
 		if(!$(this).attr('noautosubmit')) {
 			$(this).change(function (index) {
 				var loc = window.location.pathname;

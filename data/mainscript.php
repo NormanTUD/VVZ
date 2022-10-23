@@ -454,6 +454,7 @@ function start_tour () {
 }
 
 function remove_tr (item) {
+	autosubmit();
 	$($(item).closest("tr")).remove();
 }
 
