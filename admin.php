@@ -184,11 +184,11 @@ if(!$GLOBALS['logged_in']) {
 			<tr class="invisiblebg">
 				<td class="invisiblebg">
 <?php
-	if(!file_exists('/etc/x11test')) {
+				if(!get_setting('x11_debugging_mode')) {
 ?>
 						<a href="admin" border="0"><?php print_uni_logo(); ?></a>
 <?php
-	}
+				}
 ?>
 				</td>
 				<td valign="middle" class="invisiblebg">
@@ -210,7 +210,7 @@ if(!$GLOBALS['logged_in']) {
 				</script>
 <?php
 			}
-			if(!file_exists('/etc/x11test')) {
+			if(!get_setting('x11_debugging_mode')) {
 ?>
 				 <?php print get_demo_expiry_time(); ?>
 <?php
