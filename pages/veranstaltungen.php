@@ -163,7 +163,7 @@
 ?>
 							<th>Typ</th>
 							<th>Details</th>
-							<th>Anzahl Prüfungen</th>
+							<th>Anz. Prfg.</th>
 							<!--<th>Letztes Update</th>-->
 							<th>Löschen?</th>
 						</tr>
