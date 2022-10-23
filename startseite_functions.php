@@ -883,6 +883,11 @@
 							show_master_niveau($master_niveau);
 							show_angebotene_sprachen($id);
 							show_related_veranstaltung($related_veranstaltung);
+
+							if(veranstaltung_has_bezug_to($id, "%xkursion")) {
+								print "Beinhaltet eine Exkursion.";
+							}
+
 							show_pruefungen_tabelle($id, $pruefungen);
 ?>
 							</div>
