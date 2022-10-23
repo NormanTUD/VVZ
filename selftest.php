@@ -124,6 +124,7 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 			}
 
 			if($done_sth) {
+				add_system_versioning();
 				sleep(1);
 			}
 
@@ -728,8 +729,6 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 			}
 
 			rquery('set FOREIGN_KEY_CHECKS=1');
-
-			add_system_versioning();
 		} catch (\Throwable $e) {
 			stderrw($e);
 
