@@ -4666,7 +4666,7 @@ INSERT INTO
 				success('Die Details zur Veranstaltung wurden erfolgreich geändert.');
 			}
 
-			if(is_array($einzelne_termine) && count($einzelne_termine)) {
+			if(is_array($einzelne_termine)) {
 				start_transaction();
 				$delete_query = 'delete from einzelne_termine where veranstaltung_id = '.esc($id);
 				$res = rquery($delete_query);
