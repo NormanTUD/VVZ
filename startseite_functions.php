@@ -599,7 +599,7 @@
 	function show_hinweis ($hinweis) {
 		if($hinweis) {
 ?>
-			<p><i>Hinweis: </i><span class="prewrap"><?php print replace_hinweis_with_graphics(htmle($hinweis)); ?></span></p>
+			<p><?php print_info_icon(); ?> <span class="prewrap"><?php print replace_hinweis_with_graphics(htmle($hinweis)); ?></span></p>
 <?php
 		}
 	}

@@ -226,4 +226,12 @@
 	function print_work_icon () {
 		print get_work_icon();
 	}
+
+	function get_info_icon () {
+		return '<i class="fa-solid fa-circle-info"></i>';
+	}
+
+	function print_info_icon () {
+		print get_info_icon();
+	}
 ?>
