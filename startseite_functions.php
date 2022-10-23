@@ -58,12 +58,23 @@
 		}
 	}
 
+	function alle_pls_link () {
+		$studiengang_id = get_get('studiengang');
+
+		if ($studiengang_id) {
+			$alle_pls_link = "startseite?alle_pruefungsnummern=1&semester=".get_current_semester_id()."&institut=".$GLOBALS["this_institut"]."&chosen_studiengang=".htmlentities($studiengang_id);
+?>
+			&mdash; <a href="<?php print $alle_pls_link ; ?>" id="studienordnung_link" ><?php print_write_icon(); ?>&nbsp;Prüfungsleistungen</a>
+<?php
+		}
+	}
+
 	function studienordnung_link () {
 		$studienordnung_url = get_studienordnung_url(get_get('studiengang'));
 
 		if ($studienordnung_url) {
 ?>
-		&mdash; <a href="<?php print $studienordnung_url; ?>" id="studienordnung_link" ><?php print_document_icon(); ?>&nbsp;Studienordnung</a>
+			&mdash; <a href="<?php print $studienordnung_url; ?>" id="studienordnung_link" ><?php print_document_icon(); ?>&nbsp;Studienordnung</a>
 <?php
 		}
 	}
@@ -1083,6 +1094,7 @@
 <?php
 			stundenplanerstellung_link();
 			studienordnung_link();
+			alle_pls_link();
 ?>
 		</div>
 <?php
