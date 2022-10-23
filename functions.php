@@ -4658,9 +4658,11 @@ INSERT INTO
 				commit();
 			}
 
+			$show_success = 0;
+
 			if($query) {
 				if(rquery($query)) {
-					success('Gespeichert!');
+					$show_success = 1;
 				} else {
 					message('Die Details zur Veranstaltung wurden erfolgreich geändert. Aber der Raumwunsch konnte nicht gespeichert werden.');
 				}
@@ -4708,7 +4710,7 @@ INSERT INTO
 										$error++;
 									}
 							} else {
-								warning("Termine müssen ein Start- und Enddatum und ein Gebäude und einen Raum haben, um eingetragen zu werden");
+								warning("Termine müssen ein Start- und Enddatum und ein Gebäude und einen Raum haben, um eingetragen zu werden.");
 								$error++;
 							}
 						} else {
@@ -4718,6 +4720,7 @@ INSERT INTO
 
 					if($error) {
 						rollback();
+						$show_success = 0;
 						error("Die einzelnen Termine konnten nicht hinzugefügt werden.");
 					} else {
 						commit();
@@ -4752,6 +4755,7 @@ INSERT INTO
 				if($failed) {
 					rollback();
 					error("Die gewählten Präsenztypen konnten nicht hinzugefügt werden.");
+					$show_success = 0;
 				} else {
 					commit();
 					$new_db_status_hash = query_to_status_hash($check_query);
@@ -4787,10 +4791,13 @@ INSERT INTO
 					if($failed) {
 						rollback();
 						error("Die gewählten Sprachen konnten nicht hinzugefügt werden.");
+						$show_success = 0;
 					} else {
 						commit();
 						success("Die gewählten Sprachen wurden erfolgreich hinzugefügt.");
 					}
+				} else {
+					commit();
 				}
 			}
 
@@ -4812,8 +4819,13 @@ INSERT INTO
 						success('Das Niveau wurde angepasst.');
 					} else {
 						warning("Die Studiengangsniveaueinstellung konnte nicht gespeichert werden");
+						$show_success = 0;
 					}
 				}
+			}
+
+			if($show_success) {
+				success('Gespeichert!');
 			}
 		} else {
 			message('Die Metadaten zur Veranstaltung konnten nicht geändert werden oder es waren keine Änderungen notwendig.');
