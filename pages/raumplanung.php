@@ -24,27 +24,8 @@
 			}
 
 			if(count($semester)) {
-				$this_semester = get_get('semester') ? get_get('semester') : get_and_create_this_semester()[0];
-				$this_semester_is_valid = 0;
-				foreach ($semester as $tsemester) {
-					if($tsemester[0] == $this_semester) {
-						$this_semester_is_valid = 1;
-					}
+				$this_semester = get_get('semester') ? get_get('semester') : get_current_semester_id();
 
-				}
-				if(!$this_semester_is_valid) {
-					if($semester[1][0]) {
-						$new_semester = get_semester($semester[1][0], 1);
-?>
-						<i class="red_text">Für das ausgewählte bzw. ausgewählte Semester sind leider keine Veranstaltungen eingetragen. <b>Statt &raquo;<?php print get_semester($this_semester, 1)[1]; ?>&laquo; wird das &raquo;<?php print $new_semester[1]; ?>&laquo; ausgewählt.</i></b> Um das ausgewählte Semester anzeigen zu können, tragen Sie bitte Veranstaltungen ein und weisen Sie diesen dieses Semester zu.
-<?php
-						$this_semester = $new_semester[0];
-					} else {
-?>
-						<i class="class_red">Es sind noch keine Daten vorhanden, mit denen das Vorlesungsverzeichnis arbeiten könnte. Bitte fügen Sie Veranstaltungen hinzu, bevor Sie die Raumplanung aufrufen.</i>
-<?php
-					}
-				}
 				if(preg_match('/^\d+$/', $GLOBALS['user_institut_id']) && count($institute) >= 2 && $GLOBALS['user_role_id'] == 1) {
 ?>
 					<form class="form" method="get">
