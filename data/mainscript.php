@@ -158,8 +158,10 @@ function get_modul_via_pruefungs_id (pn) {
 }
 
 function update_pruefungsleistung_cookies (reload) {
-	get_absolvierte_pruefungsleistungen();
-	get_geplante_pruefungsleistungen();
+log("===================================");
+log("update_pruefungsleistung_cookies");
+	save_absolvierte_pruefungsleistungen();
+	save_geplante_pruefungsleistungen();
 
 	var regExp = /pn_modul_(.*)/;
 
@@ -215,7 +217,8 @@ function update_pruefungsleistung_cookies (reload) {
 	}
 }
 
-function get_absolvierte_pruefungsleistungen () {
+function save_absolvierte_pruefungsleistungen () {
+log("save_absolvierte_pruefungsleistungen");
 	var cname = "absolviertepruefungsleistungen";
 	var pruefungsnummern = new Array();
 	setCookie(cname, "", 0);
@@ -228,9 +231,11 @@ function get_absolvierte_pruefungsleistungen () {
 
 	var json_str = JSON.stringify(pruefungsnummern);
 	setCookie(cname, json_str, 99999999);
+	success("Cookie gesetzt");
 }
 
-function get_geplante_pruefungsleistungen () {
+function save_geplante_pruefungsleistungen () {
+log("save_geplante_pruefungsleistungen");
 	var cname = "geplante_pruefungsleistungen";
 	var pruefungsnummern = new Array();
 	setCookie(cname, "", 0);
@@ -241,8 +246,10 @@ function get_geplante_pruefungsleistungen () {
 		}
 	});
 
+
 	var json_str = JSON.stringify(pruefungsnummern);
 	setCookie(cname, json_str, 99999999);
+	success("Cookie gesetzt");
 }
 
 function toggle_filter () {
@@ -263,11 +270,11 @@ function create_tinyurl () {
 $(document).ready(function() {
 	$("#query_analyzer").hide();
 	$("input.pruefung_already_done:checkbox").on('click',function () {
-		update_pruefungsleistung_cookies(1);
+		update_pruefungsleistung_cookies(0);
 	});
 
 	$("input.pruefung_already_chosen:checkbox").on('click',function () {
-		update_pruefungsleistung_cookies(1);
+		update_pruefungsleistung_cookies(0);
 	});
 
 	$("div[id^='details_']").hide();
