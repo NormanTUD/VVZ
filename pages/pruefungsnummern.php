@@ -101,8 +101,9 @@ FROM
 JOIN
 	studiengang s on s.id = pn.studiengang_id
 ';
-						$query .= 'where `institut_id` = '.esc($chosen_institut);
+						$query .= 'where `institut_id` = '.esc($chosen_institut).' ';
 						$query .= 'order by studiengang_name asc, modul_name asc, pruefungsnummer_fach_id asc, pruefungstyp_name asc, pruefungsnummer asc';
+
 						$result = rquery($query);
 
 						$rows = array();
@@ -165,8 +166,9 @@ JOIN
 										<td><?php create_select($zeitraum, $row[9], 'zeitraum'); ?></td>
 <?php
 									}
+
 ?>
-									<td><?php create_select(array("0" => "Nein", "1" => "Ja"), $row[10] ? 'Ja' : 'Nein', 'pndisabled')  ?></td>
+									<td><input type='checkbox' name='pndisabled' <?php print $row[10] ? ' checked ' : '' ?> /></td>
 								
 									<td>
 										<button type="submit" disabled style="display: none" aria-hidden="true"></button>
@@ -179,7 +181,7 @@ JOIN
 							$j++;
 						}
 ?>
-							<form class="form" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
+						<form class="form" method="post" action="admin?page=<?php print htmlentities($GLOBALS['this_page_number']) ?>&institut=<?php print htmlentities($chosen_institut ?? ""); ?>">
 							<input data-id="noautosubmit" type="hidden" value="neue_pruefungsnummer" name="neue_pruefungsnummer" />
 							<td><?php create_select($module, '', 'modul', 0, 1); ?></td>
 							<td><?php create_select($bereiche, '', 'bereich', 0, 1); ?></td>

@@ -3988,7 +3988,7 @@ WHERE 1
 
 	function update_pruefungsnummer($id, $modul_id, $pruefungsnummer, $pruefungstyp_id, $bereich_id, $modulbezeichnung, $zeitraum_id, $disabled) {
 		if(!check_function_rights(__FUNCTION__)) { return; }
-		if($disabled == "Ja") {
+		if($disabled == "Ja" || $disabled == "on") {
 			$disabled = "1";
 		} else {
 			$disabled = "0";
@@ -5775,11 +5775,17 @@ INSERT INTO
 <?php
 	}
 
-	function create_select ($data, $chosen, $name, $allow_empty = 0, $noautosubmit = 0, $aria_labelledby = null, $submit_on_change=0) {
+	function create_select ($data, $chosen, $name, $allow_empty = 0, $noautosubmit = 0, $aria_labelledby = null, $submit_on_change = 0, $class = "") {
 		if(!is_null($aria_labelledby)) {
 			$aria_labelledby = ' aria-labelledby="'.htmle($aria_labelledby).'" ';
 		} else {
 			$aria_labelledby = '';
+		}
+
+		if($class) {
+			$class = " class='$class' ";
+		} else {
+			$class = "";
 		}
 
 		if($submit_on_change) {
@@ -5787,8 +5793,9 @@ INSERT INTO
 		} else {
 			$submit_on_change = "";
 		}
+
 ?>
-		<select <?php print $submit_on_change; print $aria_labelledby; ?> name="<?php print htmlentities($name); ?>"<?php print ($noautosubmit == 1 ? ' noautosubmit="1"' : ''); ?>>
+		<select <?php print $class; ?> <?php print $submit_on_change; print $aria_labelledby; ?> name="<?php print htmlentities($name); ?>"<?php print ($noautosubmit == 1 ? ' noautosubmit="1"' : ''); ?>>
 <?php
 			if($allow_empty) {
 ?>

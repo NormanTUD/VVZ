@@ -230,7 +230,6 @@ function save_absolvierte_pruefungsleistungen () {
 }
 
 function save_geplante_pruefungsleistungen () {
-log("save_geplante_pruefungsleistungen");
 	var cname = "geplante_pruefungsleistungen";
 	var pruefungsnummern = new Array();
 	setCookie(cname, "", 0);
