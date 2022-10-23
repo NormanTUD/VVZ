@@ -764,6 +764,14 @@
 			if(veranstaltung_has_bezug_to($id, "%eruf%")) {
 				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine berufspraktische Bezüge'>".get_work_icon()."</span>";
 			}
+
+			if(veranstaltung_has_bezug_to($id, "%nterdiszi%")) {
+				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine interdisziplinäre Bezüge'>".get_interdisciplinary_icon()."</span>";
+			}
+
+			if(veranstaltung_has_bezug_to($id, "%orschungsprojek%")) {
+				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet Bezüge zu einem Forschungsprojekt'>".get_research_icon()."</span>";
+			}
 ?>
 		</span>
 <?php
@@ -885,7 +893,20 @@
 							show_related_veranstaltung($related_veranstaltung);
 
 							if(veranstaltung_has_bezug_to($id, "%xkursion")) {
-								print get_hike_icon()." Beinhaltet eine Exkursion.";
+								print get_hike_icon()." Beinhaltet eine Exkursion.<br>";
+							}
+
+							if(veranstaltung_has_bezug_to($id, "%eruf%")) {
+								print get_work_icon()." Beinhaltet berufspraktische Bezüge.<br>";
+							}
+
+							if(veranstaltung_has_bezug_to($id, "%nterdisz%")) {
+								print get_interdisciplinary_icon()." Beinhaltet interdisziplinäre Bezüge.<br>";
+							}
+
+
+							if(veranstaltung_has_bezug_to($id, "%orschungsprojek%")) {
+								print get_research_icon()." Beinhaltet Bezüge zu einem Forschungsprojekt.<br>";
 							}
 
 							show_pruefungen_tabelle($id, $pruefungen);

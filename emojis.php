@@ -234,4 +234,20 @@
 	function print_info_icon () {
 		print get_info_icon();
 	}
+
+	function get_interdisciplinary_icon () {
+		return '<i class="fa-solid fa-people-arrows"></i>';
+	}
+
+	function print_interdisciplinary_icon () {
+		print get_interdisciplinary_icon();
+	}
+
+	function get_research_icon () {
+		return '<i class="fa-solid fa-chalkboard-user"></i>';
+	}
+
+	function print_research_icon () {
+		print get_research_icon();
+	}
 ?>
