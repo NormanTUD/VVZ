@@ -169,11 +169,11 @@ function update_pruefungsleistung_cookies (reload) {
 		if(matches.length) {
 			var pn = matches[1];
 			var modul = $("#" + name).text();
-
-			if($("#pruefung_already_done_" + pn).is(":checked")) {
-				$("#pruefung_already_chosen_" + pn).prop("checked", false);
-			} else if($("#pruefung_already_chosen_" + pn).is(":checked")) {
-				$("#pruefung_already_done_" + pn).prop("checked", false);
+			var pad_pn = $("#pruefung_already_done_" + pn);
+			if(pad_pn.is(":checked")) {
+				pad_pn.prop("checked", false);
+			} else if(pad_pn.is(":checked")) {
+				pad_pn.prop("checked", false);
 			}
 
 			var counter_done = 0;

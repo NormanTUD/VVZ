@@ -1475,11 +1475,11 @@
 					}
 				}
 ?>
-				<script nonce="<?php print nonce(); ?>" type="text/javascript">update_pruefungsleistung_cookies(0);</script>
 <?php
 			}
 ?>
 		</table>
+		<script nonce="<?php print nonce(); ?>" type="text/javascript">update_pruefungsleistung_cookies(0);</script>
 
 		<p>Jede der Prüfungsnummern kann über die Checkbox rechts von ihr als &raquo;bereits absolviert&laquo; oder als &raquo;geplant&laquo; markiert werden.
 		Dadurch taucht neben den einzelnen Prüfungsleistungen überall das Zeichen &raquo;<?php print html_checked(); ?>&laquo; (für bereits absolvierte Prüfungen)
