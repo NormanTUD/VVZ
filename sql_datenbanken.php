@@ -49,11 +49,10 @@
 
 'einzelne_termine' => "create table if not exists `einzelne_termine` (
   `veranstaltung_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `start` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `end` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `start` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+  `end` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `raum_id` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`veranstaltung_id`,`start`,`end`, `raum_id`),
-  KEY `raum_id` (`raum_id`),
+  PRIMARY KEY (`veranstaltung_id`, `start`, `end`, `raum_id`),
   CONSTRAINT `einzelne_termine_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
   CONSTRAINT `einzelne_termine_ibfk_2` FOREIGN KEY (`raum_id`) REFERENCES `raum` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;",

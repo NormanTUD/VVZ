@@ -4675,13 +4675,24 @@ INSERT INTO
 					foreach ($einzelne_termine as $einzelner_termin) {
 						if(!$error) {
 							$start = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_start']);
-							$ende = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_ende']);
+							$end = add_missing_seconds_to_datetime($einzelner_termin['einzelner_termin_ende']);
 							$gebaeude_id = $einzelner_termin['einzelner_termin_gebaeude'];
 							$raum = $einzelner_termin['einzelner_termin_raum'];
 							$raum_id = get_and_create_raum_id($gebaeude_id, $raum);
 
-							if($start && $ende) {
-								$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($ende).', '.esc($raum_id).')';
+							$veranstaltung_id = $id;
+
+							eval(check_values(
+								[
+									array("table" => "einzelne_termine", "col" => "veranstaltung_id", "name" => "Veranstaltungs-ID"),
+									array("table" => "einzelne_termine", "col" => "start", "name" => "Start"),
+									array("table" => "einzelne_termine", "col" => "end", "name" => "Ende"),
+									array("table" => "einzelne_termine", "col" => "raum_id", "name" => "Raum"),
+								]
+							));
+
+							if($start && $end) {
+								$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
 								$res = rquery($query);
 								if(!$res) {
 									$error = 1;
