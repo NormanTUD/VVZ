@@ -6,7 +6,7 @@
 		include_once('../functions.php');
 	}
 
-	if(!file_exists('/etc/x11test') && check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
+	if(!get_setting("x11_debugging_mode") && check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 ?>
 	<h2>Beschreibungen einzelner Seiten verändern</h2>
 	<?php print get_seitentext(); ?>

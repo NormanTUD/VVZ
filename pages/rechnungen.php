@@ -6,7 +6,7 @@
 		include_once('../functions.php');
 	}
 
-	if(!file_exists('/etc/x11test') && check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
+	if(!get_setting("x11_debugging_mode") && check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 		$query = "select id, plan_id, monat, jahr, rabatt, spezialpreis from vvz_global.rechnungen where kunde_id = ".esc(get_kunde_id_by_db_name($GLOBALS["dbname"]))." order by jahr, monat";
 		$result = rquery($query);
 ?>

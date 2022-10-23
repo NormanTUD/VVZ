@@ -40,7 +40,7 @@
 
 		Wir sind bemüht, alle Unannehmlichkeiten aufzuspüren und zu beseitigen.
 <?php
-	if (!file_exists('/etc/x11test')  && function_exists('mail')) {
+	if (!get_setting('x11_debugging_mode') && function_exists('mail')) {
 		$got_frage_id = get_post('frage_id');
 		//$sicherheitsfrage_bestanden = get_post('sicherheitsfrage') == $sicherheitsfragen[$got_frage_id]['answer'] ? 1 : 0;
 		$sicherheitsfrage_bestanden = 0;
@@ -171,7 +171,7 @@
 <?php
 			}
 		}
-	} else if (!file_exists('/etc/x11test')) {
+	} else if (!get_setting('x11_debugging_mode')) {
 ?>
 		<p>Kontaktieren Sie bei Fragen, gefundenen Fehlern oder Ergänzungsvorschlägen <a href="mailto:<?php print $GLOBALS['admin_email']; ?>><?php print $GLOBALS['admin_email']; ?></a>. 
 		Ich werde mich schnellstmöglich um Antwort bemühen.</p>

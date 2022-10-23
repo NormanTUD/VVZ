@@ -13,7 +13,7 @@
 <?php
 			include_once('hinweise.php');
 
-			if(!file_exists('/etc/x11test')) {
+			if(!get_setting("x11_debugging_mode")) {
 				print get_seitentext(1);
 			}
 
