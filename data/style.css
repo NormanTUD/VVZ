@@ -908,7 +908,7 @@ a, a:visited, a:hover, a:active {
 }
 
 .calendarlarge {
-	font-size: 25px;
+	font-size: clamp(8px, 3vw, 25px);
 }
 
 .raumgebaeude {

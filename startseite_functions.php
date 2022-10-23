@@ -758,19 +758,19 @@
 
 
 			if(veranstaltung_has_bezug_to($id, "%xkursion")) {
-				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine Exkursion'>".get_hike_icon()."</span>";
+				print " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;     <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine Exkursion'>".get_hike_icon()."</span>";
 			}
 
 			if(veranstaltung_has_bezug_to($id, "%eruf%")) {
-				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine berufspraktische Bezüge'>".get_work_icon()."</span>";
+				print " &nbsp; <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine berufspraktische Bezüge'>".get_work_icon()."</span>";
 			}
 
 			if(veranstaltung_has_bezug_to($id, "%nterdiszi%")) {
-				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine interdisziplinäre Bezüge'>".get_interdisciplinary_icon()."</span>";
+				print " &nbsp; <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet eine interdisziplinäre Bezüge'>".get_interdisciplinary_icon()."</span>";
 			}
 
 			if(veranstaltung_has_bezug_to($id, "%orschungsprojek%")) {
-				print " <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet Bezüge zu einem Forschungsprojekt'>".get_research_icon()."</span>";
+				print " &nbsp; <span class='calendarlarge' alt='Diese Veranstaltung beinhaltet Bezüge zu einem Forschungsprojekt'>".get_research_icon()."</span>";
 			}
 ?>
 		</span>
