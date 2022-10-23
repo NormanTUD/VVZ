@@ -6281,7 +6281,7 @@ INSERT INTO
 			$str .= "<p><i>Stand: $datum ($uhrzeit)</i></p>";
 
 			if($number_of_veranstaltungen) {
-				$str .= '<a class="no_link" href="event_file.php?veranstaltung[]='.join('&veranstaltung[]=', $got_veranstaltungen).'">'.html_calendar().'In meinen Kalendar eintragen</a>'."\n";
+				$str .= '<a class="no_link" href="event_file.php?veranstaltung[]='.join('&veranstaltung[]=', $got_veranstaltungen).'">'.html_calendar().' In meinen Kalendar eintragen</a>'."\n";
 			}
 			#$str .= '<a id="create_tinyurl">TinyURL-Link dieses Stundenplanes generieren</a><br><div id="created_tinyurl"></div>';
 
