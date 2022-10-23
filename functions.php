@@ -4692,10 +4692,20 @@ INSERT INTO
 							));
 
 							if($start && $end) {
-								$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
-								$res = rquery($query);
-								if(!$res) {
-									$error = 1;
+								if($gebaeude_id) {
+									if($raum_id) {
+										$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
+										$res = rquery($query);
+										if(!$res) {
+											$error = 1;
+										}
+									} else {
+										error("Kein Raum definiert");
+										$error++;
+									}
+								} else {
+									error("Kein Gebäude definiert");
+									$error++;
 								}
 							}
 						}
