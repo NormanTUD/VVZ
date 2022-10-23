@@ -163,6 +163,9 @@ function update_pruefungsleistung_cookies (reload) {
 
 	var regExp = /pn_modul_(.*)/;
 
+	var pad = $(".pruefung_already_done");0
+	var pac = $(".pruefung_already_chosen");
+
 	$('[id^=pn_modul_]').each(function (e) {
 		var name = this.id;
 		var matches = regExp.exec(name);
@@ -180,7 +183,7 @@ function update_pruefungsleistung_cookies (reload) {
 			var counter_geplant = 0;
 			var summe_benoetigte_pruefungen = $("#summe_benoetigte_pruefungen_modul_" + modul).text();
 
-			$(".pruefung_already_done").each(function (l) {
+			pad.each(function (l) {
 				var this_pl = $(this).val();
 				if($(this).is(':checked')) {
 					var this_pruefungs_id = $(this).val();
@@ -190,7 +193,7 @@ function update_pruefungsleistung_cookies (reload) {
 				}
 			});
 
-			$(".pruefung_already_chosen").each(function (l) {
+			pac.each(function (l) {
 				var this_pl = $(this).val();
 				if($(this).is(':checked')) {
 					var this_pruefungs_id = $(this).val();
