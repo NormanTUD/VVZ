@@ -620,8 +620,8 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 						"values" => [
 							[ "background-color", "006092" ],
 							[ "color", "ffffff" ],
-							[ "padding-left", "10px" ],
-							[ "padding-right", "10px" ]
+							[ "padding-left", "0px" ],
+							[ "padding-right", "0px" ]
 						]
 					),
 					".topnav li:hover a" => array(
