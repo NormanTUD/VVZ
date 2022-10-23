@@ -167,7 +167,11 @@ JOIN
 									}
 ?>
 									<td><?php create_select(array("0" => "Nein", "1" => "Ja"), $row[10] ? 'Ja' : 'Nein', 'pndisabled')  ?></td>
-									<td><input type="submit" name="delete" value="Löschen" /></td>
+								
+									<td>
+										<button type="submit" disabled style="display: none" aria-hidden="true"></button>
+										<input type="submit" name="delete" value="Löschen" />
+									</td>
 								</form>
 							</tr>
 <?php
