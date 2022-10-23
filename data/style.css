@@ -1,6 +1,6 @@
 body {
-	  font-family: Arial, Helvetica, sans-serif;
-	font-size: 16px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
 }
 
 table {
@@ -777,7 +777,6 @@ a, a:visited, a:hover, a:active {
 }
 
 .veranstaltungen_table {
-	min-width: 100%;
 	width: auto;
 }
 
