@@ -124,7 +124,9 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 			}
 
 			if($done_sth) {
-				add_system_versioning();
+				if(!file_exists("/etc/no_versioning")) {
+					add_system_versioning();
+				}
 				sleep(1);
 			}
 
