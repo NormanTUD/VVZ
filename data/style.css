@@ -1211,3 +1211,9 @@ a, a:visited, a:hover, a:active {
 	color: blue;
 	//display: none;
 }
+
+.logo_limits {
+	max-width: 300px;
+	max-height: 200px;
+}
+
