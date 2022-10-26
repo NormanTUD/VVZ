@@ -99,3 +99,9 @@ pre {
 .shown {
 	visibility: visible;
 }
+
+.logo_limits {
+	max-width: 300px;
+	max-height: 200px;
+}
+

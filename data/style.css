@@ -1194,11 +1194,6 @@ a, a:visited, a:hover, a:active {
 	color: white;
 }
 
-.logo_limits {
-	max-width: 300px;
-	max-height: 200px;
-}
-
 .no_link, .no_link:visited, .no_link:active {
 	color: inherit;
 	text-decoration: inherit;
