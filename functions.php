@@ -10656,7 +10656,7 @@ order by
 
 	function set_semester_sperrvermerk ($semester_id, $value) {
 		if(!user_is_admin($GLOBALS["logged_in_user_id"])) {
-			die("You are not allowed to do this!");
+			die("Sie müssen als Administrator angemeldet sein. Bitte laden Sie die Seite erneut und melden sich an.");
 		}
 		if($value) {
 			$value = 1;
