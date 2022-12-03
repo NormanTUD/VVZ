@@ -62,7 +62,14 @@
 						<li><a class="no_link" href="admin?page=<?php print get_page_id_by_filename("../kontakt.php"); ?>"><span class="utf8symbol"><?php print_email_icon(); ?></span> Kontakt</a></li>
 					</ul>
 				</div>
-				<div id="right">Right side div</div>
+				<div id="right">
+<?php
+					if(user_is_admin($GLOBALS["logged_in_user_id"])) {
+						dier(">".get_current_semester_id()."<");
+						sperrvermerk_table(array(array(get_current_semester_id())));
+					}
+?>
+				</div>
 			</div>
 			<h2>Was versteckt sich hinter der Navigationsleiste?</h2>
 			<p>

@@ -2697,7 +2697,12 @@ declare(ticks=1);
 			$GLOBALS['memoize'][$key] = $data;
 			return $data;
 		} else {
-			$query = 'INSERT IGNORE INTO `semester` (`jahr`, `typ`) VALUES ('.esc($jahr).', '.esc($type).')';
+			$default = 1;
+			if(get_single_row_from_query("select count(*) from semester")) {
+				$default = 0;
+			}
+
+			$query = 'INSERT IGNORE INTO `semester` (`jahr`, `typ`, `default`) VALUES ('.esc($jahr).', '.esc($type).', $default)';
 			$result = rquery($query);
 
 			if($result) {
