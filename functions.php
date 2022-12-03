@@ -707,9 +707,9 @@ declare(ticks=1);
 			foreach ($_POST as $k => $v) {
 				if(preg_match("/^reset_sperrvermerk_semester_id_(\d+)$/", $k, $matches)) {
 					if(set_semester_sperrvermerk($matches[1], 0)) {
-						success("Semester ".get_semester_name($matches[1]." gesetzt");
+						success("Sperrvermerk für Semester ".get_semester_name($matches[1])." gesetzt");
 					} else {
-						error("Semester ".get_semester_name($matches[1]." gesetzt");
+						error("Sperrvermerk für Semester ".get_semester_name($matches[1])." nicht gesetzt. Es trat ein Fehler auf.");
 					}
 				}
 			}
@@ -717,9 +717,9 @@ declare(ticks=1);
 			foreach ($_POST as $k => $v) {
 				if(preg_match("/^sperrvermerk_semester_id_(\d+)$/", $k, $matches)) {
 					if(set_semester_sperrvermerk($matches[1], 1)) {
-						success("Semester ".get_semester_name($matches[1]." gesetzt");
+						success("Sperrvermerk für Semester ".get_semester_name($matches[1])." gesetzt");
 					} else {
-						error("Semester ".get_semester_name($matches[1]." gesetzt");
+						error("Sperrvermerk für Semester ".get_semester_name($matches[1])." nicht gesetzt. Es trat ein Fehler auf.");
 					}
 				}
 			}
