@@ -152,8 +152,6 @@
 					}
 ?>
 
-
-
 					<table class="veranstaltungen_table">
 						<tr>
 							<th>Titel</th>
