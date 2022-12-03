@@ -10690,7 +10690,7 @@ order by
 			$value = 0;
 		}
 
-		$query = "update sperrvermerk set enabled = $value where semester_id = ".esc($semester_id);
+		$query = "insert into sperrvermerk (enabled, semester_id) values ($value, ".esc($semester_id).") on duplicate key update enabled enabled=values(enabled)";
 
 		return rquery($query);
 	}

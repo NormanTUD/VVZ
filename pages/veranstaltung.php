@@ -72,6 +72,15 @@
 					print "<span class='font_size_13px'>".htmlentities($metainfos)."<span>\n";
 				}
 ?></h2>
+
+<?php
+				if(semester_has_sperrvermerk(get_veranstaltung_semester($veranstaltung_id))) {
+?>
+					hallo
+<?php
+				}
+?>
+
 				<?php print get_seitentext(); ?>
 <?php
 				include_once('hinweise.php');
