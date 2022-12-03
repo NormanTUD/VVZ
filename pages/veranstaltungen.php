@@ -144,6 +144,16 @@
 						}
 					}
 ?>
+<?php
+					if(semester_has_sperrvermerk($chosen_semester)) {
+?>
+						<h1 class="red_giant">Für das Semester dieser Veranstaltung wurde bereits ein Sperrvermerk eingetragen! Bitte ändern Sie nur, wenn es dringend nötig ist!</h1>
+<?php
+					}
+?>
+
+
+
 					<table class="veranstaltungen_table">
 						<tr>
 							<th>Titel</th>
