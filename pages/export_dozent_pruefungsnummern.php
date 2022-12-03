@@ -49,12 +49,14 @@
 <?php
 			print export_dozent_pruefungsnummern($chosen_semester, $chosen_dozent, $chosen_institut, $chosen_studiengang, $chosen_pruefungsamt);
 ?>
+
 			<form method="get" action="export_dozenten_pruefungsnummern.php">
 				<input type="hidden" name="semester" value="<?php print htmlentities($chosen_semester ?? ""); ?>" />
 				<input type="hidden" name="institut" value="<?php print htmlentities($chosen_institut ?? ""); ?>" />
 				<input type="hidden" name="dozent" value="<?php print htmlentities($chosen_dozent ?? ""); ?>" />
 				<input type="hidden" name="studiengang" value="<?php print htmlentities($chosen_studiengang ?? ""); ?>" />
 				<input type="hidden" name="pruefungsamt" value="<?php print htmlentities($chosen_pruefungsamt ?? ""); ?>" />
+				<input type="button" onclick="event.preventDefault();set_sperrvermerk_for_semester(<?php print $chosen_semester; ?>)" value="Sperrvermerk setzen?" />
 				<input type="submit" value="Diese Liste als Excel-Datei downloaden" />
 			</form>
 		</div>
