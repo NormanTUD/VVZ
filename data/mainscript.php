@@ -672,3 +672,21 @@ function toggle_ok () {
 function help () {
 	alert("help");
 }
+
+function set_sperrvermerk_for_semester (semester_id) {
+	var d = {};
+	d["sperrvermerk_semester_id_" + semester_id] = 1;
+
+	$.ajax({
+		url: "submit.php",
+		type: "POST",
+		data: d,
+		success: function(data) {
+			success("OK: " + data);
+		},
+		error: function(data, msg, y) {
+			log("b", data, msg, y);
+			error("Fehler", msg);
+		}
+	});
+}
