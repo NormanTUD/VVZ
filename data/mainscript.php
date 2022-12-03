@@ -682,7 +682,7 @@ function set_sperrvermerk_for_semester (semester_id) {
 		type: "POST",
 		data: d,
 		success: function(data) {
-			success("OK: " + data);
+			success("OK", data);
 		},
 		error: function(data, msg, y) {
 			log("b", data, msg, y);
