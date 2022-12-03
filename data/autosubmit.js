@@ -5,11 +5,17 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 				var loc = window.location.pathname;
 				var dir = window.location.protocol  + "//" + window.location.host + "/" + loc.substring(0, loc.lastIndexOf('/'));
 				var submitfile = dir + '/submit.php';
-				if($(this.form).serialize()) {
+
+				var data = $(this.form).serialize();
+				if(!data) {
+					data = $(this).serialize();
+				}
+
+				if(data) {
 					$.ajax({
 						url : submitfile,
 						type: "POST",
-						data: $(this.form).serialize(),
+						data: data,
 						success: function (response) {
 							success("OK", response);
 							if($(".auto_reload_stylesheets").length != 0) {
@@ -22,7 +28,7 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 						}
 					});
 				} else {
-					log("autosubmit.js: $(this.form).serialize was empty: ", $(this.form));
+					log("autosubmit.js: data was empty: ", this);
 				}
 			});
 		}

@@ -65,11 +65,11 @@ function update_selection_cookies () {
 		}
 	);
 	unique_ids = filter_array(unique_ids);
-	console.log(unique_ids);
+	log(unique_ids);
 
 	var str_to_cookie = unique_ids.join(',');
-	console.log(str_to_cookie);
-	console.log("Setting cookie `" + stdcookie + "` = " + str_to_cookie);
+	log(str_to_cookie);
+	log("Setting cookie `" + stdcookie + "` = " + str_to_cookie);
 	delete_cookie(stdcookie);
 	setCookie(stdcookie, str_to_cookie, 99999999);
 }
@@ -118,7 +118,7 @@ function edit_veranstaltung (id) {
 
 	edit_text.attr('name', 'alternative_text_veranstaltung_' + id);
 
-	console.log(edit_text_name);
+	log(edit_text_name);
 
 	edit_text_div.show();
 	original_text.hide();

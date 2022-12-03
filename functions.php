@@ -706,13 +706,21 @@ declare(ticks=1);
 
 			foreach ($_POST as $k => $v) {
 				if(preg_match("/^reset_sperrvermerk_semester_id_(\d+)$/", $k, $matches)) {
-					set_semester_sperrvermerk($matches[1], 0);
+					if(set_semester_sperrvermerk($matches[1], 0)) {
+						success("Semester ".get_semester_name($matches[1]." gesetzt");
+					} else {
+						error("Semester ".get_semester_name($matches[1]." gesetzt");
+					}
 				}
 			}
 
 			foreach ($_POST as $k => $v) {
 				if(preg_match("/^sperrvermerk_semester_id_(\d+)$/", $k, $matches)) {
-					set_semester_sperrvermerk($matches[1], 1);
+					if(set_semester_sperrvermerk($matches[1], 1)) {
+						success("Semester ".get_semester_name($matches[1]." gesetzt");
+					} else {
+						error("Semester ".get_semester_name($matches[1]." gesetzt");
+					}
 				}
 			}
 
@@ -2633,6 +2641,10 @@ declare(ticks=1);
 		} else {
 			return get_and_create_this_semester();
 		}
+	}
+
+	function get_semester_name ($id) {
+		return get_semester($id)[1];
 	}
 
 	function get_semester ($id, $join_together = 0) {
