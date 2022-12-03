@@ -399,7 +399,7 @@ if(!$GLOBALS['logged_in']) {
 									$GLOBALS['this_page_number'] = $pagenr;
 									$GLOBALS['this_page_file'] = $page_file;
 									include('hinweise.php');
-									if(page_disabled_in_demo($pagenr) && is_demo()) {
+									if(page_disabled_in_demo($pagenr) && is_demo() && !file_exists("/etc/debug_mode")) {
 										print "Diese Seite ist im Demo-Modus deaktiviert.";
 									} else {
 										include($page_file);

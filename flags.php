@@ -12,6 +12,7 @@
 		array("no_cache", "Zwingt dazu, KEINEN Cache anzulegen"),
 		array("wartungsarbeiten", "Wenn Wartungsarbeiten dran sind (Seite kurzzeitig deaktiviert)."),
 		array("no_versioning", "Deaktiviert das automatische hinzufügen von SYSTEM VERSIONING in MariaDB."),
+		array("debug_mode", "Aktiviert den Debug-Modus."),
 		array("vvztud", "Für die Philosophen der TUD, keine Startseite, direkt VVZ")
 	);
 ?>

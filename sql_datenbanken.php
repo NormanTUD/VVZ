@@ -576,6 +576,7 @@
 "sperrvermerk" => "create table sperrvermerk (
 	semester_id int(10) unsigned NOT NULL,
 	enabled tinyint default 0,
+	`last_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
 	CONSTRAINT `sperrvermerk_ibfk_semester_id` FOREIGN KEY (`semester_id`) REFERENCES `semester` (`id`) ON DELETE CASCADE
 )"
 		);
