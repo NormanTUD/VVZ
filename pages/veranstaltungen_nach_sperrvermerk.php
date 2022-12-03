@@ -18,7 +18,7 @@
 		}
 
 		if(count($semester_mit_sperrvermerk)) {
-			sperrvermerk_table($semester_mit_sperrvermerk)
+			sperrvermerk_table($semester_mit_sperrvermerk);
 		} else {
 			print "Keine Semester mit Sperrvermerk.";
 		}

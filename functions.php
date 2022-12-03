@@ -10702,6 +10702,13 @@ order by
 
 	function sperrvermerk_table ($semester_mit_sperrvermerk) {
 		$veranstaltungen_nach_sperrvermerk = array();
+
+		foreach ($semester_mit_sperrvermerk as $s) {
+			if(!semester_has_sperrvermerk($s[0])) {
+				return;
+			}
+		}
+
 ?>
 		<form class="form_autosubmit" method="post">
 			<table>
