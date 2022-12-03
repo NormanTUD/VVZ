@@ -2644,7 +2644,7 @@ declare(ticks=1);
 	}
 
 	function get_semester_name ($id) {
-		return get_semester($id)[1];
+		return get_semester($id, 1)[1];
 	}
 
 	function get_semester ($id, $join_together = 0) {
