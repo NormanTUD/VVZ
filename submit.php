@@ -5,8 +5,6 @@
 		http_response_code(500);
 	}
 
-	dier($_POST);
-
 	foreach (array(
 			array("hint", "blue"),
 			array("error", "red"),

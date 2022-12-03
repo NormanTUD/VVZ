@@ -700,8 +700,21 @@ declare(ticks=1);
 				}
 			}
 		} else {
-			#dier($_POST);
+			//dier($_POST);
 			# NO_ID
+
+
+			foreach ($_POST as $k => $v) {
+				if(preg_match("/^reset_sperrvermerk_semester_id_(\d+)$/", $k, $matches)) {
+					set_semester_sperrvermerk($matches[1], 0);
+				}
+			}
+
+			foreach ($_POST as $k => $v) {
+				if(preg_match("/^sperrvermerk_semester_id_(\d+)$/", $k, $matches)) {
+					set_semester_sperrvermerk($matches[1], 1);
+				}
+			}
 
 			if(get_post("delete_current_semester_start_ids")) {
 				$query = "delete from veranstaltung_nach_lv_nr where veranstaltung_id in (select id from veranstaltung where semester_id in (select id from semester where `default` = '1'))";
@@ -10658,11 +10671,13 @@ order by
 		if(!user_is_admin($GLOBALS["logged_in_user_id"])) {
 			die("Sie müssen als Administrator angemeldet sein. Bitte laden Sie die Seite erneut und melden sich an.");
 		}
+
 		if($value) {
 			$value = 1;
 		} else {
 			$value = 0;
 		}
+
 		$query = "update sperrvermerk set enabled = $value where semester_id = ".esc($semester_id);
 
 		return rquery($query);

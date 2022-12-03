@@ -18,7 +18,7 @@
 <?php
 				foreach ($semester as $s) {
 ?>
-					<input type="hidden" name='reset_sperrvermerk_semester_id_<?php print $s[0]; ?>' />
+					<input type="hidden" name='reset_sperrvermerk_semester_id_<?php print $s[0]; ?>' value=1 />
 					<tr>
 						<td><?php print $s[1]; ?></td>
 						<td><input type='checkbox' name='sperrvermerk_semester_id_<?php print $s[0]; ?>' <?php print semester_has_sperrvermerk($s[0]) ? "checked" : "" ?> value=1 /></td>
