@@ -7,7 +7,7 @@
 	}
 
 	if(check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
-		$semester = create_semester_array_short();
+		$semester = create_semester_array();
 ?>
 		<form class="form_autosubmit" method="post">
 			<table>
