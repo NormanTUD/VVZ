@@ -10700,51 +10700,76 @@ order by
 		return rquery($query);
 	}
 
-	function sperrvermerk_table ($semester_mit_sperrvermerk) {
+	function sperrvermerk_table ($semester_mit_sperrvermerk, $header="", $show_msg=1) {
 		$veranstaltungen_nach_sperrvermerk = array();
+
 
 		foreach ($semester_mit_sperrvermerk as $s) {
 			if(!semester_has_sperrvermerk($s[0])) {
-				return;
+				return 0;
 			}
 		}
 
-?>
-		<form class="form_autosubmit" method="post">
-			<table>
-				<tr>
-					<th>Veranstaltung</th>
-					<th>Dozent</th>
-				</tr>
-<?php
+		$html_parts = array();
 
-				foreach ($semester_mit_sperrvermerk as $s) {
-?>
-					<tr><th colspan=2><?php print get_semester_name($s[0]); ?></th></tr>
-<?php
-					$semester_id = $s[0];
-					$sperrvermerk_zeit = get_single_row_from_query("select last_update from sperrvermerk where semester_id = ".esc($semester_id));
+		foreach ($semester_mit_sperrvermerk as $s) {
+			$start = "<tr><th colspan=2>".get_semester_name($s[0])."</th></tr>";
 
-					$veranstaltungen_danach = array();
-					$veranstaltungen_danach_query = "select v.id, v.name, concat(d.first_name, ' ', d.last_name) dozent_name from veranstaltung v left join dozent d on v.dozent_id = d.id where v.semester_id = ".esc($semester_id)." and last_change > ".esc($sperrvermerk_zeit);
-					$result = rquery($veranstaltungen_danach_query);
+			$semester_id = $s[0];
+			$sperrvermerk_zeit = get_single_row_from_query("select last_update from sperrvermerk where semester_id = ".esc($semester_id));
 
-					while ($row = mysqli_fetch_row($result)) {
-						$veranstaltungen_danach[] = $row;
-					}
+			$veranstaltungen_danach = array();
+			$veranstaltungen_danach_query = "select v.id, v.name, concat(d.first_name, ' ', d.last_name) dozent_name from veranstaltung v left join dozent d on v.dozent_id = d.id where v.semester_id = ".esc($semester_id)." and last_change > ".esc($sperrvermerk_zeit);
+			$result = rquery($veranstaltungen_danach_query);
 
-					foreach ($veranstaltungen_danach as $v) {
-?>
-						<tr>
-							<td><?php print $v[1]; ?></td>
-							<td><?php print $v[2]; ?></td>
-						</tr>
-<?php
-					}
+			while ($row = mysqli_fetch_row($result)) {
+				$veranstaltungen_danach[] = $row;
+			}
+
+			$i = 0;
+
+			foreach ($veranstaltungen_danach as $v) {
+				$part = "";
+				if($i == 0) {
+					$part = $start;
 				}
+				$part .= "<tr>
+					<td>$v[1]</td>
+					<td>$v[2]</td>
+				</tr>";
+				$i++;
+
+				$html_parts[] = $part;
+			}
+		}
+
+		if(count($html_parts)) {
+			if($header) {
+				print "<h2>$header</h2>";
+			}
 ?>
-			</table>
-		</form>
+			<form class="form_autosubmit" method="post">
+				<table>
+					<tr>
+						<th>Veranstaltung</th>
+						<th>Dozent</th>
+					</tr>
 <?php
+					print join("", $html_parts);
+?>
+				</table>
+			</form>
+<?php
+			return 1;
+		} else {
+			if($show_msg) {
+				if($header) {
+					print "<h2>$header</h2>";
+				}
+
+				print "Keine Veranstaltungsänderungen nach Sperrvermerk";
+			}
+			return 0;
+		}
 	}
 ?>

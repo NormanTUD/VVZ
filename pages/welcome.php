@@ -65,7 +65,7 @@
 				<div id="right">
 <?php
 					if(user_is_admin($GLOBALS["logged_in_user_id"])) {
-						sperrvermerk_table(array(array(get_current_semester_id())));
+						sperrvermerk_table(array(array(get_current_semester_id())), "Veranstaltungen nach Sperrvermerk im aktuellen Semester:", 0);
 					}
 ?>
 				</div>
