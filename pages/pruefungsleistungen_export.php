@@ -53,6 +53,7 @@
 				<input type="hidden" name="pruefungsamt" value="<?php print htmlentities($chosen_pruefungsamt ?? ""); ?>" />
 				<input type="hidden" name="einzelne_pns" value="<?php print htmlentities(get_get("einzelne_pns") ?? ""); ?>" />
 				<input type="hidden" name="last_changed_date" value="<?php print htmlentities(get_get("last_changed_date") ?? ""); ?>" />
+				<input type="button" onclick="event.preventDefault();set_sperrvermerk_for_semester(<?php print $chosen_semester; ?>)" value="Sperrvermerk setzen?" />
 				<input type="submit" value="Diese Liste als Excel-Datei downloaden" />
 			</form>
 <?php

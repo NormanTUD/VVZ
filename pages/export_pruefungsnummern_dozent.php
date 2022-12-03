@@ -57,6 +57,7 @@
 				<input type="hidden" name="dozent" value="<?php print htmlentities($chosen_dozent ?? ""); ?>" />
 				<input type="hidden" name="studiengang" value="<?php print htmlentities($chosen_studiengang ?? ""); ?>" />
 				<input type="hidden" name="pruefungsamt" value="<?php print htmlentities($chosen_pruefungsamt ?? ""); ?>" />
+				<input type="button" onclick="event.preventDefault();set_sperrvermerk_for_semester(<?php print $chosen_semester; ?>)" value="Sperrvermerk setzen?" />
 				<input type="submit" value="Diese Liste als Excel-Datei downloaden" />
 			</form>
 <?php

@@ -57,6 +57,7 @@
 <?php
 				if($export_html) {
 ?>
+					<input type="button" onclick="set_sperrvermerk_for_semester(<?php print $chosen_semester; ?>)" value="Sperrvermerk setzen?" />
 					<input type="submit" value="Diese Liste als Excel-Datei downloaden" />
 <?php
 				} else {
