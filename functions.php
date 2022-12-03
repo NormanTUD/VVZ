@@ -2702,7 +2702,7 @@ declare(ticks=1);
 				$default = 0;
 			}
 
-			$query = 'INSERT IGNORE INTO `semester` (`jahr`, `typ`, `default`) VALUES ('.esc($jahr).', '.esc($type).', $default)';
+			$query = 'INSERT IGNORE INTO `semester` (`jahr`, `typ`, `default`) VALUES ('.esc($jahr).', '.esc($type).', '.esc($default).')';
 			$result = rquery($query);
 
 			if($result) {
