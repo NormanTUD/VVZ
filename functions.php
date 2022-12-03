@@ -10649,8 +10649,22 @@ order by
 	}
 
 	function semester_has_sperrvermerk ($semester_id) {
-		$query = "select max(enabled) from sperrvermerk where semester_id = ".esc($semester_id);
+		$query = "select enabled from sperrvermerk where semester_id = ".esc($semester_id);
 
 		return !!get_single_row_from_query($query);
+	}
+
+	function set_semester_sperrvermerk ($semester_id, $value) {
+		if(!user_is_admin($GLOBALS["logged_in_user_id"])) {
+			die("You are not allowed to do this!");
+		}
+		if($value) {
+			$value = 1;
+		} else {
+			$value = 0;
+		}
+		$query = "update sperrvermerk set enabled = $value where semester_id = ".esc($semester_id);
+
+		return rquery($query);
 	}
 ?>

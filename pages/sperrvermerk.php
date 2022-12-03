@@ -7,8 +7,28 @@
 	}
 
 	if(check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
+		$semester = create_semester_array_short();
 ?>
-		
+		<form class="form_autosubmit" method="post">
+			<table>
+				<tr>
+					<th>Semester</th>
+					<th>Sperrvermerk gesetzt?</th>
+				</tr>
+<?php
+				foreach ($semester as $s) {
+?>
+					<tr>
+						<td><?php print $s[1]; ?></td>
+						<td><input type='checkbox' name='sperrvermerk_semester_id_<?php print $s[0]; ?>' <?php print semester_has_sperrvermerk($s[0]) ? "checked" : "" ?>/></td>
+					</tr>
+<?php
+				}
+?>
+			</table>
+		</form>
 <?php
 	}
+
+	js(array("autosubmit.js"));
 ?>
