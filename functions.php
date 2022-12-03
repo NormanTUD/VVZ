@@ -10647,4 +10647,10 @@ order by
 			}
 		}
 	}
+
+	function semester_has_sperrvermerk ($semester_id) {
+		$query = "select max(enabled) from sperrvermerk where semester_id = ".esc($semester_id);
+
+		return !!get_single_row_from_query($query);
+	}
 ?>

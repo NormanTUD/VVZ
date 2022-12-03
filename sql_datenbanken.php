@@ -571,7 +571,13 @@
  category varchar(50),
  PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4"
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4",
+
+"sperrvermerk" => "create table sperrvermerk (
+	semester_id int(10) unsigned NOT NULL,
+	enabled tinyint default 0,
+	CONSTRAINT `sperrvermerk_ibfk_semester_id` FOREIGN KEY (`semester_id`) REFERENCES `semester` (`id`) ON DELETE CASCADE
+)"
 		);
 
 	$GLOBALS['views'] = array(
