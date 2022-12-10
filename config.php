@@ -173,7 +173,7 @@
 	Email Settings
  */
 	$GLOBALS['from_email'] = "vvz.phil@tu-dresden.de";
-	$GLOBALS['admin_email'] = "norman.koch@tu-dresden.de";
+	$GLOBALS['admin_email'] = "kochnorman@rocketmail.com";
 	$GLOBALS['admin_name'] = "Norman Koch";
 
 	$GLOBALS['name_non_technical'] = "Norbert Engemaier";
