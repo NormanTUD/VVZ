@@ -7675,15 +7675,13 @@ $ret_string .= '</table>';
 
 	function check_this_user_role ($roles = array()) {
 		$valid = 0;
-		if(is_array($roles)) {
-			if(count($roles)) {
-				foreach ($roles as $trole) {
-					if(is_array($trole)) {
-						die("ERROR: CANNOT BE ARRAY IN `check_this_user_role`");
-					} else {
-						if($GLOBALS['user_role_id'] == $trole) {
-							$valid = 1;
-						}
+		if(is_array($roles) && count($roles)) {
+			foreach ($roles as $trole) {
+				if(is_array($trole)) {
+					die("ERROR: CANNOT BE ARRAY IN `check_this_user_role`");
+				} else {
+					if($GLOBALS['user_role_id'] == $trole) {
+						$valid = 1;
 					}
 				}
 			}
