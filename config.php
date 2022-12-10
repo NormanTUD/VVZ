@@ -176,8 +176,8 @@
 	$GLOBALS['admin_email'] = "norman.koch@tu-dresden.de";
 	$GLOBALS['admin_name'] = "Norman Koch";
 
-	$GLOBALS['name_non_technical'] = "Holm Bräuer";
-	$GLOBALS['to_non_technical'] = "holm.braeuer@tu-dresden.de";
+	$GLOBALS['name_non_technical'] = "Norbert Engemaier";
+	$GLOBALS['to_non_technical'] = "norbert.engemaier@tu-dresden.de";
 	$GLOBALS['cc_non_technical'] = array('nengemaier@gmail.com', $GLOBALS['admin_email']);
 
 /*
