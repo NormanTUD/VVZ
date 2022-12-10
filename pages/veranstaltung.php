@@ -76,7 +76,7 @@
 <?php
 				if(semester_has_sperrvermerk(get_veranstaltung_semester($veranstaltung_id))) {
 ?>
-					<h1 class="red_giant">Für das Semester dieser Veranstaltung wurde bereits ein Sperrvermerk eingetragen! Bitte ändern Sie nur, wenn es dringend nötig ist!</h1>
+					<h1 class="red_giant">Für die Lehrveranstaltungen dieses Semesters gibt es bereits einen Sperrvermerk. Vermutlich wurden die Angaben bereits an die Raumvergabe gemeldet. Informieren Sie die Verantwortlichen über Änderungen</h1>
 <?php
 				}
 ?>
