@@ -19,7 +19,7 @@ if(!$GLOBALS['logged_in']) {
 		<div class="blurbox">
 		<div id="main">
 			<a href="admin" border="0"><?php print_uni_logo(); ?></a>
-			<div id="wrapper" class="text_align_center">
+			<div class="text_align_center">
 <?php
 			print get_demo_expiry_time();
 ?>
