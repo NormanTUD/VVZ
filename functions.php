@@ -1888,6 +1888,7 @@ declare(ticks=1);
 
 		if(is_array($page_id)) {
 			$query = 'SELECT `page_id` FROM `role_to_page` WHERE `page_id` IN ('.multiple_esc_join($page_id).') AND `role_id` = '.esc($role_id);
+
 			$result = rquery($query);
 			
 			$rights_id = array();
@@ -1914,9 +1915,13 @@ declare(ticks=1);
 						$rights_id = $row[0];
 					}
 
-					if(!is_null($rights_id)) {
+
+					if(!is_null($rights_id) && !preg_match("/^\s*$/", $rights_id)) {
 						$return = 1;
 					}
+
+
+
 				}
 
 				if(!$return) {
@@ -1927,9 +1932,11 @@ declare(ticks=1);
 
 					$parent_of_this_page = get_oberkategorie_id_by_page_id($page_id);
 					
-					while ($row = mysqli_fetch_row($result)) {
-						if($row[0] == $parent_of_this_page) {
-							$return = 1;
+					if($parent_of_this_page) {
+						while ($row = mysqli_fetch_row($result)) {
+							if($row[0] == $parent_of_this_page) {
+								$return = 1;
+							}
 						}
 					}
 				}
@@ -6233,7 +6240,7 @@ INSERT INTO
 					$collisions_reported = 1;
 				}
 
-				if(preg_match('/^(\d+)-(\d+)$/', $stunde, $founds)) {
+				if(preg_match('/^(\d+)-(\d+)$/', $stunde ?? "", $founds)) {
 					foreach (range($founds[1], $founds[2]) as $this_hour) {
 						$stundenplan[$wochentag][$this_hour] = $eintrag;
 					}
@@ -6290,7 +6297,12 @@ INSERT INTO
 					try {
 						$veranstaltung_text = $stundenplan[$tag][$stunde_key];
 					} catch (\Throwable $e) {
-						$veranstaltung_text = $stundenplan[$tag]["Ganztägig"];
+						if(!array_key_exists($tag, $stundenplan)) {
+							$stundenplan[$tag] = [];
+						}
+						if(array_key_exists("Ganztägig", $stundenplan[$tag])) {
+							$veranstaltung_text = $stundenplan[$tag]["Ganztägig"];
+						}
 					}
 					$alt_text = get_get('alternative_text_veranstaltung_'.$id);
 					if($alt_text && strlen($alt_text) >= 2) {
