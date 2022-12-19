@@ -56,10 +56,12 @@
 
 				$to_name = $GLOBALS['admin_name'];
 				$to = $GLOBALS['admin_email'];
+				$headers .= "Cc: ".$to."\r\n";
 
 				if(get_post('natur') == 'inhaltlich') {
 					$to_name = $GLOBALS['name_non_technical'];
 					$to = $GLOBALS['to_non_technical'];
+					$headers .= "Cc: ".$to."\r\n";
 					if(is_array($GLOBALS['cc_non_technical'])) {
 						foreach ($GLOBALS['cc_non_technical'] as $cc_email) {
 							$headers .= "Cc: ".$cc_email."\r\n";
