@@ -62,10 +62,10 @@
 					$to = $GLOBALS['to_non_technical'];
 					if(is_array($GLOBALS['cc_non_technical'])) {
 						foreach ($GLOBALS['cc_non_technical'] as $cc_email) {
-							$headers .= "Cc: ".$cc_email."r\n";
+							$headers .= "Cc: ".$cc_email."\r\n";
 						}
 					} else if($GLOBALS['cc_non_technical']) {
-						$headers .= "Cc: ".$GLOBALS['cc_non_technical']."r\n";
+						$headers .= "Cc: ".$GLOBALS['cc_non_technical']."\r\n";
 					}
 				}
 				$subject = "Nachricht vom Vorlesungsverzeichnis";
