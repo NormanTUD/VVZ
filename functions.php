@@ -7076,7 +7076,7 @@ WHERE 1
 		return $modul;
 	}
 
-	function create_veranstaltungen_array ($dozent = null, $not_id = null, $shorten = 0, $semester = null, $institut = null) {
+	function create_veranstaltungen_array ($dozent = null, $not_id = null, $shorten = 0, $semester = null, $institut = null, $show_semester_name = null) {
 		$veranstaltungen = array();
 		$query = 'SELECT `v`.`veranstaltung_id`, `v`.`veranstaltung_name`, concat(`v`.`first_name`, " ", `v`.`last_name`) AS `dozent`, `v`.`veranstaltung_typ`, `v`.`wochentag`, `v`.`stunde` FROM `view_veranstaltung_komplett` `v` ';
 		
@@ -7108,8 +7108,22 @@ WHERE 1
 
 		$result = rquery($query);
 		while ($row = mysqli_fetch_row($result)) {
+			$sem_str = "";
+			if($show_semester_name) {
+				$sem_str .= " (";
+				$s = get_semester_from_veranstaltung_id($row[0]);
+				if($s["type"] == "Wintersemester") {
+					$sem_str .= "WiSe";
+				} else {
+					$sem_str .= "SoSe";
+				}
+				$sem_str .= "/".$s["year"];
+				$sem_str .= ")";
+			}
+
 			if($shorten) {
 				if(strlen($row[1]) >= $shorten) {
+
 					$row[1] = substr($row[1], 0, $shorten).'...';
 				}
 			}
@@ -7140,6 +7154,7 @@ WHERE 1
 				$str .= 'Dozent: '.$row[2];
 			}
 
+			$str .= $sem_str;
 			$veranstaltungen [$row[0]] = array($row[0], $str);
 		}
 		return $veranstaltungen;

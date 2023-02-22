@@ -448,7 +448,8 @@
 						<input type="hidden" value="<?php print $veranstaltung_id; ?>" name="id" />
 					</form>
 <?php
-						$veranstaltungen = create_veranstaltungen_array($GLOBALS['user_role_id'] == 1 ? '' : $valid_to_edit_dozenten, get_get('id'), 80, null, $this_institut_id);
+						// create_veranstaltungen_array ($dozent = null,
+						$veranstaltungen = create_veranstaltungen_array($GLOBALS['user_role_id'] == 1 ? '' : $valid_to_edit_dozenten, get_get('id'), 100, null, $this_institut_id, 1);
 						if(count($veranstaltungen)) {
 ?>
 						<form method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
