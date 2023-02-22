@@ -105,7 +105,7 @@
 	?>
 												<table>
 													<tr>
-														<td><input class="width50px" type="text" value="<?php print htmlentities($veranstaltungstyp_anzahl[$this_veranstaltungstyp[0]]); ?>" name="<?php print "veranstaltungstyp_$this_veranstaltungstyp[0]"; ?>" /></td>
+														<td><input class="width50px" type="text" value="<?php print htmlentities($veranstaltungstyp_anzahl[$this_veranstaltungstyp[0]] ?? ""); ?>" name="<?php print "veranstaltungstyp_$this_veranstaltungstyp[0]"; ?>" /></td>
 														<td><?php print htmle($this_veranstaltungstyp[1]); ?></td>
 													</tr>
 												</table>
