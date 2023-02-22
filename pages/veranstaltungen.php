@@ -25,8 +25,14 @@
 			}
 		}
 
+		$user_is_admin = user_is_admin($GLOBALS['logged_in_user_id']) ? 1 : 0;
+		$show_ausgeschiedene_dozenten = 0;
 
-		$dozenten = create_dozenten_array(user_is_admin($GLOBALS['logged_in_user_id']) ? 1 : 0);
+		if($user_is_admin && get_get("show_ausgeschiedene_dozenten") == "1") {
+			$show_ausgeschiedene_dozenten = 1;
+		}
+
+		$dozenten = create_dozenten_array($show_ausgeschiedene_dozenten);
 		if($is_superdozent) {
 			$dozenten = create_dozenten_by_ids_array($valid_to_edit_dozenten);
 		}
@@ -92,6 +98,7 @@
 									<input type="hidden" name="dozent_id" value="<?php print $GLOBALS['user_dozent_id']; ?>" />
 									<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
 									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
+									<input type="hidden" name="show_ausgeschiedene_dozenten" value="<?php print htmlentities(get_get('show_ausgeschiedene_dozenten') ?? ""); ?>" />
 									<input type="submit" value="Nur meine Veranstaltungen anzeigen" />
 								</form>
 <?php
@@ -100,6 +107,7 @@
 								<form method="get">
 									<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
 									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
+									<input type="hidden" name="show_ausgeschiedene_dozenten" value="<?php print htmlentities(get_get('show_ausgeschiedene_dozenten') ?? ""); ?>" />
 									<input type="submit" value="Wieder alle Veranstaltungen anzeigen" />
  								</form>					
 <?php
@@ -110,6 +118,7 @@
 							<form method="get">
 								<input type="hidden" name="page" value="<?php print $GLOBALS['this_page_number']; ?>" />
 								<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
+									<input type="hidden" name="show_ausgeschiedene_dozenten" value="<?php print htmlentities(get_get('show_ausgeschiedene_dozenten') ?? ""); ?>" />
 <?php
 								print create_select($dozenten, get_get('dozent_id'), 'dozent_id', 1);
 ?>
@@ -127,6 +136,7 @@
 									<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
 									<input type="hidden" name="dozent_id" value="<?php print htmlentities(get_get('dozent_id')); ?>" />
 									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester')); ?>" />
+									<input type="hidden" name="show_ausgeschiedene_dozenten" value="<?php print htmlentities(get_get('show_ausgeschiedene_dozenten') ?? ""); ?>" />
 									<input type="submit" value="Die Daten aller Institute anzeigen" />
 								</form>
 <?php
@@ -137,10 +147,34 @@
 									<input type="hidden" value="<?php print $GLOBALS['user_institut_id']; ?>" name="institut" />
 									<input type="hidden" name="dozent_id" value="<?php print htmlentities(get_get('dozent_id') ?? ""); ?>" />
 									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
+									<input type="hidden" name="show_ausgeschiedene_dozenten" value="<?php print htmlentities(get_get('show_ausgeschiedene_dozenten') ?? ""); ?>" />
 									<input type="submit" value="Nur die Daten meines Institutes anzeigen" />
 								</form>
 <?php
 							}
+						}
+
+						if($user_is_admin) {
+?>
+								<form class="form" method="get">
+									<input type="hidden" value="<?php print $GLOBALS['this_page_number']; ?>" name="page" />
+									<input type="hidden" value="<?php print $GLOBALS['user_institut_id']; ?>" name="institut" />
+									<input type="hidden" name="dozent_id" value="<?php print htmlentities(get_get('dozent_id') ?? ""); ?>" />
+									<input type="hidden" name="semester" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" />
+<?php
+									if($show_ausgeschiedene_dozenten) {
+?>
+										<button type="submit" name="show_ausgeschiedene_dozenten" value="0">Ausgeschiedene Dozenten nicht mehr mitanzeigen?</button>
+<?php
+									} else {
+?>
+
+										<button type="submit" name="show_ausgeschiedene_dozenten" value="1">Ausgeschiedene Dozenten mitanzeigen?</button>
+<?php
+									}
+?>
+								</form>
+<?php
 						}
 					}
 ?>
