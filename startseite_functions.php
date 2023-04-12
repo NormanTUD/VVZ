@@ -1479,7 +1479,7 @@
 			$last_studiengang = '';
 
 			foreach ($studiengaenge as $this_studiengang) {
-				if(!get_get('chosen_studiengang') || get_get('chosen_studiengang') == $this_studiengang[0]) {
+				if(!get_get('chosen_studiengang') || get_get('chosen_studiengang') == $this_studiengang[0] || get_get("chosen_studiengang") == "alle") {
 					$modul_infos = get_modul_infos($this_studiengang);
 					$module = create_module_array_by_studiengang($this_studiengang[0]);
 					foreach ($module as $this_modul) {
