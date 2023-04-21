@@ -4849,6 +4849,7 @@ INSERT INTO
 				));
 
 				$query = 'UPDATE `veranstaltung` SET `master_niveau` = '.esc($master_niveau).' WHERE `id` = '.esc($id);
+				rquery($query);
 				$new_db_status_hash = query_to_status_hash("select master_niveau from veranstaltung where id = ".esc($id));
 
 				if($new_db_status_hash != $old_db_status_hash) {
