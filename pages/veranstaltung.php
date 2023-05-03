@@ -272,26 +272,24 @@
 								$et_gebaeude_id = $row[2];
 								$et_raumname = $row[3];
 ?>
-								<form class="form_autosubmit" method="post" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&id=<?php print $veranstaltung_id; ?>">
-									<tr>
-										<td>
-											<input type="text" name="einzelner_termin_start[]" value="<?php print htmlentities($et_start ?? ""); ?>" class="datetimepicker" />
-										</td>
-										<td>
-											<input type="text" name="einzelner_termin_ende[]" value="<?php print htmlentities($et_end ?? ""); ?>" class="datetimepicker" />
-										</td>
-										<td>
-											<?php print create_select($gebaeude, $et_gebaeude_id, 'einzelner_termin_gebaeude[]', 1); ?>
-										</td>
-										<td>
+								<tr>
+									<td>
+										<input type="text" name="einzelner_termin_start[]" value="<?php print htmlentities($et_start ?? ""); ?>" class="datetimepicker" />
+									</td>
+									<td>
+										<input type="text" name="einzelner_termin_ende[]" value="<?php print htmlentities($et_end ?? ""); ?>" class="datetimepicker" />
+									</td>
+									<td>
+										<?php print create_select($gebaeude, $et_gebaeude_id, 'einzelner_termin_gebaeude[]', 1); ?>
+									</td>
+									<td>
 
-											<input type="text" value="<?php print htmlentities($et_raumname ?? ""); ?>" name="einzelner_termin_raum[]" />
-										</td>
-										<td>
-											<span class="remove_this_tr"><?php print_delete_icon(); ?></span>
-										</td>
-									</tr>
-								</form>
+										<input type="text" value="<?php print htmlentities($et_raumname ?? ""); ?>" name="einzelner_termin_raum[]" />
+									</td>
+									<td>
+										<span class="remove_this_tr"><?php print_delete_icon(); ?></span>
+									</td>
+								</tr>
 <?php
 							}
 ?>
