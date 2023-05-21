@@ -165,7 +165,7 @@ if(!$GLOBALS['logged_in']) {
 			warning("<span class='red_text text_30px'>Lasse make_all_foreign_keys_on_delete_cascade() laufen, wenn der Parameter &iamsure=$datestring eingegeben wird. ICH HOFFE DU HAST EIN BACKUP DER DATENBANK!</span>\n");
 		}
 	}
-	$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2] ?? ""));
+	$dozent_name = htmlentities(get_dozent_name($GLOBALS['logged_in_data'][2]) ?? "");
 	if(!user_is_verwalter($GLOBALS['logged_in_user_id'])) {
 		if(!preg_match('/\w{1,}/', $dozent_name)) {
 			$dozent_name = htmlentities($GLOBALS['logged_in_data'][1] ?? "").' <span class="class_red">!!! Ihr Account ist mit keinem Dozenten verknüpft! !!!</span>';
