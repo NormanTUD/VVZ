@@ -192,7 +192,7 @@ if(!$GLOBALS['logged_in']) {
 ?>
 				</td>
 				<td valign="middle" class="invisiblebg">
-					Willkommen, <?php print htmlentities($dozent_name ?? ""); ?>!
+					Willkommen, <?php print $dozent_name; ?>!
 <?php
 					if(!get_setting("x11_debugging_mode")) {
 ?>
