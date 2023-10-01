@@ -4735,14 +4735,15 @@ INSERT INTO
 									[
 										array("table" => "einzelne_termine", "col" => "veranstaltung_id", "name" => "Veranstaltungs-ID"),
 										array("table" => "einzelne_termine", "col" => "start", "name" => "Start"),
-										array("table" => "einzelne_termine", "col" => "end", "name" => "Ende"),
-										array("table" => "einzelne_termine", "col" => "raum_id", "name" => "Raum"),
+										array("table" => "einzelne_termine", "col" => "end", "name" => "Ende")
 									]
 								));
 
-								$query = 'insert ignore into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
+								$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
+
 								$res = rquery($query);
 								if(!$res) {
+									warning("Error: \$res is empty");
 									$error = 1;
 								}
 							} else {
@@ -4751,6 +4752,7 @@ INSERT INTO
 							}
 						} else {
 							warning("Mindestens ein Termin konnte nicht gespeichert werden.");
+							$error++;
 						}
 					}
 
