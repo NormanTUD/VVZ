@@ -4725,29 +4725,28 @@ INSERT INTO
 
 							$date_regex = "/^\d{4}-\d\d-\d\d\s+\d\d:\d\d:\d\d$/";
 
-							if(preg_match($date_regex, $start ?? "") && preg_match($date_regex, $end ?? "") && $gebaeude_id && $raum) {
+							if(preg_match($date_regex, $start ?? "") && preg_match($date_regex, $end ?? "")) {
+								$raum_id = null;
+								if($gebaeude_id && $raum) {
 									$raum_id = get_and_create_raum_id($gebaeude_id, $raum);
-									if($raum_id) {
-										eval(check_values(
-											[
-												array("table" => "einzelne_termine", "col" => "veranstaltung_id", "name" => "Veranstaltungs-ID"),
-												array("table" => "einzelne_termine", "col" => "start", "name" => "Start"),
-												array("table" => "einzelne_termine", "col" => "end", "name" => "Ende"),
-												array("table" => "einzelne_termine", "col" => "raum_id", "name" => "Raum"),
-											]
-										));
+								}
 
-										$query = 'insert ignore into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
-										$res = rquery($query);
-										if(!$res) {
-											$error = 1;
-										}
-									} else {
-										error("Kein Raum definiert");
-										$error++;
-									}
+								eval(check_values(
+									[
+										array("table" => "einzelne_termine", "col" => "veranstaltung_id", "name" => "Veranstaltungs-ID"),
+										array("table" => "einzelne_termine", "col" => "start", "name" => "Start"),
+										array("table" => "einzelne_termine", "col" => "end", "name" => "Ende"),
+										array("table" => "einzelne_termine", "col" => "raum_id", "name" => "Raum"),
+									]
+								));
+
+								$query = 'insert ignore into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
+								$res = rquery($query);
+								if(!$res) {
+									$error = 1;
+								}
 							} else {
-								warning("Termine müssen ein Start- und Enddatum und ein Gebäude und einen Raum haben, um eingetragen zu werden.");
+								warning("Termine müssen ein Start- und Enddatum, um eingetragen zu werden.");
 								$error++;
 							}
 						} else {
