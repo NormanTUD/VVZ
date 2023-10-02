@@ -53,8 +53,6 @@ CREATE TABLE `einzelne_termine` (
   `start` datetime NOT NULL DEFAULT current_timestamp(),
   `end` datetime NOT NULL DEFAULT current_timestamp(),
   `raum_id` int(10) unsigned NOT NULL,
-  `ts` timestamp(6) GENERATED ALWAYS AS ROW START,
-  `te` timestamp(6) GENERATED ALWAYS AS ROW END,
   PRIMARY KEY (`veranstaltung_id`,`start`,`end`),
   KEY `einzelne_termine_ibfk_2` (`raum_id`),
   CONSTRAINT `einzelne_termine_ibfk_1` FOREIGN KEY (`veranstaltung_id`) REFERENCES `veranstaltung` (`id`) ON DELETE CASCADE,
