@@ -7466,10 +7466,11 @@ WHERE
 
 			$data[$studiengang][$pn]['abgabe_pruefungsleistungen'] = $abgabe_pruefungsleistungen;
 			$data[$studiengang][$pn]['zeitraum'] = $zeitraum;
-			if(array_key_exists('dozenten', $data[$studiengang][$pn]) && is_null($data[$studiengang][$pn]['dozenten'])) {
+			if(!array_key_exists('dozenten', $data[$studiengang][$pn]) || is_null($data[$studiengang][$pn]['dozenten'])) {
 				$data[$studiengang][$pn]['dozenten'] = array();
 			}
-			if(array_key_exists("dozenten", $data[$studiengang][$pn]) && !in_array($dozent_name, $data[$studiengang][$pn]['dozenten'])) {
+
+			if(!in_array($dozent_name, $data[$studiengang][$pn]['dozenten'])) {
 				$data[$studiengang][$pn]['dozenten'][] = $dozent_name;
 			}
 			$zeitraeume[$id] = $zeitraum;
