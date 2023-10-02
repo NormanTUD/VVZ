@@ -247,9 +247,7 @@
 					<input type="hidden" value="<?php print htmlentities($veranstaltung_id ?? ""); ?>" name="id" />
 					<br />
 
-					<h3>Einzelne Termine hinzufügen</h3>
-
-					<p style="font-size: 2em" class="class_red">Bei einzelnen Terminen: Gebäude und Raum freilassen! &mdash; Wünsche oben eintragen</p>
+					<h3>Einzelne Termine hinzufügen (<span class="class_red">Gebäude und Raum freilassen! &mdash; Wünsche oben eintragen</span>)</h3>
 
 <?php
 					$last_id = null;
