@@ -249,6 +249,8 @@
 
 					<h3>Einzelne Termine hinzufügen</h3>
 
+					<p style="font-size: 2em" class="class_red">Bei einzelnen Terminen: Gebäude und Raum freilassen! &mdash; Wünsche oben eintragen</p>
+
 <?php
 					$last_id = null;
 
