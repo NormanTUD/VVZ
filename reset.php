@@ -1,6 +1,6 @@
 <?php
 	$GLOBALS["no_selftest_force"] = 1;
-	include("functions.php");
+	include_once("functions.php");
 	function isCommandLineInterface() {
 		return (php_sapi_name() === 'cli');
 	}
