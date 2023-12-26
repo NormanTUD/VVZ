@@ -150,7 +150,7 @@ declare(ticks=1);
 		$GLOBALS['show_comic_sans'] = 1;
 	}
 
-	include('mysql.php');
+	include_once('mysql.php');
 
 	rquery("SET @@system_versioning_alter_history = 0;");
 	selftest_startpage();
