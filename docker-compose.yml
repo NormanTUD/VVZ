@@ -1,0 +1,33 @@
+version: '3'
+services:
+  vvz_db:
+    container_name: vvz_db
+    restart: always
+    image: mariadb:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_PASS=root
+      - MYSQL_USER=root
+    volumes:
+      - datavolume:/var/lib/docker_mysql
+    networks:
+      - annotate_network
+  annotate:
+    build:
+      context: .
+    ports:
+      - $LOCAL_PORT:80
+    environment:
+      - DB_HOST=vvz_db
+      - DB_PORT=3306
+      - DB_PASSWORD=root
+      - DB_USER=root
+    networks:
+      - annotate_network
+    tmpfs:
+      - /tmp:rw
+volumes:
+  datavolume:
+networks:
+  annotate_network:
+    driver: bridge
