@@ -1,26 +1,24 @@
 <?php
+	include_once("config.php");
+
 	if(file_exists("/etc/wartungsarbeiten")) {
 		die("Aktuell führen wir Wartungsarbeiten durch. Bitte warten Sie kurz.");
 	}
-	$GLOBALS["dbh"] = null;
-	include("config.php");
 
-	/*
-	require_once('php-sql-parser.php');
+	if($GLOBALS["mysql_php_loaded"]) {
+		$GLOBALS["dbh"] = null;
 
-	if(!function_exists("get_base_expr_set")) {
+		/*
+		require_once('php-sql-parser.php');
+
 		function get_base_expr_set ($i) {
 			return $i["sub_tree"][0]["base_expr"];
 		}
-	}
 
-	if(!function_exists("get_base_expr")) {
 		function get_base_expr ($i) {
 			return $i["base_expr"];
 		}
-	}
 
-	if(!function_exists("parse_sql_get_table_and_cols")) {
 		function parse_sql_get_table_and_cols ($q) {
 			$q = preg_replace('/`/', '', $q);
 			$parser = new PHPSQLParser($q, true);
@@ -53,20 +51,17 @@
 				return $array;
 			}
 		}
-	}
-	 */
+		 */
 
-	if(!array_key_exists("no_selftest_force", $GLOBALS)) {
-		$GLOBALS["no_selftest_force"] = 0;
-	}
-	if(!array_key_exists("no_selftest", $GLOBALS)) {
-		$GLOBALS["no_selftest"] = 0;
-	}
+		if(!array_key_exists("no_selftest_force", $GLOBALS)) {
+			$GLOBALS["no_selftest_force"] = 0;
+		}
+		if(!array_key_exists("no_selftest", $GLOBALS)) {
+			$GLOBALS["no_selftest"] = 0;
+		}
 
-	if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
+		if(!defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
 
-
-	if(!function_exists("add_to_output")) {
 		function add_to_output ($name, $msg) {
 			if($name) {
 				if($msg) {
@@ -76,68 +71,50 @@
 				die(htmlentities($name)." existiert nicht!");
 			}
 		}
-	}
 
-	if(!function_exists("error")) {
 		function error ($message) {
 			add_to_output("error", $message);
 		}
-	}
 
-	if(!function_exists("success")) {
 		function success ($message) {
 			add_to_output("success", $message);
 		}
-	}
 
-	if(!function_exists("debug")) {
 		function debug ($message) {
 			$bt = debug_backtrace();
 			$caller = array_shift($bt);
 			$data = array("msg" => $message, "caller" => $caller);
 			add_to_output("debug", $data);
 		}
-	}
 
-	if(!function_exists("warning")) {
 		function warning ($message) {
 			add_to_output("warning", $message);
 		}
-	}
 
-	if(!function_exists("right_issue")) {
 		function right_issue ($message) {
 			add_to_output("right_issue", $message);
 		}
-	}
 
-	if(!function_exists("message")) {
 		function message ($message) {
 			add_to_output("message", $message);
 		}
-	}
 
-	if(!function_exists("show_easter_egg")) {
 		function show_easter_egg ($message) {
 			add_to_output("easter_egg", $message);
 		}
-	}
 
-	if(!function_exists("stderrw")) {
 		function stderrw ($str) {
 			fwrite(STDERR, $str);
 		}
-	}
 
-	if(!function_exists('set_login_data')) {
 		function set_login_data ($row) {
-			/*
-			print "<pre>\n";
-			debug_print_backtrace();
-			print_r($GLOBALS);
-			print "</pre>\n";
-			die("A");
-			 */
+				/*
+				print "<pre>\n";
+				debug_print_backtrace();
+				print_r($GLOBALS);
+				print "</pre>\n";
+				die("A");
+				 */
 
 			if(!institut_id_exists($row[3])) {
 				$institute = create_institute_array();
@@ -153,13 +130,11 @@
 			$GLOBALS['user_dozent_id'] = $row[2];
 			$GLOBALS['user_institut_id'] = $row[3];
 			$GLOBALS['user_role_id'] = get_role_id_by_user($row[0]);
-#dier($GLOBALS['user_role_id']);
+			#dier($GLOBALS['user_role_id']);
 			$GLOBALS['this_semester_id'] = get_and_create_this_semester();
 			$GLOBALS['accepted_public_data'] = $row[4];
 		}
-	}
 
-	if(!function_exists("query_to_json")) {
 		function query_to_json($query, $skip_array=array()) {
 			$result = rquery($query);
 
@@ -176,15 +151,11 @@
 
 			return json_encode($rows);
 		}
-	}
 
-	if(!function_exists("query_to_status_hash")) {
 		function query_to_status_hash ($query, $skip_array = array()) {
 			return hash('md5', query_to_json($query, $skip_array));
 		}
-	}
 
-	if(!function_exists("multiple_esc_join")) {
 		function multiple_esc_join ($data) {
 			if(is_array($data)) {
 				$data = array_map('esc', $data);
@@ -194,11 +165,9 @@
 				return esc($data);
 			}
 		}
-	}
 
 
 
-	if(!function_exists("rquery")) {
 		function rquery ($internalquery, $die = 1) {
 			$debug_backtrace = debug_backtrace();
 			$caller_file = $debug_backtrace[0]['file'];
@@ -259,9 +228,7 @@
 
 			return $result;
 		}
-	}
 
-	if(!function_exists("selftest_startpage")) {
 		function selftest_startpage() {
 			if(array_key_exists("no_selftest", $GLOBALS) && $GLOBALS["no_selftest"]) {
 				return;
@@ -455,9 +422,7 @@
 				}
 			}
 		}
-	}
 
-	if(!function_exists("table_exists")) {
 		function table_exists ($db, $table) {
 			$query = "SELECT table_name FROM information_schema.tables WHERE table_schema = ".esc($db)." AND table_name = ".esc($table);
 			$result = mysqli_query($GLOBALS['dbh'], $query);
@@ -467,19 +432,15 @@
 			}
 			return $table_exists;
 		}
-	}
 
-	if(!function_exists("get_url_uni_name")) {
 		function get_url_uni_name () {
 			if(isset($_SERVER["REDIRECT_URL"]) && preg_match("/^\/v\/(.*?)($|\/.*$)?$/", $_SERVER["REDIRECT_URL"], $matches)) {
 				return $matches[1];
 			}
 			return "";
 		}
-	}
 
-	if(!function_exists("esc")) {
-		function esc ($parameter) { 
+		function esc ($parameter) {
 			if(!is_array($parameter)) { // Kein array
 				if(isset($parameter) && strlen($parameter)) {
 					return '"'.mysqli_real_escape_string($GLOBALS['dbh'], $parameter).'"';
@@ -491,100 +452,102 @@
 				return $str;
 			}
 		}
-	}
 
-	$GLOBALS["db_freshly_created"] = 0;
-	$GLOBALS["db_password"] = "";
+		$GLOBALS["db_freshly_created"] = 0;
+		$GLOBALS["db_password"] = "";
 
-	$dbfile = '/etc/vvzdbpw';
+		$dbfile = '/etc/vvzdbpw';
 
-	if(file_exists($dbfile)) {
-		$vvzdbpw = explode("\n", file_get_contents($dbfile))[0];
+		if(file_exists($dbfile)) {
+			$vvzdbpw = explode("\n", file_get_contents($dbfile))[0];
 
-		if($vvzdbpw) {
-			$GLOBALS["db_password"] = $vvzdbpw;
+			if($vvzdbpw) {
+				$GLOBALS["db_password"] = $vvzdbpw;
 
-			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $GLOBALS["db_password"]);
+				$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $GLOBALS["db_password"]);
 
-			// Check connection
-			if ($GLOBALS["dbh"]->connect_error) {
-				die("Connection failed: ".$GLOBALS["dbh"]->connect_error);
-			}
-
-
-			if(array_key_exists("no_selftest", $GLOBALS) && !$GLOBALS["no_selftest"]) {
-				selftest_startpage();
-				$url_uni_name = get_url_uni_name();
-				$query = 'select dbname from vvz_global.kundendaten where urlname = '.esc($url_uni_name);
-				$result_dbname = $GLOBALS["dbh"]->query($query);
-
-				if($result_dbname) {
-					while ($row = mysqli_fetch_row($result_dbname)) {
-						$GLOBALS["dbname"] = $row[0];
-					}
+				// Check connection
+				if ($GLOBALS["dbh"]->connect_error) {
+					die("Connection failed: ".$GLOBALS["dbh"]->connect_error);
 				}
-			}
 
-			if(!$GLOBALS["dbname"]) {
-				$GLOBALS['dbname'] = get_kunden_db_name();
-			}
 
-			try {
-				if((!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) && ($GLOBALS["dbname"] == "startpage" || (preg_match("/^db_vvz_vorlesungsverzeichnis_demo_/", $GLOBALS["dbname"]) || preg_match("/^vvztud/", $GLOBALS["dbname"])) )) {
-					$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
-					if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
-						sleep(1);
-						die("Error creating database: ".$GLOBALS["dbh"]->error);
-					} else {
-						if(!array_key_exists("no_selftest", $GLOBALS) && !$GLOBALS["no_selftest"]) {
-							try {
-								if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
-									$GLOBALS["db_freshly_created"] = 1;
-									include_once("selftest.php");
+				if(array_key_exists("no_selftest", $GLOBALS) && !$GLOBALS["no_selftest"]) {
+					selftest_startpage();
+					$url_uni_name = get_url_uni_name();
+					$query = 'select dbname from vvz_global.kundendaten where urlname = '.esc($url_uni_name);
+					$result_dbname = $GLOBALS["dbh"]->query($query);
 
-									print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
-									flush();
-									print '<meta http-equiv="refresh" content="0; url=./" />';
-									flush();
-
-									$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-
-									exit(0);
-								} else {
-									die("Could not use DB");
-								}
-							} catch (\Throwable $e) {
-								#stderrw("Could not select DB: $e");
-								sleep(1);
-								print "Es dauert nur noch einen Augenblick. Bitte warten Sie...";
-								print '<meta http-equiv="refresh" content="0; url=./" />';
-								flush();
-								exit(0);
-							}
+					if($result_dbname) {
+						while ($row = mysqli_fetch_row($result_dbname)) {
+							$GLOBALS["dbname"] = $row[0];
 						}
 					}
 				}
 
-				mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
-
-				if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
-					$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name($GLOBALS["dbname"]));
-					$GLOBALS["university_name"] = get_single_row_from_query($query);
+				if(!$GLOBALS["dbname"]) {
+					$GLOBALS['dbname'] = get_kunden_db_name();
 				}
-			} catch (\Throwable $e) {
-				error_log($e);
 
-			}
-			if (!$GLOBALS['dbh']) {
-				dier("Kann nicht zur Datenbank verbinden!");
+				try {
+					if((!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) && ($GLOBALS["dbname"] == "startpage" || (preg_match("/^db_vvz_vorlesungsverzeichnis_demo_/", $GLOBALS["dbname"]) || preg_match("/^vvztud/", $GLOBALS["dbname"])) )) {
+						$sql = "CREATE DATABASE IF NOT EXISTS ".$GLOBALS["dbname"];
+						if (!$GLOBALS["dbh"]->query($sql) === TRUE) {
+							sleep(1);
+							die("Error creating database: ".$GLOBALS["dbh"]->error);
+						} else {
+							if(!array_key_exists("no_selftest", $GLOBALS) && !$GLOBALS["no_selftest"]) {
+								try {
+									if($GLOBALS["dbh"]->query("use ".$GLOBALS["dbname"])) {
+										$GLOBALS["db_freshly_created"] = 1;
+										include_once("selftest.php");
+
+										print "Die neue Uni wurde erstellt. Sie werden weitergeleitet...";
+										flush();
+										print '<meta http-equiv="refresh" content="0; url=./" />';
+										flush();
+
+										$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+										exit(0);
+									} else {
+										die("Could not use DB");
+									}
+								} catch (\Throwable $e) {
+									#stderrw("Could not select DB: $e");
+									sleep(1);
+									print "Es dauert nur noch einen Augenblick. Bitte warten Sie...";
+									print '<meta http-equiv="refresh" content="0; url=./" />';
+									flush();
+									exit(0);
+								}
+							}
+						}
+					}
+
+					mysqli_select_db($GLOBALS["dbh"], $GLOBALS["dbname"]);
+
+					if(!array_key_exists("no_selftest_force", $GLOBALS) || !$GLOBALS["no_selftest"]) {
+						$query = "select universitaet from vvz_global.kundendaten where id = ".esc(get_kunde_id_by_db_name($GLOBALS["dbname"]));
+						$GLOBALS["university_name"] = get_single_row_from_query($query);
+					}
+				} catch (\Throwable $e) {
+					error_log($e);
+
+				}
+				if (!$GLOBALS['dbh']) {
+					dier("Kann nicht zur Datenbank verbinden!");
+				}
+			} else {
+				die("Die Passwortdatei war leer bzw. das Passwort war nicht in der ersten Zeile.");
 			}
 		} else {
-			die("Die Passwortdatei war leer bzw. das Passwort war nicht in der ersten Zeile.");
+			die("Die Verbindung zur Datenbank konnte nicht hergestellt werden (falsches oder kein Passwort)");
 		}
-	} else {
-		die("Die Verbindung zur Datenbank konnte nicht hergestellt werden (falsches oder kein Passwort)");
+
+
+		$GLOBALS['cookie_hash'] = hash("md5", $GLOBALS["dbname"]);
 	}
 
-
-	$GLOBALS['cookie_hash'] = hash("md5", $GLOBALS["dbname"]);
+	$GLOBALS["mysql_php_loaded"] = true;
 ?>

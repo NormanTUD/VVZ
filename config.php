@@ -1,4 +1,6 @@
 <?php
+	$GLOBALS["mysql_php_loaded"] = false;
+
 	if(file_exists('/etc/hardcore_debugging')) {
 		error_reporting(E_ALL);
 		set_error_handler(function ($severity, $message, $file, $line) {
