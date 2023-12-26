@@ -544,6 +544,5 @@
 		die("Die Verbindung zur Datenbank konnte nicht hergestellt werden (falsches oder kein Passwort)");
 	}
 
-
 	$GLOBALS['cookie_hash'] = hash("md5", $GLOBALS["dbname"]);
 ?>
