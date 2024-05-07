@@ -115,7 +115,7 @@
 							<th>Abgabe Prüfungsleistung</th>
 							<th>Gebäude&shy;wunsch</th>
 							<th>Raum&shy;wunsch</th>
-							<th>Master-Niveau?</th>
+							<!--<th>Master-Niveau?</th>-->
 							<th>Fester BBB-Raum?</th>
 						</tr>
 <?php
@@ -212,7 +212,7 @@
 							<td><input type="text" placeholder="abgabe_pruefungsleistungen" name="abgabe_pruefungsleistungen" class="datepicker" value="<?php print htmlentities($this_data['abgabe_pruefungsleistungen']); ?>" /></td>
 							<td><?php print create_select($gebaeude, $this_data['gebaeudewunsch'], 'gebaeudewunsch', 1); ?></td>
 							<td><input type="text" value="<?php print get_raum_name_by_id($this_data['raumwunsch']); ?>" name="raumwunsch" />
-							<td><input type="checkbox" value="1" name="master_niveau" <?php print $this_data['master_niveau'] ? 'checked="checked"' : ''; ?>/></td>
+							<!--<td><input type="checkbox" value="1" name="master_niveau" <?php print $this_data['master_niveau'] ? 'checked="checked"' : ''; ?>/></td>-->
 							<td><input type="checkbox" value="1" name="fester_bbb_raum" <?php print $this_data['fester_bbb_raum'] ? 'checked="checked"' : ''; ?>/></td>
 						</tr>
 					</table>
