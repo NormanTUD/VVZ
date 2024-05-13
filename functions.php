@@ -4664,6 +4664,16 @@ INSERT INTO
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
 			}
 
+			if($query) {
+				$res = rquery($query);
+				if($res) {
+					success("Raum und/oder Gebäudewunsch eingetragen");
+				} else {
+					message('Raum und/oder Gebäudewunsch konnten nicht eingetragen werden.');
+				}
+
+			}
+
 			$check_query = "select veranstaltung_id, bezuegetyp_id from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id)." order by veranstaltung_id";
 			$old_db_status_hash = query_to_status_hash($check_query, array("id", "last_update"));
 
