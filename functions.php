@@ -4653,7 +4653,6 @@ INSERT INTO
 				));
 
 				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = '.esc($raumwunsch_id).', `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
-
 			} elseif ($gebaeudewunsch_id) {
 				eval(check_values(
 					[
@@ -4662,6 +4661,8 @@ INSERT INTO
 				));
 
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
+			} else {
+				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = NULL, `gebaeudewunsch_id` = NULL WHERE `id` = '.esc($id);
 			}
 
 			if($query) {
