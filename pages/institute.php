@@ -8,7 +8,7 @@
 
 	if(check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
 		$semester = create_semester_array_short();
-		$chosen_semester = (get_get('semester') ? get_get('semester') : get_this_semester()[0]);
+		$chosen_semester = (get_get('semester_id') ? get_get('semester_id') : get_this_semester()[0]);
 ?>
 		<div id="institute">
 			<?php print get_seitentext(); ?>
