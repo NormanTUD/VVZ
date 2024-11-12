@@ -732,15 +732,14 @@ declare(ticks=1);
 				}
 
 				$query = "delete from veranstaltung_nach_lv_nr where veranstaltung_id in (select id from veranstaltung where semester_id in $semester_choser)";
-				dier($query);
 				start_transaction();
 				$result = rquery($query);
 
 				if($result) {
-					success("Die Veranstaltungsnummern wurden für das aktuelle Semester zurückgesetzt.");
+					success("Die Veranstaltungsnummern wurden für das ausgewählte Semester zurückgesetzt.");
 					commit();
 				} else {
-					error("Die Veranstaltungsnummern konnten für das aktuelle Semester NICHT zurückgesetzt werden. Die Aktion wird rückgängig gemacht.");
+					error("Die Veranstaltungsnummern konnten für das ausgewählte Semester NICHT zurückgesetzt werden. Die Aktion wird rückgängig gemacht.");
 					rollback();
 				}
 			}
