@@ -7,6 +7,8 @@
 	}
 
 	if(check_page_rights(get_page_id_by_filename(basename(__FILE__)))) { // Wichtig, damit Niemand ohne Anmeldung etwas ändern kann
+		$semester = create_semester_array_short();
+		$chosen_semester = (get_get('semester') ? get_get('semester') : get_this_semester()[0]);
 ?>
 		<div id="institute">
 			<?php print get_seitentext(); ?>
@@ -19,7 +21,8 @@
 		</div>
 
 		<form method="post">
-			<input type="submit" name="delete_current_semester_start_ids" value="Für das aktuelle Semester Lehrveranstaltungs-ID-Werte neu schreiben" />
+			<?php create_select($semester, $chosen_semester, 'semester_id'); ?>
+			<input type="submit" name="delete_semester_start_ids" value="Für das aktuelle Semester Lehrveranstaltungs-ID-Werte neu schreiben" />
 		</form>
 <?php
 	}

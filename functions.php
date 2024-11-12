@@ -724,8 +724,15 @@ declare(ticks=1);
 				}
 			}
 
-			if(get_post("delete_current_semester_start_ids")) {
-				$query = "delete from veranstaltung_nach_lv_nr where veranstaltung_id in (select id from veranstaltung where semester_id in (select id from semester where `default` = '1'))";
+			if(get_post("delete_semester_start_ids")) {
+				$semester_choser = "(select id from semester where `default` = '1')";
+
+				if(is_integer(get_post("semester_id"))) {
+					$semester_choser = "(" . get_post("semester_id") . ")";
+				}
+
+				$query = "delete from veranstaltung_nach_lv_nr where veranstaltung_id in (select id from veranstaltung where semester_id in $semester_choser)";
+				dier($query);
 				start_transaction();
 				$result = rquery($query);
 
