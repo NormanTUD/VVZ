@@ -22,7 +22,7 @@
 
 		<form method="post">
 			<?php create_select($semester, $chosen_semester, 'semester_id'); ?>
-			<input type="submit" name="delete_semester_start_ids" value="Für das aktuelle Semester Lehrveranstaltungs-ID-Werte neu schreiben" />
+			<input type="submit" name="delete_semester_start_ids" value="Für das ausgewählte Semester Lehrveranstaltungs-ID-Werte neu schreiben" />
 		</form>
 <?php
 	}
