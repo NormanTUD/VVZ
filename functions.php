@@ -732,6 +732,7 @@ declare(ticks=1);
 				}
 
 				$query = "delete from veranstaltung_nach_lv_nr where veranstaltung_id in (select id from veranstaltung where semester_id in $semester_choser)";
+				dier($_POST);
 				dier($query);
 				start_transaction();
 				$result = rquery($query);
