@@ -4653,7 +4653,6 @@ INSERT INTO
 				));
 
 				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = '.esc($raumwunsch_id).', `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
-
 			} elseif ($gebaeudewunsch_id) {
 				eval(check_values(
 					[
@@ -4662,6 +4661,32 @@ INSERT INTO
 				));
 
 				$query = 'UPDATE `veranstaltung` SET `gebaeudewunsch_id` = '.esc($gebaeudewunsch_id).' WHERE `id` = '.esc($id);
+			} else {
+				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = NULL, `gebaeudewunsch_id` = NULL WHERE `id` = '.esc($id);
+			}
+
+			if($query) {
+				$res = rquery($query);
+				if($res) {
+					success("Raum- und/oder Gebäudewunsch eingetragen");
+				} else {
+					message('Raum- und/oder Gebäudewunsch konnten nicht eingetragen werden.');
+				}
+
+			}
+
+			if ($gebaeudewunsch_id && !$raumwunsch_id) {
+				$query = 'UPDATE `veranstaltung` SET `raumwunsch_id` = NULL WHERE `id` = '.esc($id);
+
+				if($query) {
+					$res = rquery($query);
+					if($res) {
+						success("Raumwunsch wurde erfolgreich entfernt");
+					} else {
+						message('Raumwunsch konnte nicht entfernt werden.');
+					}
+
+				}
 			}
 
 			$check_query = "select veranstaltung_id, bezuegetyp_id from veranstaltung_nach_bezuegetypen where veranstaltung_id = ".esc($id)." order by veranstaltung_id";
