@@ -727,7 +727,7 @@ declare(ticks=1);
 			if(get_post("delete_semester_start_ids")) {
 				$semester_choser = "(select id from semester where `default` = '1')";
 
-				if(is_integer(get_post("semester_id"))) {
+				if(preg_match("/^\d+$/", get_post("semester_id"))) {
 					$semester_choser = "(" . get_post("semester_id") . ")";
 				}
 
