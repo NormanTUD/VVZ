@@ -3625,7 +3625,7 @@ WHERE 1
 			eval(check_values(
 				[
 					array("table" => "dozent", "col" => "first_name", "name" => "Vorname"),
-					array("table" => "dozent", "col" => "last_name", "name" => "Nacname")
+					array("table" => "dozent", "col" => "last_name", "name" => "Nachname")
 				]
 			));
 
@@ -4390,7 +4390,7 @@ WHERE 1
 			[
 				array("table" => "api_auth_codes", "col" => "email", "name" => "Email"),
 				array("table" => "api_auth_codes", "col" => "ansprechpartner", "name" => "Ansprechpartner"),
-				array("table" => "api_auth_codes", "col" => "grund", "name" => "Grun")
+				array("table" => "api_auth_codes", "col" => "grund", "name" => "Grund")
 			]
 		));
 
@@ -4611,7 +4611,7 @@ WHERE `id` = '.esc($id);
 				array("table" => "veranstaltung_metadaten", "col" => "hinweis", "name" => "Hinweis"),
 				array("table" => "veranstaltung_metadaten", "col" => "opal_link", "name" => "eLearning-Link"),
 				array("table" => "veranstaltung_metadaten", "col" => "stunde", "name" => "Stunde"),
-				array("table" => "veranstaltung_metadaten", "col" => "related_veranstaltung", "name" => "Zugehorige Veranstaltung"),
+				array("table" => "veranstaltung_metadaten", "col" => "related_veranstaltung", "name" => "Zugehörige Veranstaltung"),
 				array("table" => "veranstaltung_metadaten", "col" => "wochentag", "name" => "Wochentag")
 			]
 		));
@@ -6370,7 +6370,7 @@ INSERT INTO
 			$str .= "<p><i>Stand: $datum ($uhrzeit)</i></p>";
 
 			if($number_of_veranstaltungen) {
-				$str .= '<a class="no_link" href="event_file.php?veranstaltung[]='.join('&veranstaltung[]=', $got_veranstaltungen).'">'.html_calendar().' In meinen Kalendar eintragen</a>'."\n";
+				$str .= '<a class="no_link" href="event_file.php?veranstaltung[]='.join('&veranstaltung[]=', $got_veranstaltungen).'">'.html_calendar().' In meinen Kalender eintragen</a>'."\n";
 			}
 			#$str .= '<a id="create_tinyurl">TinyURL-Link dieses Stundenplanes generieren</a><br><div id="created_tinyurl"></div>';
 
@@ -6963,9 +6963,9 @@ INSERT INTO
 		$first = $GLOBALS['shown_help_ids']['calendar'];
 		if($first) {
 			$GLOBALS['shown_help_ids']['calendar'] = 1;
-			return '<span class="calendarlarge" id="ical_item" title="iCal-Kalendardatei">'.get_calendar_icon().'</span>';
+			return '<span class="calendarlarge" id="ical_item" title="iCal-Kalenderdatei">'.get_calendar_icon().'</span>';
 		} else {
-			return '<span class="calendarlarge" title="iCal-Kalendardatei">'.get_calendar_icon().'</span>';
+			return '<span class="calendarlarge" title="iCal-Kalenderdatei">'.get_calendar_icon().'</span>';
 		}
 	}
 
