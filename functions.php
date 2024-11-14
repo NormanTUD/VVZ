@@ -534,6 +534,20 @@ declare(ticks=1);
 						delete_veranstaltung($this_id);
 					} else {
 						if(get_post('name') && get_post('dozent') && get_post('veranstaltungstyp') && get_post('institut') && get_post('semester')) {
+							$new_semester_id = get_post('semester');
+							$old_semester_id = get_semester_from_veranstaltung_id($this_id)["id"];
+
+							if($new_semester_id != $old_semester_id) {
+								$query = "delete from veranstaltung_nach_lv_nr where veranstaltung_id = ".esc($this_id);
+								$r = rquery($query);
+								if($r) {
+									message("Pseudo-Veranstaltungs-ID entfernt.");
+								} else {
+									error("Entfernen der Pseudo-Veranstaltungs-ID fehlgeschlagen");
+								}
+							}
+
+
 							update_veranstaltung(get_post('id'), get_post('name'), get_post('dozent'), get_post('veranstaltungstyp'), get_post('institut'), get_post('semester'), get_post('master_niveau'), get_post("fester_bbb_raum"));
 							if(get_post('speichern_metainfos')) {
 								if(preg_match('/^\d+$/', $this_id)) {
