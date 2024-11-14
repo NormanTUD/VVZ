@@ -183,12 +183,12 @@
 /*
 	Default settings
  */
-	$GLOBALS["default_universitaet"] = "omni-concept";
-	$GLOBALS["default_name"] = "Jörg Noack";
-	$GLOBALS["default_ort"] = "Oldenburg";
-	$GLOBALS["default_plz"] = "26133";
-	$GLOBALS["default_strasse"] = "Robert-Koch-Str. 2";
-	$GLOBALS["default_email"] = "noack@omni-concept.com";
+	$GLOBALS["default_universitaet"] = "VVZ";
+	$GLOBALS["default_name"] = "Norman Koch";
+	$GLOBALS["default_ort"] = "";
+	$GLOBALS["default_plz"] = "";
+	$GLOBALS["default_strasse"] = "";
+	$GLOBALS["default_email"] = "";
 	$GLOBALS["default_zahlungszyklus_monate"] = "1";
 
 	if(file_exists("/etc/vvztud")) {
