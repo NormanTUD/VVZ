@@ -148,7 +148,7 @@
  */
 	$GLOBALS["selftest_already_done"] = 0;
 	$GLOBALS['university_name'] = "TU Dresden";
-	$GLOBALS['impressum_university_page'] = "http://www.omni-concept.com/v1024/Pages/impressum.htm";
+	$GLOBALS['impressum_university_page'] = "https://tu-dresden.de/impressum";
 	$GLOBALS["calname"] = "Philosophie";
 	$GLOBALS['timezone_name'] = "Europe/Berlin";
 
