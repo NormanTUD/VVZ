@@ -4784,12 +4784,27 @@ INSERT INTO
 									]
 								));
 
-								$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
+								if ($id) {
+									if ($start && $end) {
+										if($raum_id) {
+											$query = 'insert into einzelne_termine (veranstaltung_id, start, end, raum_id) values ('.esc($id).', '.esc($start).', '.esc($end).', '.esc($raum_id).')';
 
-								$res = rquery($query);
-								if(!$res) {
-									warning("Error: \$res is empty");
-									$error = 1;
+											$res = rquery($query);
+											if(!$res) {
+												warning("Error: \$res is empty");
+												$error = 1;
+											}
+										} else {
+											warning("Termine müssen einen Raum haben.");
+											$error++;
+										}
+									} else {
+										warning("Termine müssen ein Start- und Enddatum, um eingetragen zu werden.");
+										$error++;
+									}
+								} else {
+									warning("Id war nicht definiert.");
+									$error++;
 								}
 							} else {
 								warning("Termine müssen ein Start- und Enddatum, um eingetragen zu werden.");
