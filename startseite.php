@@ -32,8 +32,8 @@
 				<a href="#kunden" class="header_link">Aktuelle Kunden</a> |
 				<a href="#testimonies" class="header_link">Testimonies</a> |
 				<a href="#uebersicht" class="header_link">Übersicht</a> |
-				<a href="http://www.omni-concept.com/v1024/Pages/impressum.htm" target="_blank" class="header_link">Impressum</a> |
-				<a href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm" target="_blank" class="header_link">Datenschutzerklärung</a>
+				<a href="https://tu-dresden.de/impressum" target="_blank" class="header_link">Impressum</a> |
+				<a href="https://tu-dresden.de/tu-dresden/organisation/gremien-und-beauftragte/beauftragte/datenschutzbeauftragter" target="_blank" class="header_link">Datenschutzerklärung</a>
 			</div>
 
 <?php
@@ -49,10 +49,6 @@
 				</div>
 			</div>
 <?php
-			$page_str = "<center><img src='default_logo.png'></center><br>";
-			$page_str .= "omni-concept ist Ihr kreativer Ansprechpartner, wenn es um innovative Lösungen im Bereich Verwaltungsautomatisierung, Internet, Datenbanken und Printdesign geht. ";
-			$page_str .= "omni-concept wurde Anfang 2000 gegründet. ";
-
 			$page_str .= "<center><h2 id='vvz'>Das Vorlesungsverzeichnis:</h2></center>";
 			$page_str .= "Sind Sie auf der Suche nach einer Software, die sowohl für Sie als auch Ihre Studierenden zeitsparend ist? Möchten Sie nicht mehr manuell Excel-Dateien herumsenden, um Vorlesungen und Prüfung zu verwalten, die man dann mühsam zusammenfügen muss? Würden Sie gerne die angebotenen Prüfungen an das Prüfungsamt melden, diese fordern es im Excel-Format?<br>";
 			$page_str .= "<br>";
@@ -304,7 +300,7 @@
 			</div>
 
 			
-			<div class="footer_link"><a target="_blank" href="http://www.omni-concept.com/v1024/Pages/impressum.htm">Impressum</a> | <a target="_blank" href="http://www.omni-concept.com/v1024/Pages/datenschutz.htm">Datenschutzerklärung</a></div>
+			<div class="footer_link"><a target="_blank" href="https://tu-dresden.de/impressum">Impressum</a> | <a target="_blank" href="https://tu-dresden.de/tu-dresden/organisation/gremien-und-beauftragte/beauftragte/datenschutzbeauftragter">Datenschutzerklärung</a></div>
 		</div> 
 <?php
 
