@@ -58,7 +58,7 @@
 
 <p>Der Anbieter stellt dem Kunden zur Beseitigung von technischen Störungen und Behebung von Fehlern, die im Rahmen der Nutzung der Software aufkommen, telefonisch einen Kundendienst zur Verfügung. Der Kundendienst des Anbieters ist via Email erreichbar, und zwar folgendermaßen:</p>
 
-<p>Email: noack@omni-concept.com</p>
+<p>Email: norman.koch@tu-dresden.de</p>
 
 
 <h2>§ 8 Mängelansprüche</h2>
