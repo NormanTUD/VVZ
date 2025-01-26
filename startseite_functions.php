@@ -699,7 +699,7 @@
 				}
 			} else {
 				if(count($einzelne_termine_gebaeude_raumliste)) {
-					print implode("/", $einzelne_termine_gebaeude_raumliste);
+					print implode("/", $einzelne_termine_gebaeude_raumliste)." (siehe Details)";
 				} else {
 					if($hinweis) {
 						print '<i class="">Kein&nbsp;Raum, evtl. siehe&nbsp;Details</i>';
