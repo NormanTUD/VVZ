@@ -699,7 +699,10 @@
 				}
 			} else {
 				if(count($einzelne_termine_gebaeude_raumliste)) {
-					print implode("/", $einzelne_termine_gebaeude_raumliste)." (siehe Details)";
+					$einzelne_termine_raeume = implode("/", $einzelne_termine_gebaeude_raumliste);
+					$einzelne_termine_raeume = preg_replace("/^\s*\//", "", $einzelne_termine_raeume);
+					$einzelne_termine_raeume = preg_replace("/\/\s*$/", "", $einzelne_termine_raeume);
+					print "$einzelne_termine_raeume (siehe Details)";
 				} else {
 					if($hinweis) {
 						print '<i class="">Kein&nbsp;Raum, evtl. siehe&nbsp;Details</i>';
