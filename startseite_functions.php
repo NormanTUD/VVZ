@@ -688,16 +688,24 @@
 	}
 
 	function show_raum_gebaeude ($raum_gebaeude, $hinweis, $id) {
+		$einzelne_termine_gebaeude_raumliste = get_einzelne_termine_gebaeude_raum_liste($id);
 ?>
 		<div class="small-3 columns text-right"><p>
 <?php
 			if($raum_gebaeude) {
 				print $raum_gebaeude;
+				if(count($einzelne_termine_gebaeude_raumliste)) {
+					print ", mehr siehe Details";
+				}
 			} else {
-				if($hinweis) {
-					print '<i class="">Kein&nbsp;Raum, evtl. siehe&nbsp;Details</i>';
+				if(count($einzelne_termine_gebaeude_raumliste)) {
+					print implode("/", $einzelne_termine_gebaeude_raumliste);
 				} else {
-					print '<i>Kein Raum</i>';
+					if($hinweis) {
+						print '<i class="">Kein&nbsp;Raum, evtl. siehe&nbsp;Details</i>';
+					} else {
+						print '<i>Kein Raum</i>';
+					}
 				}
 			}
 

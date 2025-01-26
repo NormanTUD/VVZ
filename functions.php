@@ -4539,6 +4539,21 @@ WHERE `id` = '.esc($id);
 		}
 	}
 
+	function get_einzelne_termine_gebaeude_raum_liste($id) {
+		$query = 'select g.abkuerzung as gebaeude_abkuerzung, r.raumnummer from einzelne_termine e left join raum r on e.raum_id = r.id left join gebaeude g on g.id = r.gebaeude_id  where veranstaltung_id = '.esc($id).
+			"group by r.id";
+		$result = rquery($query);
+
+		$data = array();
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			$data[] = $row["gebaeude_abkuerzung"]." ".$row["raumnummer"];
+		}
+
+		return $data;
+	}
+
+
 	function get_einzelne_termine_by_veranstaltung_id ($id) {
 		$query = 'select year(e.start) as start_year, month(e.start) as start_month, day(e.start) as start_day, hour(e.start) as start_hour, minute(e.start) as start_minute, year(e.end) as end_year, month(e.end) as end_month, day(e.end) as end_day, hour(e.end) as end_hour, minute(e.end) as end_minute, g.id as gebaeude_id, g.name as gebaeude_name, r.raumnummer, r.id as raum_id, g.abkuerzung as gebaeude_abkuerzung, dayname(e.start) as day_start, dayname(e.end) as day_end from einzelne_termine e left join raum r on e.raum_id = r.id left join gebaeude g on g.id = r.gebaeude_id  where veranstaltung_id = '.esc($id);
 		$result = rquery($query);
