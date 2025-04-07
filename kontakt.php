@@ -52,7 +52,9 @@
 		}
 		if(get_post('frage_id') && array_key_exists(get_post('frage_id'), $sicherheitsfragen) && $sicherheitsfrage_bestanden) {
 			if(strlen(get_post('nachricht')) >= 5) {
-				$headers = '';
+				$headers = "MIME-Version: 1.0" . "\r\n";
+				$headers .= "Content-Type: text/plain; charset=UTF-8" . "\r\n";
+				$headers .= "From: " . $GLOBALS["from_email"] . "\r\n";  // Ersetze durch deine Absenderadresse
 
 				$to_name = $GLOBALS['admin_name'];
 				$to = $GLOBALS['admin_email'];
@@ -85,7 +87,7 @@
 				}
 				$message .= "Email: ".htmlentities(get_post('email'))."\n\n";
 				$message .= "Nachricht ===============================\n";
-				$message .= htmlentities(get_post('nachricht'))."\n";
+				$message .= strip_tags(get_post('nachricht'))."\n";
 				$message .= "========================== Nachricht Ende\n";
 
 				$headers .= "From:" . $GLOBALS['from_email']."\r\n";
