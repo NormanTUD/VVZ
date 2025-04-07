@@ -54,7 +54,6 @@
 			if(strlen(get_post('nachricht')) >= 5) {
 				$headers = "MIME-Version: 1.0" . "\r\n";
 				$headers .= "Content-Type: text/plain; charset=UTF-8" . "\r\n";
-				$headers .= "From: " . $GLOBALS["from_email"] . "\r\n";  // Ersetze durch deine Absenderadresse
 
 				$to_name = $GLOBALS['admin_name'];
 				$to = $GLOBALS['admin_email'];
