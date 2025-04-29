@@ -5585,7 +5585,7 @@ INSERT INTO
 	function user_is_superdozent ($user) {
 		$superdozent_role_id = get_role_id('Superdozent');
 		$verwalter_role_id = get_role_id('Verwalter');
-		$raumplanungsdozent_role_id = get_role_id('Dozent, Raumplanung');
+		$raumplanungsdozent_role_id = get_role_id('Raumplanungsverwalter');
 
 		$this_user_role_id = get_role_id_by_user($user);
 
@@ -5599,7 +5599,7 @@ INSERT INTO
 	function get_user_per_superdozent ($user) {
 		$dozenten_liste = array();
 
-		$raumplanungsdozent_role_id = get_role_id('Dozent, Raumplanung');
+		$raumplanungsdozent_role_id = get_role_id('Raumplanungsverwalter');
 
 		$this_user_role_id = get_role_id_by_user($user);
 
