@@ -15,7 +15,7 @@
 			$valid_to_edit_dozenten[] = $GLOBALS['user_dozent_id'];
 		}
 
-		$raumplanungsdozent_role_id = get_role_id('Dozent, Raumplanung');
+		$raumplanungsdozent_role_id = get_role_id('Raumplanungsverwalter');
 		$this_user_role_id = get_role_id_by_user($GLOBALS["logged_in_user_id"]);
 
 		if($this_user_role_id == $raumplanungsdozent_role_id) {
