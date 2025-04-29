@@ -4577,7 +4577,7 @@ WHERE `id` = '.esc($id);
 			$name = array_key_exists("name", $item) ? $item["name"] : $col;
 
 			$this_eval = "
-				\${$varname}_check = value_fits_into_db_column('$db', '$table', '${col}', \$$varname, '$name');
+				\${$varname}_check = value_fits_into_db_column('{$db}', '{$table}', '{$col}', \${$varname}, '{$name}');
 				if(\${$varname}_check['ok'] == 1) {
 					if(array_key_exists('error', \${$varname}_check)) {
 						error(\${$varname}_check['error']);
@@ -4596,7 +4596,7 @@ WHERE `id` = '.esc($id);
 					\${$varname} = null;
 				}
 
-				if(array_key_exists('cannot_continue', \$${varname}_check)) {
+				if(array_key_exists('cannot_continue', \${$varname}_check)) {
 					return;
 				}
 			";
