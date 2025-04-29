@@ -4577,23 +4577,23 @@ WHERE `id` = '.esc($id);
 			$name = array_key_exists("name", $item) ? $item["name"] : $col;
 
 			$this_eval = "
-				$${varname}_check = value_fits_into_db_column('$db', '$table', '${col}', \$$varname, '$name');
-				if($${varname}_check['ok'] == 1) {
-					if(array_key_exists('error', $${varname}_check)) {
-						error($${varname}_check['error']);
+				\${$varname}_check = value_fits_into_db_column('$db', '$table', '${col}', \$$varname, '$name');
+				if(\${$varname}_check['ok'] == 1) {
+					if(array_key_exists('error', \${$varname}_check)) {
+						error(\${$varname}_check['error']);
 					}
-					if(array_key_exists('warning', $${varname}_check)) {
-						warning($${varname}_check['warning']);
+					if(array_key_exists('warning', \${$varname}_check)) {
+						warning(\${$varname}_check['warning']);
 					}
-					$${varname} = \$${varname}_check['value'];
+					\${$varname} = \${$varname}_check['value'];
 				} else {
-					if(array_key_exists('error', $${varname}_check)) {
-						error($${varname}_check['error']);
+					if(array_key_exists('error', \${$varname}_check)) {
+						error(\${$varname}_check['error']);
 					}
-					if(array_key_exists('warning', $${varname}_check)) {
-						warning($${varname}_check['warning']);
+					if(array_key_exists('warning', \${$varname}_check)) {
+						warning(\${$varname}_check['warning']);
 					}
-					$${varname} = null;
+					\${$varname} = null;
 				}
 
 				if(array_key_exists('cannot_continue', \$${varname}_check)) {
