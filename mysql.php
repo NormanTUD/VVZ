@@ -579,10 +579,10 @@
 				dier("Kann nicht zur Datenbank verbinden!");
 			}
 		} else {
-			die("Die Passwortdatei war leer bzw. das Passwort war nicht in der ersten Zeile.");
+			die("Die Passwortdatei war leer bzw. das Passwort war nicht in der ersten Zeile.\n");
 		}
 	} else {
-		die("Die Verbindung zur Datenbank konnte nicht hergestellt werden (falsches oder kein Passwort)");
+		die("Die Verbindung zur Datenbank konnte nicht hergestellt werden (falsches oder kein Passwort).\n");
 	}
 
 
