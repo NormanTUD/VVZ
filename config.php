@@ -56,7 +56,7 @@
 				stderrw("debug logs is no dir");
 			}
 
-			http_response_code(500);
+			#http_response_code(500);
 			if(might_be_query($data)) {
 				$sql = 1;
 			}
