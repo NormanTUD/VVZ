@@ -5585,10 +5585,11 @@ INSERT INTO
 	function user_is_superdozent ($user) {
 		$superdozent_role_id = get_role_id('Superdozent');
 		$verwalter_role_id = get_role_id('Verwalter');
+		$raumplanungsdozent_role_id = get_role_id('Dozent, Raumplanung');
 
 		$this_user_role_id = get_role_id_by_user($user);
 
-		if($this_user_role_id == $superdozent_role_id || $this_user_role_id == $verwalter_role_id) {
+		if($this_user_role_id == $superdozent_role_id || $this_user_role_id == $verwalter_role_id || $this_user_role_id == $raumplanungsdozent_role_id) {
 			return 1;
 		} else {
 			return 0;
@@ -5598,7 +5599,15 @@ INSERT INTO
 	function get_user_per_superdozent ($user) {
 		$dozenten_liste = array();
 
-		$query = 'SELECT `dozent_id` FROM `superdozent` WHERE `user_id` = '.esc($user);
+		$raumplanungsdozent_role_id = get_role_id('Dozent, Raumplanung');
+
+		$this_user_role_id = get_role_id_by_user($user);
+
+		$query = 'SELECT `dozent_id` FROM `superdozent`';
+		if($this_user_role_id != $raumplanungsdozent_role_id) {
+			$query .= ' WHERE `user_id` = '.esc($user);
+		}
+
 		$result = rquery($query);
 
 		while ($row = mysqli_fetch_row($result)) {
