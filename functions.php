@@ -6879,7 +6879,7 @@ INSERT INTO
 		$enum = NULL;
 		while ($row = mysqli_fetch_row($result)) {
 			preg_match('#^enum\((.*?)\)$#ism', $row[1], $matches);
-			$enum = str_getcsv($matches[1], ",", "'");
+			$enum = str_getcsv($matches[1], ",", "'", "\\");
 		}
 		return $enum;
 	}
