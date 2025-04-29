@@ -62,7 +62,7 @@ function apt_get_upgrade {
 }
 
 function install_apache {
-	apt-get install curl unzip ca-certificates apt-transport-https lsb-release gnupg apache2 -y
+	apt-get install curl unzip ca-certificates apt-transport-https lsb-release gnupg apache2 libapache2-mod-php php-mysql -y
 }
 
 function install_php {
