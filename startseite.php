@@ -49,7 +49,7 @@
 				</div>
 			</div>
 <?php
-			$page_str .= "<center><h2 id='vvz'>Das Vorlesungsverzeichnis:</h2></center>";
+			$page_str = "<center><h2 id='vvz'>Das Vorlesungsverzeichnis:</h2></center>";
 			$page_str .= "Sind Sie auf der Suche nach einer Software, die sowohl für Sie als auch Ihre Studierenden zeitsparend ist? Möchten Sie nicht mehr manuell Excel-Dateien herumsenden, um Vorlesungen und Prüfung zu verwalten, die man dann mühsam zusammenfügen muss? Würden Sie gerne die angebotenen Prüfungen an das Prüfungsamt melden, diese fordern es im Excel-Format?<br>";
 			$page_str .= "<br>";
 			$page_str .= "Auch der Raumplanungsprozess und die Abstimmungen mit den Raumplanungsdezernaten ist hier abgebildet und einfach, aus dem Browser heraus, möglich.<br>";
