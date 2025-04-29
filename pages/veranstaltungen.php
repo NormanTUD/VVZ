@@ -15,6 +15,16 @@
 			$valid_to_edit_dozenten[] = $GLOBALS['user_dozent_id'];
 		}
 
+		$raumplanungsdozent_role_id = get_role_id('Dozent, Raumplanung');
+		$this_user_role_id = get_role_id_by_user($GLOBALS["logged_in_user_id"]);
+
+		if($this_user_role_id == $raumplanungsdozent_role_id) {
+			$alle_dozenten = get_dozent_array();
+			foreach ($alle_dozenten as $alle_dozenten_id => $alle_dozenten_value) {
+				$valid_to_edit_dozenten[] = $alle_dozenten_id;
+			}
+		}
+
 		foreach (get_user_per_superdozent($GLOBALS['logged_in_user_id']) as $superuser_item => $superuser_id) {
 			$valid_to_edit_dozenten[] = $superuser_id[0];
 		}
@@ -36,6 +46,7 @@
 		if($is_superdozent) {
 			$dozenten = create_dozenten_by_ids_array($valid_to_edit_dozenten);
 		}
+
 		$veranstaltungstypen = create_veranstaltungstyp_abkuerzung_array();
 		$institute = create_institute_array();
 		$semester = create_semester_array_short();
