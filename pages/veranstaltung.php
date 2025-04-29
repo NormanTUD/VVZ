@@ -44,7 +44,10 @@
 			$dozent_id = get_dozent_id_by_veranstaltung_id($veranstaltung_id);
 			$this_institut_id = get_institut_id_by_veranstaltung_id($veranstaltung_id);
 
-			if($dozent_id == $GLOBALS['user_dozent_id'] || $GLOBALS['user_role_id'] == 1 || in_array($dozent_id, $valid_to_edit_dozenten)) {
+			$raumplanungsdozent_role_id = get_role_id('Dozent, Raumplanung');
+			$this_user_role_id = get_role_id_by_user($GLOBALS["logged_in_user_id"]);
+
+			if($dozent_id == $GLOBALS['user_dozent_id'] || $GLOBALS['user_role_id'] == 1 || in_array($dozent_id, $valid_to_edit_dozenten) || $raumplanungsdozent_role_id == $this_user_role_id) {
 					if(count($studiengaenge)) {
 ?>
 				<h2>Veranstaltung &raquo;<?php print htmlentities(get_veranstaltungsname_by_id($veranstaltung_id)); ?>&laquo;<?php
