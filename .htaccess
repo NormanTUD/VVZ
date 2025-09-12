@@ -35,4 +35,5 @@ AddDefaultCharset UTF-8
 	Redirect 301 ^/v/$ /
 
 	RedirectMatch 404 /\.git
+	RedirectMatch 404 /\install.sh
 </IfModule>
