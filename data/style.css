@@ -1,6 +1,8 @@
 body {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
+	opacity: 0;
+	animation: bodyFadeIn 1s ease forwards;
 }
 
 table {
@@ -1225,4 +1227,9 @@ a, a:visited, a:hover, a:active {
 
 .row {
 	max-width: unset !important;
+}
+
+@keyframes bodyFadeIn {
+	from { opacity: 0; }
+	to { opacity: 1; }
 }
