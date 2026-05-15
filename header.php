@@ -668,6 +668,273 @@
 				opacity: 1;
 				transform: rotate(0deg) scale(1);
 			}
+/* ============================================================
+   DARK MODE — TABLES (COMPLETE)
+   thead, tbody, tfoot, striped, bordered, hover, captions
+   ============================================================ */
+
+/* --- TABLE BASE --- */
+html.dark-mode table {
+	background-color: #16213e !important;
+	color: #e0e0e0 !important;
+	border-color: #2a2a4a !important;
+}
+
+html.dark-mode table caption {
+	color: #aaa !important;
+	padding: 8px 0 !important;
+}
+
+/* --- THEAD --- */
+html.dark-mode table thead,
+html.dark-mode table thead tr {
+	background-color: #0f2940 !important;
+	color: #fff !important;
+	border-color: #3a3a5a !important;
+}
+
+html.dark-mode table thead th,
+html.dark-mode table thead td {
+	background-color: #0f2940 !important;
+	color: #fff !important;
+	border-color: #3a3a5a !important;
+	border-bottom: 2px solid #4a6fa5 !important;
+	padding: 10px 8px !important;
+	font-weight: bold !important;
+}
+
+/* --- TBODY --- */
+html.dark-mode table tbody {
+	background-color: transparent !important;
+}
+
+html.dark-mode table tbody tr {
+	background-color: #16213e !important;
+	color: #e0e0e0 !important;
+	border-color: #2a2a4a !important;
+	transition: background-color 0.2s ease !important;
+}
+
+html.dark-mode table tbody td {
+	background-color: inherit !important;
+	color: #e0e0e0 !important;
+	border-color: #2a2a4a !important;
+	padding: 8px !important;
+}
+
+html.dark-mode table tbody th {
+	background-color: #1a2d4a !important;
+	color: #ccd6e0 !important;
+	border-color: #2a2a4a !important;
+	font-weight: bold !important;
+}
+
+/* --- TFOOT --- */
+html.dark-mode table tfoot,
+html.dark-mode table tfoot tr {
+	background-color: #0f2940 !important;
+	color: #ccd6e0 !important;
+	border-color: #3a3a5a !important;
+}
+
+html.dark-mode table tfoot td,
+html.dark-mode table tfoot th {
+	background-color: #0f2940 !important;
+	color: #ccd6e0 !important;
+	border-color: #3a3a5a !important;
+	border-top: 2px solid #4a6fa5 !important;
+	padding: 10px 8px !important;
+	font-weight: bold !important;
+}
+
+/* --- STRIPED ROWS (alternating) --- */
+html.dark-mode table tbody tr:nth-child(even) {
+	background-color: #1a2744 !important;
+}
+
+html.dark-mode table tbody tr:nth-child(odd) {
+	background-color: #16213e !important;
+}
+
+/* --- HOVER STATE --- */
+html.dark-mode table tbody tr:hover {
+	background-color: #1e3a5f !important;
+	color: #7eb8ff !important;
+}
+
+html.dark-mode table tbody tr:hover td {
+	background-color: inherit !important;
+	color: inherit !important;
+}
+
+/* --- BORDERED TABLE --- */
+html.dark-mode table[border],
+html.dark-mode table.bordered,
+html.dark-mode table.table-bordered {
+	border: 1px solid #3a3a5a !important;
+}
+
+html.dark-mode table[border] td,
+html.dark-mode table[border] th,
+html.dark-mode table.bordered td,
+html.dark-mode table.bordered th,
+html.dark-mode table.table-bordered td,
+html.dark-mode table.table-bordered th {
+	border: 1px solid #3a3a5a !important;
+}
+
+/* --- TABLE GROUP DIVIDERS (between thead/tbody/tfoot) --- */
+html.dark-mode table tbody + tbody {
+	border-top: 3px solid #4a6fa5 !important;
+}
+
+html.dark-mode table thead + tbody {
+	border-top: none !important;
+}
+
+/* --- COLGROUP / COL --- */
+html.dark-mode table colgroup,
+html.dark-mode table col {
+	background-color: transparent !important;
+}
+
+/* --- SELECTED / ACTIVE ROW --- */
+html.dark-mode table tbody tr.active,
+html.dark-mode table tbody tr.selected,
+html.dark-mode table tbody tr[class*="active"],
+html.dark-mode table tbody tr[class*="selected"] {
+	background-color: #1a3a5f !important;
+	color: #fff !important;
+}
+
+/* --- STATUS ROWS (colored rows) --- */
+html.dark-mode table tbody tr.success,
+html.dark-mode table tbody tr.table-success {
+	background-color: #1b4332 !important;
+	color: #a3d9b1 !important;
+}
+
+html.dark-mode table tbody tr.danger,
+html.dark-mode table tbody tr.table-danger,
+html.dark-mode table tbody tr.error {
+	background-color: #4a1e1e !important;
+	color: #f5a5a5 !important;
+}
+
+html.dark-mode table tbody tr.warning,
+html.dark-mode table tbody tr.table-warning {
+	background-color: #4a3a1e !important;
+	color: #f5d5a5 !important;
+}
+
+html.dark-mode table tbody tr.info,
+html.dark-mode table tbody tr.table-info {
+	background-color: #1e3a4a !important;
+	color: #a5d5f5 !important;
+}
+
+/* --- EMPTY TABLE / NO DATA --- */
+html.dark-mode table tbody tr.empty td,
+html.dark-mode table tbody td.dataTables_empty,
+html.dark-mode table tbody td[colspan] {
+	color: #888 !important;
+	background-color: #1a1a2e !important;
+}
+
+/* --- RESPONSIVE TABLE WRAPPER --- */
+html.dark-mode .table-responsive,
+html.dark-mode .table-scroll,
+html.dark-mode .table-wrapper {
+	background-color: #16213e !important;
+	border-color: #3a3a5a !important;
+}
+
+/* --- SORTABLE TABLE HEADERS --- */
+html.dark-mode table thead th[class*="sort"],
+html.dark-mode table thead th.sorting,
+html.dark-mode table thead th.sorting_asc,
+html.dark-mode table thead th.sorting_desc {
+	background-color: #0f2940 !important;
+	color: #fff !important;
+}
+
+html.dark-mode table thead th.sorting_asc {
+	border-bottom-color: #7eb8ff !important;
+}
+
+html.dark-mode table thead th.sorting_desc {
+	border-bottom-color: #ff7e7e !important;
+}
+
+html.dark-mode table thead th:hover {
+	background-color: #1a3a5f !important;
+	color: #7eb8ff !important;
+	cursor: pointer;
+}
+
+/* --- COMPACT / CONDENSED TABLE --- */
+html.dark-mode table.compact td,
+html.dark-mode table.compact th,
+html.dark-mode table.condensed td,
+html.dark-mode table.condensed th {
+	padding: 4px 6px !important;
+}
+
+/* --- FIXED HEADER TABLE --- */
+html.dark-mode table thead.fixed-header th,
+html.dark-mode table.sticky-header thead th {
+	background-color: #0f2940 !important;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* --- YOUR CUSTOM TABLE CLASSES --- */
+html.dark-mode .stundenplan {
+	background-color: #16213e !important;
+}
+
+html.dark-mode .stundenplan td,
+html.dark-mode .stundenplan_td {
+	background-color: #1a2744 !important;
+	color: #e0e0e0 !important;
+	border-color: #3a3a5a !important;
+}
+
+html.dark-mode .raumplanungtable {
+	background-color: #16213e !important;
+	color: #e0e0e0 !important;
+}
+
+html.dark-mode .raumplanungtable td,
+html.dark-mode .raumplanungtable th {
+	border-color: #3a3a5a !important;
+}
+
+html.dark-mode .veranstaltungen_table {
+	background-color: #16213e !important;
+}
+
+html.dark-mode .veranstaltungen_table td,
+html.dark-mode .veranstaltungen_table th {
+	border-color: #3a3a5a !important;
+	color: #e0e0e0 !important;
+}
+
+/* --- BACKGROUND COLOR CLASSES USED IN TABLES --- */
+html.dark-mode .background_color_006092,
+html.dark-mode .background_color_003377_color_white {
+	background-color: #0a3050 !important;
+	color: #fff !important;
+}
+
+html.dark-mode .background_color_225599_color_white {
+	background-color: #1a3a6a !important;
+	color: #fff !important;
+}
+
+html.dark-mode .bg_225599_ddaa66 {
+	background-color: #1a3a6a !important;
+	color: #ddaa66 !important;
+}
 		</style>
 	</head>
 <body>
