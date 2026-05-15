@@ -7,10 +7,19 @@
 
 	$fn = get_logo_filename();
 
-	header("Content-type: image/png");
-	if($fn == "tudlogo.png" || $fn == "default_logo.png") {
+	// Check if the specific TUD logo is requested and if the SVG version exists
+	if ($fn == "tudlogo.png" && file_exists("tudlogo.svg")) {
+		header("Content-type: image/svg+xml");
+		readfile("tudlogo.svg");
+	} 
+	// Fallback for the PNG versions
+	elseif ($fn == "tudlogo.png" || $fn == "default_logo.png") {
+		header("Content-type: image/png");
 		readfile($fn);
-	} else {
+	} 
+	// Default behavior for other filenames
+	else {
+		header("Content-type: text/plain");
 		print $fn;
 	}
 ?>
