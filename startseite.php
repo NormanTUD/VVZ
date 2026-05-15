@@ -104,7 +104,7 @@
 						$desc = "<img height=100 src='logo.php?kunde_id=".htmlentities($kunde_id)."' />";
 					}
 
-					$str_contents .= "<li class='display_inline'><a target='_blank' href='$urlname/'>$desc</a></li>";
+					$str_contents .= "<li class='display_inline'><a target='_blank' href='".htmlentities($urlname)."/'>$desc</a></li>";
 				}
 			}
 
