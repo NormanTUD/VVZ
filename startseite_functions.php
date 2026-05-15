@@ -1546,7 +1546,7 @@
 		if(count($GLOBALS['institute']) >= 2) {
 ?>
 			<form method="get">
-				<p class="text-center"><?php create_select($GLOBALS['institute'], $GLOBALS['this_institut'], 'institut'); ?></p>
+				<p class="text-center"><?php create_select($GLOBALS['institute'], $GLOBALS['this_institut'], 'institut', 0, 0, "institut-input", 1);; ?></p>
 <?php
 				if(array_key_exists('studiengang', $_GET)) {
 ?>
