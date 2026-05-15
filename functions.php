@@ -2121,13 +2121,28 @@ declare(ticks=1);
 
 	// http://stackoverflow.com/questions/10038236/php-htmlentities-allow-b-and-i-only
 	function strip_tags_attributes( $str, 
-		$allowedTags = array('<a>','<b>','<blockquote>','<br>','<cite>','<code>','<del>','<div>','<em>','<ul>','<ol>','<li>','<dl>','<dt>','<dd>','<img>','<ins>','<u>','<q>','<h3>','<h4>','<h5>','<h6>','<samp>','<strong>','<sub>','<sup>','<p>','<table>','<tr>','<td>','<th>','<pre>','<span>'), 
-		$disabledEvents = array('onclick','ondblclick','onkeydown','onkeypress','onkeyup','onload','onmousedown','onmousemove','onmouseout','onmouseover','onmouseup','onunload') )
+	    $allowedTags = array('<a>','<b>','<blockquote>','<br>','<cite>','<code>','<del>','<div>','<em>','<ul>','<ol>','<li>','<dl>','<dt>','<dd>','<img>','<ins>','<u>','<q>','<h3>','<h4>','<h5>','<h6>','<samp>','<strong>','<sub>','<sup>','<p>','<table>','<tr>','<td>','<th>','<pre>','<span>'), 
+	    $disabledEvents = array('onclick','ondblclick','onkeydown','onkeypress','onkeyup','onload','onmousedown','onmousemove','onmouseout','onmouseover','onmouseup','onunload') )
 	{       
 		if( empty($disabledEvents) ) {
 			return strip_tags($str, implode('', $allowedTags));
 		}
-		return preg_replace('/<(.*?)>/ies', "'<' . preg_replace(array('/javascript:[^\"\']*/i', '/(" . implode('|', $disabledEvents) . ")=[\"\'][^\"\']*[\"\']/i', '/\s+/'), array('', '', ' '), stripslashes('\\1')) . '>'", strip_tags($str, implode('', $allowedTags)));
+		return preg_replace_callback(
+			'/<(.*?)>/is',
+			function($matches) use ($disabledEvents) {
+				$cleaned = preg_replace(
+					array(
+						'/javascript:[^\"\']*/i',
+						'/(' . implode('|', $disabledEvents) . ')=[\"\'][^\"\']*[\"\']/i',
+						'/\s+/'
+					),
+					array('', '', ' '),
+					$matches[1]
+				);
+				return '<' . $cleaned . '>';
+			},
+			strip_tags($str, implode('', $allowedTags))
+		);
 	}
 
 	function my_mysqli_real_escape_string ($arg) {
