@@ -97,7 +97,6 @@
 				"jquery-ui-timepicker-addon.css"
 			));
 
-			// Dark mode CSS files
 			css(array(
 				"data/style_darkmode.css",
 				"data/styles_darkmode.css",
@@ -144,7 +143,7 @@
 
 		js(array("color-hash.js"));
 ?>
-		<!-- Anti-FOUC: Apply dark mode instantly before paint -->
+		<!-- Anti-FOUC: Apply dark mode class to <html> before anything renders -->
 		<script>
 			(function() {
 				var stored = localStorage.getItem('darkModeEnabled');
@@ -154,8 +153,8 @@
 			})();
 		</script>
 
-		<!-- Dark mode toggle button styles (inline to avoid extra request) -->
 		<style>
+			/* Toggle button styles */
 			.dark-mode-toggle {
 				position: fixed;
 				top: 10px;
@@ -170,7 +169,7 @@
 				align-items: center;
 				justify-content: center;
 				border-radius: 50%;
-				opacity: 0.45;
+				opacity: 0.4;
 				transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
 				padding: 0;
 				font-size: 18px;
@@ -206,27 +205,78 @@
 				transform: rotate(-90deg) scale(0.5);
 			}
 
+			/* When dark-mode is on html OR body, swap icons */
+			html.dark-mode .dark-mode-toggle .toggle-icon.sun,
 			body.dark-mode .dark-mode-toggle .toggle-icon.sun {
 				opacity: 0;
 				transform: rotate(90deg) scale(0.5);
 			}
 
+			html.dark-mode .dark-mode-toggle .toggle-icon.moon,
 			body.dark-mode .dark-mode-toggle .toggle-icon.moon {
 				opacity: 1;
 				transform: rotate(0deg) scale(1);
 			}
 		</style>
 	</head>
-<body>
+<body<?php if(isset($_COOKIE['darkModeEnabled']) || (isset($GLOBALS['dark_mode']) && $GLOBALS['dark_mode'])) { /* optional server-side hint */ } ?>>
 
-<!-- Dark Mode Toggle — subtle, top-right, non-intrusive -->
+<!-- Dark Mode Toggle -->
 <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dunkelmodus umschalten" title="Hell/Dunkel umschalten">
 	<span class="toggle-icon sun">☀️</span>
 	<span class="toggle-icon moon">🌙</span>
 </button>
 
-<!-- Dark mode JS -->
-<script src="data/darkmode.js"></script>
+<!-- 
+	CRITICAL: This inline script runs immediately after <body> opens.
+	It syncs the dark-mode class from <html> to <body> AND sets up the click handler.
+	Do NOT move this to an external file or to end of body.
+-->
+<script>
+(function() {
+	// 1. Sync: if <html> has dark-mode (set by anti-FOUC), apply to <body> immediately
+	if (document.documentElement.classList.contains('dark-mode')) {
+		document.body.classList.add('dark-mode');
+	}
+
+	// 2. Set up click handler right now (button already exists above this script)
+	var btn = document.getElementById('darkModeToggle');
+	if (btn) {
+		btn.addEventListener('click', function() {
+			var isDarkNow = document.body.classList.contains('dark-mode');
+
+			if (isDarkNow) {
+				// Switch to light
+				document.body.classList.remove('dark-mode');
+				document.documentElement.classList.remove('dark-mode');
+				localStorage.setItem('darkModeEnabled', 'false');
+			} else {
+				// Switch to dark
+				document.body.classList.add('dark-mode');
+				document.documentElement.classList.add('dark-mode');
+				localStorage.setItem('darkModeEnabled', 'true');
+			}
+		});
+	}
+
+	// 3. Listen for system preference changes (only if no manual choice saved)
+	if (window.matchMedia) {
+		try {
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+				if (localStorage.getItem('darkModeEnabled') === null) {
+					if (e.matches) {
+						document.body.classList.add('dark-mode');
+						document.documentElement.classList.add('dark-mode');
+					} else {
+						document.body.classList.remove('dark-mode');
+						document.documentElement.classList.remove('dark-mode');
+					}
+				}
+			});
+		} catch(err) {}
+	}
+})();
+</script>
 
 <!--
 <span id="help_icon">
