@@ -410,11 +410,6 @@
 			$where .= '`veranstaltungstyp_id` = '.esc(get_get('veranstaltungstyp_id'));
 		}
 
-		if(get_get('dozent')) {
-			if($where) { $where .= " AND "; }
-			$where .= '`dozent_id` = '.esc(get_get('dozent'));
-		}
-
 		if(get_get('wochentag')) {
 			if($where) { $where .= " AND "; }
 			$where .= '`wochentag` = '.esc(get_get('wochentag'));
@@ -1635,7 +1630,6 @@
 				<input type="hidden" value="1" name="stundenplan_to_be_created" />
 				<input type="hidden" value="<?php print htmlentities(get_get('bereich') ?? ""); ?>" name="bereich" />
 				<input type="hidden" value="<?php print htmlentities($GLOBALS['this_institut'] ?? ""); ?>" name="institut" />
-				<input type="hidden" value="<?php print htmlentities($GLOBALS['this_semester'][0] ?? ""); ?>" name="semester" />
 				<input type="hidden" value="<?php print htmlentities(get_get('semester') ?? ""); ?>" name="semester" />
 <?php
 				show_auswaehlbare_veranstaltungen_stuff();

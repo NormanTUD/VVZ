@@ -405,7 +405,7 @@
 			} else {
 				if(!get_get('create_stundenplan')) {
 ?>
-					<script nonce=<?php print($GLOBALS['nonce']); ?> >
+					<script nonce="<?php print($GLOBALS['nonce']); ?>">
 						document.onkeypress = function (e) {
 							e = e || window.event;
 

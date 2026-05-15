@@ -1982,7 +1982,7 @@ declare(ticks=1);
 			return null;
 		}
 
-		$data = split('-', $str);
+		$data = explode('-', $str);
 		$year = $data[0];
 		$month = $data[1];
 		$day = $data[2];
