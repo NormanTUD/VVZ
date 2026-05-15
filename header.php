@@ -97,12 +97,6 @@
 				"jquery-ui-timepicker-addon.css"
 			));
 
-			css(array(
-				"data/style_darkmode.css",
-				"data/styles_darkmode.css",
-				"data/admin_darkmode.css"
-			));
-
 			js(array(
 				"jquery-3.6.1.min.js",
 				"jquery-ui.js",
@@ -142,6 +136,13 @@
 		css("toastr.min.css");
 
 		js(array("color-hash.js"));
+
+		// DARK MODE CSS — LOADED LAST to guarantee override of all above stylesheets
+		css(array(
+			"data/admin_darkmode.css",
+			"data/styles_darkmode.css",
+			"data/style_darkmode.css"
+		));
 ?>
 		<!-- Anti-FOUC: Apply dark mode class to <html> before anything renders -->
 		<script>
@@ -205,7 +206,6 @@
 				transform: rotate(-90deg) scale(0.5);
 			}
 
-			/* When dark-mode is on html OR body, swap icons */
 			html.dark-mode .dark-mode-toggle .toggle-icon.sun,
 			body.dark-mode .dark-mode-toggle .toggle-icon.sun {
 				opacity: 0;
@@ -219,15 +219,15 @@
 			}
 		</style>
 	</head>
-<body<?php if(isset($_COOKIE['darkModeEnabled']) || (isset($GLOBALS['dark_mode']) && $GLOBALS['dark_mode'])) { /* optional server-side hint */ } ?>>
+<body>
 
-<!-- Dark Mode Toggle -->
+<!-- Dark Mode Toggle — subtle, top-right, non-intrusive -->
 <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dunkelmodus umschalten" title="Hell/Dunkel umschalten">
 	<span class="toggle-icon sun">☀️</span>
 	<span class="toggle-icon moon">🌙</span>
 </button>
 
-<!-- 
+<!--
 	CRITICAL: This inline script runs immediately after <body> opens.
 	It syncs the dark-mode class from <html> to <body> AND sets up the click handler.
 	Do NOT move this to an external file or to end of body.

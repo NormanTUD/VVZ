@@ -1,55 +1,41 @@
-body {
-	background-image: url("adminbg.jpg");
-	background-position: top;
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-	background-size: cover;
-	transition: background-color 0.4s ease, color 0.4s ease;
+/* ===== DARK MODE — admin_darkmode.css ===== */
+
+html.dark-mode body {
+	background-color: #0f0f1a !important;
+	color: #e0e0e0 !important;
 }
 
-.blurbox {
-	background-color: #fff;
-	border: solid #ccc 2px;
-	border-radius: 10px;
-	margin: 10px 0 0 10px;
-	width: fit-content;
-	min-width: 99%;
-	opacity: 0.95;
-	transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+html.dark-mode .blurbox {
+	background-color: #1e1e3a !important;
+	border-color: #444 !important;
+	color: #e0e0e0 !important;
 }
 
-a {
-	text-decoration: none;
+html.dark-mode .blurbox a {
+	color: #7eb8ff !important;
 }
 
-#main {
-	margin: 10px;
+html.dark-mode .blurbox table {
+	color: #e0e0e0 !important;
 }
 
-#wrapper {
-	display: flex;
+html.dark-mode .blurbox td,
+html.dark-mode .blurbox th {
+	border-color: #444 !important;
 }
 
-#left {
-	flex: 0 0 65%;
+html.dark-mode .blurbox input[type="text"],
+html.dark-mode .blurbox input[type="password"],
+html.dark-mode .blurbox textarea,
+html.dark-mode .blurbox select {
+	background-color: #252540 !important;
+	color: #e0e0e0 !important;
+	border-color: #555 !important;
 }
 
-#right {
-	flex: 1;
-}
-
-/* ===== DARK MODE ===== */
-body.dark-mode {
-	background-color: #0f0f1a;
-	color: #e0e0e0;
-}
-
-body.dark-mode .blurbox {
-	background-color: #1e1e3a;
-	border-color: #444;
-	color: #e0e0e0;
-}
-
-body.dark-mode a {
-	color: #7eb8ff;
+html.dark-mode .blurbox h1,
+html.dark-mode .blurbox h2,
+html.dark-mode .blurbox h3,
+html.dark-mode .blurbox h4 {
+	color: #e0e0e0 !important;
 }
