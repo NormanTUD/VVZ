@@ -1428,23 +1428,29 @@ declare(ticks=1);
 		} else {
 			$tables = is_array($tables) ? $tables : explode(',', $tables);
 		}
-		
+
 		$return = "SET FOREIGN_KEY_CHECKS=0;\n";
 		$return .= "DROP DATABASE `".$GLOBALS['dbname']."`;\n";
 		$return .= "CREATE DATABASE `".$GLOBALS['dbname']."`;\n";
 		$return .= "USE `".$GLOBALS['dbname']."`;\n";
 
 		foreach(sort_tables($tables) as $table) {
-			$result = rquery('SELECT * FROM '.$table);
+			// Validate table name to prevent SQL injection
+			if(!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+				error('Invalid table name detected: ' . htmlentities($table) . '. Skipping.');
+				continue;
+			}
+
+			$result = rquery('SELECT * FROM `' . $table . '`');
 			$num_fields = mysqli_field_count($GLOBALS['dbh']);
 
 			$this_return = '';
-			
+
 			$row2 = show_create_table($GLOBALS['dbname'], $table);
 			if(preg_match('/^CREATE TABLE/i', $row2[1])) {
-				$this_return .= 'DROP TABLE IF EXISTS '.$table.';';
+				$this_return .= 'DROP TABLE IF EXISTS `'.$table.'`;';
 			} else {
-				$this_return .= 'DROP VIEW IF EXISTS '.$table.';';
+				$this_return .= 'DROP VIEW IF EXISTS `'.$table.'`;';
 			}
 
 			$this_return.= "\n\n".$row2[1].";\n\n";
@@ -1473,7 +1479,7 @@ declare(ticks=1);
 
 			$return .= "$this_return\n";
 		}
-		
+
 		$return .= "\n\n\nSET FOREIGN_KEY_CHECKS=1;\n";
 		return $return;
 	}
