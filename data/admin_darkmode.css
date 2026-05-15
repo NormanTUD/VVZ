@@ -1,0 +1,55 @@
+body {
+	background-image: url("adminbg.jpg");
+	background-position: top;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+	transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+.blurbox {
+	background-color: #fff;
+	border: solid #ccc 2px;
+	border-radius: 10px;
+	margin: 10px 0 0 10px;
+	width: fit-content;
+	min-width: 99%;
+	opacity: 0.95;
+	transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+}
+
+a {
+	text-decoration: none;
+}
+
+#main {
+	margin: 10px;
+}
+
+#wrapper {
+	display: flex;
+}
+
+#left {
+	flex: 0 0 65%;
+}
+
+#right {
+	flex: 1;
+}
+
+/* ===== DARK MODE ===== */
+body.dark-mode {
+	background-color: #0f0f1a;
+	color: #e0e0e0;
+}
+
+body.dark-mode .blurbox {
+	background-color: #1e1e3a;
+	border-color: #444;
+	color: #e0e0e0;
+}
+
+body.dark-mode a {
+	color: #7eb8ff;
+}

@@ -97,6 +97,13 @@
 				"jquery-ui-timepicker-addon.css"
 			));
 
+			// Dark mode CSS files
+			css(array(
+				"data/style_darkmode.css",
+				"data/styles_darkmode.css",
+				"data/admin_darkmode.css"
+			));
+
 			js(array(
 				"jquery-3.6.1.min.js",
 				"jquery-ui.js",
@@ -132,16 +139,95 @@
 <?php
 		}
 
-		#$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-		#file_get_contents("$actual_link/data/custom.php");
-
 		css("custom.php");
 		css("toastr.min.css");
 
 		js(array("color-hash.js"));
 ?>
+		<!-- Anti-FOUC: Apply dark mode instantly before paint -->
+		<script>
+			(function() {
+				var stored = localStorage.getItem('darkModeEnabled');
+				if (stored === 'true' || (stored === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+					document.documentElement.classList.add('dark-mode');
+				}
+			})();
+		</script>
+
+		<!-- Dark mode toggle button styles (inline to avoid extra request) -->
+		<style>
+			.dark-mode-toggle {
+				position: fixed;
+				top: 10px;
+				right: 14px;
+				z-index: 999999;
+				background: none;
+				border: none;
+				width: 32px;
+				height: 32px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+				opacity: 0.45;
+				transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+				padding: 0;
+				font-size: 18px;
+				line-height: 1;
+			}
+
+			.dark-mode-toggle:hover {
+				opacity: 1;
+				transform: scale(1.15);
+				background-color: rgba(128, 128, 128, 0.15);
+			}
+
+			.dark-mode-toggle:active {
+				transform: scale(0.9);
+			}
+
+			.dark-mode-toggle:focus {
+				outline: none;
+			}
+
+			.dark-mode-toggle .toggle-icon {
+				position: absolute;
+				transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+			}
+
+			.dark-mode-toggle .toggle-icon.sun {
+				opacity: 1;
+				transform: rotate(0deg) scale(1);
+			}
+
+			.dark-mode-toggle .toggle-icon.moon {
+				opacity: 0;
+				transform: rotate(-90deg) scale(0.5);
+			}
+
+			body.dark-mode .dark-mode-toggle .toggle-icon.sun {
+				opacity: 0;
+				transform: rotate(90deg) scale(0.5);
+			}
+
+			body.dark-mode .dark-mode-toggle .toggle-icon.moon {
+				opacity: 1;
+				transform: rotate(0deg) scale(1);
+			}
+		</style>
 	</head>
 <body>
+
+<!-- Dark Mode Toggle — subtle, top-right, non-intrusive -->
+<button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dunkelmodus umschalten" title="Hell/Dunkel umschalten">
+	<span class="toggle-icon sun">☀️</span>
+	<span class="toggle-icon moon">🌙</span>
+</button>
+
+<!-- Dark mode JS -->
+<script src="data/darkmode.js"></script>
+
 <!--
 <span id="help_icon">
 	<span onclick="help()"><?php print_help_icon(); ?></span>
