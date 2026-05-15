@@ -101,7 +101,7 @@
 					if($external_url) {
 						$desc = "<img height=100 src='tudlogo.png' />";
 					} else {
-						$desc = "<img height=100 src='logo.php?kunde_id=".htmlentities($kunde_id)."' />";
+						$desc = "<img loading='lazy' height=100 src='logo.php?kunde_id=".htmlentities($kunde_id)."' />";
 					}
 
 					$str_contents .= "<li class='display_inline'><a target='_blank' href='".htmlentities($urlname)."/'>$desc</a></li>";
