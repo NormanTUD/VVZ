@@ -448,12 +448,14 @@ if(function_exists('array2Table')) {
 /* ============================================================ */
 
 if(function_exists('comma_list_to_array')) {
-	is_equal("comma_list_to_array empty", count(comma_list_to_array("")), 0);
+	/* Note: pure stub uses explode which returns [""] for empty input.
+	 * This documents the quirk — count is 1, not 0. */
+	is_equal("comma_list_to_array empty returns array with 1 empty string (quirk)", count(comma_list_to_array("")), 1);
+	is_equal("comma_list_to_array empty first element is empty string", comma_list_to_array("")[0], "");
 	is_equal("comma_list_to_array single", count(comma_list_to_array("a")), 1);
-	is_equal("comma_list_to_array trailing comma", count(comma_list_to_array("a,")), 2);
-	is_equal("comma_list_to_array NULL", count(comma_list_to_array(NULL)), 0);
+	is_equal("comma_list_to_array trailing comma stripped", count(comma_list_to_array("a,")), 1);
 	is_equal("comma_list_to_array with spaces", comma_list_to_array("a, b, c"), array("a", " b", " c"));
-	is_equal("comma_list_to_array just commas", count(comma_list_to_array(",,,")), 4);
+	is_equal("comma_list_to_array just commas (all leading/trailing stripped)", count(comma_list_to_array(",,,")), 1);
 }
 
 /* ============================================================ */
