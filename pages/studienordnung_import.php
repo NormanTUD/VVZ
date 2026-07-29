@@ -657,8 +657,74 @@
 								error('Import-Eintrag konnte nicht angelegt werden.');
 								print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
 							} elseif($auto_commit) {
-								// Direkt committen
-								require_once __DIR__ . '/../pages/studienordnung_import_commit.php';
+								// Direkt committen: in $_POST umkopieren und Stage auf 'commit' setzen
+								$_POST = array();
+								$_POST['import_id'] = $import_id;
+								$_POST['create_pruefungsnummern'] = $create_pns;
+								$_POST['reuse'] = $reuse;
+								$mod_post = array();
+								foreach($modules as $idx => $m) {
+									$mod_post[$idx] = array(
+										'include' => 1,
+										'modulnummer' => $m['modulnummer'],
+										'name' => $m['name'],
+										'lp' => $m['lp'],
+										'sws' => $m['sws_total'],
+										'dauer_semester' => $m['dauer_semester'],
+										'pruefungstypen' => $m['pruefungstypen'] ?? array(),
+									);
+								}
+								$_POST['modules'] = $mod_post;
+								$_SERVER['REQUEST_METHOD'] = 'POST';
+
+								// Commit-Logik inline aufrufen (gleicher Code wie $stage === 'commit')
+								$commit_studiengang_id = $studiengang_id;
+								$commit_import_id = $import_id;
+								$commit_modules_post = $mod_post;
+								$commit_create_pns = $create_pns;
+
+								$imported_modules = 0;
+								$imported_pns = 0;
+								$seen_pns = array();
+
+								foreach($commit_modules_post as $idx => $m_post) {
+									if(empty($m_post['include'])) continue;
+									$modulnummer = trim((string)($m_post['modulnummer'] ?? ''));
+									$name = trim((string)($m_post['name'] ?? ''));
+									if($modulnummer === '' || $name === '') continue;
+
+									$beschreibung_parts = array();
+									if(isset($m_post['lp']) && $m_post['lp'] !== '') $beschreibung_parts[] = 'LP: '.(int)$m_post['lp'];
+									if(isset($m_post['sws']) && $m_post['sws'] !== '' && $m_post['sws'] !== null) $beschreibung_parts[] = 'SWS: '.(float)$m_post['sws'];
+									if(isset($m_post['dauer_semester']) && $m_post['dauer_semester'] !== '') $beschreibung_parts[] = 'Dauer: '.(int)$m_post['dauer_semester'].' Sem.';
+									$beschreibung = mb_substr(implode('; ', $beschreibung_parts), 0, 500);
+
+									rquery('INSERT INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($name).', '.esc($commit_studiengang_id).', '.esc($modulnummer).', '.esc($beschreibung).') ON DUPLICATE KEY UPDATE name=VALUES(name), beschreibung=VALUES(beschreibung)');
+
+									$mod_row = get_single_row_from_query('SELECT id FROM `modul` WHERE `studiengang_id` = '.esc($commit_studiengang_id).' AND `abkuerzung` = '.esc($modulnummer).' LIMIT 1');
+									if(!is_array($mod_row) || !isset($mod_row[0])) continue;
+									$modul_id = (int)$mod_row[0];
+									$imported_modules++;
+
+									if($commit_create_pns) {
+										$ptypes = isset($m_post['pruefungstypen']) && is_array($m_post['pruefungstypen']) ? $m_post['pruefungstypen'] : array('Klausurarbeit');
+										foreach($ptypes as $ptname) {
+											if(!$ptname) continue;
+											$pt_id = soi_ensure_pruefungstyp($ptname);
+											if(!$pt_id) continue;
+											$generated_nr = soi_generate_pruefungsnummer($modulnummer, $ptname, $m_post['lp'] ?? '', $seen_pns);
+											rquery('INSERT INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `modulbezeichnung`) VALUES ('.esc($generated_nr).', '.esc($modul_id).', '.esc($pt_id).', '.esc($modulnummer.' '.$name).')');
+											$pn_row = get_single_row_from_query('SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = '.esc($generated_nr).' LIMIT 1');
+											$pn_id = is_array($pn_row) && isset($pn_row[0]) ? (int)$pn_row[0] : null;
+											rquery('INSERT INTO `pruefungsnummer_import` (import_id, modul_id, pruefungsnummer_id, generated_nr, pruefungstyp_name, lp) VALUES ('.esc($commit_import_id).', '.esc($modul_id).', '.esc($pn_id).', '.esc($generated_nr).', '.esc($ptname).', '.esc($m_post['lp'] ?? null).')');
+											$imported_pns++;
+										}
+									}
+								}
+
+								rquery('UPDATE `studienordnung_import` SET `modules_imported` = '.esc($imported_modules).', `pruefungsnummern_imported` = '.esc($imported_pns).' WHERE `id` = '.esc($commit_import_id));
+								success('Import (auto-commit) abgeschlossen: '.$imported_modules.' Modul(e), '.$imported_pns.' Prüfungsnummer(n) angelegt.');
+								print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück zur Übersicht</a> &middot; <a href="admin?page='.$GLOBALS['this_page_number'].'&stage=detail&id='.$commit_import_id.'">Details ansehen</a></p>';
 							} else {
 								// In Session ablegen, damit der User die Vorschau bearbeiten kann
 								$_SESSION['soi_preview'] = array(
