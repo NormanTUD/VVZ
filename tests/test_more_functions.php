@@ -211,7 +211,11 @@ if(isset($GLOBALS["dbname"]) && $GLOBALS["dbname"]) {
 	is_equal("show_in_current_page returns bool for 1", is_bool(show_in_current_page(1)) ? 1 : 0, 1);
 
 	/* check_function_rights returns int (0 or 1) */
+	/* Set user_role_id so production doesn't warn about undefined variable. */
+	$saved_role = isset($GLOBALS['user_role_id']) ? $GLOBALS['user_role_id'] : null;
+	$GLOBALS['user_role_id'] = NULL;
 	is_equal("check_function_rights returns int", is_int(check_function_rights("definitely_nonexistent_function_xyz")) || check_function_rights("definitely_nonexistent_function_xyz") === null ? 1 : 0, 1);
+	if($saved_role !== null) $GLOBALS['user_role_id'] = $saved_role;
 }
 
 /* ============================================================ */
@@ -350,7 +354,7 @@ is_equal("might_be_query with very long query", strlen(might_be_query("SELECT " 
 is_equal("mask_module with zero string", mask_module("0"), "<i>0</i>");
 is_equal("mask_module with false", mask_module(false), "<i></i>");
 is_equal("mask_module with true", mask_module(true), "<i>1</i>"); /* true -> "1" */
-is_equal("mask_module with array", mask_module(array("a")), "<i>Array</i>");
+is_equal("mask_module with array", @mask_module(array("a")), "<i>Array</i>");
 is_equal("mask_module with newlines", mask_module("line1\nline2"), "<i>line1\nline2</i>");
 
 /* ============================================================ */
