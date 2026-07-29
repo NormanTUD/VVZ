@@ -92,7 +92,7 @@
 			}
 
 			$cnt_accounts_ohne_rolle = dashboard_get_count(
-				'SELECT COUNT(*) FROM `users` WHERE `enabled` = "1" AND NOT EXISTS (SELECT 1 FROM `user_to_role` WHERE `user_id` = `users`.`id`)'
+				'SELECT COUNT(*) FROM `users` WHERE `enabled` = "1" AND NOT EXISTS (SELECT 1 FROM `role_to_user` WHERE `user_id` = `users`.`id`)'
 			);
 			if($cnt_accounts_ohne_rolle > 0) {
 				$tasks[] = array(
