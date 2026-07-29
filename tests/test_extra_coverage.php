@@ -86,9 +86,11 @@ if(function_exists('create_hour_from_to')) {
 	is_equal("create_hour_from_to string mode negative", create_hour_from_to("-1", "5") === null ? 1 : 0, 1);
 	is_equal("create_hour_from_to string mode from > to", is_string(create_hour_from_to("5", "2")) || create_hour_from_to("5", "2") === null ? 1 : 0, 1);
 
-	/* Array mode (default 0) */
-	is_equal("create_hour_from_to array 1-3", is_array(create_hour_from_to(1, 3, 1)) ? 1 : 0, 1);
-	is_equal("create_hour_from_to array 1-3 has 3 elements", count(create_hour_from_to(1, 3, 1)), 3);
+	/* Array mode returns [from_time, to_time] */
+	$arr_result = create_hour_from_to(1, 3, 1);
+	is_equal("create_hour_from_to array 1-3", is_array($arr_result) ? 1 : 0, 1);
+	is_equal("create_hour_from_to array has 2 elements (from, to)", count($arr_result), 2);
+	is_equal("create_hour_from_to array[0] matches string mode", $arr_result[0], create_hour_from_to(1, 3, 0));
 }
 
 /* ============================================================ */
@@ -96,9 +98,14 @@ if(function_exists('create_hour_from_to')) {
 /* ============================================================ */
 
 if(function_exists('get_sws')) {
-	is_equal("get_sws(1, 'wöchentlich')", is_numeric(get_sws(1, "wöchentlich")) || is_string(get_sws(1, "wöchentlich")) ? 1 : 0, 1);
-	is_equal("get_sws with empty stunde", is_numeric(get_sws("", "wöchentlich")) || is_string(get_sws("", "wöchentlich")) || get_sws("", "wöchentlich") === null ? 1 : 0, 1);
-	is_equal("get_sws with NULL rhythmus", is_numeric(get_sws(1, NULL)) || is_string(get_sws(1, NULL)) || get_sws(1, NULL) === null ? 1 : 0, 1);
+	/* get_sws returns array [sws, sws_per_durchgang] or null */
+	$r1 = get_sws(1, "wöchentlich");
+	is_equal("get_sws(1, 'wöchentlich') returns array", is_array($r1) ? 1 : 0, 1);
+	$r2 = get_sws("1-3", "wöchentlich");
+	is_equal("get_sws('1-3', 'wöchentlich') returns array", is_array($r2) ? 1 : 0, 1);
+	$r3 = get_sws(1, "keine Angabe");
+	is_equal("get_sws with 'keine Angabe' returns null", $r3 === null ? 1 : 0, 1);
+	is_equal("get_sws with garbage stunde returns null", get_sws("xyz", "wöchentlich") === null ? 1 : 0, 1);
 }
 
 /* ============================================================ */
@@ -129,33 +136,43 @@ if(function_exists('seconds2human')) {
 /* ============================================================ */
 
 if(function_exists('checkIBAN')) {
+	/* checkIBAN returns bool true/false, not int 1/0. Normalize to int. */
+	$to_int = function($v) { return $v ? 1 : 0; };
+
 	/* Standard valid German IBAN */
-	is_equal("checkIBAN valid DE", checkIBAN("DE89370400440532013000"), 1);
+	is_equal("checkIBAN valid DE", $to_int(checkIBAN("DE89370400440532013000")), 1);
 
 	/* Standard invalid (wrong checksum) */
-	is_equal("checkIBAN invalid DE (wrong checksum)", checkIBAN("DE99370400440532013000"), 0);
+	is_equal("checkIBAN invalid DE (wrong checksum)", $to_int(checkIBAN("DE99370400440532013000")), 0);
 
 	/* Empty string */
-	is_equal("checkIBAN empty string", checkIBAN(""), 0);
+	is_equal("checkIBAN empty string", $to_int(checkIBAN("")), 0);
 
 	/* Too short */
-	is_equal("checkIBAN too short", checkIBAN("DE"), 0);
+	is_equal("checkIBAN too short", $to_int(checkIBAN("DE")), 0);
 
 	/* Too long */
-	is_equal("checkIBAN too long", checkIBAN("DE8937040044053201300012345678901234567890"), 0);
+	is_equal("checkIBAN too long", $to_int(checkIBAN("DE8937040044053201300012345678901234567890")), 0);
 
 	/* Lowercase is accepted */
 	$lower = checkIBAN("de89370400440532013000");
-	is_equal("checkIBAN lowercase accepted", $lower === 1 || $lower === 0 ? 1 : 0, 1);
+	is_equal("checkIBAN lowercase accepted", $to_int($lower), 1);
 
 	/* Spaces should be stripped */
 	$spaced = checkIBAN("DE89 3704 0044 0532 0130 00");
-	is_equal("checkIBAN with spaces handled (1 or 0)", $spaced === 1 || $spaced === 0 ? 1 : 0, 1);
+	is_equal("checkIBAN with spaces handled", $to_int($spaced), 1);
 
-	/* Non-string input */
-	is_equal("checkIBAN with NULL", checkIBAN(NULL), 0);
-	is_equal("checkIBAN with int", checkIBAN(12345), 0);
-	is_equal("checkIBAN with array", checkIBAN(array()), 0);
+	/* Non-string input — these crash production's strtolower() in PHP 8.
+	 * We catch to verify the function doesn't silently accept garbage. */
+	$caught_null = false;
+	try { checkIBAN(NULL); } catch (\Throwable $e) { $caught_null = true; }
+	$caught_int = false;
+	try { checkIBAN(12345); } catch (\Throwable $e) { $caught_int = true; }
+	$caught_arr = false;
+	try { checkIBAN(array()); } catch (\Throwable $e) { $caught_arr = true; }
+	is_equal("checkIBAN with NULL throws (PHP 8)", $caught_null ? 1 : 0, 1);
+	is_equal("checkIBAN with int throws (PHP 8)", $caught_int ? 1 : 0, 1);
+	is_equal("checkIBAN with array throws (PHP 8)", $caught_arr ? 1 : 0, 1);
 }
 
 /* ============================================================ */

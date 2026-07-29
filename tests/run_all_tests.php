@@ -33,6 +33,7 @@ $test_files = array(
 	"test_edge_cases.php",
 	"test_more_functions.php",
 	"test_icon_helpers.php",
+	"test_extra_coverage.php",
 );
 
 foreach ($test_files as $file) {
