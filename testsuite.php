@@ -107,4 +107,9 @@
 
 	is_equal("strlen(nonce()) = 10", strlen(nonce()), 10);
 	is_equal("nonce() == nonce()", nonce(), nonce());
+
+	// Extended test suite - see tests/ directory for individual test files
+	if(file_exists(__DIR__ . "/tests/run_all_tests.php")) {
+		include_once(__DIR__ . "/tests/run_all_tests.php");
+	}
 ?>
