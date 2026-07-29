@@ -319,9 +319,10 @@ is_equal("array_value_or_null with bool true key", array_value_or_null(array(tru
 /* ----- might_be_query: more edge cases ----- */
 /* ============================================================ */
 
-/* Note: "/* SELECT */DELETE FROM x" doesn't match because the regex
- * requires ^SELECT at the start. */
-is_equal("might_be_query with SELECT in comment-like syntax", might_be_query("/* SELECT */DELETE FROM x"), 0);
+/* Note: "comment-like SELECT DELETE FROM x" doesn't match because the regex
+ * requires ^SELECT at the start. We use a different prefix to avoid
+ * the /* comment terminator inside the string. */
+is_equal("might_be_query with SELECT in comment-like syntax", might_be_query("/x SELECT x/ DELETE FROM x"), 0);
 is_equal("might_be_query with mixed case keywords", might_be_query("Delete From x"), 1);
 is_equal("might_be_query with leading whitespace before keyword", might_be_query("   delete from x"), 0);
 is_equal("might_be_query with tab between keywords", might_be_query("SELECT\t1\tFROM\tx"), 1);
