@@ -583,11 +583,11 @@
 			<script nonce=<?php print($GLOBALS['nonce']); ?> >
 				(function(){
 					function update_mode() {
-						var m = document.getElementById('studiengang_mode').value;
+						var m = document.getElementById('soi_studiengang_mode').value;
 						document.getElementById('existing_studiengang_box').style.display = (m === 'existing') ? '' : 'none';
 						document.getElementById('new_studiengang_box').style.display = (m === 'new') ? '' : 'none';
 					}
-					var sel = document.getElementById('studiengang_mode');
+					var sel = document.getElementById('soi_studiengang_mode');
 					if(sel) sel.addEventListener('change', update_mode);
 					update_mode();
 				})();
@@ -623,18 +623,18 @@
 						$modules = soi_parse_modules($raw_text);
 						$anlage2 = soi_parse_anlage2($raw_text);
 
-						// Studiengang bestimmen
-						$mode = get_post('studiengang_mode') ?: 'auto';
-						$institut_id = (int)get_post('institut');
-						if($institut_id <= 0) {
-							$first = reset($institute);
-							if(is_array($first) && isset($first[0])) $institut_id = (int)$first[0];
-						}
-						$studiengang_id = null;
-						if($mode === 'existing') {
-							$studiengang_id = (int)get_post('studiengang_id');
-						} elseif($mode === 'new') {
-							$new_name = trim((string)get_post('new_studiengang_name'));
+					// Studiengang bestimmen
+					$mode = get_post('soi_studiengang_mode') ?: 'auto';
+					$institut_id = (int)get_post('soi_institut');
+					if($institut_id <= 0) {
+						$first = reset($institute);
+						if(is_array($first) && isset($first[0])) $institut_id = (int)$first[0];
+					}
+					$studiengang_id = null;
+					if($mode === 'existing') {
+						$studiengang_id = (int)get_post('soi_studiengang_id');
+					} elseif($mode === 'new') {
+						$new_name = trim((string)get_post('new_studiengang_name'));
 							if($new_name === '') $new_name = $cover['program'] ?: 'Unbekannt';
 							$studiengang_id = soi_ensure_studiengang($new_name, $cover['degree'], $institut_id);
 						} else {
@@ -665,9 +665,9 @@
 							} elseif($auto_commit) {
 								// Direkt committen: in $_POST umkopieren und Stage auf 'commit' setzen
 								$_POST = array();
-								$_POST['import_id'] = $import_id;
-								$_POST['create_pruefungsnummern'] = $create_pns;
-								$_POST['reuse'] = $reuse;
+								$_POST['soi_import_id'] = $import_id;
+								$_POST['soi_create_pruefungsnummern'] = $create_pns;
+								$_POST['soi_reuse'] = $reuse;
 								$mod_post = array();
 								foreach($modules as $idx => $m) {
 									$mod_post[$idx] = array(
@@ -680,7 +680,7 @@
 										'pruefungstypen' => $m['pruefungstypen'] ?? array(),
 									);
 								}
-								$_POST['modules'] = $mod_post;
+								$_POST['soi_modules'] = $mod_post;
 								$_SERVER['REQUEST_METHOD'] = 'POST';
 
 								// Commit-Logik inline aufrufen (gleicher Code wie $stage === 'commit')
