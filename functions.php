@@ -10758,16 +10758,29 @@ order by
 	function search_veranstaltung ($term) {
 		$veranstaltung_page = get_page_id_by_filename("veranstaltung.php");
 		$query = 'select concat("goto_page=admin?page='.$veranstaltung_page.'&id=", v.id) as id, concat(v.name, " (", s.typ, " ", s.jahr, ")") as label, concat(v.name, " (", s.typ, " ", s.jahr, ")") as value from veranstaltung v left join semester s on v.semester_id = s.id where name like '.esc("%$term%");
-		if(!user_is_admin($GLOBALS["logged_in_user_id"])) {
-			$allowed_dozenten = array(get_dozent_id_by_user_id($GLOBALS["logged_in_user_id"]));
-			foreach (get_user_per_superdozent($GLOBALS["logged_in_user_id"]) as $nr => $dt) {
-				$allowed_dozenten[] = $dt[0];
+		$logged_in_user_id = isset($GLOBALS["logged_in_user_id"]) ? $GLOBALS["logged_in_user_id"] : null;
+		if($logged_in_user_id && !user_is_admin($logged_in_user_id)) {
+			$allowed_dozenten = array();
+			$own_dozent = get_dozent_id_by_user_id($logged_in_user_id);
+			if($own_dozent) {
+				$allowed_dozenten[] = $own_dozent;
 			}
-			$query .= " and dozent_id in (".join(", ", $allowed_dozenten).")";
+			foreach (get_user_per_superdozent($logged_in_user_id) as $nr => $dt) {
+				if(isset($dt[0]) && $dt[0]) {
+					$allowed_dozenten[] = (int)$dt[0];
+				}
+			}
+			$allowed_dozenten = array_values(array_unique(array_filter($allowed_dozenten, function($v){ return is_numeric($v) && (int)$v > 0; })));
+			if(count($allowed_dozenten) > 0) {
+				$query .= " and dozent_id in (".join(", ", array_map('intval', $allowed_dozenten)).")";
+			} else {
+				// Eingeloggter Nicht-Admin ohne zugeordneten Dozent: keine Treffer
+				return "[]";
+			}
 		}
 		$query .= " order by s.id desc";
 
-		return query_to_json($query);	
+		return query_to_json($query);
 	}
 
 	function rarr ($str) {

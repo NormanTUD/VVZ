@@ -47,6 +47,9 @@
 		$page_ids[] = $thispage[0];
 	}
 	$page_rights_data = check_page_rights($page_ids, 0);
+	if(!is_array($page_rights_data)) {
+		$page_rights_data = array();
+	}
 	foreach ($pagedata as $thispage) {
 		$pid = $thispage[0];
 		$fn = $thispage[2];
