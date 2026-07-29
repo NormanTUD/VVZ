@@ -10651,7 +10651,7 @@ order by
 		foreach($data as $row) {
 			$column = 0;
 			if($line == 0) {
-				print '<thead class="high_z_index" id="wartungstabelle_thead">';
+				print '<thead class="high_z_index" id="thead">';
 			}
 
 			$tr_class = '';
@@ -10700,7 +10700,7 @@ order by
 			$str .= "\t</tr>\n";
 
 			if($line == 0) {
-				print '<thead class="high_z_index" id="wartungstabelle_thead">';
+				print '<thead class="high_z_index" id="thead">';
 			}
 
 			$line = $line + 1;
