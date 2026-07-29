@@ -641,6 +641,14 @@ function get_post ($name) {
 	}
 }
 
+function get_get ($name) {
+	if(array_key_exists($name, $_GET)) {
+		return $_GET[$name];
+	} else {
+		return NULL;
+	}
+}
+
 function get_cookie ($name, $default = NULL) {
 	if(array_key_exists($name, $_COOKIE)) {
 		return $_COOKIE[$name];
