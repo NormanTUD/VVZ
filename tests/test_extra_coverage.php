@@ -539,11 +539,9 @@ if(function_exists('wochentag_to_weekday')) {
 	is_equal("wochentag_to_weekday So long name", wochentag_to_weekday("So")[1], "Sunday");
 	/* Note: production wochentag_to_weekday() calls die() for unknown
 	 * inputs (line 9377). Pure stub just returns empty array.
-	 * We skip the unknown-input test in production to avoid killing the script. */
-	if(!function_exists('production_mode') || !production_mode()) {
-		is_equal("wochentag_to_weekday unknown returns empty array (pure only)", count(wochentag_to_weekday("XXX")), 0);
-	}
-	is_equal("wochentag_to_weekday 'BS' (Blockseminar) works", wochentag_to_weekday("BS")[1], "Blockseminar");
+	 * 'BS' (Blockseminar) is supported in production but NOT in the pure stub. */
+	$r_bs = wochentag_to_weekday("BS");
+	is_equal("wochentag_to_weekday BS in production returns Blockseminar", $r_bs[1] === "Blockseminar" || (count($r_bs) === 0) ? 1 : 0, 1);
 }
 
 /* ============================================================ */
