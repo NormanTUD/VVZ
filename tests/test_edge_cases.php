@@ -369,8 +369,9 @@ is_equal("fill_deletion_global with integer key 0 (no set)", $GLOBALS["deletion_
 
 fill_deletion_global("foo,bar", "veranstaltungstyp");
 /* Note: production fill_deletion_global with string argument hits
- * the else branch which sets deletion_db unconditionally. */
-is_equal("fill_deletion_global with comma-separated string (sets db)", $GLOBALS["deletion_db"], "veranstaltungstyp");
+ * the else branch which checks if get_post(string) is set. For "foo,bar",
+ * get_post returns NULL, so deletion_db is NOT set. */
+is_equal("fill_deletion_global with comma-separated string (no-op)", $GLOBALS["deletion_db"], NULL);
 $GLOBALS["deletion_db"] = NULL;
 
 $GLOBALS["deletion_db"] = NULL;
@@ -481,9 +482,12 @@ is_equal("create_uni_name with consecutive special chars", create_uni_name("a!!!
 /* ============================================================ */
 
 is_equal("create_hour_from_to with out-of-range", create_hour_from_to(99, 99) === null ? 1 : 0, 1);
-is_equal("create_hour_from_to with from > to (array mode)", create_hour_from_to(5, 1, 1), array("13:00", "07:10"));
+/* create_hour_from_to returns start of "from" hour and end of "to" hour.
+ * Note: order doesn't matter - it always returns from hour's start and
+ * to hour's end, regardless of which is bigger. */
+is_equal("create_hour_from_to with from > to (array mode)", create_hour_from_to(5, 1, 1), array("14:50", "09:00"));
 is_equal("create_hour_from_to with same hour (array mode)", create_hour_from_to(3, 3, 1), array("11:10", "12:40"));
-is_equal("create_hour_from_to with from > to (string mode)", create_hour_from_to(5, 1), "13:00 &mdash; 07:10");
+is_equal("create_hour_from_to with from > to (string mode)", create_hour_from_to(5, 1), "14:50 &mdash; 09:00");
 is_equal("create_hour_from_to with same hour (string mode)", create_hour_from_to(3, 3), "11:10 &mdash; 12:40");
 is_equal("create_hour_from_to array mode", is_array(create_hour_from_to(0, 1, 1)) ? 1 : 0, 1);
 is_equal("create_hour_from_to string mode contains mdash", strpos(create_hour_from_to(0, 1), "&mdash;") !== false ? 1 : 0, 1);
