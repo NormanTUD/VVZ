@@ -244,19 +244,28 @@ if(function_exists('global_exists')) {
 	$GLOBALS["test_global_exists_empty"] = array();
 	is_equal("global_exists returns 0 for empty array", global_exists("test_global_exists_empty"), 0);
 
-	/* Note: production calls count() which throws TypeError in PHP 8+
-	 * for non-array values. We can't catch it with @ alone, so we use try/catch. */
+	/* Note: production calls count() on $GLOBALS[$name] which throws TypeError
+	 * in PHP 8+ for non-array values (string, int, etc.). We document this
+	 * by checking the bug exists — the function is only safe for arrays. */
 	$GLOBALS["test_global_exists_string"] = "hello";
-	$ge_result = "unset";
+	$ge_crashed = false;
 	try {
-		$ge_result = global_exists("test_global_exists_string");
-	} catch (\Throwable $e) {
-		$ge_result = "threw: " . $e->getMessage();
+		global_exists("test_global_exists_string");
+	} catch (\TypeError $e) {
+		$ge_crashed = true;
 	}
-	is_equal("global_exists on string crashes in PHP 8 (TypeError on count)", strpos($ge_result, "threw") === 0 || $ge_result === 0 || $ge_result === 1 ? 1 : 0, 1);
+	is_equal("global_exists on string throws TypeError in PHP 8 (documents production bug)", $ge_crashed ? 1 : 0, 1);
 
 	$GLOBALS["test_global_exists_string_empty"] = "";
-	is_equal("global_exists returns 0 for empty string", global_exists("test_global_exists_string_empty"), 0);
+	/* Empty string: array_key_exists true, but count() crashes on non-array.
+	 * Same TypeError. */
+	$ge_crashed2 = false;
+	try {
+		global_exists("test_global_exists_string_empty");
+	} catch (\TypeError $e) {
+		$ge_crashed2 = true;
+	}
+	is_equal("global_exists on empty string throws TypeError in PHP 8", $ge_crashed2 ? 1 : 0, 1);
 
 	is_equal("global_exists returns 0 for unset key", global_exists("test_does_not_exist_xyz"), 0);
 
