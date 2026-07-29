@@ -628,6 +628,9 @@ $(document).ready(function() {
 	$("#toggle_ok").on("click", toggle_ok);
 
 	var $globalsearch = $("#globalsearch");
+	if($globalsearch.length === 0) {
+		// Suchfeld existiert nur in admin.php — auf anderen Seiten überspringen.
+	} else {
 	var prettyCategories = {
 		"Seite":              { color: "#1565c0", icon: "🗂" },
 		"Veranstaltung":      { color: "#2e7d32", icon: "📘" },
@@ -678,24 +681,26 @@ $(document).ready(function() {
 	});
 
 	var acWidget = $globalsearch.data("ui-autocomplete");
-	acWidget._renderItem = function( ul, item ) {
-		var meta = prettyCategories[item.category] || { color: "#555", icon: "\u2022" };
-		var safeRaw = $('<div/>').text(item.raw || item.value || '').html();
-		var $li = $('<li/>').attr('data-category', item.category);
-		$('<a/>', { href: 'javascript:void(0)' })
-			.append(
-				$('<span class="search_category_badge"/>')
-					.css({ backgroundColor: meta.color })
-					.text(item.category)
-			)
-			.append(' ')
-			.append($('<span class="search_item_raw"/>').html(safeRaw))
-			.appendTo($li);
-		return $li.appendTo(ul);
-	};
-	// Wichtig: _renderItemData hängt das Original-Item via .data() an das <li> an.
-	// Unsere _renderItem-Override gibt das <li> zurück, daher funktioniert das
-	// Standard-Verhalten von _renderItemData weiterhin korrekt.
+	if(acWidget) {
+		acWidget._renderItem = function( ul, item ) {
+			var meta = prettyCategories[item.category] || { color: "#555", icon: "\u2022" };
+			var safeRaw = $('<div/>').text(item.raw || item.value || '').html();
+			var $li = $('<li/>').attr('data-category', item.category);
+			$('<a/>', { href: 'javascript:void(0)' })
+				.append(
+					$('<span class="search_category_badge"/>')
+						.css({ backgroundColor: meta.color })
+						.text(item.category)
+				)
+				.append(' ')
+				.append($('<span class="search_item_raw"/>').html(safeRaw))
+				.appendTo($li);
+			return $li.appendTo(ul);
+		};
+		// Wichtig: _renderItemData hängt das Original-Item via .data() an das <li> an.
+		// Unsere _renderItem-Override gibt das <li> zurück, daher funktioniert das
+		// Standard-Verhalten von _renderItemData weiterhin korrekt.
+	}
 
 	// Enter ohne Auswahl: zum obersten Treffer springen
 	$globalsearch.on('keydown', function(e) {
@@ -719,6 +724,7 @@ $(document).ready(function() {
 	}).on('blur', function() {
 		$(this).removeClass('globalsearch_active');
 	});
+	}
 });
 
 
