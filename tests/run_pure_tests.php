@@ -682,16 +682,25 @@ function get_user_ip () {
 }
 
 function referrer_from_same_domain () {
-	if(!isset($_SERVER['HTTP_REFERER']) || !$_SERVER['HTTP_REFERER']) {
+	if(isset($_SERVER['HTTP_REFERER'])) {
+		$referer = $_SERVER['HTTP_REFERER'];
+		$referer_host = parse_url($referer, PHP_URL_HOST);
+		$referer_path = parse_url($referer, PHP_URL_PATH);
+
+		$referer_url = $referer_host . $referer_path;
+
+		$this_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+		$this_path = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+
+		$this_url = $this_host . $this_path;
+		if($this_url == $referer_url) {
+			return 1;
+		} else {
+			return 0;
+		}
+	} else {
 		return 0;
 	}
-	if(!isset($_SERVER['HTTP_HOST'])) {
-		return 0;
-	}
-	if(strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) !== false) {
-		return 1;
-	}
-	return 0;
 }
 
 function file_is_image ($mediapath) {
@@ -708,8 +717,12 @@ function file_is_image ($mediapath) {
 }
 
 function institut_id_exists($id) {
-	if(!$id) return false;
-	return false; // Without DB
+	if(!$id) return 0;
+	if(!isset($GLOBALS['dbh']) || !is_object($GLOBALS['dbh'])) {
+		return 0;
+	}
+	$query = 'select count(*) from institut where id = ' . esc($id);
+	return get_single_row_from_query($query);
 }
 
 function print_h ($string, $level = 1, $toc = array()) {

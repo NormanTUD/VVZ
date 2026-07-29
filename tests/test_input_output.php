@@ -28,19 +28,41 @@ if($orig_remote !== null) {
 
 /* ----- referrer_from_same_domain ----- */
 $orig_http_referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
-$orig_http_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+$orig_http_host   = isset($_SERVER['HTTP_HOST'])     ? $_SERVER['HTTP_HOST']     : null;
+$orig_script_name = isset($_SERVER['SCRIPT_NAME'])  ? $_SERVER['SCRIPT_NAME']   : null;
 
+/* Production compares host + path, not just host. We need to match
+   HTTP_HOST and SCRIPT_NAME exactly with the referrer. */
+
+/* unset referrer -> 0 */
+unset($_SERVER['HTTP_REFERER']);
+$_SERVER['HTTP_HOST']    = 'example.com';
+$_SERVER['SCRIPT_NAME']  = '/page';
+is_equal("referrer_from_same_domain with no referer", referrer_from_same_domain() === 0 ? 1 : 0, 1);
+
+/* empty referrer string -> 0 (parse_url fails on empty) */
 $_SERVER['HTTP_REFERER'] = '';
-$_SERVER['HTTP_HOST'] = 'example.com';
+$_SERVER['HTTP_HOST']    = 'example.com';
+$_SERVER['SCRIPT_NAME']  = '/page';
 is_equal("referrer_from_same_domain with empty referer", referrer_from_same_domain() === 0 ? 1 : 0, 1);
 
+/* matching host and path -> 1 */
 $_SERVER['HTTP_REFERER'] = 'http://example.com/page';
-$_SERVER['HTTP_HOST'] = 'example.com';
-is_equal("referrer_from_same_domain with same domain", referrer_from_same_domain() === 1 ? 1 : 0, 1);
+$_SERVER['HTTP_HOST']    = 'example.com';
+$_SERVER['SCRIPT_NAME']  = '/page';
+is_equal("referrer_from_same_domain with matching host+path", referrer_from_same_domain() === 1 ? 1 : 0, 1);
 
+/* different host -> 0 */
 $_SERVER['HTTP_REFERER'] = 'http://different.com/page';
-$_SERVER['HTTP_HOST'] = 'example.com';
-is_equal("referrer_from_same_domain with different domain", referrer_from_same_domain() === 0 ? 1 : 0, 1);
+$_SERVER['HTTP_HOST']    = 'example.com';
+$_SERVER['SCRIPT_NAME']  = '/page';
+is_equal("referrer_from_same_domain with different host", referrer_from_same_domain() === 0 ? 1 : 0, 1);
+
+/* different path -> 0 */
+$_SERVER['HTTP_REFERER'] = 'http://example.com/other';
+$_SERVER['HTTP_HOST']    = 'example.com';
+$_SERVER['SCRIPT_NAME']  = '/page';
+is_equal("referrer_from_same_domain with different path", referrer_from_same_domain() === 0 ? 1 : 0, 1);
 
 if($orig_http_referer !== null) {
 	$_SERVER['HTTP_REFERER'] = $orig_http_referer;
@@ -49,8 +71,9 @@ if($orig_http_referer !== null) {
 }
 if($orig_http_host !== null) {
 	$_SERVER['HTTP_HOST'] = $orig_http_host;
-} else {
-	unset($_SERVER['HTTP_HOST']);
+}
+if($orig_script_name !== null) {
+	$_SERVER['SCRIPT_NAME'] = $orig_script_name;
 }
 
 /* ----- get_get_or_cookie ----- */
