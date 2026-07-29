@@ -165,17 +165,13 @@ if(function_exists('checkIBAN')) {
 	$spaced = checkIBAN("DE89 3704 0044 0532 0130 00");
 	is_equal("checkIBAN with spaces handled", $to_int($spaced), 1);
 
-	/* Non-string input — these crash production's strtolower() in PHP 8.
-	 * We catch to verify the function doesn't silently accept garbage. */
-	$caught_null = false;
-	try { checkIBAN(NULL); } catch (\Throwable $e) { $caught_null = true; }
-	$caught_int = false;
-	try { checkIBAN(12345); } catch (\Throwable $e) { $caught_int = true; }
+	/* Non-string input — strtolower() in production coerces to empty
+	 * for NULL/int (strlen("") != 22 → false). Array throws TypeError. */
+	is_equal("checkIBAN with NULL returns false", $to_int(checkIBAN(NULL)), 0);
+	is_equal("checkIBAN with int returns false", $to_int(checkIBAN(12345)), 0);
 	$caught_arr = false;
-	try { checkIBAN(array()); } catch (\Throwable $e) { $caught_arr = true; }
-	is_equal("checkIBAN with NULL throws (PHP 8)", $caught_null ? 1 : 0, 1);
-	is_equal("checkIBAN with int throws (PHP 8)", $caught_int ? 1 : 0, 1);
-	is_equal("checkIBAN with array throws (PHP 8)", $caught_arr ? 1 : 0, 1);
+	try { checkIBAN(array()); } catch (\TypeError $e) { $caught_arr = true; }
+	is_equal("checkIBAN with array throws TypeError (PHP 8)", $caught_arr ? 1 : 0, 1);
 }
 
 /* ============================================================ */
