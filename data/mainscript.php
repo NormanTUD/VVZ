@@ -636,6 +636,10 @@ $(document).ready(function() {
 					term: request.term
 				},
 				success: function( data ) {
+					if(!data || data.error) {
+						response([]);
+						return;
+					}
 					response(data);
 				},
 				error: function(data, msg, y) {
@@ -647,15 +651,61 @@ $(document).ready(function() {
 			} );
 		},
 		minLength: 1,
+		delay: 120,
 		select: function( event, ui ) {
 			log( "Selected: " + ui.item.value + " aka " + ui.item.id );
 			var goto_page_regex = /goto_page=(.*)/;
 			var goto_page_matches = goto_page_regex.exec(ui.item.id);
-			if(goto_page_matches.length) {
+			if(goto_page_matches && goto_page_matches[1]) {
 				window.location.href = goto_page_matches[1];
 			}
+		},
+		focus: function( event, ui ) {
+			event.preventDefault();
+		},
+		_prettyCategories: {
+			"Seite":              { color: "#1565c0", icon: "🗂" },
+			"Veranstaltung":      { color: "#2e7d32", icon: "📘" },
+			"Dozent":             { color: "#6a1b9a", icon: "👤" },
+			"Modul":              { color: "#00838f", icon: "📦" },
+			"Studiengang":        { color: "#ef6c00", icon: "🎓" },
+			"Institut":           { color: "#4527a0", icon: "🏛" },
+			"Prüfungsnummer":     { color: "#c62828", icon: "📝" },
+			"Gebäude":            { color: "#5d4037", icon: "🏢" }
+		},
+		_renderItem: function( ul, item ) {
+			var meta = (this._prettyCategories && this._prettyCategories[item.category]) ? this._prettyCategories[item.category] : { color: "#555", icon: "•" };
+			var safeRaw = $('<div/>').text(item.raw || item.value || '').html();
+			var $li = $('<li/>')
+				.attr('data-category', item.category)
+				.appendTo(ul);
+			return $('<a/>', { href: 'javascript:void(0)' })
+				.append(
+					$('<span class="search_category_badge"/>')
+						.css({ backgroundColor: meta.color })
+						.text(item.category)
+				)
+				.append(' ')
+				.append($('<span class="search_item_raw"/>').html(safeRaw))
+				.appendTo($li);
 		}
-	} );
+	} ).data('ui-autocomplete')._renderItemData = function( ul, item ) {
+		return this._renderItem( ul, item );
+	};
+
+	// Enter ohne Auswahl: zum obersten Treffer springen
+	$("#globalsearch").on('keydown', function(e) {
+		if(e.keyCode === 13) {
+			var ac = $(this).data('ui-autocomplete');
+			if(ac && ac.menu && ac.menu.element && ac.menu.element.children().length > 0 && !ac.menu.active) {
+				e.preventDefault();
+				var firstItem = ac.menu.element.children().first().data('uiAutocompleteItem');
+				if(firstItem) {
+					$(this).data('ui-autocomplete')._trigger('select', 'autocompleteselect', { item: firstItem });
+				}
+			}
+		}
+	});
 });
 
 

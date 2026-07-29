@@ -215,13 +215,41 @@ if(!$GLOBALS['logged_in']) {
 			</tr>
 		</table>
 <?php
-			if(get_post('password') == 'test' && get_post('try_login') && !db_is_demo($GLOBALS["dbname"], 1)) {
+		if(get_post('password') == 'test' && get_post('try_login') && !db_is_demo($GLOBALS["dbname"], 1)) {
+			$pw_change_page_id = get_page_id_by_filename("password.php");
 ?>
-				<script type="text/javascript">
-					alert("Bitte ändern Sie Ihr Passwort! Dies können Sie unter dem Menüpunkt 'Eigene Daten ändern' machen. Diese Meldung wird bei jedem Anmelden kommen, solange Sie Ihr Passwort nicht geändert haben.");
-				</script>
+				<div class="password_change_warning ui-widget ui-corner-all" id="password_change_warning">
+					<span class="ui-icon ui-icon-alert" style="float:left; margin: 6px 8px 0 4px;"></span>
+					<strong>Bitte ändern Sie Ihr Passwort!</strong>
+					Sie sind noch mit dem Standard-Passwort &raquo;test&laquo; angemeldet. Diese Erinnerung erscheint bei jeder Anmeldung, bis Sie das Passwort geändert haben.
+<?php
+			if($pw_change_page_id) {
+?>
+					&nbsp;<a class="password_change_link" href="admin?page=<?php print htmlentities($pw_change_page_id); ?>">Jetzt ändern &rarr;</a>
 <?php
 			}
+?>
+					<a href="#" class="password_change_dismiss" title="Erinnerung für diese Sitzung ausblenden">&times;</a>
+				</div>
+				<script nonce=<?php print($GLOBALS['nonce']); ?> >
+					(function() {
+						try {
+							if(window.toastr && typeof window.toastr.warning === 'function') {
+								window.toastr.warning("Sie sind noch mit dem Standard-Passwort angemeldet. Bitte änern Sie es unter &raquo;Eigene Daten ändern&laquo;.", "Passwort ändern", { timeOut: 0, extendedTimeOut: 0, closeButton: true });
+							}
+						} catch(e) {}
+						var dismiss = document.querySelector('.password_change_dismiss');
+						if(dismiss) {
+							dismiss.addEventListener('click', function(e) {
+								e.preventDefault();
+								var el = document.getElementById('password_change_warning');
+								if(el) el.style.display = 'none';
+							});
+						}
+					})();
+				</script>
+<?php
+		}
 			if(!get_setting('x11_debugging_mode')) {
 ?>
 				 <?php print get_demo_expiry_time(); ?>
