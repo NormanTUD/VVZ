@@ -311,7 +311,9 @@ is_equal("htmle with control chars", htmle("\x00\x01\x02"), "\x00\x01\x02");
 
 is_equal("array_value_or_null with float key", array_value_or_null(array(1.5 => "x"), 1.5), "x");
 is_equal("array_value_or_null with NULL key (treated as empty)", array_value_or_null(array(NULL => "x"), "") === null || array_value_or_null(array(NULL => "x"), "") === "x" ? 1 : 0, 1);
-is_equal("array_value_or_null with object key", array_value_or_null(array(new stdClass => "x"), new stdClass), "x");
+/* Note: PHP 8 doesn't allow object instances as array keys (only int|string). */
+is_equal("array_value_or_null with int 0 key", array_value_or_null(array(0 => "zero"), 0), "zero");
+is_equal("array_value_or_null with bool true key", array_value_or_null(array(true => "yes"), true), "yes");
 
 /* ============================================================ */
 /* ----- might_be_query: more edge cases ----- */
