@@ -1,0 +1,120 @@
+name: tests
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: ['*']
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same branch when a new commit is pushed.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: PHP ${{ matrix.php }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # Don't fail the whole matrix if one combination has issues - report them
+      # individually so we still see results from the others.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        php: ['8.1', '8.2', '8.3', '8.4']
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: rootpw
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'yes'
+          MARIADB_ROOT_HOST: '%'
+        ports:
+          - 3311:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h localhost -u root"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, mbstring, bcmath, pdo_mysql
+          coverage: none
+          tools: composer
+
+      - name: Verify required extensions are loaded
+        run: |
+          set -e
+          for ext in mysqli mbstring bcmath pdo_mysql; do
+            if ! php -m | grep -qi "^$ext"; then
+              echo "::error::Required PHP extension '$ext' is not loaded"
+              exit 1
+            fi
+          done
+
+      - name: Wait for MariaDB to be reachable
+        run: |
+          for i in $(seq 1 30); do
+            if mysql -h 127.0.0.1 -P 3311 -u root -e "SELECT 1" >/dev/null 2>&1; then
+              echo "MariaDB is up"
+              exit 0
+            fi
+            echo "Waiting for MariaDB... ($i)"
+            sleep 2
+          done
+          echo "::error::MariaDB did not become reachable in time"
+          exit 1
+
+      - name: Seed /etc/vvzdbpw with the DB password
+        run: |
+          # VVZ reads the DB password from /etc/vvzdbpw. We point it at the
+          # root user of the MariaDB service container.
+          echo -n "rootpw" | sudo tee /etc/vvzdbpw > /dev/null
+          sudo chmod 600 /etc/vvzdbpw
+
+      - name: Create startpage database role (best-effort)
+        run: |
+          # Some VVZ bootstrap queries hit a couple of grants that the default
+          # root user has anyway; we make sure the customer DB exists so
+          # selftest() doesn't have to.
+          mysql -h 127.0.0.1 -P 3311 -u root -e "CREATE DATABASE IF NOT EXISTS startpage"
+
+      - name: Run tests
+        run: |
+          set -e
+          echo "=========================================="
+          echo "  PHP $(php -r 'echo PHP_VERSION;')"
+          echo "  MariaDB $(mysql -h 127.0.0.1 -P 3311 -u root -e 'SELECT VERSION();' | tail -1)"
+          echo "=========================================="
+          php testsuite.php
+
+      - name: Run pure (no-DB) tests
+        run: |
+          echo "=========================================="
+          echo "  Pure tests (no database)"
+          echo "=========================================="
+          php tests/run_pure_tests.php
+
+  lint:
+    name: Lint syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Lint every PHP file
+        run: |
+          set -e
+          find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+          echo "All PHP files parse cleanly."
