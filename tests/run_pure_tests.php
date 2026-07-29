@@ -923,6 +923,96 @@ function urlname_already_exists ($urlname) {
 	return 0; // No DB
 }
 
+/* Load emojis.php so the icon library is available in pure mode.
+ * It's pure functions returning HTML strings, so it works without DB. */
+if(file_exists(__DIR__ . "/../emojis.php")) {
+	include_once __DIR__ . "/../emojis.php";
+}
+
+/* Pure-mode stubs for the helpers exercised by test_icon_helpers.php */
+function fq ($str) {
+	return "&raquo;" . htmle($str) . "&laquo;";
+}
+
+function rarr ($str) {
+	return preg_replace("/&rarr;/", "→", $str);
+}
+
+function escape ($t) {
+	return $t;
+}
+
+function print_debug ($str) {
+	print green_text($str);
+}
+
+function sanitize_data ($data, $recursion = 0) {
+	if(is_array($data)) {
+		$out = array();
+		foreach ($data as $k => $v) {
+			$out[$k] = sanitize_data($v, $recursion + 1);
+		}
+		return $out;
+	}
+	return htmlentities($data ?? "");
+}
+
+function replace_hinweis_with_graphics ($text) {
+	$text = preg_replace('/LaTeX/', '<img width="45px" alt="LaTeX" src="i/LaTeX.svg">', $text ?? "");
+	$text = preg_replace('/\\\\git/', '<img width="45px" alt="git" src="i/git.svg">', $text);
+	$text = preg_replace('/\b(warnung|achtung|vorsicht)\b/i', get_warning_icon().' \1', $text);
+	return $text;
+}
+
+function user_is_logged_in () {
+	if(preg_match('/^\d+$/', $GLOBALS["logged_in_user_id"] ?? "")) {
+		return 1;
+	}
+	return 0;
+}
+
+function global_exists ($name) {
+	if(array_key_exists($name, $GLOBALS) && count($GLOBALS[$name])) {
+		return 1;
+	}
+	return 0;
+}
+
+/* create_select writes its HTML directly to output via print; for pure
+ * testing we redirect into an output buffer. We also need to stub the
+ * helper htmlentities (used inside) so it works without mb_string etc. */
+if(!function_exists('htmlentities')) {
+	function htmlentities ($s) { return $s; }
+}
+
+function create_select ($data, $chosen, $name, $allow_empty = 0, $noautosubmit = 0, $aria_labelledby = null, $submit_on_change = 0, $class = "") {
+	if(!is_null($aria_labelledby)) {
+		$aria = ' aria-labelledby="' . htmle($aria_labelledby) . '" ';
+	} else {
+		$aria = '';
+	}
+	if($class) {
+		$class_attr = " class='" . $class . "' ";
+	} else {
+		$class_attr = "";
+	}
+	if($submit_on_change) {
+		$onchange = ' onchange="this.form.submit()" ';
+	} else {
+		$onchange = "";
+	}
+	$noauto = ($noautosubmit == 1 ? ' noautosubmit="1"' : '');
+	print "<select " . $class_attr . $onchange . $aria . " name=\"" . htmlentities($name) . "\"" . $noauto . ">\n";
+	if($allow_empty) {
+		print "<option value=\"\">&mdash;</option>\n";
+	}
+	foreach($data as $val => $label) {
+		$sel = ($val == $chosen ? ' selected' : '');
+		print "<option value=\"" . htmlentities($val) . "\"" . $sel . ">" . htmle($label) . "</option>\n";
+	}
+	print "</select>\n";
+}
+
 // Now run the pure tests
 $pure_test_files = array(
 	"test_framework.php",
@@ -939,6 +1029,7 @@ $pure_test_files = array(
 	"test_sort_functions.php",
 	"test_edge_cases.php",
 	"test_more_functions.php",
+	"test_icon_helpers.php",
 );
 
 foreach ($pure_test_files as $file) {

@@ -32,6 +32,7 @@ $test_files = array(
 	"test_language_functions.php",
 	"test_edge_cases.php",
 	"test_more_functions.php",
+	"test_icon_helpers.php",
 );
 
 foreach ($test_files as $file) {
