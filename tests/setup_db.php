@@ -129,7 +129,7 @@ if(!empty($missing_customer)) {
  * are missing for some reason (e.g. partial install, manual SQL),
  * re-insert them here. Using "insert ignore" is safe - it won't
  * duplicate rows that are already there. */
-if(isset($GLOBALS["dbh"]) && function_exists("rquery") && function_exists("esc")) {
+if(isset($GLOBALS['dbh']) && function_exists('rquery') && function_exists('esc')) {
 	try {
 		$plan_rows = array(
 			array("Demo", 0, 0),
@@ -144,5 +144,107 @@ if(isset($GLOBALS["dbh"]) && function_exists("rquery") && function_exists("esc")
 		}
 	} catch(\Throwable $e) {
 		// best-effort
+	}
+}
+
+/* ---------- 4. seed extra demo data that testsuite.php relies on ----------
+ *
+ * The legacy testsuite.php expects the customer DB to be populated with
+ * enough demo data for its sanity checks:
+ *   - faq_has_entry()              -> at least one FAQ entry
+ *   - sizeof(get_raum_gebaeude_array()) -> at least one building+room
+ *   - get_bereich_name_by_id(1)    -> "Grundzüge der Logik"
+ *
+ * After a fresh install these tables are either empty (faq, raum) or
+ * have a placeholder "-" entry (bereich). We seed the canonical demo
+ * rows here, using INSERT IGNORE so re-running is safe.
+ */
+if(isset($GLOBALS["dbh"]) && function_exists("rquery") && function_exists("esc")) {
+	try {
+		/* FAQ entries */
+		$faq_entries = array(
+			array(
+				"frage"      => "Wie finde ich meinen Stundenplan?",
+				"antwort"    => "Den aktuellen Stundenplan finden Sie auf der Startseite unter \"Stundenplan\".",
+				"wie_oft"    => 0,
+			),
+			array(
+				"frage"      => "Wo finde ich das Vorlesungsverzeichnis?",
+				"antwort"    => "Das Vorlesungsverzeichnis ist über die Navigation unter \"Veranstaltungen\" erreichbar.",
+				"wie_oft"    => 0,
+			),
+			array(
+				"frage"      => "Wie melde ich mich zu Prüfungen an?",
+				"antwort"    => "Die Prüfungsanmeldung erfolgt über das Prüfungsamt Ihrer Fakultät.",
+				"wie_oft"    => 0,
+			),
+		);
+		foreach($faq_entries as $f) {
+			@rquery("insert ignore into `faq` (`frage`, `antwort`, `wie_oft_gestellt`) VALUES (" . esc($f["frage"]) . ", " . esc($f["antwort"]) . ", " . (int)$f["wie_oft"] . ")");
+		}
+
+		/* Buildings + rooms. We need at least one of each so that
+		 * the JOIN in get_raum_gebaeude_array() yields a non-empty
+		 * result. The abkuerzung is unique. */
+		$gebaeude_rows = array(
+			array("ABS", "Absolutismus-Bau"),
+			array("BZW", "Beyer-Bau"),
+			array("CHE", "Chemie-Gebäude"),
+			array("GER", "Gerthsen-Bau"),
+			array("HSZ", "Hörsaalzentrum"),
+			array("MPLT", "Piloty-Gebäude"),
+			array("PHY", "Physik-Gebäude"),
+			array("WIL", "Wilhelm-Bau"),
+		);
+		foreach($gebaeude_rows as $g) {
+			@rquery("insert ignore into `gebaeude` (`abkuerzung`, `name`) VALUES (" . esc($g[0]) . ", " . esc($g[1]) . ")");
+		}
+
+		/* Rooms. We attach rooms to the buildings we just created.
+		 * The unique key on (gebaeude_id, raumnummer) makes this safe
+		 * to re-run. */
+		$raum_rows = array(
+			array("ABS", "101"),
+			array("ABS", "202"),
+			array("CHE", "A123"),
+			array("CHE", "B201"),
+			array("GER", "A001"),
+			array("HSZ", "H001"),
+			array("HSZ", "H002"),
+			array("MPLT", "E01"),
+			array("PHY", "HS1"),
+			array("WIL", "A100"),
+		);
+		foreach($raum_rows as $r) {
+			$gid = (int)get_single_row_from_query("select id from gebaeude where abkuerzung = " . esc($r[0]));
+			if($gid > 0) {
+				@rquery("insert ignore into `raum` (`gebaeude_id`, `raumnummer`) VALUES (" . $gid . ", " . esc($r[1]) . ")");
+			}
+		}
+
+		/* Bereich id=1 must be "Grundzüge der Logik" for the legacy
+		 * test get_bereich_name_by_id(1). selftest() inserts "-" as
+		 * id=1, so we UPDATE the existing row in place. */
+		$b1 = @get_single_row_from_query("select id from bereich where id = 1");
+		if($b1) {
+			@rquery("update `bereich` set name = 'Grundzüge der Logik' where id = 1");
+		} else {
+			@rquery("insert into `bereich` (id, name) values (1, 'Grundzüge der Logik')");
+		}
+
+		/* A few more classical philosophy bereiche so the list isn't
+		 * single-entry (used implicitly by some views/tests). */
+		$extra_bereiche = array(
+			"Theoretische Philosophie",
+			"Praktische Philosophie",
+			"Philosophie des Geistes",
+			"Erkenntnistheorie",
+			"Wissenschaftstheorie",
+		);
+		foreach($extra_bereiche as $bname) {
+			@rquery("insert ignore into `bereich` (`name`) VALUES (" . esc($bname) . ")");
+		}
+	} catch(\Throwable $e) {
+		// best-effort - don't break the test run if seed data fails
 	}
 }

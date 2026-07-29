@@ -41,6 +41,7 @@
 			}
 		} else {
 			print print_diffs($name, $a, $b);
+			$message = print_diffs($name, $a, $b);
 			trigger_error($message, E_USER_WARNING);
 			test_failed();
 		}
@@ -57,7 +58,7 @@
 				if(gettype($a) == 'string') {
 					if($a == $b) {
 						$message = print_diffs($name, $a, $b);
-						trigger_error($message, E_USER_WARNING);;
+						trigger_error($message, E_USER_WARNING);
 						test_failed();
 					} else {
 						print green_text("OK").": $name\n";
@@ -66,7 +67,7 @@
 				} else {
 					if (serialize($a) == serialize($b)) {
 						$message = print_diffs($name, $a, $b);
-						trigger_error($message, E_USER_WARNING);;
+						trigger_error($message, E_USER_WARNING);
 						test_failed();
 					} else {
 						print green_text("OK").": $name\n";
@@ -75,7 +76,8 @@
 				}
 			} else {
 				print print_diffs($name, $a, $b);
-				trigger_error($message, E_USER_WARNING);;
+				$message = print_diffs($name, $a, $b);
+				trigger_error($message, E_USER_WARNING);
 				test_failed();
 			}
 		}
