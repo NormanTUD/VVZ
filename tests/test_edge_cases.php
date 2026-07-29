@@ -22,7 +22,8 @@ is_equal("htmle('') returns em-dash", htmle(""), "&mdash;");
 is_equal("htmle(false) returns em-dash (false is treated as empty)", htmle(false), "&mdash;");
 is_equal("htmle(0) returns em-dash (0 is treated as empty)", htmle(0), "&mdash;");
 is_equal("htmle('0') returns em-dash (PHP's `if('0')` is falsy)", htmle("0"), "&mdash;");
-is_equal("htmle(array()) returns em-dash (arrays stringify to 'Array', but `if(array)` is true)", htmle(array()), "Array");
+is_equal("htmle(array()) returns em-dash (empty array is falsy)", htmle(array()), "&mdash;");
+is_equal("htmle(non-empty array) returns 'Array' (non-empty array is truthy)", htmle(array("a")), "Array");
 is_equal("htmle with all HTML chars", htmle("<a href=\"x\">a&amp;b</a>"), "&lt;a href=&quot;x&quot;&gt;a&amp;amp;b&lt;/a&gt;");
 
 /* htmle with multibyte */
@@ -48,10 +49,12 @@ is_equal("htmle shy with float", htmle(3.14, 1), "3.14");
 is_equal("add_leading_zero('0') becomes '00'", add_leading_zero("0"), "00");
 is_equal("add_leading_zero('00') stays '00' (already 2 chars)", add_leading_zero("00"), "00");
 is_equal("add_leading_zero('100') stays '100'", add_leading_zero("100"), "100");
-is_equal("add_leading_zero('') stays empty (0 length)", add_leading_zero(""), "");
-is_equal("add_leading_zero(false) becomes '0'", add_leading_zero(false), "00"); /* 'false' to '0' to '00' - PHP strlen=false=0, returns 0+0='00'? let's just check string */
-is_equal("add_leading_zero returns string type", is_string(add_leading_zero(5)) ? 1 : 0, 1);
-is_equal("add_leading_zero returns string type for large numbers", is_string(add_leading_zero(999)) ? 1 : 0, 1);
+is_equal("add_leading_zero('') becomes '0' (prepended because len < 2)", add_leading_zero(""), "0");
+is_equal("add_leading_zero(false) becomes '00' (false -> '' -> '0' -> '00')", add_leading_zero(false), "00");
+is_equal("add_leading_zero returns string type when prepending", is_string(add_leading_zero(5)) ? 1 : 0, 1);
+/* add_leading_zero returns the input unchanged when its length is >= 2,
+ * so the return type matches the input type. */
+is_equal("add_leading_zero int passthrough for length>=2", add_leading_zero(999), 999);
 
 /* ============================================================ */
 /* ----- comma_list_to_array: edge cases ----- */
