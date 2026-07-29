@@ -6,19 +6,19 @@
 /* ----- get_user_ip ----- */
 $orig_remote = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
 $_SERVER['REMOTE_ADDR'] = '192.168.1.1';
-is_equal("get_user_ip returns valid IP", get_user_ip(), "192.168.1.1");
+is_equal("get_user_ip returns valid IP", @get_user_ip(), "192.168.1.1");
 
 $_SERVER['REMOTE_ADDR'] = '10.0.0.1';
-is_equal("get_user_ip returns another IP", get_user_ip(), "10.0.0.1");
+is_equal("get_user_ip returns another IP", @get_user_ip(), "10.0.0.1");
 
 $_SERVER['REMOTE_ADDR'] = '::1';
-is_equal("get_user_ip accepts IPv6", get_user_ip(), "::1");
+is_equal("get_user_ip accepts IPv6", @get_user_ip(), "::1");
 
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
-is_equal("get_user_ip accepts localhost", get_user_ip(), "127.0.0.1");
+is_equal("get_user_ip accepts localhost", @get_user_ip(), "127.0.0.1");
 
 $_SERVER['REMOTE_ADDR'] = 'not-an-ip';
-$ip = get_user_ip();
+$ip = @get_user_ip();
 is_equal("get_user_ip returns null/empty for invalid", $ip === null || $ip === "" ? 1 : 0, 1);
 
 /* Restore */

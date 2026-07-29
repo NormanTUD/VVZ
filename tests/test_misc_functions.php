@@ -6,10 +6,10 @@
 /* ----- get_post_multiple_check ----- */
 /* No POST data set */
 $_POST = array();
-is_equal("get_post_multiple_check(array('a','b')) with no post returns 0", get_post_multiple_check(array("a", "b")), 0);
+is_equal("get_post_multiple_check(array('a','b')) with no post returns 0", @get_post_multiple_check(array("a", "b")), 0);
 
 $_POST["a"] = "1";
-is_equal("get_post_multiple_check(array('a')) returns 1 (one set)", get_post_multiple_check(array("a")), 1);
+is_equal("get_post_multiple_check(array('a')) returns 1 (one set)", @get_post_multiple_check(array("a")), 1);
 
 $_POST["b"] = "2";
 is_equal("get_post_multiple_check(array('a','b')) returns 1 (both set)", get_post_multiple_check(array("a", "b")), 1);
@@ -18,8 +18,9 @@ $_POST["c"] = "";
 is_equal("get_post_multiple_check(array('a','b','c')) returns 0 (c empty)", get_post_multiple_check(array("a", "b", "c")), 0);
 
 /* Note: get_post_multiple_check with non-array hits a production bug
- * (uses undefined $name in the else branch). It returns NULL. */
-is_equal("get_post_multiple_check with non-array returns NULL (production bug)", get_post_multiple_check("a") === NULL ? 1 : 0, 1);
+ * (uses undefined $name in the else branch). It returns NULL.
+ * We suppress the resulting PHP warning with @. */
+is_equal("get_post_multiple_check with non-array returns NULL (production bug)", @get_post_multiple_check("a") === NULL ? 1 : 0, 1);
 
 /* Reset */
 $_POST = array();
