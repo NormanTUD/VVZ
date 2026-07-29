@@ -18,6 +18,23 @@ require_once(__DIR__ . "/cli_guard.php");
 $GLOBALS['started_tests'] = 0;
 $GLOBALS['failed_tests'] = 0;
 $GLOBALS['settings_cache'] = array();
+$GLOBALS['test_verbose'] = false;
+if(isset($argc) && $argc > 1) {
+	foreach(array_slice($argv, 1) as $arg) {
+		if($arg === '--verbose' || $arg === '-v' || $arg === '--ok') {
+			$GLOBALS['test_verbose'] = true;
+		}
+	}
+}
+if(getenv('VERBOSE') === '1' || getenv('VERBOSE') === 'true') {
+	$GLOBALS['test_verbose'] = true;
+}
+
+function test_ok ($name) {
+	if(!empty($GLOBALS['test_verbose'])) {
+		print green_text("OK").": $name\n";
+	}
+}
 
 // Minimal subset of functions needed for pure tests
 function green_text ($str) { return "\033[32m".$str."\033[0m"; }
@@ -62,7 +79,7 @@ function is_equal ($name, $a, $b) {
 	if(gettype($a) == gettype($b)) {
 		if(gettype($a) == 'string') {
 			if($a == $b) {
-				print green_text("OK").": $name\n";
+				test_ok($name);
 				return 1;
 			} else {
 				print red_text("FAIL").": $name (expected: '$b', got: '$a')\n";
@@ -71,7 +88,7 @@ function is_equal ($name, $a, $b) {
 			}
 		} else {
 			if (serialize($a) == serialize($b)) {
-				print green_text("OK").": $name\n";
+				test_ok($name);
 				return 1;
 			} else {
 				print red_text("FAIL").": $name (expected: " . print_r($b, true) . ", got: " . print_r($a, true) . ")\n";
@@ -89,7 +106,7 @@ function is_equal ($name, $a, $b) {
 function is_unequal ($name, $a, $b) {
 	increate_started_tests();
 	if(!gettype($a) == gettype($b)) {
-		print green_text("OK").": $name\n";
+		test_ok($name);
 		return 1;
 	} else {
 		if(gettype($a) == gettype($b)) {
@@ -98,7 +115,7 @@ function is_unequal ($name, $a, $b) {
 					test_failed();
 					return 0;
 				} else {
-					print green_text("OK").": $name\n";
+					test_ok($name);
 					return 1;
 				}
 			} else {
@@ -106,7 +123,7 @@ function is_unequal ($name, $a, $b) {
 					test_failed();
 					return 0;
 				} else {
-					print green_text("OK").": $name\n";
+					test_ok($name);
 					return 1;
 				}
 			}
@@ -122,7 +139,7 @@ function regex_matches ($name, $string, $regex) {
 	}
 	if(gettype($string) == 'string') {
 		if(preg_match($regex, $string)) {
-			print green_text("OK").": $name\n";
+			test_ok($name);
 			return 1;
 		} else {
 			print red_text("FAIL").": $name (regex did not match: '$regex' on '$string')\n";
@@ -146,7 +163,7 @@ function regex_fails ($name, $string, $regex) {
 			test_failed();
 			return 0;
 		} else {
-			print green_text("OK").": $name\n";
+			test_ok($name);
 			return 1;
 		}
 	}
@@ -157,7 +174,7 @@ function regex_fails ($name, $string, $regex) {
 
 function is_equal_safe ($name, $a, $b) {
 	if($a == $b) {
-		print green_text("OK").": $name\n";
+		test_ok($name);
 		return 1;
 	} else {
 		test_failed();
