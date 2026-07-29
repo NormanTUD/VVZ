@@ -1,6 +1,15 @@
 <?php
 /*
  * Standalone test runner for PURE (non-DB) tests.
+ *
+ * CLI guard: refuse to run when accessed via the web.
+ * Without this, anyone hitting /tests/run_pure_tests.php in a browser
+ * could leak file paths and stack traces from the production code.
+ */
+require_once(__DIR__ . "/cli_guard.php");
+
+/*
+ * Standalone test runner for PURE (non-DB) tests.
  * This bypasses the database connection by defining only the functions we need.
  *
  * Usage: php tests/run_pure_tests.php
@@ -236,6 +245,21 @@ function create_hour_from_to ($from, $to, $array = 0) {
 		}
 	} else {
 		return null;
+	}
+}
+
+function add_next_year_to_wintersemester ($semestertype, $year) {
+	if(preg_match('/^\d+(\/\d+)?$/', $semestertype)) {
+		$tmp = $year;
+		$year = $semestertype;
+		$semestertype = $tmp;
+	}
+	$year = preg_replace('/\/.*$/', '', $year);
+	if(is_numeric($year) && $semestertype == 'Wintersemester') {
+		$next_year = $year + 1;
+		return "$semestertype $year/$next_year";
+	} else {
+		return "$semestertype $year";
 	}
 }
 

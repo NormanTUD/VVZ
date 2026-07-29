@@ -1,5 +1,12 @@
 <?php
 	/*
+	 * CLI guard: refuse to run when accessed via the web.
+	 * Without this, anyone hitting /testsuite.php in a browser could
+	 * trigger selftest() which DROPS AND RECREATES all DB tables.
+	 */
+	require_once(__DIR__ . "/tests/cli_guard.php");
+
+	/*
 	 * Pre-flight check: required PHP extensions.
 	 *
 	 * VVZ needs the mysqli extension to talk to the database. If it is
