@@ -248,7 +248,7 @@ if(function_exists('create_uni_name')) {
 	is_equal("create_uni_name with sharp s", create_uni_name("Straße"), "strasse");
 	is_equal("create_uni_name with multiple spaces", create_uni_name("hello   world"), "hello_world");
 	is_equal("create_uni_name with digits replaced (trailing dash stripped)", create_uni_name("course 101"), "course");
-	is_equal("create_uni_name with digits in middle", create_uni_name("course 101 intro"), "course-intro");
+	is_equal("create_uni_name with digits in middle (final step converts dash to underscore)", create_uni_name("course 101 intro"), "course_intro");
 	is_equal("create_uni_name with NULL", create_uni_name(NULL), "");
 	is_equal("create_uni_name with empty string", create_uni_name(""), "");
 	is_equal("create_uni_name with special chars stripped", create_uni_name("hello!@#"), "hello");
@@ -428,18 +428,23 @@ if(function_exists('array2Table')) {
 	$out = array2Table(array(array("x" => 1, "y" => 2)), array());
 	is_equal("array2Table single row contains data", strpos($out, "1") !== false && strpos($out, "2") !== false ? 1 : 0, 1);
 
-	/* Many rows with empty status (avoids PHP 8 TypeError on null deref) */
+	/* Many rows with status that has all lines (production needs $status[$line]
+	 * for every line — it crashes in PHP 8 with empty status on line >= 1) */
 	$rows = array();
-	for($i = 0; $i < 50; $i++) $rows[] = array("id" => $i);
-	$out50 = array2Table($rows, array());
+	$status = array();
+	for($i = 0; $i < 50; $i++) {
+		$rows[] = array("id" => $i);
+		$status[$i] = array("something_failed" => 0);
+	}
+	$out50 = array2Table($rows, $status);
 	is_equal("array2Table 50 rows contains last id", strpos($out50, "49") !== false ? 1 : 0, 1);
 
-	/* With status array */
+	/* With status array (single row) */
 	$out_status = array2Table(array(array("a" => 1)), array(0 => array("something_failed" => 0)));
 	is_equal("array2Table with status still has table", strpos($out_status, "<table") !== false || is_string($out_status) ? 1 : 0, 1);
 
 	/* With error_lines */
-	$out_err = array2Table(array(array("a" => 1)), array(), array(0));
+	$out_err = array2Table(array(array("a" => 1)), array(0 => array("something_failed" => 0)), array(0));
 	is_equal("array2Table with error_lines still works", is_string($out_err) ? 1 : 0, 1);
 }
 
