@@ -113,10 +113,9 @@ is_equal("get_post_multiple_check with integer in array", get_post_multiple_chec
 is_equal("get_post_multiple_check with mixed valid/invalid", get_post_multiple_check(array("a", "missing")), 0);
 /* Note: get_post_multiple_check with a scalar argument hits the
  * `else` branch which uses an undefined variable - production bug.
- * The function returns the scalar as-is (truthy), which is wrong but
- * documents current behavior. */
-is_equal("get_post_multiple_check with non-array scalar returns truthy (bug)", @get_post_multiple_check("a") ? 1 : 0, 1);
-is_equal("get_post_multiple_check with NULL returns falsy", !@get_post_multiple_check(NULL) ? 1 : 0, 1);
+ * get_post(undefined_var) returns NULL, so the whole call returns NULL. */
+is_equal("get_post_multiple_check with non-array scalar returns NULL (production bug)", @get_post_multiple_check("a") === NULL ? 1 : 0, 1);
+is_equal("get_post_multiple_check with NULL returns NULL", @get_post_multiple_check(NULL) === NULL ? 1 : 0, 1);
 is_equal("get_post_multiple_check with empty array", get_post_multiple_check(array()), 1);
 $_POST = array();
 
@@ -547,12 +546,22 @@ is_equal("might_be_query with 'FROM' uppercase", might_be_query("SELECT 1 FROM d
 /* ============================================================ */
 
 is_equal("esc with whitespace string", esc(" "), '" "');
-is_equal("esc with tab", esc("\t"), "\"	\"");
-/* Pure-mode esc() is a stub: wraps in quotes, escapes " but NOT \n, \t, \\ */
-is_equal("esc with newline (raw, not escaped)", esc("\n"), "\"\n\"");
+/* Production esc() uses mysqli_real_escape_string which escapes:
+ *   \n → \n (literal backslash + n)
+ *   \r → \r
+ *   \ → \\
+ *   " → \"
+ * Pure-mode stub does NOT do this — see run_pure_tests.php. */
+if(function_exists('mysqli_real_escape_string') && isset($GLOBALS['dbh']) && $GLOBALS['dbh']) {
+	/* Production mode: mysqli escapes newlines and backslashes */
+	is_equal("esc with newline (mysqli escapes)", esc("\n"), "\"\\n\"");
+	is_equal("esc with backslash (mysqli doubles)", esc("a\\b"), '"a\\\\b"');
+} else {
+	/* Pure mode: stub just wraps in quotes and escapes " */
+	is_equal("esc with newline (raw, not escaped in pure)", esc("\n"), "\"\n\"");
+	is_equal("esc with backslash (raw, not escaped in pure)", esc("a\\b"), '"a\\b"');
+}
 is_equal("esc with special sql chars", strpos(esc("'; DROP TABLE users;--"), "DROP TABLE") !== false ? 1 : 0, 1);
-/* Note: stub esc() does not escape backslashes — passes through verbatim */
-is_equal("esc with backslash (raw, not escaped)", esc("a\\b"), '"a\\b"');
 
 /* ============================================================ */
 /* ----- multiple_esc_join variants ----- */
