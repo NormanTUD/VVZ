@@ -765,8 +765,49 @@
 			/* --- ADMIN SPECIFIC --- */
 			html.dark-mode .blurbox {
 				background-color: #1e1e3a !important;
-				border-color: #444 !important;
+				border-color: #2a2a4a !important;
 				color: #e0e0e0 !important;
+			}
+
+			/* Tabellen-Zellen: im Lightmode weiße Borders (unsichtbar), im Darkmode
+			   wären sie als helle Linien sichtbar — durch dezenten Dunkelton ersetzen. */
+			html.dark-mode td,
+			html.dark-mode th {
+				border-color: #2a2a4a !important;
+			}
+			html.dark-mode table {
+				border-color: #2a2a4a !important;
+			}
+			html.dark-mode .invisiblebg,
+			html.dark-mode .invisiblebg td,
+			html.dark-mode .invisiblebg th,
+			html.dark-mode .invisiblebg > tbody > tr,
+			html.dark-mode .invisiblebg > thead > tr {
+				background-color: transparent !important;
+				border: 0 !important;
+			}
+
+			/* Navigation oben (Topnav) im Admin-Bereich: die Tab-Trennlinien */
+			html.dark-mode .topnav li a {
+				border-color: #2a2a4a !important;
+			}
+			html.dark-mode .topnav {
+				border-bottom: 1px solid #2a2a4a;
+			}
+
+			/* Formular-Hilfen (gelbe Tooltips etc.) */
+			html.dark-mode .callout,
+			html.dark-mode .info {
+				background-color: #1a2d4a !important;
+				border-color: #2a4a7a !important;
+				color: #e0e0e0 !important;
+			}
+
+			/* Eingebettete Bilder mit text-shadow-Filter (Logo) bekommen im Darkmode
+			   einen leichten Glow statt einer schwarzen Outline */
+			html.dark-mode img.logo_limits {
+				filter: drop-shadow(1px 0 0 #2a2a4a) drop-shadow(-1px 0 0 #2a2a4a)
+				        drop-shadow(0 1px 0 #2a2a4a) drop-shadow(0 -1px 0 #2a2a4a) !important;
 			}
 
 			/* --- MISC BACKGROUNDS --- */
