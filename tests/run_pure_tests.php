@@ -934,10 +934,6 @@ function fq ($str) {
 	return "&raquo;" . htmle($str) . "&laquo;";
 }
 
-function rarr ($str) {
-	return preg_replace("/&rarr;/", "→", $str);
-}
-
 function escape ($t) {
 	return $t;
 }
