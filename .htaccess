@@ -4,36 +4,35 @@ RewriteBase /
 AddDefaultCharset UTF-8
 
 <Files "reset.php">
-	Order Allow,Deny
-	Deny from all
+        Order Allow,Deny
+        Deny from all
 </Files>
 
 <IfModule mod_rewrite.c>
-	DirectoryIndex startseite.php
-	RewriteEngine On
+        DirectoryIndex startseite.php
+        RewriteEngine On
 
-	Redirect 301 /v/startseite.php /
-	Redirect 301 /v/startseite /
-	Redirect 301 /v/$ /
+        Redirect 301 /v/startseite.php /
+        Redirect 301 /v/startseite /
+        RedirectMatch 301 ^/v/$ /
 
-	RewriteRule ^v/(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4/$5 [NE,E=SFURI:$1]
-	RewriteRule ^v/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4 [NE,E=SFURI:$1]
-	RewriteRule ^v/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
-	RewriteRule ^v/(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
-	RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
-	RewriteRule ^admin$ admin.php [L]
-	RewriteRule ^impressum$ impressum.php [L]
-	RewriteRule ^docs$ docs.php [L]
-	RewriteRule ^faq$ faq.php [L]
-	RewriteRule ^api$ api.php [L]
-	RewriteRule ^zeitraster$ zeitraster.php [L]
-	RewriteRule ^kontakt$ kontakt.php [L]
-	RewriteRule ^startseite$ startseite.php [L]
-	RewriteRule ^logo.png$ logo.php [L]
+        RewriteRule ^v/(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4/$5 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
+        RewriteRule ^admin$ admin.php [L]
+        RewriteRule ^impressum$ impressum.php [L]
+        RewriteRule ^docs$ docs.php [L]
+        RewriteRule ^faq$ faq.php [L]
+        RewriteRule ^api$ api.php [L]
+        RewriteRule ^zeitraster$ zeitraster.php [L]
+        RewriteRule ^kontakt$ kontakt.php [L]
+        RewriteRule ^startseite$ startseite.php [L]
+        RewriteRule ^logo.png$ logo.php [L]
 
-	RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
-	Redirect 301 ^/v/$ /
+        RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
 
-	RedirectMatch 404 /\.git
-	RedirectMatch 404 /\install.sh
+        RedirectMatch 404 /\.git
+        RedirectMatch 404 /install\.sh
 </IfModule>
