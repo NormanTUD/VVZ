@@ -1,0 +1,7 @@
+# Block all web access to the tests/ directory.
+# The CLI guard inside each PHP file is the primary defense;
+# this .htaccess is a belt-and-suspenders backup so that even if a
+# test file is misconfigured (or someone drops a .php in here that
+# forgets to include cli_guard.php), the web server will not serve it.
+
+Require all denied
