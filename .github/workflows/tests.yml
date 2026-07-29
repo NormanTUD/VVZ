@@ -133,3 +133,39 @@ jobs:
           echo "  Pure tests (no database)"
           echo "=========================================="
           php tests/run_pure_tests.php
+
+  # Separate job that runs once per workflow run (after all matrix
+  # combinations succeed) and pushes a tag like `ci-run-1234567890`
+  # pointing at the tested commit. The runner ID is unique across all
+  # workflow runs, so tags never collide even on rapid pushes.
+  #
+  # Skipped on pull_request because external forks don't have write
+  # access to the base repo's tags.
+  tag-success:
+    name: Tag successful run
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+        with:
+          # Need full history so `git push origin <tag>` works.
+          fetch-depth: 0
+
+      - name: Push tag with runner ID
+        run: |
+          TAG="ci-run-${{ github.run_id }}"
+          # Don't re-tag if the workflow was re-run with the same ID
+          # (can happen on manual re-runs).
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists, skipping."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG" -m "CI run ${{ github.run_id }} passed on ${{ github.sha }}"
+          git push origin "$TAG"
+          echo "Pushed tag: $TAG"
