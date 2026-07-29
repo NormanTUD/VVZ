@@ -66,6 +66,19 @@ jobs:
             fi
           done
 
+      - name: Lint first-party PHP files
+        # Skip third-party libraries under Classes/ - they pin PHP 5/7 syntax
+        # (e.g. PHPExcel uses curly-brace array offsets which PHP 8 removed).
+        # We don't own that code and don't need to keep it lint-clean.
+        run: |
+          set -e
+          find . -name '*.php' -not -path './.git/*' -not -path './Classes/*' -print0 | xargs -0 -n1 php -l 2>&1 | tee /tmp/lint.log | grep -v "No syntax errors" || true
+          if grep -q "Errors parsing" /tmp/lint.log; then
+            echo "::error::PHP lint errors found"
+            exit 1
+          fi
+          echo "All first-party PHP files parse cleanly."
+
       # Use PHP's mysqli instead of the mysql CLI client - the mysql
       # binary isn't installed by default on ubuntu-latest, and PHP
       # is already set up and knows about mysqli.
@@ -120,20 +133,3 @@ jobs:
           echo "  Pure tests (no database)"
           echo "=========================================="
           php tests/run_pure_tests.php
-
-  lint:
-    name: Lint syntax
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-      - name: Lint every PHP file
-        run: |
-          set -e
-          # Skip third-party libraries under Classes/ - they pin PHP 5/7 syntax
-          # (e.g. PHPExcel uses curly-brace array offsets which PHP 8 removed).
-          # We don't own that code and don't need to keep it lint-clean.
-          find . -name '*.php' -not -path './.git/*' -not -path './Classes/*' -print0 | xargs -0 -n1 php -l
-          echo "All first-party PHP files parse cleanly."
