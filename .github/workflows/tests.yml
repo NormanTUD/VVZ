@@ -30,15 +30,19 @@ jobs:
         image: mariadb:11
         env:
           MARIADB_ROOT_PASSWORD: rootpw
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 'yes'
           MARIADB_ROOT_HOST: '%'
         ports:
-          - 3311:3306
+          - 3306:3306
+        # The mariadb image ships a healthcheck.sh that works without
+        # external clients. The default MySQL/MariaDB images only
+        # listen on a unix socket until initialised, so we wait for
+        # "innodb_initialized" before considering the service healthy.
         options: >-
-          --health-cmd="mariadb-admin ping -h localhost -u root"
-          --health-interval=5s
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
           --health-timeout=5s
-          --health-retries=10
+          --health-retries=30
+          --health-start-period=30s
 
     steps:
       - name: Checkout
@@ -62,10 +66,18 @@ jobs:
             fi
           done
 
+      # Use PHP's mysqli instead of the mysql CLI client - the mysql
+      # binary isn't installed by default on ubuntu-latest, and PHP
+      # is already set up and knows about mysqli.
       - name: Wait for MariaDB to be reachable
         run: |
-          for i in $(seq 1 30); do
-            if mysql -h 127.0.0.1 -P 3311 -u root -e "SELECT 1" >/dev/null 2>&1; then
+          for i in $(seq 1 60); do
+            if php -r '
+              $dbh = @mysqli_connect("127.0.0.1", "root", "rootpw", "", 3306);
+              if(!$dbh) { exit(1); }
+              $r = @mysqli_query($dbh, "SELECT 1");
+              exit($r ? 0 : 1);
+            ' 2>/dev/null; then
               echo "MariaDB is up"
               exit 0
             fi
@@ -82,19 +94,23 @@ jobs:
           echo -n "rootpw" | sudo tee /etc/vvzdbpw > /dev/null
           sudo chmod 600 /etc/vvzdbpw
 
-      - name: Create startpage database role (best-effort)
+      - name: Create startpage database (best-effort)
         run: |
-          # Some VVZ bootstrap queries hit a couple of grants that the default
-          # root user has anyway; we make sure the customer DB exists so
-          # selftest() doesn't have to.
-          mysql -h 127.0.0.1 -P 3311 -u root -e "CREATE DATABASE IF NOT EXISTS startpage"
+          # Some VVZ bootstrap queries need the customer DB to exist
+          # before selftest() runs. We create it via PHP here so we
+          # don't depend on the mysql CLI being installed.
+          php -r '
+            $dbh = mysqli_connect("127.0.0.1", "root", "rootpw", "", 3306);
+            if(!$dbh) { fwrite(STDERR, "Cannot connect to MariaDB\n"); exit(1); }
+            mysqli_query($dbh, "CREATE DATABASE IF NOT EXISTS startpage");
+            echo "startpage DB is ready\n";
+          '
 
-      - name: Run tests
+      - name: Run testsuite
         run: |
           set -e
           echo "=========================================="
           echo "  PHP $(php -r 'echo PHP_VERSION;')"
-          echo "  MariaDB $(mysql -h 127.0.0.1 -P 3311 -u root -e 'SELECT VERSION();' | tail -1)"
           echo "=========================================="
           php testsuite.php
 
