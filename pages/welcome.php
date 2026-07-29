@@ -25,14 +25,16 @@
 		$tasks = array();
 
 		if($my_dozent_id) {
-			$scope_dozent_ids = array($my_dozent_id);
+			$scope_dozent_ids = array((int)$my_dozent_id);
 			foreach (get_user_per_superdozent($GLOBALS['logged_in_user_id']) as $su) {
-				$scope_dozent_ids[] = (int)$su[0];
+				if(isset($su[0]) && (int)$su[0] > 0) {
+					$scope_dozent_ids[] = (int)$su[0];
+				}
 			}
-			$scope_dozent_ids = array_unique($scope_dozent_ids);
+			$scope_dozent_ids = array_values(array_unique(array_filter($scope_dozent_ids, function($v) { return is_numeric($v) && (int)$v > 0; })));
 			$doz_in = join(',', array_map('intval', $scope_dozent_ids));
 
-			if($aktuelles_semester) {
+			if($aktuelles_semester && $doz_in !== '') {
 				$cnt_missing_pn = dashboard_get_count(
 					'SELECT COUNT(*) FROM `veranstaltung` `v` '.
 					'WHERE `v`.`dozent_id` IN ('.$doz_in.') '.
