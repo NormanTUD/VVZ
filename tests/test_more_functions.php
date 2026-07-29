@@ -319,7 +319,9 @@ is_equal("array_value_or_null with bool true key", array_value_or_null(array(tru
 /* ----- might_be_query: more edge cases ----- */
 /* ============================================================ */
 
-is_equal("might_be_query with SELECT in comment-like syntax", might_be_query("/* SELECT */DELETE FROM x"), 1);
+/* Note: "/* SELECT */DELETE FROM x" doesn't match because the regex
+ * requires ^SELECT at the start. */
+is_equal("might_be_query with SELECT in comment-like syntax", might_be_query("/* SELECT */DELETE FROM x"), 0);
 is_equal("might_be_query with mixed case keywords", might_be_query("Delete From x"), 1);
 is_equal("might_be_query with leading whitespace before keyword", might_be_query("   delete from x"), 0);
 is_equal("might_be_query with tab between keywords", might_be_query("SELECT\t1\tFROM\tx"), 1);
@@ -346,7 +348,8 @@ is_equal("mask_module with newlines", mask_module("line1\nline2"), "<i>line1\nli
 
 is_equal("print_line_link with float", print_line_link(3.14), '<a href="#line_3.14">3.14</a>');
 is_equal("print_line_link with zero-padded string", print_line_link("001"), '<a href="#line_001">001</a>');
-regex_matches("print_line_link with HTML chars", print_line_link("<script>"), '/href="#line_<\/script>"/');
+/* Note: print_line_link doesn't escape HTML, so "<script>" stays literal */
+regex_matches("print_line_link with HTML chars", print_line_link("<script>"), '/href="#line_<script>"/');
 
 /* ============================================================ */
 /* ----- create_hour_from_to with array mode ----- */
