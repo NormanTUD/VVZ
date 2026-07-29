@@ -507,12 +507,12 @@
 					</tr>
 					<tr>
 						<th>Institut</th>
-						<td><?php create_select($institute, get_get('institut'), 'institut', 1); ?></td>
+						<td><?php create_select($institute, get_get('institut'), 'soi_institut', 1); ?></td>
 					</tr>
 					<tr>
 						<th>Studiengang</th>
 						<td>
-							<select name="studiengang_mode" id="studiengang_mode">
+							<select name="soi_studiengang_mode" id="soi_studiengang_mode">
 								<option value="existing">bestehenden auswählen</option>
 								<option value="auto">aus PDF automatisch ermitteln</option>
 								<option value="new">neuen anlegen</option>
@@ -520,7 +520,7 @@
 							<div id="existing_studiengang_box">
 								<?php
 									$studiengaenge = create_studiengaenge_array();
-									create_select($studiengaenge, '', 'studiengang_id', 1);
+									create_select($studiengaenge, '', 'soi_studiengang_id', 1);
 								?>
 							</div>
 							<div id="new_studiengang_box" style="display:none;">
