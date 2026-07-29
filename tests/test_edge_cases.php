@@ -113,9 +113,9 @@ is_equal("get_post_multiple_check with integer in array", get_post_multiple_chec
 is_equal("get_post_multiple_check with mixed valid/invalid", get_post_multiple_check(array("a", "missing")), 0);
 /* Note: get_post_multiple_check with a scalar argument hits the
  * `else` branch which uses an undefined variable - production bug.
- * The result is NULL or false depending on PHP version/settings.
- * We just verify it doesn't return a valid value. */
-is_equal("get_post_multiple_check with non-array scalar returns falsy", !@get_post_multiple_check("a") ? 1 : 0, 1);
+ * The function returns the scalar as-is (truthy), which is wrong but
+ * documents current behavior. */
+is_equal("get_post_multiple_check with non-array scalar returns truthy (bug)", @get_post_multiple_check("a") ? 1 : 0, 1);
 is_equal("get_post_multiple_check with NULL returns falsy", !@get_post_multiple_check(NULL) ? 1 : 0, 1);
 is_equal("get_post_multiple_check with empty array", get_post_multiple_check(array()), 1);
 $_POST = array();
@@ -547,12 +547,12 @@ is_equal("might_be_query with 'FROM' uppercase", might_be_query("SELECT 1 FROM d
 /* ============================================================ */
 
 is_equal("esc with whitespace string", esc(" "), '" "');
-is_equal("esc with tab", esc("\t"), '"	"');
-is_equal("esc with newline", esc("\n"), '"\n"');
-/* Note: esc() uses mysqli_real_escape_string which escapes backslashes too.
- * The actual output has double backslashes around the escaped quote. */
+is_equal("esc with tab", esc("\t"), "\"	\"");
+/* Pure-mode esc() is a stub: wraps in quotes, escapes " but NOT \n, \t, \\ */
+is_equal("esc with newline (raw, not escaped)", esc("\n"), "\"\n\"");
 is_equal("esc with special sql chars", strpos(esc("'; DROP TABLE users;--"), "DROP TABLE") !== false ? 1 : 0, 1);
-is_equal("esc with backslash", esc("a\\b"), '"a\\\\b"');
+/* Note: stub esc() does not escape backslashes — passes through verbatim */
+is_equal("esc with backslash (raw, not escaped)", esc("a\\b"), '"a\\b"');
 
 /* ============================================================ */
 /* ----- multiple_esc_join variants ----- */

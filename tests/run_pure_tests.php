@@ -875,14 +875,15 @@ function print_debug ($str) {
 }
 
 function FormatBacktrace() {
-	return array();
+	return "<h4>Backtrace</h4><pre>" . debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['file'] . "</pre>";
 }
 
 function discordian_date ($str) {
 	if(!isset($str) || !$str) {
 		return null;
 	}
-	return null; // Without ddatelibrary
+	/* Pure-mode stub: return a stable placeholder for valid input */
+	return "Discordian date for: " . (string)$str;
 }
 
 // esc - simple version that just wraps in quotes
