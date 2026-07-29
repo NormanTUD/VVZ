@@ -675,13 +675,14 @@ $(document).ready(function() {
 		focus: function( event, ui ) {
 			event.preventDefault();
 		}
-	}).data("ui-autocomplete")._renderItemData = function( ul, item ) {
-		var meta = prettyCategories[item.category] || { color: "#555", icon: "•" };
+	});
+
+	var acWidget = $globalsearch.data("ui-autocomplete");
+	acWidget._renderItem = function( ul, item ) {
+		var meta = prettyCategories[item.category] || { color: "#555", icon: "\u2022" };
 		var safeRaw = $('<div/>').text(item.raw || item.value || '').html();
-		var $li = $('<li/>')
-			.attr('data-category', item.category)
-			.appendTo(ul);
-		return $('<a/>', { href: 'javascript:void(0)' })
+		var $li = $('<li/>').attr('data-category', item.category);
+		$('<a/>', { href: 'javascript:void(0)' })
 			.append(
 				$('<span class="search_category_badge"/>')
 					.css({ backgroundColor: meta.color })
@@ -690,18 +691,24 @@ $(document).ready(function() {
 			.append(' ')
 			.append($('<span class="search_item_raw"/>').html(safeRaw))
 			.appendTo($li);
+		return $li.appendTo(ul);
 	};
+	// Wichtig: _renderItemData hängt das Original-Item via .data() an das <li> an.
+	// Unsere _renderItem-Override gibt das <li> zurück, daher funktioniert das
+	// Standard-Verhalten von _renderItemData weiterhin korrekt.
 
 	// Enter ohne Auswahl: zum obersten Treffer springen
 	$globalsearch.on('keydown', function(e) {
 		if(e.keyCode === 13) {
 			var ac = $(this).data('ui-autocomplete');
-			if(ac && ac.menu && ac.menu.element && ac.menu.element.children().length > 0 && !ac.menu.active) {
+			if(!ac || !ac.menu || !ac.menu.element) return;
+			var $items = ac.menu.element.children();
+			if($items.length === 0) return;
+			var $target = ac.menu.active ? $items.eq(ac.menu.active) : $items.first();
+			var item = $target.data('ui-autocomplete-item');
+			if(item) {
 				e.preventDefault();
-				var firstItem = ac.menu.element.children().first().data('uiAutocompleteItem');
-				if(firstItem) {
-					ac._trigger('select', 'autocompleteselect', { item: firstItem });
-				}
+				ac._trigger('select', 'autocompleteselect', { item: item });
 			}
 		}
 	});

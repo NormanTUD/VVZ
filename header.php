@@ -81,7 +81,7 @@
 			"css/v4-shims.css"
 		);
 
-		if(array_key_exists("SCRIPT_NAME", $_SERVER) && !($_SERVER["SCRIPT_NAME"] == "/admin" || $_SERVER["SCRIPT_NAME"] == "/admin.php")) {
+		if(array_key_exists("SCRIPT_NAME", $_SERVER) && !in_array(basename($_SERVER["SCRIPT_NAME"]), array("admin", "admin.php"), true)) {
 			css(array("foundation.min.css"));
 		} else {
 			css(array("admin.css"));
