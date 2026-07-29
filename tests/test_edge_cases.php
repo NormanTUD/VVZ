@@ -274,8 +274,11 @@ is_equal("weekday_to_wochentag with int 1", weekday_to_wochentag(1), array("ERRO
  * switch uses loose comparison and (bool)'Monday' is true. */
 is_equal("weekday_to_wochentag with bool returns Monday (PHP loose comparison)", weekday_to_wochentag(true), array("Mo", "Montag"));
 /* Note: weekday_to_wochentag(array("Monday")) hits the default case
- * after PHP converts the array to string "Array" which doesn't match. */
-is_equal("weekday_to_wochentag with array returns ERROR", weekday_to_wochentag(array("Monday")), array("ERROR", "Fehler beim Bestimmen des Tages"));
+ * after PHP converts the array to string "Array" which doesn't match.
+ * The production debug() call inside the default branch tries to
+ * stringify the array and triggers an "Array to string conversion"
+ * warning, so we suppress it here with @. */
+is_equal("weekday_to_wochentag with array returns ERROR", @weekday_to_wochentag(array("Monday")), array("ERROR", "Fehler beim Bestimmen des Tages"));
 
 /* ============================================================ */
 /* ----- wochentag_to_weekday with weird inputs ----- */
