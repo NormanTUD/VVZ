@@ -137,6 +137,233 @@
 
 		js(array("color-hash.js"));
 ?>
+		<style>
+			.password_change_warning {
+				background-color: #fff3cd;
+				border: 1px solid #ffe082;
+				color: #664d03;
+				padding: 10px 36px 10px 12px;
+				margin: 10px 0;
+				border-radius: 4px;
+				position: relative;
+				font-size: 14px;
+				line-height: 1.4;
+			}
+			.password_change_warning .password_change_link {
+				font-weight: bold;
+				color: #664d03;
+				text-decoration: underline;
+				margin-left: 4px;
+			}
+			.password_change_warning .password_change_link:hover {
+				color: #b58900;
+			}
+			.password_change_warning .password_change_dismiss {
+				position: absolute;
+				top: 6px;
+				right: 10px;
+				color: #664d03;
+				text-decoration: none;
+				font-size: 18px;
+				line-height: 1;
+				opacity: 0.6;
+			}
+			.password_change_warning .password_change_dismiss:hover {
+				opacity: 1;
+			}
+			html.dark-mode .password_change_warning {
+				background-color: #5c4a1e !important;
+				border-color: #8a6e2e !important;
+				color: #f5d5a5 !important;
+			}
+			html.dark-mode .password_change_warning a,
+			html.dark-mode .password_change_warning .password_change_link {
+				color: #f5d5a5 !important;
+			}
+
+			/* Globale Suche: Kategorie-Badges in den Autocomplete-Vorschlägen */
+			.ui-autocomplete {
+				max-width: 520px;
+				max-height: 420px;
+				overflow-y: auto;
+				overflow-x: hidden;
+			}
+			.ui-autocomplete .ui-menu-item {
+				margin: 0;
+			}
+			.ui-autocomplete .ui-menu-item a {
+				display: flex !important;
+				align-items: center;
+				gap: 8px;
+				padding: 6px 10px;
+				font-size: 13px;
+				line-height: 1.3;
+				white-space: normal;
+				text-overflow: ellipsis;
+			}
+			.ui-autocomplete .ui-menu-item a .search_category_badge {
+				display: inline-block;
+				flex: 0 0 auto;
+				min-width: 78px;
+				padding: 1px 6px;
+				border-radius: 3px;
+				background: #555;
+				color: #fff !important;
+				font-size: 10px;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.3px;
+				text-align: center;
+				line-height: 1.4;
+			}
+			.ui-autocomplete .ui-menu-item a .search_item_raw {
+				flex: 1 1 auto;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.ui-autocomplete .ui-menu-item.ui-state-active a {
+				background: #3875d7 !important;
+				border: 1px solid #2a5dab !important;
+				color: #fff !important;
+				margin: 0;
+			}
+			.ui-autocomplete .ui-menu-item.ui-state-active a .search_category_badge {
+				background: rgba(0,0,0,0.35) !important;
+				color: #fff !important;
+			}
+			html.dark-mode .ui-autocomplete .ui-menu-item a {
+				color: #e0e0e0 !important;
+				border-color: #444 !important;
+			}
+			html.dark-mode .ui-autocomplete .ui-menu-item.ui-state-active a {
+				background: #0f3460 !important;
+				border-color: #1a4a7a !important;
+				color: #fff !important;
+			}
+
+			/* Dashboard (Willkommensseite) */
+			#dashboard_header { margin: 12px 0 18px 0; }
+			.dashboard_greeting h1 { font-size: 26px; }
+			.dashboard_subtitle { margin: 0; color: #555; font-size: 14px; }
+			html.dark-mode .dashboard_subtitle { color: #b0b0c0 !important; }
+
+			.dashboard_card {
+				background: #fafafa;
+				border: 1px solid #e2e2e2;
+				border-radius: 6px;
+				padding: 12px 16px;
+				margin: 0 0 16px 0;
+				box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+			}
+			html.dark-mode .dashboard_card {
+				background: #16213e !important;
+				border-color: #3a3a5a !important;
+			}
+			.dashboard_card_title {
+				font-size: 15px;
+				margin: 0 0 10px 0;
+				padding: 0;
+				border: 0;
+				color: #333;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.dashboard_card_icon {
+				font-size: 15px;
+				opacity: 0.8;
+			}
+
+			.dashboard_card_tasks { border-left: 4px solid #ef6c00; }
+			.dashboard_card_stats { }
+			.dashboard_card_recent { }
+			.dashboard_card_nav_help { }
+
+			.dashboard_task_list { list-style: none; margin: 0; padding: 0; }
+			.dashboard_task_item { margin: 0; padding: 0; }
+			.dashboard_task_item a {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 8px 10px;
+				border-radius: 4px;
+				text-decoration: none;
+				color: #222;
+				border-bottom: 1px solid #ececec;
+			}
+			.dashboard_task_item:last-child a { border-bottom: 0; }
+			.dashboard_task_item a:hover { background: #fff5e0; }
+			html.dark-mode .dashboard_task_item a {
+				color: #e0e0e0 !important;
+				border-bottom-color: #2a2a4a !important;
+			}
+			html.dark-mode .dashboard_task_item a:hover { background: #2a2a4a !important; }
+			.dashboard_task_count {
+				display: inline-block;
+				min-width: 28px;
+				padding: 2px 6px;
+				text-align: center;
+				background: #f0a020;
+				color: #fff;
+				border-radius: 10px;
+				font-weight: bold;
+				font-size: 12px;
+				flex: 0 0 auto;
+			}
+			.dashboard_task_severity_warn .dashboard_task_count { background: #e65100; }
+			.dashboard_task_severity_info .dashboard_task_count { background: #1976d2; }
+			.dashboard_task_severity_error .dashboard_task_count { background: #c62828; }
+			.dashboard_task_text { flex: 1 1 auto; }
+
+			.dashboard_stats_table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+			.dashboard_stats_table td {
+				padding: 4px 8px;
+				border-bottom: 1px solid #ececec;
+			}
+			.dashboard_stats_table tr:last-child td { border-bottom: 0; }
+			.dashboard_stats_value {
+				text-align: right;
+				font-weight: bold;
+				font-variant-numeric: tabular-nums;
+			}
+
+			.dashboard_recent_list { list-style: none; margin: 0; padding: 0; }
+			.dashboard_recent_item {
+				padding: 6px 0;
+				border-bottom: 1px solid #ececec;
+				display: flex;
+				flex-direction: column;
+				gap: 1px;
+			}
+			.dashboard_recent_item:last-child { border-bottom: 0; }
+			.dashboard_recent_meta {
+				font-size: 11px;
+				color: #777;
+			}
+			html.dark-mode .dashboard_recent_meta { color: #a0a0b0 !important; }
+			.dashboard_recent_time { font-style: italic; }
+
+			.dashboard_nav_list {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+				gap: 6px 18px;
+			}
+			.dashboard_nav_item { padding: 4px 0; }
+			.dashboard_nav_desc { color: #555; font-size: 12px; }
+			html.dark-mode .dashboard_nav_desc { color: #b0b0c0 !important; }
+
+			@media (max-width: 800px) {
+				.dashboard_nav_list { grid-template-columns: 1fr; }
+			}
+		</style>
+
 		<!-- Anti-FOUC: Apply dark mode class to <html> before anything renders -->
 		<script>
 			(function() {
