@@ -547,7 +547,8 @@ if(function_exists('wochentag_to_weekday')) {
 	 * inputs (line 9377). Pure stub just returns empty array.
 	 * 'BS' (Blockseminar) is supported in production but NOT in the pure stub. */
 	$r_bs = wochentag_to_weekday("BS");
-	is_equal("wochentag_to_weekday BS in production returns Blockseminar", $r_bs[1] === "Blockseminar" || (count($r_bs) === 0) ? 1 : 0, 1);
+	$bs_long = isset($r_bs[1]) ? $r_bs[1] : "";
+	is_equal("wochentag_to_weekday BS works (production: Blockseminar, pure: empty)", $bs_long === "Blockseminar" || $bs_long === "" ? 1 : 0, 1);
 }
 
 /* ============================================================ */
