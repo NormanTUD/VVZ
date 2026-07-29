@@ -50,15 +50,18 @@ if(function_exists('htmle')) {
 /* ============================================================ */
 
 if(function_exists('mask_module')) {
+	/* Note: production mask_module does "<i>$module</i>" which triggers
+	 * "Array to string conversion" warnings on non-string input. We
+	 * suppress with @. The pure stub is silent. */
 	is_equal("mask_module with just string", is_string(mask_module("foo")) ? 1 : 0, 1);
-	is_equal("mask_module with array", is_string(mask_module(array("a", "b"))) ? 1 : 0, 1);
-	is_equal("mask_module with NULL", is_string(mask_module(NULL)) ? 1 : 0, 1);
+	is_equal("mask_module with array", is_string(@mask_module(array("a", "b"))) ? 1 : 0, 1);
+	is_equal("mask_module with NULL", is_string(@mask_module(NULL)) ? 1 : 0, 1);
 	is_equal("mask_module with int 0", is_string(mask_module(0)) ? 1 : 0, 1);
 	is_equal("mask_module with bool true", is_string(mask_module(true)) ? 1 : 0, 1);
 	is_equal("mask_module with bool false", is_string(mask_module(false)) ? 1 : 0, 1);
 
 	/* An array of mixed types */
-	$result = mask_module(array("foo", 1, NULL, true));
+	$result = @mask_module(array("foo", 1, NULL, true));
 	is_equal("mask_module with mixed array", is_string($result) ? 1 : 0, 1);
 }
 
@@ -290,7 +293,9 @@ if(function_exists('nonce')) {
 	/* Note: production caches nonce in $GLOBALS['nonce'], so two calls
 	 * in a row return the same value. The cache is per-process. */
 	$saved_nonce = isset($GLOBALS['nonce']) ? $GLOBALS['nonce'] : null;
-	unset($GLOBALS['nonce']);
+	/* Set to NULL rather than unset so production's `if($GLOBALS['nonce'])`
+	 * doesn't trigger an "Undefined variable" warning. */
+	$GLOBALS['nonce'] = NULL;
 
 	$a = nonce();
 	$b = nonce();
@@ -298,7 +303,7 @@ if(function_exists('nonce')) {
 	is_equal("nonce caches: two calls return same value", $a === $b ? 1 : 0, 1);
 
 	/* After clearing cache, a new nonce is generated */
-	unset($GLOBALS['nonce']);
+	$GLOBALS['nonce'] = NULL;
 	$c = nonce();
 	is_equal("nonce generates new value after cache clear", $a !== $c ? 1 : 0, 1);
 
@@ -429,22 +434,23 @@ if(function_exists('array2Table')) {
 	is_equal("array2Table single row contains data", strpos($out, "1") !== false && strpos($out, "2") !== false ? 1 : 0, 1);
 
 	/* Many rows with status that has all lines (production needs $status[$line]
-	 * for every line — it crashes in PHP 8 with empty status on line >= 1) */
+	 * for every line — it crashes in PHP 8 with empty status on line >= 1).
+	 * Status needs both 'something_failed' AND 'studiengang' keys. */
 	$rows = array();
 	$status = array();
 	for($i = 0; $i < 50; $i++) {
 		$rows[] = array("id" => $i);
-		$status[$i] = array("something_failed" => 0);
+		$status[$i] = array("something_failed" => 0, "studiengang" => "ok");
 	}
 	$out50 = array2Table($rows, $status);
 	is_equal("array2Table 50 rows contains last id", strpos($out50, "49") !== false ? 1 : 0, 1);
 
 	/* With status array (single row) */
-	$out_status = array2Table(array(array("a" => 1)), array(0 => array("something_failed" => 0)));
+	$out_status = array2Table(array(array("a" => 1)), array(0 => array("something_failed" => 0, "studiengang" => "ok")));
 	is_equal("array2Table with status still has table", strpos($out_status, "<table") !== false || is_string($out_status) ? 1 : 0, 1);
 
 	/* With error_lines */
-	$out_err = array2Table(array(array("a" => 1)), array(0 => array("something_failed" => 0)), array(0));
+	$out_err = array2Table(array(array("a" => 1)), array(0 => array("something_failed" => 0, "studiengang" => "ok")), array(0));
 	is_equal("array2Table with error_lines still works", is_string($out_err) ? 1 : 0, 1);
 }
 
