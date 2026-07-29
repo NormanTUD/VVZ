@@ -439,12 +439,18 @@
 	if(!function_exists('soi_ensure_studiengang')) {
 		function soi_ensure_studiengang($name, $degree, $institut_id) {
 			if(!$name) return null;
-			$existing = get_single_row_from_query('SELECT id FROM `studiengang` WHERE `name` = '.esc($name).' LIMIT 1');
-			if(is_array($existing) && isset($existing[0])) return (int)$existing[0];
-			$full_name = $name;
+			$full_name = trim($name);
 			if($degree && mb_stripos($full_name, $degree) === false) {
-				$full_name = $degree.' '.$name;
+				$full_name = $degree.' '.$full_name;
 			}
+			$full_name = mb_substr($full_name, 0, 100);
+
+			// Erst exakten Treffer (mit Grad) prüfen, dann auch ohne Grad.
+			$existing = get_single_row_from_query('SELECT id FROM `studiengang` WHERE `name` = '.esc($full_name).' LIMIT 1');
+			if(is_array($existing) && isset($existing[0])) return (int)$existing[0];
+			$existing = get_single_row_from_query('SELECT id FROM `studiengang` WHERE `name` = '.esc(mb_substr($name, 0, 100)).' LIMIT 1');
+			if(is_array($existing) && isset($existing[0])) return (int)$existing[0];
+
 			$query = 'INSERT INTO `studiengang` (`name`, `institut_id`, `studienordnung`, `order_key`) VALUES ('.
 				esc($full_name).', '.esc((int)$institut_id).', '.esc('importiert am '.date('Y-m-d H:i')).', 999999)';
 			rquery($query);
