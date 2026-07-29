@@ -1,6 +1,5 @@
 Options +FollowSymLinks -MultiViews
 RewriteEngine On
-RewriteBase /
 AddDefaultCharset UTF-8
 
 <Files "reset.php">
@@ -12,15 +11,22 @@ AddDefaultCharset UTF-8
         DirectoryIndex startseite.php
         RewriteEngine On
 
-        Redirect 301 /v/startseite.php /
-        Redirect 301 /v/startseite /
-        RedirectMatch 301 ^/v/$ /
+        # Dynamische Base-URL ermitteln (funktioniert im Root und in Unterordnern)
+        RewriteCond %{REQUEST_URI}::$1 ^(/.*/)([^/]*)::\2$
+        RewriteRule ^(.*)$ - [E=BASE:%1]
 
-        RewriteRule ^v/(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4/$5 [NE,E=SFURI:$1]
-        RewriteRule ^v/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3/$4 [NE,E=SFURI:$1]
-        RewriteRule ^v/(.*)/(.*)/(.*)$ %{ENV:BASE}/$2/$3 [NE,E=SFURI:$1]
-        RewriteRule ^v/(.*)/(.*)$ %{ENV:BASE}/$2 [NE,E=SFURI:$1]
-        RewriteRule ^v/(.*)$ %{ENV:BASE}/ [NE,E=SFURI:$1]
+        # 301 Redirects für alte v/-Pfade (relativ zum aktuellen Ordner)
+        RewriteRule ^v/startseite(\.php)?$ %{ENV:BASE} [R=301,L]
+        RewriteRule ^v/$ %{ENV:BASE} [R=301,L]
+
+        # Trailing-v Entpackung
+        RewriteRule ^v/(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}$2/$3/$4/$5 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}$2/$3/$4 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)/(.*)/(.*)$ %{ENV:BASE}$2/$3 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)/(.*)$ %{ENV:BASE}$2 [NE,E=SFURI:$1]
+        RewriteRule ^v/(.*)$ %{ENV:BASE} [NE,E=SFURI:$1]
+
+        # Seiten-Rewrites (ohne führenden Slash, damit sie im selben Ordner bleiben)
         RewriteRule ^admin$ admin.php [L]
         RewriteRule ^impressum$ impressum.php [L]
         RewriteRule ^docs$ docs.php [L]
@@ -29,10 +35,12 @@ AddDefaultCharset UTF-8
         RewriteRule ^zeitraster$ zeitraster.php [L]
         RewriteRule ^kontakt$ kontakt.php [L]
         RewriteRule ^startseite$ startseite.php [L]
-        RewriteRule ^logo.png$ logo.php [L]
+        RewriteRule ^logo\.png$ logo.php [L]
 
-        RewriteRule (/\w+)$ %{ENV:BASE}/$1.php [NE,E=SFURI:$1]
+        # Dynamischer Auto-Append für .php
+        RewriteRule ^([a-zA-Z0-9_]+)$ $1.php [L]
 
+        # Versteckte / Sensible Dateien schützen
         RedirectMatch 404 /\.git
         RedirectMatch 404 /install\.sh
 </IfModule>
