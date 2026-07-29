@@ -1051,6 +1051,20 @@ a, a:visited, a:hover, a:active {
 
 .invisiblebg {
 	background-color: transparent !important;
+	border: 0 !important;
+}
+
+.invisiblebg > tr,
+.invisiblebg > tbody > tr,
+.invisiblebg > thead > tr {
+	background-color: transparent !important;
+	border: 0 !important;
+}
+
+.invisiblebg td,
+.invisiblebg th {
+	border: 0 !important;
+	background-color: transparent !important;
 }
 
 .submenu_ul {
