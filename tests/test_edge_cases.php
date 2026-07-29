@@ -481,8 +481,10 @@ is_equal("create_uni_name with consecutive special chars", create_uni_name("a!!!
 /* ============================================================ */
 
 is_equal("create_hour_from_to with out-of-range", create_hour_from_to(99, 99) === null ? 1 : 0, 1);
-is_equal("create_hour_from_to with from > to", create_hour_from_to(5, 1), array("13:00", "07:10"));
-is_equal("create_hour_from_to with same hour", create_hour_from_to(3, 3), array("11:10", "12:40"));
+is_equal("create_hour_from_to with from > to (array mode)", create_hour_from_to(5, 1, 1), array("13:00", "07:10"));
+is_equal("create_hour_from_to with same hour (array mode)", create_hour_from_to(3, 3, 1), array("11:10", "12:40"));
+is_equal("create_hour_from_to with from > to (string mode)", create_hour_from_to(5, 1), "13:00 &mdash; 07:10");
+is_equal("create_hour_from_to with same hour (string mode)", create_hour_from_to(3, 3), "11:10 &mdash; 12:40");
 is_equal("create_hour_from_to array mode", is_array(create_hour_from_to(0, 1, 1)) ? 1 : 0, 1);
 is_equal("create_hour_from_to string mode contains mdash", strpos(create_hour_from_to(0, 1), "&mdash;") !== false ? 1 : 0, 1);
 is_equal("create_hour_from_to with non-int from", create_hour_from_to("foo", 1) === null ? 1 : 0, 1);
@@ -496,7 +498,8 @@ is_equal("create_hour_from_to with negative", create_hour_from_to(-1, 1) === nul
 is_equal("get_zeiten with star returns HTML", get_zeiten("*"), "<i>Siehe Hinweise</i>");
 is_equal("get_zeiten with 'Ganztägig'", get_zeiten("Ganztägig"), "Ganztägig");
 is_equal("get_zeiten with garbage", get_zeiten("xyz"), "ERROR");
-is_equal("get_zeiten with single digit", get_zeiten("3"), "<i>Siehe Hinweise</i>"); /* '3' is single digit but format expects 'X-Y' */
+/* get_zeiten with "3" - matches the single digit regex, returns 3-3 hour */
+is_equal("get_zeiten with single digit", get_zeiten("3"), "11:10 &mdash; 12:40");
 is_equal("get_zeiten with empty string", get_zeiten(""), "ERROR");
 is_equal("get_zeiten with NULL", get_zeiten(NULL), "ERROR");
 
