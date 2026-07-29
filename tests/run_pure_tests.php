@@ -871,7 +871,7 @@ function teacher_icon() {
 }
 
 function print_debug ($str) {
-	return green_text($str);
+	print green_text($str);
 }
 
 function FormatBacktrace() {
@@ -936,10 +936,6 @@ function fq ($str) {
 
 function escape ($t) {
 	return $t;
-}
-
-function print_debug ($str) {
-	print green_text($str);
 }
 
 function sanitize_data ($data, $recursion = 0) {
