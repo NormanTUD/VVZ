@@ -896,6 +896,7 @@ $pure_test_files = array(
 	"test_validation.php",
 	"test_sort_functions.php",
 	"test_edge_cases.php",
+	"test_more_functions.php",
 );
 
 foreach ($pure_test_files as $file) {
