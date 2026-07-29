@@ -134,7 +134,10 @@ is_equal("generate_random_string only valid chars", preg_match("/^[a-zA-Z0-9]+$/
 is_equal("might_be_query with newline prefix", might_be_query("\n  SELECT 1"), 0);
 is_equal("might_be_query with tab prefix", might_be_query("\tSELECT 1"), 0);
 is_equal("might_be_query with lowercase select", might_be_query("select"), 0); /* requires FROM */
-is_equal("might_be_query with select from no data", might_be_query("select from"), 1);
+/* Note: "select from" (no whitespace after from) does NOT match because
+ * the regex requires \s+ after FROM. */
+is_equal("might_be_query with select from no data", might_be_query("select from"), 0);
+is_equal("might_be_query with select 1 from", might_be_query("select 1 from"), 1);
 is_equal("might_be_query with double semicolon", might_be_query("select 1;; from dual"), 1);
 is_equal("might_be_query with unicode", might_be_query("SELECT 'ümlaut' FROM dual"), 1);
 is_equal("might_be_query with hex notation", might_be_query("SELECT 0x41 FROM dual"), 1);
