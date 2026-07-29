@@ -283,8 +283,11 @@ if(function_exists('global_exists')) {
 /* ============================================================ */
 
 if(function_exists('create_select')) {
+	/* Production create_select() takes a list of strings (or list of
+	 * [value, label] pairs). Both value and label are htmlencoded.
+	 * Selected is added when the chosen value equals the datum. */
 	ob_start();
-	create_select(array("a" => "Apple", "b" => "Banana"), "a", "fruit");
+	create_select(array("Apple", "Banana"), "Apple", "fruit");
 	$out = ob_get_clean();
 	is_equal("create_select contains <select>", strpos($out, "<select") !== false ? 1 : 0, 1);
 	is_equal("create_select contains name='fruit'", strpos($out, "name=\"fruit\"") !== false || strpos($out, "name='fruit'") !== false ? 1 : 0, 1);
@@ -293,38 +296,38 @@ if(function_exists('create_select')) {
 
 	/* With allow_empty, an empty option is added */
 	ob_start();
-	create_select(array("a" => "A"), "a", "x", 1);
+	create_select(array("A"), "A", "x", 1);
 	$out = ob_get_clean();
 	is_equal("create_select with allow_empty has empty value option", strpos($out, "value=\"\"") !== false || strpos($out, "value=''") !== false ? 1 : 0, 1);
 
 	/* With submit_on_change, onchange handler added */
 	ob_start();
-	create_select(array("a" => "A"), "a", "x", 0, 0, null, 1);
+	create_select(array("A"), "A", "x", 0, 0, null, 1);
 	$out = ob_get_clean();
 	is_equal("create_select with submit_on_change has onchange", strpos($out, "onchange") !== false ? 1 : 0, 1);
 
 	/* With class */
 	ob_start();
-	create_select(array("a" => "A"), "a", "x", 0, 0, null, 0, "myclass");
+	create_select(array("A"), "A", "x", 0, 0, null, 0, "myclass");
 	$out = ob_get_clean();
 	is_equal("create_select with class uses it", strpos($out, "myclass") !== false ? 1 : 0, 1);
 
 	/* With aria-labelledby */
 	ob_start();
-	create_select(array("a" => "A"), "a", "x", 0, 0, "label123");
+	create_select(array("A"), "A", "x", 0, 0, "label123");
 	$out = ob_get_clean();
 	is_equal("create_select with aria-labelledby uses it", strpos($out, "label123") !== false ? 1 : 0, 1);
 
 	/* XSS: the name attribute is htmlencoded */
 	ob_start();
-	create_select(array("a" => "A"), "a", "<script>");
+	create_select(array("A"), "A", "<script>");
 	$out = ob_get_clean();
 	is_equal("create_select html-encodes name attribute", strpos($out, "<script>") === false ? 1 : 0, 1);
 	is_equal("create_select encodes <script> as &lt;script&gt;", strpos($out, "&lt;script&gt;") !== false ? 1 : 0, 1);
 
 	/* With noautosubmit=1, adds noautosubmit attribute */
 	ob_start();
-	create_select(array("a" => "A"), "a", "x", 0, 1);
+	create_select(array("A"), "A", "x", 0, 1);
 	$out = ob_get_clean();
 	is_equal("create_select with noautosubmit adds attribute", strpos($out, "noautosubmit") !== false ? 1 : 0, 1);
 
@@ -337,7 +340,14 @@ if(function_exists('create_select')) {
 
 	/* Chosen option that's not in the data: no option is selected */
 	ob_start();
-	create_select(array("a" => "A"), "z", "x");
+	create_select(array("A"), "z", "x");
 	$out = ob_get_clean();
 	is_equal("create_select with non-existent chosen: no selected", strpos($out, "selected") === false ? 1 : 0, 1);
+
+	/* With [value, label] pairs */
+	ob_start();
+	create_select(array(array("a", "Apple"), array("b", "Banana")), "a", "fruit");
+	$out = ob_get_clean();
+	is_equal("create_select with [value,label] pairs has correct labels", strpos($out, "Apple") !== false && strpos($out, "Banana") !== false ? 1 : 0, 1);
+	is_equal("create_select with [value,label] marks matching one selected", strpos($out, "selected") !== false ? 1 : 0, 1);
 }

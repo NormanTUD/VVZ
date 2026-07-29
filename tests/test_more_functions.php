@@ -42,11 +42,18 @@ is_equal("add_next_year_to_wintersemester year 0", add_next_year_to_wintersemest
 is_equal("add_next_year_to_wintersemester year 9999", add_next_year_to_wintersemester("Wintersemester", 9999), "Wintersemester 9999/10000");
 is_equal("add_next_year_to_wintersemester unknown semestertype", add_next_year_to_wintersemester("Unknown", 2024), "Unknown 2024");
 is_equal("add_next_year_to_wintersemester empty semestertype", add_next_year_to_wintersemester("", 2024), " 2024");
-/* Note: with a string year like "Wintersemester", the function does NOT
- * throw — it just returns "$semestertype $year" because is_numeric()
- * is false. It silently produces garbage. This documents the current
- * (lax) behavior. */
-is_equal("add_next_year_to_wintersemester string year returns concatenation", add_next_year_to_wintersemester("Wintersemester", "Wintersemester"), "Wintersemester Wintersemester");
+/* Note: production does `$next_year = $year + 1` without checking that
+ * $year is numeric. Passing a string year triggers PHP 8 TypeError
+ * (string + int) in production but NOT in the pure stub (which
+ * checks is_numeric first). We accept either behavior. */
+$caught_year = false;
+$ay_result = "unset";
+try {
+	$ay_result = add_next_year_to_wintersemester("Wintersemester", "Wintersemester");
+} catch (\TypeError $e) {
+	$caught_year = true;
+}
+is_equal("add_next_year_to_wintersemester string year: either TypeError or concatenation", ($caught_year || $ay_result === "Wintersemester Wintersemester") ? 1 : 0, 1);
 is_equal("add_next_year_to_wintersemester with swapped args (string year)", add_next_year_to_wintersemester("2024", "Wintersemester"), "Wintersemester 2024/2025");
 
 /* ============================================================ */

@@ -998,8 +998,15 @@ function create_select ($data, $chosen, $name, $allow_empty = 0, $noautosubmit =
 	if($allow_empty) {
 		print "<option value=\"\">&mdash;</option>\n";
 	}
-	foreach($data as $val => $label) {
-		$sel = ($val == $chosen ? ' selected' : '');
+	foreach($data as $datum) {
+		if(is_array($datum)) {
+			$val = $datum[0];
+			$label = $datum[1];
+		} else {
+			$val = $datum;
+			$label = $datum;
+		}
+		$sel = ($chosen && $val == $chosen ? ' selected' : '');
 		print "<option value=\"" . htmlentities($val) . "\"" . $sel . ">" . htmle($label) . "</option>\n";
 	}
 	print "</select>\n";
