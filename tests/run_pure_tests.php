@@ -206,6 +206,39 @@ function add_leading_zero ($v) {
 	}
 }
 
+function create_hour_from_to ($from, $to, $array = 0) {
+	$re = '/^\d+$/';
+	if(preg_match($re, $from) && preg_match($re, $to)) {
+		$times = array(
+			0 => array("from" => "05:40", "to" => "07:10"),
+			1 => array("from" => "07:30", "to" => "09:00"),
+			2 => array("from" => "09:20", "to" => "10:50"),
+			3 => array("from" => "11:10", "to" => "12:40"),
+			4 => array("from" => "13:00", "to" => "14:30"),
+			5 => array("from" => "14:50", "to" => "16:20"),
+			6 => array("from" => "16:40", "to" => "18:10"),
+			7 => array("from" => "18:30", "to" => "20:00"),
+			8 => array("from" => "20:20", "to" => "21:50"),
+			9 => array("from" => "22:10", "to" => "23:40")
+		);
+
+		if(array_key_exists($from, $times) && array_key_exists($to, $times)) {
+			$from_time = $times[$from]['from'];
+			$to_time = $times[$to]['to'];
+
+			if($array) {
+				return array($from_time, $to_time);
+			} else {
+				return "$from_time &mdash; $to_time";
+			}
+		} else {
+			return null;
+		}
+	} else {
+		return null;
+	}
+}
+
 function get_previous_letter($string){
 	if($string == "A") {
 		return "A";
@@ -661,6 +694,21 @@ function get_post_int ($name) {
 	return intval(get_post($name));
 }
 
+function fill_deletion_global ($post_ids, $dbn, $debugvalues = array()) {
+	if(is_array($post_ids)) {
+		$true = 1;
+		foreach ($post_ids as $this_post_id) {
+			if(!(get_post($this_post_id) || array_key_exists($this_post_id, $debugvalues))) {
+				$true = 0;
+				break;
+			}
+		}
+		if($true) {
+			$GLOBALS["deletion_db"] = $dbn;
+		}
+	}
+}
+
 function get_post_multiple_check ($names) {
 	if(is_array($names)) {
 		$return = 1;
@@ -757,6 +805,23 @@ function foreignKeyAscSort($item1, $item2) {
 		return 0;
 	} else {
 		return ($item1['foreign_keys_counter'] < $item2['foreign_keys_counter']) ? -1 : 1;
+	}
+}
+
+function get_zeiten ($stunde, $array = 0) {
+	if(preg_match('/^(\d+)-(\d+)$/', $stunde, $founds)) {
+		return create_hour_from_to($founds[1], $founds[2], $array);
+	} else if(preg_match('/^\d$/', $stunde)) {
+		return create_hour_from_to($stunde, $stunde, $array);
+	} else {
+		switch($stunde) {
+		case '*':
+			return '<i>Siehe Hinweise</i>';
+		case 'Ganztägig':
+			return 'Ganztägig';
+		default:
+			return 'ERROR';
+		}
 	}
 }
 
