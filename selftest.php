@@ -335,6 +335,17 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 					ON DUPLICATE KEY UPDATE file = VALUES(file), show_in_navigation = VALUES(show_in_navigation), parent = VALUES(parent), show_in_startpage = VALUES(show_in_startpage)");
 			}
 
+			// Admin-Zugriff (Rolle 1) auf die neue Seite gewährleisten — idempotent.
+			if(table_exists($GLOBALS['dbname'], 'role_to_page') && table_exists($GLOBALS['dbname'], 'page')) {
+				$page_id_row = get_single_row_from_query("SELECT id FROM `page` WHERE `file` = 'studienordnung_import.php' LIMIT 1");
+				if(is_array($page_id_row) && isset($page_id_row[0])) {
+					$page_id_soi = (int)$page_id_row[0];
+					rquery("INSERT IGNORE INTO `role_to_page` (role_id, page_id) VALUES (1, ".$page_id_soi.")");
+					// Hinweistext für die neue Seite hinterlegen
+					rquery("INSERT INTO `page_info` (page_id, info) VALUES (".$page_id_soi.", 'Hier können Studienordnungen als PDF hochgeladen werden. Module und Prüfungsnummern werden automatisch extrahiert und in die Datenbank übernommen.') ON DUPLICATE KEY UPDATE info = VALUES(info)");
+				}
+			}
+
 			if(!table_exists_and_has_entries("role_to_page") && !already_initialized("role_to_page")) {
 				# removed: (1,32),
 				rquery("insert ignore INTO `role_to_page` (role_id, page_id) VALUES (1,1),
