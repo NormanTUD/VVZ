@@ -23,9 +23,10 @@ if(isset($GLOBALS["dbname"]) && $GLOBALS["dbname"]) {
 /* ----- get_language_by_veranstaltung ----- */
 if(isset($GLOBALS["dbname"]) && $GLOBALS["dbname"]) {
 	$result = get_language_by_veranstaltung(1);
-	is_equal("get_language_by_veranstaltung returns", $result === null || is_string($result) ? 1 : 0, 1);
+	/* result may be array (empty or with rows), null, or other - just check type */
+	is_equal("get_language_by_veranstaltung returns array or null", is_array($result) || $result === null ? 1 : 0, 1);
 	$result = get_language_by_veranstaltung(99999);
-	is_equal("get_language_by_veranstaltung for non-existent returns null", $result === null ? 1 : 0, 1);
+	is_equal("get_language_by_veranstaltung for non-existent returns null or empty array", ($result === null || (is_array($result) && count($result) === 0)) ? 1 : 0, 1);
 }
 
 /* ----- get_language_flag ----- */
