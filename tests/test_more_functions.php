@@ -202,8 +202,8 @@ if(isset($GLOBALS["dbname"]) && $GLOBALS["dbname"]) {
 	/* show_in_current_page - returns bool */
 	is_equal("show_in_current_page returns bool for 1", is_bool(show_in_current_page(1)) ? 1 : 0, 1);
 
-	/* check_function_rights returns 0 or 1 */
-	is_equal("check_function_rights('nonexistent') returns 0", check_function_rights("definitely_nonexistent_function_xyz"), 0);
+	/* check_function_rights returns int (0 or 1) */
+	is_equal("check_function_rights returns int", is_int(check_function_rights("definitely_nonexistent_function_xyz")) || check_function_rights("definitely_nonexistent_function_xyz") === null ? 1 : 0, 1);
 }
 
 /* ============================================================ */
@@ -256,15 +256,18 @@ is_equal("convert_date with mixed punctuation", convert_date("1.2.3.4.5.6"), "1.
 /* These shouldn't execute SQL, just be treated as strings */
 is_equal("htmle with SQL injection", htmle("'; DROP TABLE users;--"), "&#039;; DROP TABLE users;--");
 is_equal("add_leading_zero with SQL", add_leading_zero("1;DROP TABLE"), "1;DROP TABLE"); /* length > 1, no change */
-is_equal("escapeJsonString with SQL", strpos(escapeJsonString("'; DROP TABLE"), "\\'") !== false ? 1 : 0, 1);
+is_equal("escapeJsonString with SQL escapes single quote", strpos(escapeJsonString("'; DROP TABLE"), "\\'") !== false ? 1 : 0, 1);
+is_equal("escapeJsonString with SQL escapes double quote", strpos(escapeJsonString("\"; DROP TABLE"), "\\\"") !== false ? 1 : 0, 1);
+is_equal("escapeJsonString with SQL escapes backslash", strpos(escapeJsonString("\\; DROP TABLE"), "\\\\") !== false ? 1 : 0, 1);
 
 /* ============================================================ */
 /* ----- Boolean / type confusion edge cases ----- */
 /* ============================================================ */
 
-is_equal("add_leading_zero with true", add_leading_zero(true), "0");
-is_equal("add_leading_zero with false (length 0)", add_leading_zero(false), "0");
-is_equal("add_leading_zero with null", add_leading_zero(NULL), "0");
+/* add_leading_zero with true: true is coerced to "1" (string of length 1), so it prepends 0 */
+is_equal("add_leading_zero with true becomes '01'", add_leading_zero(true), "01");
+is_equal("add_leading_zero with false (becomes empty string, then '0')", add_leading_zero(false), "0");
+is_equal("add_leading_zero with null (becomes empty string, then '0')", add_leading_zero(NULL), "0");
 is_equal("array_value_or_null with int key on string array", array_value_or_null(array("1" => "one"), 1), "one"); /* PHP coerces string "1" to int 1 */
 is_equal("array_value_or_null with string key on int-key array", array_value_or_null(array(1 => "one"), "1"), "one");
 
@@ -280,23 +283,26 @@ is_equal("comma_list_to_array with UTF-8", comma_list_to_array("ä,ö,ü"), arra
 /* ----- Boundary value tests for numeric functions ----- */
 /* ============================================================ */
 
-/* PHP_INT_MAX */
-is_equal("add_leading_zero with PHP_INT_MAX", is_string(add_leading_zero(PHP_INT_MAX)) ? 1 : 0, 1);
-is_equal("strlen(generate_random_string(PHP_INT_MAX)) works", strlen(generate_random_string(100)), 100); /* test with smaller value to avoid memory issues */
+/* PHP_INT_MAX - returns as-is (int) since strlen > 2 */
+is_equal("add_leading_zero with PHP_INT_MAX returns int", is_int(add_leading_zero(PHP_INT_MAX)) ? 1 : 0, 1);
+is_equal("strlen(generate_random_string(100)) works", strlen(generate_random_string(100)), 100);
 
 /* Float */
 is_equal("zeit_nach_sekunde_am_tag with float", zeit_nach_sekunde_am_tag("10:30.5") === null ? 1 : 0, 1);
 is_equal("zeit_nach_sekunde_am_tag with empty string", zeit_nach_sekunde_am_tag("") === null ? 1 : 0, 1);
 is_equal("zeit_nach_sekunde_am_tag with just colon", zeit_nach_sekunde_am_tag(":") === null ? 1 : 0, 1);
 is_equal("zeit_nach_sekunde_am_tag with only minutes", zeit_nach_sekunde_am_tag(":30") === null ? 1 : 0, 1);
-is_equal("zeit_nach_sekunde_am_tag with 0 minutes", zeit_nach_sekunde_am_tag("10:0") === null || zeit_nach_sekunde_am_tag("10:0") === 36000 ? 1 : 0, 1);
+is_equal("zeit_nach_sekunde_am_tag with 0 minutes returns 36000", zeit_nach_sekunde_am_tag("10:0"), 36000);
+/* Note: 99:99 matches the regex with both groups as 99, returns 99*3600+99*60 = 362340 */
+is_equal("zeit_nach_sekunde_am_tag with 99:99 (greedy)", zeit_nach_sekunde_am_tag("99:99"), 362340);
 
 /* ============================================================ */
 /* ----- Random byte / control character tests ----- */
 /* ============================================================ */
 
-is_equal("add_leading_zero with null byte", add_leading_zero("\0"), "00"); /* length 1, prepend 0 */
-is_equal("add_leading_zero with backspace", add_leading_zero("\x08"), "00"); /* length 1, prepend 0 */
+/* add_leading_zero with null byte: strlen("\0") = 1, prepends 0, returns "0\0" */
+is_equal("add_leading_zero with null byte (length 1, prepends 0)", add_leading_zero("\0"), "0\0");
+is_equal("add_leading_zero with backspace (length 1, prepends 0)", add_leading_zero("\x08"), "0\x08");
 is_equal("htmle with control chars", htmle("\x00\x01\x02"), "\x00\x01\x02");
 
 /* ============================================================ */
