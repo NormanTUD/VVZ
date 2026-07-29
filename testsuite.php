@@ -111,6 +111,19 @@
 
 	include_once("testing.php");
 
+	/*
+	 * Bootstrap the DB schema if VVZ has not been installed yet on
+	 * this system. This makes the test suite self-bootstrapping: a
+	 * fresh checkout only needs MariaDB running and the password
+	 * file /etc/vvzdbpw in place; the tests will create all required
+	 * tables and seed data on the first run.
+	 *
+	 * See tests/setup_db.php for details.
+	 */
+	if(file_exists(__DIR__ . "/tests/setup_db.php")) {
+		include_once(__DIR__ . "/tests/setup_db.php");
+	}
+
 	$number_regex = "/^[1-9][0-9]*$/";
 
 	is_equal_safe("Basistest", 1, 1);
