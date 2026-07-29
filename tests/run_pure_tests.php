@@ -264,7 +264,13 @@ function array2Table($data, $status = array(), $error_lines = array()) {
 	$html = "<table>";
 	foreach ($data as $i => $row) {
 		$html .= "<tr>";
-		if(isset($status[$i])) {
+		if(isset($status[$i]) && is_array($status[$i])) {
+			if(isset($status[$i]['studiengang'])) {
+				$html .= "<td>" . $status[$i]['studiengang'] . "</td>";
+			} else {
+				$html .= "<td></td>";
+			}
+		} elseif(isset($status[$i])) {
 			$html .= "<td>" . $status[$i] . "</td>";
 		}
 		foreach ($row as $cell) {

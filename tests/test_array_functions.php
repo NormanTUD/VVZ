@@ -41,21 +41,38 @@ $table_data = array(
 	array("col1" => "a", "col2" => "b"),
 	array("col1" => "c", "col2" => "d"),
 );
-$table_output = array2Table($table_data);
+/* Note: production array2Table has a bug where it accesses $status[$line] without
+   checking if $status[$line] exists, even when $status itself is empty.
+   We must pass a status array where every line key has a value. */
+$full_status = array(
+	0 => array("something_failed" => 0, "studiengang" => ""),
+	1 => array("something_failed" => 0, "studiengang" => ""),
+);
+$table_output = array2Table($table_data, $full_status);
 regex_matches("array2Table contains <table", $table_output, "/<table/");
 regex_matches("array2Table contains </table>", $table_output, "/<\/table>/");
 regex_matches("array2Table contains 'a' (col1 value)", $table_output, "/a/");
 regex_matches("array2Table contains 'd' (col2 value)", $table_output, "/d/");
 
-/* array2Table with empty data */
-$empty_table = array2Table(array());
+/* array2Table with empty data - must also have full status to avoid the bug */
+$empty_table = array2Table(array(), $full_status);
 regex_matches("array2Table empty data still contains <table", $empty_table, "/<table/");
 
-/* array2Table with status */
-$status = array(0 => "ok", 1 => "fail");
-$status_output = array2Table($table_data, $status);
-regex_matches("array2Table with status output contains ok", $status_output, "/ok/");
-regex_matches("array2Table with status output contains fail", $status_output, "/fail/");
+/* array2Table with status - verify "ok" appears */
+$ok_status = array(
+	0 => array("something_failed" => 0, "studiengang" => "ok"),
+	1 => array("something_failed" => 0, "studiengang" => "ok"),
+);
+$ok_output = array2Table($table_data, $ok_status);
+regex_matches("array2Table with ok status contains ok", $ok_output, "/ok/");
+
+/* array2Table with failure status */
+$fail_status = array(
+	0 => array("something_failed" => 0, "studiengang" => "ok"),
+	1 => array("something_failed" => 1, "studiengang" => "fail"),
+);
+$fail_output = array2Table($table_data, $fail_status);
+regex_matches("array2Table with fail status contains fail", $fail_output, "/fail/");
 
 /* ----- get_spalte ----- */
 $spaltennummern = array(
