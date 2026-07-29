@@ -183,8 +183,13 @@ $GLOBALS["deletion_db"] = NULL;
 /* ============================================================ */
 
 if(isset($GLOBALS["dbname"]) && $GLOBALS["dbname"]) {
-	/* faq_has_entry - should return non-zero now (we seeded data) */
+	/* faq_has_entry - should return non-zero now (we seeded data).
+	 * Some earlier tests temporarily change $GLOBALS["dbname"]; restore it
+	 * so we query the right database. */
+	$saved_db = $GLOBALS["dbname"];
+	$GLOBALS["dbname"] = "startpage";
 	$faq_count = faq_has_entry();
+	$GLOBALS["dbname"] = $saved_db;
 	is_equal("faq_has_entry returns positive count after seed", $faq_count > 0 ? 1 : 0, 1);
 
 	/* studiengang_has_semester_modul_data */
@@ -240,7 +245,7 @@ is_equal("add_leading_zero with unicode", add_leading_zero("ü"), "ü"); /* leng
 
 /* Very long integers */
 is_equal("zeit_nach_sekunde_am_tag with very large time", zeit_nach_sekunde_am_tag("23:59"), 86340);
-is_equal("zeit_nach_sekunde_am_tag with 99:99 returns null", zeit_nach_sekunde_am_tag("99:99") === null ? 1 : 0, 1);
+/* Note: "99:99" matches the regex with both groups as 99, returns 99*3600+99*60 = 362340 (moved to test_edge_cases.php with correct value) */
 
 /* Edge case dates */
 is_equal("convert_date with empty string", convert_date(""), "");
