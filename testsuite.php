@@ -9,7 +9,7 @@
 	 * the right install command for every common OS / package manager.
 	 */
 
-	$required_extensions = array("mysqli", "mbstring");
+	$required_extensions = array("mysqli", "mbstring", "bcmath");
 	$missing_extensions  = array();
 	foreach ($required_extensions as $ext) {
 		if(!extension_loaded($ext)) {
@@ -41,21 +41,21 @@
 
 		$err .= "  Debian / Ubuntu / Linux Mint / Pop!_OS / Elementary / KDE neon:\n";
 		$err .= "      sudo apt update\n";
-		$err .= "      sudo apt install php-mysql php-mbstring\n";
+		$err .= "      sudo apt install php-mysql php-mbstring php-bcmath\n";
 		$err .= "\n";
 
 		$err .= "  RHEL / CentOS / Fedora / Rocky / AlmaLinux:\n";
-		$err .= "      sudo yum install php-mysqlnd php-mbstring\n";
+		$err .= "      sudo yum install php-mysqlnd php-mbstring php-bcmath\n";
 		$err .= "    or (on newer Fedora / RHEL 8+):\n";
-		$err .= "      sudo dnf install php-mysqlnd php-mbstring\n";
+		$err .= "      sudo dnf install php-mysqlnd php-mbstring php-bcmath\n";
 		$err .= "\n";
 
 		$err .= "  openSUSE / SUSE Linux Enterprise:\n";
-		$err .= "      sudo zypper install php-mysql php-mbstring\n";
+		$err .= "      sudo zypper install php-mysql php-mbstring php-bcmath\n";
 		$err .= "\n";
 
 		$err .= "  Alpine Linux:\n";
-		$err .= "      sudo apk add php-mysqli php-pdo_mysql php-mbstring\n";
+		$err .= "      sudo apk add php-mysqli php-pdo_mysql php-mbstring php-bcmath\n";
 		$err .= "\n";
 
 		$err .= "  Arch Linux / Manjaro:\n";
@@ -63,7 +63,7 @@
 		$err .= "\n";
 
 		$err .= "  Void Linux:\n";
-		$err .= "      sudo xbps-install php php-mysql php-mbstring\n";
+		$err .= "      sudo xbps-install php php-mysql php-mbstring php-bcmath\n";
 		$err .= "\n";
 
 		$err .= "  macOS (Homebrew):\n";
@@ -71,13 +71,14 @@
 		$err .= "\n";
 
 		$err .= "  macOS (MacPorts):\n";
-		$err .= "      sudo port install php-mysql php-mbstring\n";
+		$err .= "      sudo port install php-mysql php-mbstring php-bcmath\n";
 		$err .= "\n";
 
 		$err .= "  Windows (XAMPP):\n";
 		$err .= "    Edit xampp\\php\\php.ini and uncomment / add the line:\n";
 		$err .= "      extension=mysqli\n";
 		$err .= "      extension=mbstring\n";
+		$err .= "      extension=bcmath\n";
 		$err .= "    Then restart Apache from the XAMPP control panel.\n";
 		$err .= "\n";
 
@@ -85,10 +86,11 @@
 		$err .= "    Edit your php.ini and uncomment / add the lines:\n";
 		$err .= "      extension=mysqli\n";
 		$err .= "      extension=mbstring\n";
+		$err .= "      extension=bcmath\n";
 		$err .= "\n";
 
 		$err .= "  Docker (official php image):\n";
-		$err .= "      docker-php-ext-install mysqli mbstring\n";
+		$err .= "      docker-php-ext-install mysqli mbstring bcmath\n";
 		$err .= "\n";
 
 		$err .= "After installing, you may also need to:\n";
@@ -96,7 +98,7 @@
 		$err .= "  2. Verify the extension is loaded with: php -m | grep mysqli\n";
 		$err .= "  3. If you have multiple PHP versions, install the package for the\n";
 		$err .= "     version you are running, e.g. on Debian/Ubuntu:\n";
-		$err .= "        sudo apt install php8.1-mysql php8.1-mbstring\n";
+		$err .= "        sudo apt install php8.1-mysql php8.1-mbstring php8.1-bcmath\n";
 		$err .= "\n";
 
 		fwrite(STDERR, $err);
