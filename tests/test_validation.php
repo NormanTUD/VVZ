@@ -13,10 +13,11 @@ is_equal("is_valid_auth_code returns 0 or 1", in_array(is_valid_auth_code("inval
 /* ----- institut_id_exists (DB needed) ----- */
 if(isset($GLOBALS["dbname"]) && $GLOBALS["dbname"]) {
 	$result = institut_id_exists(99999999);
-	/* institut_id_exists returns the count(*) result, which can be 0, null, or a positive integer.
-	   For non-existent IDs it returns 0 or null. */
-	is_equal("institut_id_exists returns 0 or null for non-existent", ($result === 0 || $result === null) ? 1 : 0, 1);
-	is_equal("institut_id_exists(1) returns positive count for existing", institut_id_exists(1) > 0 ? 1 : 0, 1);
+	/* institut_id_exists returns the count(*) result, which can be 0, null, or "0" depending on
+	   the DB driver. For non-existent IDs it should be falsy. */
+	is_equal("institut_id_exists returns falsy for non-existent", !$result ? 1 : 0, 1);
+	$result_existing = institut_id_exists(1);
+	is_equal("institut_id_exists(1) returns truthy for existing", (int)$result_existing > 0 ? 1 : 0, 1);
 }
 
 /* ----- file_is_image ----- */
