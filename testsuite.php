@@ -1,4 +1,114 @@
 <?php
+	/*
+	 * Pre-flight check: required PHP extensions.
+	 *
+	 * VVZ needs the mysqli extension to talk to the database. If it is
+	 * not loaded we used to die with a cryptic "Call to undefined
+	 * function mysqli_connect()" fatal error. The block below catches
+	 * that situation early and prints an actionable error message with
+	 * the right install command for every common OS / package manager.
+	 */
+
+	$required_extensions = array("mysqli", "mbstring");
+	$missing_extensions  = array();
+	foreach ($required_extensions as $ext) {
+		if(!extension_loaded($ext)) {
+			$missing_extensions[] = $ext;
+		}
+	}
+
+	if(!empty($missing_extensions)) {
+		$php_version = PHP_VERSION;
+		$php_binary  = PHP_BINARY;
+		$php_sapi    = php_sapi_name();
+
+		$err  = "\n";
+		$err .= "================================================================================\n";
+		$err .= "  ERROR: Required PHP extension(s) are not loaded\n";
+		$err .= "================================================================================\n";
+		$err .= "\n";
+		$err .= "The following PHP extension(s) are required but not loaded:\n";
+		foreach ($missing_extensions as $ext) {
+			$err .= "  * " . $ext . "\n";
+		}
+		$err .= "\n";
+		$err .= "PHP version : " . $php_version . "\n";
+		$err .= "PHP binary  : " . $php_binary . "\n";
+		$err .= "PHP SAPI    : " . $php_sapi . "\n";
+		$err .= "\n";
+		$err .= "Install the missing extension(s) with the command appropriate for your OS:\n";
+		$err .= "\n";
+
+		$err .= "  Debian / Ubuntu / Linux Mint / Pop!_OS / Elementary / KDE neon:\n";
+		$err .= "      sudo apt update\n";
+		$err .= "      sudo apt install php-mysql php-mbstring\n";
+		$err .= "\n";
+
+		$err .= "  RHEL / CentOS / Fedora / Rocky / AlmaLinux:\n";
+		$err .= "      sudo yum install php-mysqlnd php-mbstring\n";
+		$err .= "    or (on newer Fedora / RHEL 8+):\n";
+		$err .= "      sudo dnf install php-mysqlnd php-mbstring\n";
+		$err .= "\n";
+
+		$err .= "  openSUSE / SUSE Linux Enterprise:\n";
+		$err .= "      sudo zypper install php-mysql php-mbstring\n";
+		$err .= "\n";
+
+		$err .= "  Alpine Linux:\n";
+		$err .= "      sudo apk add php-mysqli php-pdo_mysql php-mbstring\n";
+		$err .= "\n";
+
+		$err .= "  Arch Linux / Manjaro:\n";
+		$err .= "      sudo pacman -S php\n";
+		$err .= "\n";
+
+		$err .= "  Void Linux:\n";
+		$err .= "      sudo xbps-install php php-mysql php-mbstring\n";
+		$err .= "\n";
+
+		$err .= "  macOS (Homebrew):\n";
+		$err .= "      brew install php\n";
+		$err .= "\n";
+
+		$err .= "  macOS (MacPorts):\n";
+		$err .= "      sudo port install php-mysql php-mbstring\n";
+		$err .= "\n";
+
+		$err .= "  Windows (XAMPP):\n";
+		$err .= "    Edit xampp\\php\\php.ini and uncomment / add the line:\n";
+		$err .= "      extension=mysqli\n";
+		$err .= "      extension=mbstring\n";
+		$err .= "    Then restart Apache from the XAMPP control panel.\n";
+		$err .= "\n";
+
+		$err .= "  Windows (standalone PHP):\n";
+		$err .= "    Edit your php.ini and uncomment / add the lines:\n";
+		$err .= "      extension=mysqli\n";
+		$err .= "      extension=mbstring\n";
+		$err .= "\n";
+
+		$err .= "  Docker (official php image):\n";
+		$err .= "      docker-php-ext-install mysqli mbstring\n";
+		$err .= "\n";
+
+		$err .= "After installing, you may also need to:\n";
+		$err .= "  1. Restart your web server (Apache, Nginx, etc.) if applicable\n";
+		$err .= "  2. Verify the extension is loaded with: php -m | grep mysqli\n";
+		$err .= "  3. If you have multiple PHP versions, install the package for the\n";
+		$err .= "     version you are running, e.g. on Debian/Ubuntu:\n";
+		$err .= "        sudo apt install php8.1-mysql php8.1-mbstring\n";
+		$err .= "\n";
+
+		fwrite(STDERR, $err);
+		exit(1);
+	}
+
+	/*
+	 * End of pre-flight check. If we get here, all required extensions
+	 * are loaded. From here on, any error is a real bug and is reported
+	 * by the existing testing framework.
+	 */
+
 	include_once("testing.php");
 
 	$number_regex = "/^[1-9][0-9]*$/";
