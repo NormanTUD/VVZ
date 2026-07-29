@@ -320,11 +320,19 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 					(57, 'Importer', 'import.php', '1', 25, 1),
 					(58, 'Einstellungen', 'settings.php', '1', 25, 1),
 					('59', 'Sperrvermerk', 'sperrvermerk.php', '1', 28, 0),
-					('60', 'Veranstaltungen nach Sperrvermerk', 'veranstaltungen_nach_sperrvermerk.php', '1', NULL, '0')
+					('60', 'Veranstaltungen nach Sperrvermerk', 'veranstaltungen_nach_sperrvermerk.php', '1', NULL, '0'),
+					('61', 'Studienordnung importieren', 'studienordnung_import.php', '1', 25, 1)
 					"
 				);
 				rquery("update page set disable_in_demo = 1 where id in (23, 24, 31, 55)");
 				initialized("page");
+			}
+
+			// Idempotent Registrierung der neuen Seite, falls Tabelle 'page' schon initialisiert war.
+			if(table_exists($GLOBALS['dbname'], 'page')) {
+				rquery("INSERT INTO `page` (name, file, show_in_navigation, parent, show_in_startpage) VALUES
+					('Studienordnung importieren', 'studienordnung_import.php', '1', 25, 1)
+					ON DUPLICATE KEY UPDATE file = VALUES(file), show_in_navigation = VALUES(show_in_navigation), parent = VALUES(parent), show_in_startpage = VALUES(show_in_startpage)");
 			}
 
 			if(!table_exists_and_has_entries("role_to_page") && !already_initialized("role_to_page")) {
