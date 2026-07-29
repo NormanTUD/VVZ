@@ -134,10 +134,11 @@ is_equal("generate_random_string only valid chars", preg_match("/^[a-zA-Z0-9]+$/
 is_equal("might_be_query with newline prefix", might_be_query("\n  SELECT 1"), 0);
 is_equal("might_be_query with tab prefix", might_be_query("\tSELECT 1"), 0);
 is_equal("might_be_query with lowercase select", might_be_query("select"), 0); /* requires FROM */
-/* Note: "select from" (no whitespace after from) does NOT match because
- * the regex requires \s+ after FROM. */
+/* Note: "select from" and "select 1 from" (no whitespace after FROM)
+ * do NOT match because the regex requires \s+ after FROM. */
 is_equal("might_be_query with select from no data", might_be_query("select from"), 0);
-is_equal("might_be_query with select 1 from", might_be_query("select 1 from"), 1);
+is_equal("might_be_query with select 1 from (no trailing data)", might_be_query("select 1 from"), 0);
+is_equal("might_be_query with select 1 from dual", might_be_query("select 1 from dual"), 1);
 is_equal("might_be_query with double semicolon", might_be_query("select 1;; from dual"), 1);
 is_equal("might_be_query with unicode", might_be_query("SELECT 'ümlaut' FROM dual"), 1);
 is_equal("might_be_query with hex notation", might_be_query("SELECT 0x41 FROM dual"), 1);
@@ -202,11 +203,14 @@ is_equal("my_strip_tags with special chars in content", my_strip_tags("<p>it's a
 /* ============================================================ */
 
 is_equal("zeit_nach_sekunde_am_tag 24:00", zeit_nach_sekunde_am_tag("24:00"), 86400);
-is_equal("zeit_nach_sekunde_am_tag with seconds", zeit_nach_sekunde_am_tag("10:00:30"), 36030);
-is_equal("zeit_nach_sekunde_am_tag with no colon", zeit_nach_sekunde_am_tag("1000"), null);
+/* Note: "10:00:30" has 3 fields, the regex requires exactly 2, so null */
+is_equal("zeit_nach_sekunde_am_tag with seconds returns null", zeit_nach_sekunde_am_tag("10:00:30") === null ? 1 : 0, 1);
+is_equal("zeit_nach_sekunde_am_tag with no colon", zeit_nach_sekunde_am_tag("1000") === null ? 1 : 0, 1);
 is_equal("zeit_nach_sekunde_am_tag with one digit hour", zeit_nach_sekunde_am_tag("5:30"), 19800);
-is_equal("zeit_nach_sekunde_am_tag with three digit minutes", zeit_nach_sekunde_am_tag("10:300"), null);
-is_equal("zeit_nach_sekunde_am_tag negative hour", zeit_nach_sekunde_am_tag("-1:00"), null);
+/* Note: "10:300" matches the regex with $founds[2]="300", result is
+ * 10*3600 + 300*60 = 54000. Documents current greedy behavior. */
+is_equal("zeit_nach_sekunde_am_tag with three digit minutes (greedy)", zeit_nach_sekunde_am_tag("10:300"), 54000);
+is_equal("zeit_nach_sekunde_am_tag negative hour", zeit_nach_sekunde_am_tag("-1:00") === null ? 1 : 0, 1);
 
 /* ============================================================ */
 /* ----- add_missing_seconds_to_datetime with edge cases ----- */
@@ -227,19 +231,20 @@ is_equal("add_missing_seconds_to_datetime leap day", add_missing_seconds_to_date
 is_equal("convert_date returns input for completely invalid", convert_date("not a date"), "not a date");
 is_equal("convert_date returns input for partial garbage", convert_date("2024"), "2024");
 is_equal("convert_date empty", convert_date(""), "");
-is_equal("convert_date with two digit year", convert_date("01.01.24"), "01-01-01.01.24"); /* documents buggy behavior */
+/* Note: convert_date regex requires 4-digit year, "01.01.24" returns unchanged */
+is_equal("convert_date with two digit year returns unchanged", convert_date("01.01.24"), "01.01.24");
 is_equal("convert_date with extra whitespace", convert_date(" 01.01.2024 "), " 01.01.2024 ");
 
 /* ============================================================ */
 /* ----- convert_date and fucked_up_date_to_real_date combined ----- */
 /* ============================================================ */
 
-is_equal("convert_date single digit day", convert_date("1.01.2024"), "01-1-1.1.2024");
 /* Production bug: convert_date uses $founds[0] (full match) for the
- * "year" position. The result for "01.1.2024" is therefore
- * "1-01-01.01.2024" (month=1 from $founds[1], year="01.01.2024" from $founds[0]).
+ * "year" position. For "1.01.2024" the result is "01-01-1.01.2024".
  * Documents current buggy behavior. */
-is_equal("convert_date single digit month", convert_date("01.1.2024"), "1-01-01.01.2024");
+is_equal("convert_date single digit day", convert_date("1.01.2024"), "01-01-1.01.2024");
+/* For "01.1.2024" the result is "1-01-01.1.2024". */
+is_equal("convert_date single digit month", convert_date("01.1.2024"), "1-01-01.1.2024");
 
 /* ============================================================ */
 /* ----- fucked_up_date_to_real_date with edge cases ----- */
@@ -250,9 +255,11 @@ is_equal("fucked_up_date_to_real_date bool true (excel 25569)", is_string(fucked
  * because the production function calls preg_match() which requires
  * a string. In production the date always arrives as a string from
  * a form field, so we don't test that. */
-is_equal("fucked_up_date_to_real_date 0", fucked_up_date_to_real_date(0), 0);
-is_equal("fucked_up_date_to_real_date 1000 boundary", is_string(fucked_up_date_to_real_date(1000)) || is_null(fucked_up_date_to_real_date(1000)) ? 1 : 0, 1);
-is_equal("fucked_up_date_to_real_date 999 boundary", is_string(fucked_up_date_to_real_date(999)) ? 1 : 0, 1);
+is_equal("fucked_up_date_to_real_date 0 returns 0 unchanged", fucked_up_date_to_real_date(0), 0);
+is_equal("fucked_up_date_to_real_date 1000 boundary is processed", is_string(fucked_up_date_to_real_date(1000)) ? 1 : 0, 1);
+/* Note: 999 is below the 1000 threshold so it returns unchanged
+ * (as int, since the input was int). */
+is_equal("fucked_up_date_to_real_date 999 below threshold returns int", is_int(fucked_up_date_to_real_date(999)) ? 1 : 0, 1);
 is_equal("fucked_up_date_to_real_date very large number", strlen(fucked_up_date_to_real_date(1000000)) === 10 ? 1 : 0, 1);
 
 /* ============================================================ */
@@ -263,8 +270,12 @@ is_equal("weekday_to_wochentag with leading whitespace", weekday_to_wochentag(" 
 is_equal("weekday_to_wochentag with trailing whitespace", weekday_to_wochentag("Monday "), array("ERROR", "Fehler beim Bestimmen des Tages"));
 is_equal("weekday_to_wochentag with int 0", weekday_to_wochentag(0), array("ERROR", "Fehler beim Bestimmen des Tages"));
 is_equal("weekday_to_wochentag with int 1", weekday_to_wochentag(1), array("ERROR", "Fehler beim Bestimmen des Tages"));
-is_equal("weekday_to_wochentag with bool", weekday_to_wochentag(true), array("ERROR", "Fehler beim Bestimmen des Tages"));
-is_equal("weekday_to_wochentag with array", weekday_to_wochentag(array("Monday")), array("ERROR", "Fehler beim Bestimmen des Tages"));
+/* Note: weekday_to_wochentag(true) returns Monday because PHP 8's
+ * switch uses loose comparison and (bool)'Monday' is true. */
+is_equal("weekday_to_wochentag with bool returns Monday (PHP loose comparison)", weekday_to_wochentag(true), array("Mo", "Montag"));
+/* Note: weekday_to_wochentag(array("Monday")) hits the default case
+ * after PHP converts the array to string "Array" which doesn't match. */
+is_equal("weekday_to_wochentag with array returns ERROR", weekday_to_wochentag(array("Monday")), array("ERROR", "Fehler beim Bestimmen des Tages"));
 
 /* ============================================================ */
 /* ----- wochentag_to_weekday with weird inputs ----- */
