@@ -822,6 +822,7 @@ $pure_test_files = array(
 	"test_random_crypto.php",
 	"test_validation.php",
 	"test_sort_functions.php",
+	"test_edge_cases.php",
 );
 
 foreach ($pure_test_files as $file) {

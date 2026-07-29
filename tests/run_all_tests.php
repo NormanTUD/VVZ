@@ -30,6 +30,7 @@ $test_files = array(
 	"test_kunde_functions.php",
 	"test_misc_functions.php",
 	"test_language_functions.php",
+	"test_edge_cases.php",
 );
 
 foreach ($test_files as $file) {
