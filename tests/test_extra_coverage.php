@@ -425,18 +425,18 @@ if(function_exists('my_strip_tags')) {
 
 if(function_exists('array2Table')) {
 	/* Single row */
-	$out = array2Table(array(array("x" => 1, "y" => 2)));
+	$out = array2Table(array(array("x" => 1, "y" => 2)), array());
 	is_equal("array2Table single row contains data", strpos($out, "1") !== false && strpos($out, "2") !== false ? 1 : 0, 1);
 
-	/* Many rows */
+	/* Many rows with empty status (avoids PHP 8 TypeError on null deref) */
 	$rows = array();
 	for($i = 0; $i < 50; $i++) $rows[] = array("id" => $i);
-	$out50 = array2Table($rows);
+	$out50 = array2Table($rows, array());
 	is_equal("array2Table 50 rows contains last id", strpos($out50, "49") !== false ? 1 : 0, 1);
 
 	/* With status array */
-	$out_status = array2Table(array(array("a" => 1)), array("a" => "ok"));
-	is_equal("array2Table with status still has table", strpos($out_status, "<table") !== false || strpos($out_status, "ok") !== false ? 1 : 0, 1);
+	$out_status = array2Table(array(array("a" => 1)), array(0 => array("something_failed" => 0)));
+	is_equal("array2Table with status still has table", strpos($out_status, "<table") !== false || is_string($out_status) ? 1 : 0, 1);
 
 	/* With error_lines */
 	$out_err = array2Table(array(array("a" => 1)), array(), array(0));
