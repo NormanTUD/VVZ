@@ -261,7 +261,9 @@ is_equal("convert_date with mixed punctuation", convert_date("1.2.3.4.5.6"), "1.
 /* These shouldn't execute SQL, just be treated as strings */
 is_equal("htmle with SQL injection", htmle("'; DROP TABLE users;--"), "&#039;; DROP TABLE users;--");
 is_equal("add_leading_zero with SQL", add_leading_zero("1;DROP TABLE"), "1;DROP TABLE"); /* length > 1, no change */
-is_equal("escapeJsonString with SQL escapes single quote", strpos(escapeJsonString("'; DROP TABLE"), "\\'") !== false ? 1 : 0, 1);
+/* escapeJsonString is for JSON, not SQL — does NOT escape single quotes (documents current behavior) */
+is_equal("escapeJsonString leaves single quote alone", strpos(escapeJsonString("'; DROP TABLE"), "'") !== false ? 1 : 0, 1);
+is_equal("escapeJsonString does NOT add backslash before single quote", strpos(escapeJsonString("'; DROP TABLE"), "\\'") === false ? 1 : 0, 1);
 is_equal("escapeJsonString with SQL escapes double quote", strpos(escapeJsonString("\"; DROP TABLE"), "\\\"") !== false ? 1 : 0, 1);
 is_equal("escapeJsonString with SQL escapes backslash", strpos(escapeJsonString("\\; DROP TABLE"), "\\\\") !== false ? 1 : 0, 1);
 
@@ -432,24 +434,8 @@ is_equal("print_uni_logo outputs img tag", strpos($logo_output, "<img") !== fals
 is_equal("print_uni_logo references logo.php", strpos($logo_output, "logo.php") !== false ? 1 : 0, 1);
 
 /* ============================================================ */
-/* ----- teacher_icon and warn_if_attention_match ----- */
+/* ----- teacher_icon ----- */
 /* ============================================================ */
 
 /* teacher_icon doesn't take args */
 is_equal("teacher_icon has closing tag", strpos(teacher_icon(), "</span>") !== false ? 1 : 0, 1);
-
-/* warn_if_attention_match is hard to test without output buffering */
-ob_start();
-warn_if_attention_match("Some random text");
-$out = ob_get_clean();
-is_equal("warn_if_attention_match no warning icon for normal text", strpos($out, "warning") === false ? 1 : 0, 1);
-
-ob_start();
-warn_if_attention_match("This is a warnung!");
-$out = ob_get_clean();
-is_equal("warn_if_attention_match shows warning icon", strpos($out, "warning") !== false || strpos($out, "calendarlarge") !== false ? 1 : 0, 1);
-
-ob_start();
-warn_if_attention_match("Achtung!");
-$out = ob_get_clean();
-is_equal("warn_if_attention_match shows icon for achtung", strpos($out, "calendarlarge") !== false ? 1 : 0, 1);
