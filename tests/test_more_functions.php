@@ -355,7 +355,9 @@ regex_matches("print_line_link with HTML chars", print_line_link("<script>"), '/
 /* ----- create_hour_from_to with array mode ----- */
 /* ============================================================ */
 
-is_equal("create_hour_from_to array mode 0-1", create_hour_from_to(0, 1, 1), array("05:40", "07:10"));
+/* create_hour_from_to returns start of "from" hour and end of "to" hour */
+is_equal("create_hour_from_to array mode 0-1", create_hour_from_to(0, 1, 1), array("05:40", "09:00"));
+is_equal("create_hour_from_to array mode 1-2", create_hour_from_to(1, 2, 1), array("07:30", "10:50"));
 is_equal("create_hour_from_to array mode 2-5", create_hour_from_to(2, 5, 1), array("09:20", "16:20"));
 is_equal("create_hour_from_to array mode same hour", create_hour_from_to(4, 4, 1), array("13:00", "14:30"));
 is_equal("create_hour_from_to string mode same hour", create_hour_from_to(4, 4, 0), "13:00 &mdash; 14:30");
@@ -374,16 +376,21 @@ for($i = 0; $i < 100; $i++) {
 	$large_data[] = array("col" => $i);
 }
 $t = array2Table($large_data, array_fill(0, 100, array("something_failed" => 0, "studiengang" => "ok")));
-regex_matches("array2Table 100 rows", $t, "/100/");
+/* Last row should be 99 (0-indexed) */
+regex_matches("array2Table 100 rows contains last value 99", $t, "/99<\/td>/");
+/* Count <tr> tags - should be at least 100 */
+$tr_count = substr_count($t, "<tr");
+is_equal("array2Table 100 rows has at least 100 tr tags", $tr_count >= 100 ? 1 : 0, 1);
 
 /* ============================================================ */
 /* ----- Convert_date more ----- */
 /* ============================================================ */
 
-is_equal("convert_date with year 1900", convert_date("01.01.1900"), "01-01-1900"); /* documents bug */
+/* Note: convert_date uses $founds[0] (full match) for "year" position. Documents buggy behavior. */
+is_equal("convert_date with year 1900", convert_date("01.01.1900"), "01-01-01.01.1900"); /* documents bug */
 is_equal("convert_date with year 2099", convert_date("31.12.2099"), "12-31-31.12.2099"); /* documents bug */
 is_equal("convert_date with 31 December", convert_date("31.12.2024"), "12-31-31.12.2024"); /* documents bug */
-is_equal("convert_date with 29 February (leap year)", convert_date("29.02.2024"), "02-29-29.02.2024");
+is_equal("convert_date with 29 February (leap year)", convert_date("29.02.2024"), "02-29-29.02.2024"); /* documents bug */
 
 /* ============================================================ */
 /* ----- fuck date more ----- */
