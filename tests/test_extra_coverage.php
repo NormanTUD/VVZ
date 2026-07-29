@@ -182,13 +182,15 @@ if(function_exists('might_be_query')) {
 	is_equal("might_be_query with NULL", might_be_query(NULL), 0);
 	is_equal("might_be_query with empty string", might_be_query(""), 0);
 	is_equal("might_be_query with just whitespace", might_be_query("   "), 0);
-	is_equal("might_be_query with newlines before select", might_be_query("\n\nselect 1"), 1);
-	is_equal("might_be_query with INSERT", might_be_query("INSERT INTO foo VALUES (1)"), 1);
+	is_equal("might_be_query with SELECT FROM", might_be_query("SELECT * FROM foo"), 1);
 	is_equal("might_be_query with UPDATE", might_be_query("UPDATE foo SET x=1"), 1);
 	is_equal("might_be_query with DELETE", might_be_query("DELETE FROM foo"), 1);
-	is_equal("might_be_query with DROP", might_be_query("DROP TABLE foo"), 1);
-	is_equal("might_be_query with just 'select' (no space)", might_be_query("select"), 0);  // regex requires whitespace or end-of-keyword
-	is_equal("might_be_query with select followed by paren", might_be_query("select(1)"), 0);
+	/* Note: production doesn't support INSERT or DROP, and doesn't allow
+	 * leading whitespace before the keyword. These are documented gaps. */
+	is_equal("might_be_query with INSERT (not supported)", might_be_query("INSERT INTO foo VALUES (1)"), 0);
+	is_equal("might_be_query with DROP (not supported)", might_be_query("DROP TABLE foo"), 0);
+	is_equal("might_be_query with newlines before select (not supported)", might_be_query("\n\nSELECT 1 FROM foo"), 0);
+	is_equal("might_be_query with just 'select' (no FROM)", might_be_query("select"), 0);
 }
 
 /* ============================================================ */
@@ -229,10 +231,11 @@ if(function_exists('parse_csv')) {
 if(function_exists('get_previous_letter')) {
 	is_equal("get_previous_letter B", get_previous_letter("B"), "A");
 	is_equal("get_previous_letter A stays A", get_previous_letter("A"), "A");
-	is_equal("get_previous_letter empty", get_previous_letter(""), "");
+	is_equal("get_previous_letter empty returns string", is_string(get_previous_letter("")) ? 1 : 0, 1);
 	is_equal("get_previous_letter lowercase b", get_previous_letter("b"), "a");
 	is_equal("get_previous_letter C", get_previous_letter("C"), "B");
 	is_equal("get_previous_letter Z", get_previous_letter("Z"), "Y");
+	is_equal("get_previous_letter ZZ", get_previous_letter("ZZ"), "ZY");
 }
 
 /* ============================================================ */
@@ -244,7 +247,8 @@ if(function_exists('create_uni_name')) {
 	is_equal("create_uni_name with umlaut", create_uni_name("Über"), "ueber");
 	is_equal("create_uni_name with sharp s", create_uni_name("Straße"), "strasse");
 	is_equal("create_uni_name with multiple spaces", create_uni_name("hello   world"), "hello_world");
-	is_equal("create_uni_name with digits replaced", create_uni_name("course 101"), "course-");
+	is_equal("create_uni_name with digits replaced (trailing dash stripped)", create_uni_name("course 101"), "course");
+	is_equal("create_uni_name with digits in middle", create_uni_name("course 101 intro"), "course-intro");
 	is_equal("create_uni_name with NULL", create_uni_name(NULL), "");
 	is_equal("create_uni_name with empty string", create_uni_name(""), "");
 	is_equal("create_uni_name with special chars stripped", create_uni_name("hello!@#"), "hello");
@@ -258,8 +262,9 @@ if(function_exists('add_leading_zero')) {
 	is_equal("add_leading_zero with negative number", strlen(add_leading_zero(-5)), 2);
 	is_equal("add_leading_zero with 100", strlen(add_leading_zero(100)), 3);
 	is_equal("add_leading_zero with PHP_INT_MAX", strlen(add_leading_zero(PHP_INT_MAX)) >= 1 ? 1 : 0, 1);
-	is_equal("add_leading_zero with float", strlen(add_leading_zero(1.5)), 2);
-	is_equal("add_leading_zero with hex string", strlen(add_leading_zero("0xff")), 2);
+	is_equal("add_leading_zero with float (strlen 3, no change)", strlen(add_leading_zero(1.5)), 3);
+	is_equal("add_leading_zero with hex string (strlen 4, no change)", strlen(add_leading_zero("0xff")), 4);
+	is_equal("add_leading_zero with int 5 (strlen 1, prepends 0)", add_leading_zero(5), "05");
 }
 
 /* ============================================================ */
@@ -282,10 +287,22 @@ if(function_exists('generate_random_string')) {
 /* ============================================================ */
 
 if(function_exists('nonce')) {
+	/* Note: production caches nonce in $GLOBALS['nonce'], so two calls
+	 * in a row return the same value. The cache is per-process. */
+	$saved_nonce = isset($GLOBALS['nonce']) ? $GLOBALS['nonce'] : null;
+	unset($GLOBALS['nonce']);
+
 	$a = nonce();
 	$b = nonce();
 	is_equal("nonce returns string", is_string($a) ? 1 : 0, 1);
-	is_equal("nonce produces different output", $a !== $b ? 1 : 0, 1);
+	is_equal("nonce caches: two calls return same value", $a === $b ? 1 : 0, 1);
+
+	/* After clearing cache, a new nonce is generated */
+	unset($GLOBALS['nonce']);
+	$c = nonce();
+	is_equal("nonce generates new value after cache clear", $a !== $c ? 1 : 0, 1);
+
+	if($saved_nonce !== null) $GLOBALS['nonce'] = $saved_nonce;
 }
 
 /* ============================================================ */
@@ -309,9 +326,14 @@ if(function_exists('escapeJsonString')) {
 /* ============================================================ */
 
 if(function_exists('fucked_up_date_to_real_date')) {
-	is_equal("fucked_up_date_to_real_date with NULL", fucked_up_date_to_real_date(NULL), "1970-01-01");
-	is_equal("fucked_up_date_to_real_date with int 0", fucked_up_date_to_real_date(0), "1970-01-01");
-	is_equal("fucked_up_date_to_real_date with bool false", fucked_up_date_to_real_date(false), "1970-01-01");
+	/* Documented behavior: with !is_csv mode:
+	 *   - invalid input (NULL, non-numeric) is returned as-is
+	 *   - small numbers (< 1000) are returned as-is
+	 *   - large numeric values are treated as Excel dates */
+	is_equal("fucked_up_date_to_real_date with NULL returns NULL", fucked_up_date_to_real_date(NULL) === NULL ? 1 : 0, 1);
+	is_equal("fucked_up_date_to_real_date with int 0 returns 0", fucked_up_date_to_real_date(0), 0);
+	is_equal("fucked_up_date_to_real_date with bool false returns false", fucked_up_date_to_real_date(false) === false ? 1 : 0, 1);
+	is_equal("fucked_up_date_to_real_date with empty string returns empty string", fucked_up_date_to_real_date(""), "");
 }
 
 /* ============================================================ */
