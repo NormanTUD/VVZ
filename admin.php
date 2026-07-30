@@ -27,7 +27,7 @@ if($is_ajax_admin && isset($_GET['stage']) && in_array($_GET['stage'], $ajax_onl
 		exit(0);
 	}
 	// $GLOBALS['pages'] wird normalerweise unten aufgebaut; für AJAX hier vorziehen
-	if(!is_array($GLOBALS['pages'])) {
+	if(!is_array($GLOBALS['pages']) || count($GLOBALS['pages']) === 0) {
 		$GLOBALS['pages'] = array();
 		$req_pn = (int)get_get('page');
 		if($req_pn > 0) {
@@ -37,10 +37,11 @@ if($is_ajax_admin && isset($_GET['stage']) && in_array($_GET['stage'], $ajax_onl
 			}
 		}
 	}
-	$page_file = $GLOBALS['pages'][(int)get_get('page')][1] ?? null;
+	$req_pn = (int)get_get('page');
+	$page_file = isset($GLOBALS['pages'][$req_pn]) ? $GLOBALS['pages'][$req_pn][1] : null;
 	if(!$page_file) {
 		header('Content-Type: application/json; charset=utf-8');
-		print json_encode(array('ok' => false, 'error' => 'Seite nicht gefunden.'));
+		print json_encode(array('ok' => false, 'error' => 'Seite nicht gefunden.', 'pages_count' => is_array($GLOBALS['pages']) ? count($GLOBALS['pages']) : 'null', 'req_pn' => $req_pn));
 		exit(0);
 	}
 	$page_file = dirname(__FILE__).'/pages/'.$page_file;
