@@ -466,6 +466,23 @@
 		}
 	}
 
+	/** Säubert einen Wert rekursiv von Control-Chars (PDF-Text enthält Form-Feed 0x0c etc.). */
+	if(!function_exists('soi_sanitize_for_json')) {
+		function soi_sanitize_for_json($v) {
+			if(is_array($v)) {
+				$out = array();
+				foreach($v as $k => $vv) { $out[$k] = soi_sanitize_for_json($vv); }
+				return $out;
+			}
+			if(is_string($v)) {
+				return preg_replace_callback('/[\x00-\x08\x0b\x0c\x0e-\x1f]/', function($m) {
+					return '\\u' . str_pad(dechex(ord($m[0])), 4, '0', STR_PAD_LEFT);
+				}, $v);
+			}
+			return $v;
+		}
+	}
+
 	/** Findet einen Studiengang anhand des Namens oder legt ihn an. */
 	if(!function_exists('soi_ensure_studiengang')) {
 		function soi_ensure_studiengang($name, $degree, $institut_id) {
@@ -1252,12 +1269,8 @@
 								'cover' => $cover,
 								'created_at' => date('c'),
 							);
+							$parsed_payload = soi_sanitize_for_json($parsed_payload);
 							$notes_json = json_encode($parsed_payload, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
-							// PDF-Text enthält oft Form-Feed (0x0c) und andere Control-Chars, die JSON ungültig machen.
-							// Wir ersetzen sie durch \x escapes, damit der Browser sie korrekt parsen kann.
-							$notes_json = preg_replace_callback('/[\x00-\x1f]/', function($m) {
-								return '\\u' . str_pad(dechex(ord($m[0])), 4, '0', STR_PAD_LEFT);
-							}, $notes_json);
 
 							$query = 'INSERT INTO `studienordnung_import` (studiengang_id, filename, pdf_sha256, pdf_size, pdf_data, raw_text, degree, program_name, modules_found, modules_imported, pruefungsnummern_imported, imported_by_user_id, notes) VALUES ('.
 								esc($studiengang_id).', '.esc($filename).', '.esc($sha).', '.esc($size).', '.esc($pdf_b64).', '.esc($raw_text).', '.
@@ -1291,8 +1304,8 @@
 									'studiengang_id' => $studiengang_id,
 									'studiengang_name' => $cover['program'] ?: '',
 									'degree' => $cover['degree'] ?: '',
-									'modules' => $modules,
-									'anlage2' => $anlage2,
+									'modules' => soi_sanitize_for_json($modules),
+									'anlage2' => soi_sanitize_for_json($anlage2),
 									'modules_found' => count($modules),
 									'anlage2_found' => count($anlage2),
 									'modul_pages' => $modul_pages,
@@ -1300,7 +1313,7 @@
 									'reuse' => $reuse,
 									'text_length' => strlen($raw_text),
 									'size' => $size,
-								), JSON_UNESCAPED_UNICODE);
+								), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
 								exit;
 							} elseif($auto_commit) {
 								// Direkt committen: in $_POST umkopieren und Stage auf 'commit' setzen
@@ -1611,12 +1624,12 @@
 				'studiengang_name' => $row['program_name'] ?? '',
 				'degree' => $row['degree'] ?? '',
 				'cover' => $cover,
-				'modules' => $modules,
-				'anlage2' => $anlage2,
+				'modules' => soi_sanitize_for_json($modules),
+				'anlage2' => soi_sanitize_for_json($anlage2),
 				'modul_pages' => $modul_pages,
 				'modules_found' => count($modules),
 				'anlage2_found' => count($anlage2),
-			), JSON_UNESCAPED_UNICODE);
+			), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
 			exit;
 		} elseif($stage === 'page_image') {
 			// AJAX: Liefert PNG der Seite N eines Imports
