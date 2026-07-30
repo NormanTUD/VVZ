@@ -19,7 +19,8 @@
 		return;
 	}
 
-	if(isset($_GET['debug_soi'])) { header('Content-Type: text/plain'); echo "DBG: stage=".htmlspecialchars((string)($_GET['stage'] ?? '-'))." ajax=".((!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])==='xmlhttprequest')?'yes':'no')."\n"; }
+	// Debug-Helfer: bei ?debug_soi=1 zusätzliche Statusinfos ausgeben
+	$debug_soi = get_get('debug_soi') === '1';
 
 	// -------- Hilfsfunktionen (Parser) --------
 
@@ -1256,24 +1257,11 @@
 							$query = 'INSERT INTO `studienordnung_import` (studiengang_id, filename, pdf_sha256, pdf_size, pdf_data, raw_text, degree, program_name, modules_found, modules_imported, pruefungsnummern_imported, imported_by_user_id, notes) VALUES ('.
 								esc($studiengang_id).', '.esc($filename).', '.esc($sha).', '.esc($size).', '.esc($pdf_b64).', '.esc($raw_text).', '.
 								esc($cover['degree']).', '.esc($cover['program']).', '.esc(count($modules)).', 0, 0, '.esc($user_id).', '.esc($notes_json).')';
-							if(isset($_GET['debug_soi'])) {
-								header('Content-Type: text/plain');
-								echo "DBG_INSERT: query_len=".strlen($query)." mem=".memory_get_usage()."/".memory_get_peak_usage()."\n";
-								flush();
-							}
+							// rquery kann bei großen BLOBs/Strings fehlschlagen, daher direkter mysqli_query mit Exception-Handling
 							try {
-								$result = mysqli_query($GLOBALS['dbh'], $query);
-								$insert_result = $result;
+								$insert_result = mysqli_query($GLOBALS['dbh'], $query);
 							} catch (\Throwable $e) {
-								if(isset($_GET['debug_soi'])) {
-									echo "DBG_INSERT: EXCEPTION: ".$e->getMessage()."\n";
-									flush();
-								}
 								$insert_result = false;
-							}
-							if(isset($_GET['debug_soi'])) {
-								echo "DBG_INSERT: result=".var_export($insert_result, true)." mysql_err=".mysqli_error($GLOBALS['dbh'])." errno=".mysqli_errno($GLOBALS['dbh'])."\n";
-								flush();
 							}
 							$import_row = get_single_row_from_query('SELECT id FROM `studienordnung_import` WHERE `pdf_sha256` = '.esc($sha).' ORDER BY id DESC LIMIT 1');
 							$import_id = (!is_null($import_row) && $import_row !== '' && $import_row !== false) ? (int)$import_row : 0;
