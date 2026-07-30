@@ -229,59 +229,40 @@
 		}
 	}
 
-	/** Bestimmt für jede Modul-Zeile, auf welcher PDF-Seite sie beginnt. */
+	/**
+	 * Bestimmt für jedes Modul die PDF-Seite, auf der es zuerst auftaucht.
+	 * Nutzt die SoiExtractor-Locator-API und indiziert das Ergebnis nach Modulnummer-Index
+	 * (Kompatibilität zu alten Aufrufern).
+	 *
+	 * @param string $raw_text_layout  Layout-Text aus pdftotext -layout.
+	 * @param array  $modules          Array von Modulen mit 'modulnummer'.
+	 * @return array<int,int>          [idx => page_number (1-basiert, 1 wenn nicht gefunden)].
+	 */
 	if(!function_exists('soi_locate_modules_in_pages')) {
-		function soi_locate_modules_in_pages($raw_text, $modules, $total_pages = 0) {
-			// pdftotext liefert mit -layout Seitenzahl-Banner: "^      19" oder "Page 19" etc.
-			// Wir nähern: jedes "L N" / "Seite N" / "L  N" am Zeilenende zählt.
-			$lines = preg_split('/\r\n|\r|\n/', $raw_text);
-			$page_starts = array();
-			$cur_page = 1;
-			foreach($lines as $i => $ln) {
-				// Format-Decision: typische TU-Dresden PDFs haben rechts unten eine Zahl
-				// Wir versuchen: Zeile mit nur einer Zahl (1-3 Stellen) am Ende eines Blocks
-				if(preg_match('/^\s*(\d{1,3})\s*$/', $ln, $pm) && (int)$pm[1] <= ($total_pages ?: 9999)) {
-					$n = (int)$pm[1];
-					if($n > $cur_page) {
-						$page_starts[$i] = $n;
-						$cur_page = $n;
+		function soi_locate_modules_in_pages($raw_text_layout, $modules, $total_pages = 0) {
+			$pages = explode("\f", (string)$raw_text_layout);
+			$out = array();
+			if(empty($modules)) return $out;
+			$code_to_idx = array();
+			foreach($modules as $idx => $m) {
+				$out[$idx] = 1;
+				if(isset($m['modulnummer'])) $code_to_idx[trim((string)$m['modulnummer'])] = $idx;
+			}
+			$found = array();
+			foreach($pages as $page_idx => $page_text) {
+				$lines = preg_split('/\r\n|\r|\n/', (string)$page_text);
+				foreach($lines as $ln) {
+					if(preg_match('/^\s*([A-Za-z][A-Za-z0-9-]{3,})(?:\s|$)/u', $ln, $cm)) {
+						$code = trim($cm[1]);
+						if(isset($code_to_idx[$code]) && !isset($found[$code_to_idx[$code]])) {
+							$out[$code_to_idx[$code]] = $page_idx + 1;
+							$found[$code_to_idx[$code]] = true;
+						}
 					}
 				}
+				if(count($found) === count($modules)) break;
 			}
-
-			// Bestimme für jedes Modul die Seitenzahl
-			$modul_positions = array();
-			$modul_starts = array();
-			foreach($modules as $idx => $m) {
-				$modul_starts[$idx] = -1;
-			}
-			$modul_keys = array();
-			foreach($modules as $idx => $m) {
-				$modul_keys[$idx] = $m['modulnummer'];
-			}
-			$current_page = 1;
-			foreach($lines as $i => $ln) {
-				if(isset($page_starts[$i])) $current_page = $page_starts[$i];
-				foreach($modul_keys as $idx => $code) {
-					if($modul_starts[$idx] === -1 && strpos($ln, $code) === 0) {
-						$modul_starts[$idx] = $current_page;
-					}
-				}
-			}
-			return $modul_starts;
-		}
-	}
-
-	/** Liefert für ein Modul die Zeile, in der es im Text auftaucht (für Quellenangabe). */
-	if(!function_exists('soi_find_line_for_modul')) {
-		function soi_find_line_for_modul($raw_text, $modulnummer) {
-			$lines = preg_split('/\r\n|\r|\n/', $raw_text);
-			foreach($lines as $i => $ln) {
-				if(preg_match('/^'.preg_quote($modulnummer, '/').'\s/s', $ln)) {
-					return $i;
-				}
-			}
-			return -1;
+			return $out;
 		}
 	}
 
@@ -887,19 +868,55 @@
 					// PDF in DB als Base64 speichern, um SQL-Injection durch Binärdaten zu vermeiden
 					$pdf_b64 = base64_encode($pdf_bytes);
 
-					// Text extrahieren
+					// Extraktions-Methode aus dem Formular (Default: auto).
+					$extract_method = (string)(get_post('soi_extract_method') ?: get_get('soi_extract_method') ?: 'auto');
+					if(!in_array($extract_method, SoiExtractor::METHODS, true)) $extract_method = 'auto';
+
+					// PDF-Text + Module + Anlage 2 in einem Rutsch extrahieren.
 					try {
-						$raw_text = soi_extract_pdf_text($pdf_path);
-					} catch (Exception $e) {
-						error('Fehler bei der Textextraktion: '.htmlentities($e->getMessage()));
-						print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
-						$raw_text = null;
+						$extraction = soi_run_extraction($pdf_path, $extract_method);
+					} catch (\Throwable $e) {
+						$extraction = array(
+							'method' => $extract_method,
+							'cover' => array('degree' => null, 'program' => null),
+							'modules' => array(),
+							'anlage2' => array(),
+							'modules_count' => 0,
+							'anlage2_count' => 0,
+							'text_length' => 0,
+							'errors' => array($e->getMessage()),
+							'__raw_text' => '',
+							'__pages' => array(),
+							'__modul_pages' => array(),
+						);
 					}
 
-					if($raw_text !== null) {
-						$cover = soi_parse_cover($raw_text);
-						$modules = soi_parse_modules($raw_text);
-						$anlage2 = soi_parse_anlage2($raw_text);
+					// Wenn pdftotext etc. fehlt, wurde eine Exception geworfen. Wir prüfen explizit
+					// auf typische Fehler und geben dem Admin einen konkreten Hinweis.
+					if(!empty($extraction['errors'])) {
+						$err_msg = implode(' / ', $extraction['errors']);
+						$hint = '';
+						if(stripos($err_msg, 'pdftotext') !== false || stripos($err_msg, 'pdftohtml') !== false || stripos($err_msg, 'pdftoppm') !== false || stripos($err_msg, 'poppler') !== false) {
+							$hint = ' Bitte installieren Sie die fehlenden Tools: <code>apt-get install poppler-utils</code> (Debian/Ubuntu) bzw. <code>dnf install poppler-utils</code> (Fedora/RHEL).';
+						}
+						if($is_ajax) {
+							header('Content-Type: application/json; charset=utf-8');
+							print json_encode(array('ok' => false, 'error' => 'Extraktion fehlgeschlagen: '.$err_msg.$hint));
+							exit;
+						}
+						error('Extraktion fehlgeschlagen: '.htmlentities($err_msg).$hint);
+						print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
+						$raw_text = null;
+					} else {
+						$raw_text = $extraction['__raw_text'];
+						$cover = $extraction['cover'];
+						$modules = $extraction['modules'];
+						$anlage2 = $extraction['anlage2'];
+						$modul_pages_by_code = $extraction['__modul_pages'];
+						$extract_method_used = $extraction['method'];
+					}
+
+					if(isset($raw_text) && $raw_text !== null) {
 
 					// Studiengang bestimmen
 					$mode = get_post('soi_studiengang_mode') ?: 'auto';
@@ -935,6 +952,9 @@
 								'modules' => $modules,
 								'anlage2' => $anlage2,
 								'cover' => $cover,
+								'method' => isset($extract_method_used) ? $extract_method_used : $extract_method,
+								'alternatives' => isset($extraction['_alternatives']) ? $extraction['_alternatives'] : null,
+								'modul_pages' => isset($modul_pages_by_code) ? $modul_pages_by_code : array(),
 								'created_at' => date('c'),
 							);
 							$parsed_payload = soi_sanitize_for_json($parsed_payload);
@@ -962,7 +982,11 @@
 								print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
 							} elseif($is_ajax) {
 								// Sofortige JSON-Antwort mit allen geparsten Daten + Seitenzuordnungen
-								$modul_pages = soi_locate_modules_in_pages($raw_text, $modules);
+								$modul_pages = array();
+								foreach($modules as $idx => $m) {
+									$code = isset($m['modulnummer']) ? trim((string)$m['modulnummer']) : '';
+									$modul_pages[$idx] = isset($modul_pages_by_code[$code]) ? (int)$modul_pages_by_code[$code] : 1;
+								}
 								header('Content-Type: application/json; charset=utf-8');
 								print json_encode(array(
 									'ok' => true,
@@ -977,6 +1001,8 @@
 									'modules_found' => count($modules),
 									'anlage2_found' => count($anlage2),
 									'modul_pages' => $modul_pages,
+									'extract_method' => isset($extract_method_used) ? $extract_method_used : $extract_method,
+									'extract_alternatives' => isset($extraction['_alternatives']) ? $extraction['_alternatives'] : null,
 									'create_pruefungsnummern' => $create_pns,
 									'reuse' => $reuse,
 									'text_length' => strlen($raw_text),
@@ -1268,7 +1294,7 @@
 			// AJAX: geparste Daten zu einem bestehenden Import-Eintrag zurückgeben.
 			header('Content-Type: application/json; charset=utf-8');
 			$id = (int)get_get('id');
-			$row = get_single_row_from_query_assoc('SELECT id, filename, raw_text, notes, studiengang_id, degree, program_name FROM `studienordnung_import` WHERE id = '.esc($id));
+			$row = get_single_row_from_query_assoc('SELECT id, filename, pdf_data, raw_text, notes, studiengang_id, degree, program_name FROM `studienordnung_import` WHERE id = '.esc($id));
 			if(!$row) {
 				print json_encode(array('ok' => false, 'error' => 'Import nicht gefunden.'));
 				exit;
@@ -1276,14 +1302,52 @@
 			$payload = json_decode($row['notes'] ?? '', true);
 			$modules = is_array($payload) && isset($payload['modules']) ? $payload['modules'] : null;
 			$anlage2 = is_array($payload) && isset($payload['anlage2']) ? $payload['anlage2'] : null;
-			if($modules === null) {
-				$modules = soi_parse_modules($row['raw_text']);
+			$extract_method = is_array($payload) && isset($payload['method']) ? (string)$payload['method'] : 'auto';
+			$extract_alternatives = is_array($payload) && isset($payload['alternatives']) ? $payload['alternatives'] : null;
+			$re_extracted = false;
+
+			// Falls keine cached notes vorhanden sind, re-extrahiere aus dem gespeicherten PDF.
+			if($modules === null || $anlage2 === null) {
+				$pdf_bin = base64_decode($row['pdf_data'] ?? '', true);
+				if($pdf_bin !== false && strlen($pdf_bin) > 0) {
+					$tmp = tempnam(sys_get_temp_dir(), 'soi_analyze_');
+					if($tmp !== false) {
+						$tmp_pdf = $tmp . '.pdf';
+						@rename($tmp, $tmp_pdf);
+						if(file_put_contents($tmp_pdf, $pdf_bin) !== false) {
+							try {
+								$re = soi_run_extraction($tmp_pdf, $extract_method);
+								$modules = $re['modules'];
+								$anlage2 = $re['anlage2'];
+								$row['raw_text'] = $re['__raw_text'];
+								$modul_pages_by_code = $re['__modul_pages'];
+								$extract_method = $re['method'];
+								$extract_alternatives = isset($re['_alternatives']) ? $re['_alternatives'] : null;
+								$re_extracted = true;
+							} catch (\Throwable $e) {
+								// Fallback: leere Arrays
+								if($modules === null) $modules = array();
+								if($anlage2 === null) $anlage2 = array();
+							}
+						}
+						@unlink($tmp_pdf);
+					}
+				}
+				if($modules === null) $modules = array();
+				if($anlage2 === null) $anlage2 = array();
 			}
-			if($anlage2 === null) {
-				$anlage2 = soi_parse_anlage2($row['raw_text']);
-			}
+
 			$cover = is_array($payload) && isset($payload['cover']) ? $payload['cover'] : array('degree' => $row['degree'], 'program' => $row['program_name']);
-			$modul_pages = soi_locate_modules_in_pages($row['raw_text'], $modules);
+			if($re_extracted && isset($modul_pages_by_code)) {
+				$modul_pages = array();
+				foreach($modules as $idx => $m) {
+					$code = isset($m['modulnummer']) ? trim((string)$m['modulnummer']) : '';
+					$modul_pages[$idx] = isset($modul_pages_by_code[$code]) ? (int)$modul_pages_by_code[$code] : 1;
+				}
+			} else {
+				$modul_pages = soi_locate_modules_in_pages($row['raw_text'], $modules);
+			}
+
 			print json_encode(array(
 				'ok' => true,
 				'import_id' => (int)$row['id'],
@@ -1297,6 +1361,8 @@
 				'modul_pages' => $modul_pages,
 				'modules_found' => count($modules),
 				'anlage2_found' => count($anlage2),
+				'extract_method' => $extract_method,
+				'extract_alternatives' => $extract_alternatives,
 			), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
 			exit;
 		} elseif($stage === 'page_image') {
