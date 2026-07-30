@@ -445,17 +445,18 @@
 			}
 			$full_name = mb_substr($full_name, 0, 100);
 
-			// Erst exakten Treffer (mit Grad) prüfen, dann auch ohne Grad.
+			// get_single_row_from_query gibt bei Match einen String (Spaltenwert) zurück,
+			// KEIN Array. Deshalb prüfen wir auf !is_null.
 			$existing = get_single_row_from_query('SELECT id FROM `studiengang` WHERE `name` = '.esc($full_name).' LIMIT 1');
-			if(is_array($existing) && isset($existing[0])) return (int)$existing[0];
+			if(!is_null($existing) && $existing !== '' && $existing !== false) return (int)$existing;
 			$existing = get_single_row_from_query('SELECT id FROM `studiengang` WHERE `name` = '.esc(mb_substr($name, 0, 100)).' LIMIT 1');
-			if(is_array($existing) && isset($existing[0])) return (int)$existing[0];
+			if(!is_null($existing) && $existing !== '' && $existing !== false) return (int)$existing;
 
 			$query = 'INSERT INTO `studiengang` (`name`, `institut_id`, `studienordnung`, `order_key`) VALUES ('.
 				esc($full_name).', '.esc((int)$institut_id).', '.esc('importiert am '.date('Y-m-d H:i')).', 999999)';
 			rquery($query);
 			$new = get_single_row_from_query('SELECT id FROM `studiengang` WHERE `name` = '.esc($full_name).' LIMIT 1');
-			if(is_array($new) && isset($new[0])) return (int)$new[0];
+			if(!is_null($new) && $new !== '' && $new !== false) return (int)$new;
 			return null;
 		}
 	}
@@ -465,10 +466,10 @@
 		function soi_ensure_pruefungstyp($name) {
 			if(!$name) return null;
 			$existing = get_single_row_from_query('SELECT id FROM `pruefungstyp` WHERE `name` = '.esc($name).' LIMIT 1');
-			if(is_array($existing) && isset($existing[0])) return (int)$existing[0];
+			if(!is_null($existing) && $existing !== '' && $existing !== false) return (int)$existing;
 			rquery('INSERT INTO `pruefungstyp` (`name`) VALUES ('.esc($name).')');
 			$new = get_single_row_from_query('SELECT id FROM `pruefungstyp` WHERE `name` = '.esc($name).' LIMIT 1');
-			if(is_array($new) && isset($new[0])) return (int)$new[0];
+			if(!is_null($new) && $new !== '' && $new !== false) return (int)$new;
 			return null;
 		}
 	}
@@ -655,12 +656,12 @@
 							$query = 'INSERT INTO `studienordnung_import` (studiengang_id, filename, pdf_sha256, pdf_size, pdf_data, raw_text, degree, program_name, modules_found, modules_imported, pruefungsnummern_imported, imported_by_user_id) VALUES ('.
 								esc($studiengang_id).', '.esc($filename).', '.esc($sha).', '.esc($size).', '.esc($pdf_bytes).', '.esc($raw_text).', '.
 								esc($cover['degree']).', '.esc($cover['program']).', '.esc(count($modules)).', 0, 0, '.esc($user_id).')';
-							rquery($query);
+							$insert_result = rquery($query);
 							$import_row = get_single_row_from_query('SELECT id FROM `studienordnung_import` WHERE `pdf_sha256` = '.esc($sha).' ORDER BY id DESC LIMIT 1');
-							$import_id = is_array($import_row) && isset($import_row[0]) ? (int)$import_row[0] : 0;
+							$import_id = (!is_null($import_row) && $import_row !== '' && $import_row !== false) ? (int)$import_row : 0;
 
 							if(!$import_id) {
-								error('Import-Eintrag konnte nicht angelegt werden.');
+								error('Import-Eintrag konnte nicht angelegt werden.'.($insert_result === false ? ' (Datenbank-Fehler beim INSERT)' : ''));
 								print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
 							} elseif($auto_commit) {
 								// Direkt committen: in $_POST umkopieren und Stage auf 'commit' setzen
@@ -708,8 +709,8 @@
 									rquery('INSERT INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($name).', '.esc($commit_studiengang_id).', '.esc($modulnummer).', '.esc($beschreibung).') ON DUPLICATE KEY UPDATE name=VALUES(name), beschreibung=VALUES(beschreibung)');
 
 									$mod_row = get_single_row_from_query('SELECT id FROM `modul` WHERE `studiengang_id` = '.esc($commit_studiengang_id).' AND `abkuerzung` = '.esc($modulnummer).' LIMIT 1');
-									if(!is_array($mod_row) || !isset($mod_row[0])) continue;
-									$modul_id = (int)$mod_row[0];
+									if(is_null($mod_row) || $mod_row === '' || $mod_row === false) continue;
+									$modul_id = (int)$mod_row;
 									$imported_modules++;
 
 									if($commit_create_pns) {
@@ -721,7 +722,7 @@
 											$generated_nr = soi_generate_pruefungsnummer($modulnummer, $ptname, $m_post['lp'] ?? '', $seen_pns);
 											rquery('INSERT INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `modulbezeichnung`) VALUES ('.esc($generated_nr).', '.esc($modul_id).', '.esc($pt_id).', '.esc($modulnummer.' '.$name).')');
 											$pn_row = get_single_row_from_query('SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = '.esc($generated_nr).' LIMIT 1');
-											$pn_id = is_array($pn_row) && isset($pn_row[0]) ? (int)$pn_row[0] : null;
+											$pn_id = (!is_null($pn_row) && $pn_row !== '' && $pn_row !== false) ? (int)$pn_row : null;
 											rquery('INSERT INTO `pruefungsnummer_import` (import_id, modul_id, pruefungsnummer_id, generated_nr, pruefungstyp_name, lp) VALUES ('.esc($commit_import_id).', '.esc($modul_id).', '.esc($pn_id).', '.esc($generated_nr).', '.esc($ptname).', '.esc($m_post['lp'] ?? null).')');
 											$imported_pns++;
 										}
@@ -832,7 +833,7 @@
 
 			// Studiengang-ID aus Import holen
 			$row = get_single_row_from_query('SELECT studiengang_id FROM `studienordnung_import` WHERE id = '.esc($import_id));
-			$studiengang_id = is_array($row) && isset($row[0]) ? (int)$row[0] : 0;
+			$studiengang_id = (!is_null($row) && $row !== '' && $row !== false) ? (int)$row : 0;
 
 			if(!$studiengang_id) {
 				error('Import-Eintrag nicht gefunden.');
@@ -859,8 +860,8 @@
 					rquery($query);
 
 					$mod_row = get_single_row_from_query('SELECT id FROM `modul` WHERE `studiengang_id` = '.esc($studiengang_id).' AND `abkuerzung` = '.esc($modulnummer).' LIMIT 1');
-					if(!is_array($mod_row) || !isset($mod_row[0])) continue;
-					$modul_id = (int)$mod_row[0];
+					if(is_null($mod_row) || $mod_row === '' || $mod_row === false) continue;
+					$modul_id = (int)$mod_row;
 					$imported_modules++;
 
 					// Prüfungsnummern erzeugen
@@ -879,7 +880,7 @@
 							$generated_nr = soi_generate_pruefungsnummer($modulnummer, $ptname, $m_post['lp'] ?? '', $seen_pns);
 							rquery('INSERT INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `modulbezeichnung`) VALUES ('.esc($generated_nr).', '.esc($modul_id).', '.esc($pt_id).', '.esc($modulnummer.' '.$name).')');
 							$pn_row = get_single_row_from_query('SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = '.esc($generated_nr).' LIMIT 1');
-							$pn_id = is_array($pn_row) && isset($pn_row[0]) ? (int)$pn_row[0] : null;
+							$pn_id = (!is_null($pn_row) && $pn_row !== '' && $pn_row !== false) ? (int)$pn_row : null;
 							rquery('INSERT INTO `pruefungsnummer_import` (import_id, modul_id, pruefungsnummer_id, generated_nr, pruefungstyp_name, lp) VALUES ('.esc($import_id).', '.esc($modul_id).', '.esc($pn_id).', '.esc($generated_nr).', '.esc($ptname).', '.esc($m_post['lp'] ?? null).')');
 							$imported_pns++;
 						}
