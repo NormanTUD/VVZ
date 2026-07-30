@@ -26,6 +26,17 @@ if($is_ajax_admin && isset($_GET['stage']) && in_array($_GET['stage'], $ajax_onl
 		print json_encode(array('ok' => false, 'error' => 'Nicht angemeldet.'));
 		exit(0);
 	}
+	// $GLOBALS['pages'] wird normalerweise unten aufgebaut; für AJAX hier vorziehen
+	if(!is_array($GLOBALS['pages'])) {
+		$GLOBALS['pages'] = array();
+		$req_pn = (int)get_get('page');
+		if($req_pn > 0) {
+			$row = get_single_row_from_query_assoc('SELECT `name`, `file`, `id`, `show_in_navigation`, `parent` FROM `page` WHERE `id` = '.esc($req_pn).' LIMIT 1');
+			if(is_array($row) && isset($row['id'])) {
+				$GLOBALS['pages'][(int)$row['id']] = array($row['name'], $row['file'], $row['id'], $row['show_in_navigation'], $row['parent']);
+			}
+		}
+	}
 	$page_file = $GLOBALS['pages'][(int)get_get('page')][1] ?? null;
 	if(!$page_file) {
 		header('Content-Type: application/json; charset=utf-8');
