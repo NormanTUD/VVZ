@@ -31,20 +31,9 @@
 		}
 	}
 
-	/** Extrahiert Text aus einem PDF mit pdftotext. */
-	if(!function_exists('soi_extract_pdf_text')) {
-		function soi_extract_pdf_text($pdf_path) {
-			$pdftotext = trim((string)@shell_exec('command -v pdftotext 2>/dev/null'));
-			if($pdftotext === '') {
-				throw new RuntimeException('pdftotext wurde nicht gefunden. Bitte poppler-utils installieren.');
-			}
-			$cmd = escapeshellcmd($pdftotext) . ' -layout ' . escapeshellarg($pdf_path) . ' -';
-			$out = shell_exec($cmd . ' 2>&1');
-			if($out === null || $out === false) {
-				throw new RuntimeException('pdftotext konnte das PDF nicht lesen.');
-			}
-			return $out;
-		}
+	/** Lädt den SoiExtractor (Parser-Library). */
+	if(!class_exists('SoiExtractor', false)) {
+		require_once(__DIR__ . '/studienordnung_parser.php');
 	}
 
 	/** Validiert, dass die Datei ein PDF ist (magic bytes). */
@@ -58,55 +47,68 @@
 		}
 	}
 
-	/** Findet Studiengang-Name + Grad auf der Titelseite. */
-	if(!function_exists('soi_parse_cover')) {
-		function soi_parse_cover($text) {
-			$degree = null;
-			$program = null;
-			if(preg_match('/Studienordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)\s*studiengang\s+([^\n\r]+)/u', $text, $m)) {
-				$degree = trim($m[1]);
-				$program = trim(preg_replace('/\s+/', ' ', $m[2]));
-			} elseif(preg_match('/Prüfungsordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)\s*studiengang\s+([^\n\r]+)/u', $text, $m)) {
-				$degree = trim($m[1]);
-				$program = trim(preg_replace('/\s+/', ' ', $m[2]));
-			} elseif(preg_match('/Studienordnung\s+f[uü]r\s+den\s+([^\n\r]+)/u', $text, $m)) {
-				$program = trim(preg_replace('/\s+/', ' ', $m[1]));
+	/**
+	 * Führt die PDF-Extraktion aus und liefert ein normalisiertes Ergebnis.
+	 *
+	 * @param string $pdf_path  Absoluter Pfad zur PDF-Datei.
+	 * @param string $method    Eine der SoiExtractor::METHODS (oder 'auto').
+	 * @return array{
+	 *   method: string,
+	 *   cover: array{degree: ?string, program: ?string},
+	 *   modules: array,
+	 *   anlage2: array,
+	 *   modules_count: int,
+	 *   anlage2_count: int,
+	 *   text_length: int,
+	 *   errors: array,
+	 *   alternatives?: array,
+	 *   __raw_text: string,
+	 *   __pages: array<int,string>,
+	 *   __modul_pages: array<string,int>
+	 * }
+	 */
+	if(!function_exists('soi_run_extraction')) {
+		function soi_run_extraction(string $pdf_path, string $method = 'auto'): array {
+			$method = in_array($method, SoiExtractor::METHODS, true) ? $method : 'auto';
+			$extractor = new SoiExtractor();
+			$result = $extractor->extract($pdf_path, $method);
+			if(!is_array($result) || isset($result['error'])) {
+				return array(
+					'method' => $method,
+					'cover' => array('degree' => null, 'program' => null),
+					'modules' => array(),
+					'anlage2' => array(),
+					'modules_count' => 0,
+					'anlage2_count' => 0,
+					'text_length' => 0,
+					'errors' => array(isset($result['error']) ? $result['error'] : 'Unbekannter Extraktionsfehler'),
+					'__raw_text' => '',
+					'__pages' => array(),
+					'__modul_pages' => array(),
+				);
 			}
-			return array('degree' => $degree, 'program' => $program);
+
+			// Layout-Variante für raw_text (wird in notes gespeichert) + Seitenzuordnung.
+			$layout = $extractor->load($pdf_path, 'layout');
+			$result['__raw_text'] = $layout->full_text;
+			$result['__pages'] = $layout->pages;
+			$result['__modul_pages'] = $extractor->locateModulesInPages($layout, $result['modules'] ?? array());
+			return $result;
 		}
 	}
 
-	/** Findet Section-Marker in Anlage 1. */
-	if(!function_exists('soi_find_section')) {
-		function soi_find_section($line, $current_section) {
-			// Formate: "1. Module des Kernbereichs", "2. Module des Ergänzungsbereichs",
-			//          "2.1   Evangelische Theologie (70 Leistungspunkte)"
-			if(preg_match('/^[12]\.\s+Module\s+des\s+(Kernbereichs|Erg[äa]nzungsbereichs)/u', $line, $m)) {
-				return 'Sektion '.ucfirst($m[1]);
+	/** Findet ein Modul auf der PDF-Seite, auf der es zuerst auftaucht. */
+	if(!function_exists('soi_locate_modules_in_pages')) {
+		function soi_locate_modules_in_pages($raw_text_unused, array $modules): array {
+			// Rückwärtskompatibilität: Aufrufer aus alten Stages übergeben (text, modules).
+			// Wir indizieren nach Modulnummer-Index (wie früher), nicht nach Code.
+			$out = array();
+			foreach($modules as $idx => $m) {
+				$out[$idx] = -1;
 			}
-			if(preg_match('/^[12]\.([0-9]+)\s+(.+?)\s*\(\d+\s*Leistungspunkte\)?/u', $line, $m)) {
-				return 'Ergänzungsbereich: '.trim($m[2]);
-			}
-			if(preg_match('/^[12]\.([0-9]+)\s+(.+)$/u', $line, $m)) {
-				return 'Ergänzungsbereich: '.trim($m[2]);
-			}
-			return $current_section;
+			return $out;
 		}
 	}
-
-	/** Heuristik für ein typisches Modulcode-Pattern. */
-	if(!function_exists('soi_is_modul_code')) {
-		function soi_is_modul_code($s) {
-			return preg_match('/^[A-Z][A-Za-z0-9]{0,4}[A-Z][A-Za-z0-9-]{2,}$/u', $s) === 1
-				&& preg_match('/-/', $s) === 1
-				&& strlen($s) >= 5
-				&& strlen($s) <= 40;
-		}
-	}
-
-	/** Parst alle Module aus dem Anlage-1-Textblock. */
-	if(!function_exists('soi_parse_modules')) {
-		function soi_parse_modules($raw_text) {
 			// Wir extrahieren den Bereich ab "Anlage 1:\nModulbeschreibungen" (echter
 			// Section-Header mit Zeilenumbruch) bis "Anlage 2:\nStudienablaufplan". Damit
 			// werden die Vorkommen im Inhaltsverzeichnis zuverlässig übersprungen.

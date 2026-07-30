@@ -670,6 +670,37 @@ class SoiExtractor {
     }
 
     /**
+     * Locate each module on the PDF page where its modulnummer first appears.
+     * Returns array of [modulnummer => page_number] (1-based).
+     *
+     * Strategy: for each page in the parsed text, check whether the modulnummer
+     * token appears at the start of a line (after optional whitespace). The first
+     * page containing such a hit wins.
+     */
+    public function locateModulesInPages(SoiPdfText $text, array $modules): array {
+        $pages = $text->pages;
+        $result = [];
+        if(empty($pages) || empty($modules)) return $result;
+        foreach($modules as $m) {
+            $code = isset($m['modulnummer']) ? trim((string)$m['modulnummer']) : '';
+            if($code === '') continue;
+            $found_page = -1;
+            foreach($pages as $page_idx => $page_text) {
+                // Strip form-feed; check line-start with optional whitespace
+                $lines = preg_split('/\r\n|\r|\n/', (string)$page_text);
+                foreach($lines as $ln) {
+                    if(preg_match('/^\s*'.preg_quote($code, '/').'(?:\s|$)/u', $ln)) {
+                        $found_page = $page_idx + 1;
+                        break 2;
+                    }
+                }
+            }
+            $result[$code] = $found_page > 0 ? $found_page : 1;
+        }
+        return $result;
+    }
+
+    /**
      * Layout-based Anlage 2 parser (improved version).
      * Strategy:
      *  - Read Anlage 2 block
