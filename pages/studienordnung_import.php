@@ -691,13 +691,25 @@
 <?php
 		} elseif($stage === 'upload') {
 			// Upload + Analyse
+			$is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+			$is_ajax = $is_ajax || get_get('ajax') === '1';
 			if(!isset($_FILES['pdf']) || $_FILES['pdf']['error'] !== UPLOAD_ERR_OK) {
+				if($is_ajax) {
+					header('Content-Type: application/json; charset=utf-8');
+					print json_encode(array('ok' => false, 'error' => 'Keine Datei hochgeladen oder Upload-Fehler.'));
+					exit;
+				}
 				warning('Keine Datei hochgeladen oder Upload-Fehler.');
 				print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
 			} else {
 				$pdf_path = $_FILES['pdf']['tmp_name'];
 				$filename = $_FILES['pdf']['name'];
 				if(!soi_is_pdf($pdf_path)) {
+					if($is_ajax) {
+						header('Content-Type: application/json; charset=utf-8');
+						print json_encode(array('ok' => false, 'error' => 'Die hochgeladene Datei ist kein gültiges PDF.'));
+						exit;
+					}
 					error('Die hochgeladene Datei ist kein gültiges PDF.');
 					print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
 				} else {
