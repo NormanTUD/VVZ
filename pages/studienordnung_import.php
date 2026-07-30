@@ -190,6 +190,86 @@
 		}
 	}
 
+	/**
+	 * Persistiert Anlage-2-Semester-Metadaten (PL-Anzahl pro Semester, ggf. LP pro Semester)
+	 * in `modul_nach_semester_metadata`.
+	 *
+	 * @param int    $modul_id        ID des Moduls in der DB.
+	 * @param array  $anlage2_row     Array {lp, semester: [{semester, sws, pl_count}, ...]}.
+	 * @return int Anzahl geschriebener Zeilen.
+	 */
+	if(!function_exists('soi_persist_semester_metadata')) {
+		function soi_persist_semester_metadata(int $modul_id, array $anlage2_row): int {
+			if($modul_id <= 0) return 0;
+			if(empty($anlage2_row['semester']) || !is_array($anlage2_row['semester'])) return 0;
+
+			$total_lp = isset($anlage2_row['lp']) && is_numeric($anlage2_row['lp']) ? (int)$anlage2_row['lp'] : null;
+			$n_sem = count($anlage2_row['semester']);
+
+			// LP gleichmäßig auf Semester verteilen, falls nicht anders bekannt.
+			// Erste Semester bekommen den Rest (damit Summe wieder stimmt).
+			$lp_per_sem = array();
+			if($total_lp !== null && $n_sem > 0) {
+				$base = intdiv($total_lp, $n_sem);
+				$rest = $total_lp - ($base * $n_sem);
+				for($i = 0; $i < $n_sem; $i++) {
+					$lp_per_sem[$i] = $base + ($i < $rest ? 1 : 0);
+				}
+			}
+
+			$written = 0;
+			foreach($anlage2_row['semester'] as $idx => $sem) {
+				$sem_n = isset($sem['semester']) ? (int)$sem['semester'] : ($idx + 1);
+				$pl_n = isset($sem['pl_count']) ? (int)$sem['pl_count'] : 0;
+				$lp = isset($lp_per_sem[$idx]) ? $lp_per_sem[$idx] : null;
+
+				// Wenn keine nützlichen Infos vorhanden, überspringen.
+				if($lp === null && $pl_n === 0) continue;
+
+				$query = 'INSERT INTO `modul_nach_semester_metadata` (`modul_id`, `semester`, `credit_points`, `anzahl_pruefungsleistungen`) VALUES ('.
+					esc($modul_id).', '.esc($sem_n).', '.esc($lp).', '.esc($pl_n).
+					') ON DUPLICATE KEY UPDATE `anzahl_pruefungsleistungen` = '.esc($pl_n);
+				// credit_points wird im UPDATE nur überschrieben, wenn wir einen Wert haben
+				// (sonst NULL → bestehende UI-Eingaben bleiben erhalten).
+				if($lp !== null) {
+					$query = 'INSERT INTO `modul_nach_semester_metadata` (`modul_id`, `semester`, `credit_points`, `anzahl_pruefungsleistungen`) VALUES ('.
+						esc($modul_id).', '.esc($sem_n).', '.esc($lp).', '.esc($pl_n).
+						') ON DUPLICATE KEY UPDATE `credit_points` = '.esc($lp).', `anzahl_pruefungsleistungen` = '.esc($pl_n);
+				}
+				rquery($query);
+				$written++;
+			}
+			return $written;
+		}
+	}
+
+	/**
+	 * Liefert die Anlage-2-Zeile für eine gegebene Modulnummer aus einem Anlage-2-Array.
+	 * Sucht sowohl nach direkter Modulnummer als auch nach Wildcards.
+	 */
+	if(!function_exists('soi_find_anlage2_for_modul')) {
+		function soi_find_anlage2_for_modul(array $anlage2_rows, string $modulnummer): ?array {
+			foreach($anlage2_rows as $row) {
+				if(isset($row['modulnummer']) && trim((string)$row['modulnummer']) === $modulnummer) {
+					return $row;
+				}
+			}
+			return null;
+		}
+	}
+
+	/** Prüft, ob die externen Tools (pdftotext, pdftohtml, pdftoppm) verfügbar sind. */
+	if(!function_exists('soi_check_tools')) {
+		function soi_check_tools(): array {
+			$missing = array();
+			foreach(array('pdftotext', 'pdftohtml', 'pdftoppm') as $tool) {
+				$path = trim((string)@shell_exec('command -v '.escapeshellarg($tool).' 2>/dev/null'));
+				if($path === '') $missing[] = $tool;
+			}
+			return $missing;
+		}
+	}
+
 	/** Rendert eine bestimmte Seite eines PDFs als PNG-Thumbnail.
 	 *  Speichert im Verzeichnis data/imported_so/<import_id>/pages/.
 	 *  Gibt den absoluten Pfad zum PNG zurück oder null bei Fehler.
