@@ -1659,7 +1659,15 @@
 			header('Content-Type: application/json; charset=utf-8');
 			$import_id = (int)get_post('soi_import_id');
 			$create_pns = get_post('soi_create_pruefungsnummern') ? 1 : 0;
-			$modules_in = get_post('soi_modules_v2') ?: array();
+			$modules_raw = get_post('soi_modules_v2');
+			if(is_string($modules_raw)) {
+				$decoded = json_decode($modules_raw, true);
+				$modules_in = is_array($decoded) ? $decoded : array();
+			} elseif(is_array($modules_raw)) {
+				$modules_in = $modules_raw;
+			} else {
+				$modules_in = array();
+			}
 			$new_studiengang_name = trim((string)get_post('soi_new_studiengang_name'));
 
 			$import_row = get_single_row_from_query_assoc('SELECT studiengang_id, program_name, notes FROM `studienordnung_import` WHERE id = '.esc($import_id));
