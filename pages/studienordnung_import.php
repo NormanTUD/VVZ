@@ -1252,7 +1252,12 @@
 								'cover' => $cover,
 								'created_at' => date('c'),
 							);
-							$notes_json = json_encode($parsed_payload, JSON_UNESCAPED_UNICODE);
+							$notes_json = json_encode($parsed_payload, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
+							// PDF-Text enthält oft Form-Feed (0x0c) und andere Control-Chars, die JSON ungültig machen.
+							// Wir ersetzen sie durch \x escapes, damit der Browser sie korrekt parsen kann.
+							$notes_json = preg_replace_callback('/[\x00-\x1f]/', function($m) {
+								return '\\u' . str_pad(dechex(ord($m[0])), 4, '0', STR_PAD_LEFT);
+							}, $notes_json);
 
 							$query = 'INSERT INTO `studienordnung_import` (studiengang_id, filename, pdf_sha256, pdf_size, pdf_data, raw_text, degree, program_name, modules_found, modules_imported, pruefungsnummern_imported, imported_by_user_id, notes) VALUES ('.
 								esc($studiengang_id).', '.esc($filename).', '.esc($sha).', '.esc($size).', '.esc($pdf_b64).', '.esc($raw_text).', '.
