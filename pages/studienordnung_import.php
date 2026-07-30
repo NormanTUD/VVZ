@@ -474,6 +474,101 @@
 		}
 	}
 
+	/** Rendert eine bestimmte Seite eines PDFs als PNG-Thumbnail.
+	 *  Speichert im Verzeichnis data/imported_so/<import_id>/pages/.
+	 *  Gibt den absoluten Pfad zum PNG zurück oder null bei Fehler.
+	 */
+	if(!function_exists('soi_render_page')) {
+		function soi_render_page($import_id, $pdf_data, $page_number, $dpi = 110) {
+			$dir = $GLOBALS['datadir'].'imported_so/'.intval($import_id).'/pages';
+			if(!is_dir($dir)) { @mkdir($dir, 0775, true); }
+			$png = $dir.'/page_'.intval($page_number).'.png';
+			if(file_exists($png) && filesize($png) > 0) return $png;
+
+			// PDF in temporäre Datei schreiben, pdftoppm darauf anwenden
+			$tmp_pdf = tempnam(sys_get_temp_dir(), 'soipdf_');
+			if($tmp_pdf === false) return null;
+			$tmp_pdf .= '.pdf';
+			if(file_put_contents($tmp_pdf, $pdf_data) === false) { @unlink($tmp_pdf); return null; }
+
+			$cmd = escapeshellcmd('pdftoppm') .
+				' -png -r '.intval($dpi) .
+				' -f '.intval($page_number) .
+				' -l '.intval($page_number).
+				' '.escapeshellarg($tmp_pdf) .
+				' '.escapeshellarg($dir.'/page');
+			$out = @shell_exec($cmd.' 2>&1');
+			@unlink($tmp_pdf);
+
+			// pdftoppm schreibt "page_N.png" (1-basiert), wir wollen explizit page_<n>.png
+			$generated = $dir.'/page-'.str_pad($page_number, 3, '0', STR_PAD_LEFT).'.png';
+			if(!file_exists($generated)) {
+				$generated = $dir.'/page-'.$page_number.'.png';
+			}
+			if(file_exists($generated)) {
+				if($generated !== $png) @rename($generated, $png);
+				return $png;
+			}
+			return null;
+		}
+	}
+
+	/** Bestimmt für jede Modul-Zeile, auf welcher PDF-Seite sie beginnt. */
+	if(!function_exists('soi_locate_modules_in_pages')) {
+		function soi_locate_modules_in_pages($raw_text, $modules, $total_pages = 0) {
+			// pdftotext liefert mit -layout Seitenzahl-Banner: "^      19" oder "Page 19" etc.
+			// Wir nähern: jedes "L N" / "Seite N" / "L  N" am Zeilenende zählt.
+			$lines = preg_split('/\r\n|\r|\n/', $raw_text);
+			$page_starts = array();
+			$cur_page = 1;
+			foreach($lines as $i => $ln) {
+				// Format-Decision: typische TU-Dresden PDFs haben rechts unten eine Zahl
+				// Wir versuchen: Zeile mit nur einer Zahl (1-3 Stellen) am Ende eines Blocks
+				if(preg_match('/^\s*(\d{1,3})\s*$/', $ln, $pm) && (int)$pm[1] <= ($total_pages ?: 9999)) {
+					$n = (int)$pm[1];
+					if($n > $cur_page) {
+						$page_starts[$i] = $n;
+						$cur_page = $n;
+					}
+				}
+			}
+
+			// Bestimme für jedes Modul die Seitenzahl
+			$modul_positions = array();
+			$modul_starts = array();
+			foreach($modules as $idx => $m) {
+				$modul_starts[$idx] = -1;
+			}
+			$modul_keys = array();
+			foreach($modules as $idx => $m) {
+				$modul_keys[$idx] = $m['modulnummer'];
+			}
+			$current_page = 1;
+			foreach($lines as $i => $ln) {
+				if(isset($page_starts[$i])) $current_page = $page_starts[$i];
+				foreach($modul_keys as $idx => $code) {
+					if($modul_starts[$idx] === -1 && strpos($ln, $code) === 0) {
+						$modul_starts[$idx] = $current_page;
+					}
+				}
+			}
+			return $modul_starts;
+		}
+	}
+
+	/** Liefert für ein Modul die Zeile, in der es im Text auftaucht (für Quellenangabe). */
+	if(!function_exists('soi_find_line_for_modul')) {
+		function soi_find_line_for_modul($raw_text, $modulnummer) {
+			$lines = preg_split('/\r\n|\r|\n/', $raw_text);
+			foreach($lines as $i => $ln) {
+				if(preg_match('/^'.preg_quote($modulnummer, '/').'\s/s', $ln)) {
+					return $i;
+				}
+			}
+			return -1;
+		}
+	}
+
 	// -------- Seitenlogik --------
 
 	$stage = get_get('stage') ?: 'list';
