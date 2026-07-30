@@ -335,6 +335,23 @@
 						</td>
 					</tr>
 					<tr>
+						<th>Extraktions-Methode</th>
+						<td>
+							<select name="soi_extract_method" id="soi_extract_method" title="Welche PDF-Parsing-Strategie angewendet werden soll">
+								<option value="auto" selected>auto (alle Methoden testen, beste wählen) — empfohlen</option>
+								<option value="bbox">bbox — pdftotext -bbox-layout + Spaltenerkennung (gut für Tabellen)</option>
+								<option value="layout">layout — pdftotext -layout + Heuristik (schnell)</option>
+								<option value="hybrid">hybrid — layout + bbox kombiniert</option>
+								<option value="xml">xml — pdftohtml -xml + XML-DOM</option>
+								<option value="html">html — pdftohtml + HTML-Tabellen</option>
+								<option value="table">table — pdftotext -table (experimentell)</option>
+							</select>
+							<div style="font-size:11px; color:#666; margin-top:4px;">
+								Bei Problemen mit der Erkennung: zuerst <b>auto</b> versuchen, dann einzelne Methoden.
+							</div>
+						</td>
+					</tr>
+					<tr>
 						<th>Optionen</th>
 						<td>
 							<label><input noautosubmit="1" type="checkbox" name="create_pruefungsnummern" value="1" checked /> Prüfungsnummern automatisch erzeugen</label><br />
