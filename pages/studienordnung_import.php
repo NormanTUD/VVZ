@@ -999,7 +999,7 @@
 							if(modulePages[modulnr] === p) hasMod = true;
 						});
 						pagesHtml += '<div class="soi-page-card' + (hasMod ? ' has-modules' : '') + '" data-soi-page="' + p + '">' +
-							'<img src="data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&page=' + p + '" alt="Seite ' + p + '" loading="lazy" />' +
+							'<img src="data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p + '" alt="Seite ' + p + '" loading="lazy" />' +
 							'<div class="soi-page-num">Seite ' + p + (hasMod ? ' &mdash; enthält Modul' : '') + '</div>' +
 							'</div>';
 					}
