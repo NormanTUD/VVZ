@@ -1261,11 +1261,7 @@
 							try {
 								$insert_result = mysqli_query($GLOBALS['dbh'], $query);
 							} catch (\Throwable $e) {
-								error_log('SOI INSERT FAILED: '.preg_replace('/.{0,200}/', '...', $e->getMessage()));
 								$insert_result = false;
-							}
-							if($insert_result === false) {
-								error_log('SOI mysqli_query failed: '.mysqli_error($GLOBALS['dbh']).' errno='.mysqli_errno($GLOBALS['dbh']));
 							}
 							$import_row = get_single_row_from_query('SELECT id FROM `studienordnung_import` WHERE `pdf_sha256` = '.esc($sha).' ORDER BY id DESC LIMIT 1');
 							$import_id = (!is_null($import_row) && $import_row !== '' && $import_row !== false) ? (int)$import_row : 0;

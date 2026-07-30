@@ -267,7 +267,9 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 				try {
 					$col_row = get_single_row_from_query_assoc("SHOW COLUMNS FROM `studienordnung_import` WHERE Field = 'notes'");
 					if(is_array($col_row) && isset($col_row['Type']) && stripos($col_row['Type'], 'mediumtext') === false && stripos($col_row['Type'], 'longtext') === false) {
-						rquery("ALTER TABLE `studienordnung_import` MODIFY COLUMN `notes` MEDIUMTEXT DEFAULT NULL");
+						try { rquery("SET @@system_versioning_alter_history = 1"); } catch (\Throwable $e) {}
+						try { rquery("ALTER TABLE `studienordnung_import` MODIFY COLUMN `notes` MEDIUMTEXT DEFAULT NULL"); } catch (\Throwable $e) {}
+						try { rquery("SET @@system_versioning_alter_history = 0"); } catch (\Throwable $e) {}
 					}
 				} catch (\Throwable $e) { /* Migration nicht kritisch */ }
 			}
