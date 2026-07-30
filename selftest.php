@@ -262,6 +262,16 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 				}
 			}
 
+			// Stellen Sie sicher, dass `notes` MEDIUMTEXT ist (kann mehr als 65 KB fassen)
+			if(table_exists($GLOBALS['dbname'], 'studienordnung_import')) {
+				try {
+					$col_row = get_single_row_from_query_assoc("SHOW COLUMNS FROM `studienordnung_import` WHERE Field = 'notes'");
+					if(is_array($col_row) && isset($col_row['Type']) && stripos($col_row['Type'], 'mediumtext') === false && stripos($col_row['Type'], 'longtext') === false) {
+						rquery("ALTER TABLE `studienordnung_import` MODIFY COLUMN `notes` MEDIUMTEXT DEFAULT NULL");
+					}
+				} catch (\Throwable $e) { /* Migration nicht kritisch */ }
+			}
+
 			if(!table_exists_and_has_entries("page") && !already_initialized("page")) {
 				rquery(
 					"insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) VALUES 
