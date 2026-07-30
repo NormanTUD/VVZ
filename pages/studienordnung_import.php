@@ -1261,9 +1261,18 @@
 								echo "DBG_INSERT: query_len=".strlen($query)." mem=".memory_get_usage()."/".memory_get_peak_usage()."\n";
 								flush();
 							}
-							$insert_result = @rquery($query);
+							try {
+								$result = mysqli_query($GLOBALS['dbh'], $query);
+								$insert_result = $result;
+							} catch (\Throwable $e) {
+								if(isset($_GET['debug_soi'])) {
+									echo "DBG_INSERT: EXCEPTION: ".$e->getMessage()."\n";
+									flush();
+								}
+								$insert_result = false;
+							}
 							if(isset($_GET['debug_soi'])) {
-								echo "DBG_INSERT: result=".var_export($insert_result, true)." mysql_err=".mysqli_error($GLOBALS['dbh'])."\n";
+								echo "DBG_INSERT: result=".var_export($insert_result, true)." mysql_err=".mysqli_error($GLOBALS['dbh'])." errno=".mysqli_errno($GLOBALS['dbh'])."\n";
 								flush();
 							}
 							$import_row = get_single_row_from_query('SELECT id FROM `studienordnung_import` WHERE `pdf_sha256` = '.esc($sha).' ORDER BY id DESC LIMIT 1');
