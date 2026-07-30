@@ -1012,11 +1012,11 @@
 					});
 				}
 
-				window.soi_show_page = function(p) {
-					var img = $('soi_page_modal_img');
-					img.src = 'data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&page=' + p;
-					$('soi_page_modal').classList.add('soi-open');
-				};
+			window.soi_show_page = function(p) {
+				var img = $('soi_page_modal_img');
+				img.src = 'data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p;
+				$('soi_page_modal').classList.add('soi-open');
+			};
 				window.soi_close_modal = function() {
 					$('soi_page_modal').classList.remove('soi-open');
 				};
@@ -1616,7 +1616,7 @@
 		} elseif($stage === 'page_image') {
 			// AJAX: Liefert PNG der Seite N eines Imports
 			$id = (int)get_get('id');
-			$page = (int)get_get('page');
+			$page = (int)(get_get('pdf_page') ?: get_get('page'));
 			if($page < 1) $page = 1;
 			$row = get_single_row_from_query_assoc('SELECT pdf_data FROM `studienordnung_import` WHERE id = '.esc($id));
 			if(!$row) {
