@@ -7,9 +7,19 @@
 	}
 
 	if(!check_page_rights(get_page_id_by_filename(basename(__FILE__)))) {
+		$is_ajax_check = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+		$is_ajax_check = $is_ajax_check || get_get('ajax') === '1';
+		if($is_ajax_check) {
+			header('Content-Type: application/json; charset=utf-8');
+			header('HTTP/1.0 403 Forbidden');
+			print json_encode(array('ok' => false, 'error' => 'Sie haben keine Rechte für diese Seite.'));
+			exit;
+		}
 		print '<p class="class_red">Sie haben keine Rechte, auf diese Seite zuzugreifen.</p>';
 		return;
 	}
+
+	if(isset($_GET['debug_soi'])) { header('Content-Type: text/plain'); echo "DBG: stage=".htmlspecialchars((string)($_GET['stage'] ?? '-'))." ajax=".((!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])==='xmlhttprequest')?'yes':'no')."\n"; }
 
 	// -------- Hilfsfunktionen (Parser) --------
 
@@ -96,12 +106,26 @@
 	/** Parst alle Module aus dem Anlage-1-Textblock. */
 	if(!function_exists('soi_parse_modules')) {
 		function soi_parse_modules($raw_text) {
-			// Wir extrahieren den Bereich ab "Anlage 1: Modulbeschreibungen" bis "Anlage 2"
-			$anlage1_start = mb_strpos($raw_text, 'Anlage 1');
+			// Wir extrahieren den Bereich ab "Anlage 1:\nModulbeschreibungen" (echter
+			// Section-Header mit Zeilenumbruch) bis "Anlage 2:\nStudienablaufplan". Damit
+			// werden die Vorkommen im Inhaltsverzeichnis zuverlässig übersprungen.
+			$anlage1_start = mb_strpos($raw_text, "Anlage 1:\nModulbeschreibungen");
+			if($anlage1_start === false) {
+				$anlage1_start = mb_strpos($raw_text, 'Anlage 1:');
+			}
+			if($anlage1_start === false) {
+				$anlage1_start = mb_strpos($raw_text, 'Modulbeschreibungen');
+			}
 			if($anlage1_start === false) {
 				$anlage1_start = 0;
 			}
-			$anlage2_start = mb_strpos($raw_text, 'Anlage 2', $anlage1_start);
+			$anlage2_start = mb_strpos($raw_text, "Anlage 2:\nStudienablaufplan", $anlage1_start);
+			if($anlage2_start === false) {
+				$anlage2_start = mb_strpos($raw_text, 'Studienablaufplan', $anlage1_start);
+			}
+			if($anlage2_start === false) {
+				$anlage2_start = mb_strpos($raw_text, 'Anlage 2', $anlage1_start);
+			}
 			$block = $anlage2_start !== false ? mb_substr($raw_text, $anlage1_start, $anlage2_start - $anlage1_start) : mb_substr($raw_text, $anlage1_start);
 
 			$lines = preg_split('/\r\n|\r|\n/', $block);
@@ -278,7 +302,13 @@
 	/** Parst Anlage 2 (Studienablaufplan). */
 	if(!function_exists('soi_parse_anlage2')) {
 		function soi_parse_anlage2($raw_text) {
-			$anlage2_start = mb_strpos($raw_text, 'Anlage 2');
+			$anlage2_start = mb_strpos($raw_text, "Anlage 2:\nStudienablaufplan");
+			if($anlage2_start === false) {
+				$anlage2_start = mb_strpos($raw_text, 'Studienablaufplan');
+			}
+			if($anlage2_start === false) {
+				$anlage2_start = mb_strpos($raw_text, 'Anlage 2');
+			}
 			if($anlage2_start === false) return array();
 			$block = mb_substr($raw_text, $anlage2_start);
 			$lines = preg_split('/\r\n|\r|\n/', $block);
@@ -582,24 +612,37 @@
 		elseif($cls === 'success') success($msg);
 		else message($msg);
 	};
+
+	$is_ajax_stage = $is_ajax_admin && in_array($stage, $ajax_only_stages, true);
 ?>
+<?php if(!$is_ajax_stage): ?>
 	<div id="studienordnung_import">
 		<?php print get_seitentext(); ?>
 <?php
+	endif;
+	if(!$is_ajax_stage) {
 		include_once('hinweise.php');
-
+	}
+?>
+<?php
 		if($stage === 'list' || $stage === '') {
 			// Übersicht der bisherigen Importe
 			$query = 'SELECT `id`, `filename`, `imported_at`, `program_name`, `degree`, `modules_found`, `modules_imported`, `pruefungsnummern_imported` FROM `studienordnung_import` ORDER BY `imported_at` DESC LIMIT 50';
 			$result = rquery($query);
 ?>
 			<h2>Studienordnung (PDF) hochladen</h2>
-			<p>Hier kann eine Studienordnung (PDF) hochgeladen werden. Das System extrahiert automatisch Modulnummer, Modulname, ECTS-Leistungspunkte, Prüfungstypen und Studienverlauf (Anlage 2) und legt diese in der Datenbank an.</p>
-			<form method="post" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=upload">
+			<p>Hier kann eine Studienordnung (PDF) hochgeladen werden. Das System extrahiert automatisch Modulnummer, Modulname, ECTS-Leistungspunkte, Prüfungstypen und Studienverlauf (Anlage 2) und legt diese in der Datenbank an. Die Verarbeitung erfolgt live: nach der Auswahl der Datei wird sofort eine Vorschau mit allen erkannten Daten und Seitenvorschauen angezeigt.</p>
+			<form id="soi_upload_form" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=upload&ajax=1" method="post">
 				<table>
 					<tr>
 						<th>PDF-Datei</th>
-						<td><input noautosubmit="1" type="file" name="pdf" accept="application/pdf" required /></td>
+						<td>
+							<input id="soi_pdf_input" noautosubmit="1" type="file" name="pdf" accept="application/pdf" />
+							<div id="soi_upload_progress" style="display:none;">
+								<div class="soi-spinner"></div>
+								<span id="soi_upload_status">Wird hochgeladen…</span>
+							</div>
+						</td>
 					</tr>
 					<tr>
 						<th>Institut</th>
@@ -609,11 +652,11 @@
 						<th>Studiengang</th>
 						<td>
 							<select name="soi_studiengang_mode" id="soi_studiengang_mode">
+								<option value="auto" selected>aus PDF automatisch ermitteln</option>
 								<option value="existing">bestehenden auswählen</option>
-								<option value="auto">aus PDF automatisch ermitteln</option>
 								<option value="new">neuen anlegen</option>
 							</select>
-							<div id="existing_studiengang_box">
+							<div id="existing_studiengang_box" style="display:none;">
 								<?php
 									$studiengaenge = create_studiengaenge_array();
 									create_select($studiengaenge, '', 'soi_studiengang_id', 1);
@@ -627,16 +670,164 @@
 					<tr>
 						<th>Optionen</th>
 						<td>
-							<label><input noautosubmit="1" type="checkbox" name="auto_commit" value="1" /> Sofit ohne Vorschau importieren (nur empfohlen, wenn Sie dem Parser vertrauen)</label><br />
 							<label><input noautosubmit="1" type="checkbox" name="create_pruefungsnummern" value="1" checked /> Prüfungsnummern automatisch erzeugen</label><br />
 							<label><input noautosubmit="1" type="checkbox" name="reuse_in_other_studiengaenge" value="1" checked /> Module zusätzlich in allen Studiengängen anlegen, die sie laut Verwendbarkeit nutzen</label>
 						</td>
 					</tr>
-					<tr>
-						<td colspan="2"><input noautosubmit="1" type="submit" value="Hochladen und analysieren" /></td>
-					</tr>
 				</table>
 			</form>
+
+			<div id="soi_preview_container" style="display:none;">
+				<h2 id="soi_preview_title">Vorschau</h2>
+				<div id="soi_preview_meta" class="dashboard_card" style="margin-bottom:16px;"></div>
+				<div id="soi_preview_status" class="soi-status" style="display:none;"></div>
+				<div class="soi-tabs">
+					<button type="button" class="soi-tab-button soi-tab-active" data-soi-tab="modules">Module (<span id="soi_count_modules">0</span>)</button>
+					<button type="button" class="soi-tab-button" data-soi-tab="anlage2">Anlage 2 (<span id="soi_count_anlage2">0</span>)</button>
+					<button type="button" class="soi-tab-button" data-soi-tab="pages">PDF-Seiten</button>
+				</div>
+				<div class="soi-tab-panel" id="soi_tab_modules">
+					<div id="soi_modules_list"></div>
+				</div>
+				<div class="soi-tab-panel" id="soi_tab_anlage2" style="display:none;">
+					<div id="soi_anlage2_list"></div>
+				</div>
+				<div class="soi-tab-panel" id="soi_tab_pages" style="display:none;">
+					<div id="soi_pages_list"></div>
+				</div>
+				<div class="soi-actions">
+					<button type="button" id="soi_btn_commit" class="soi-btn-primary">Auswahl in Datenbank eintragen</button>
+					<button type="button" id="soi_btn_cancel" class="soi-btn-secondary">Abbrechen</button>
+				</div>
+			</div>
+
+			<style nonce=<?php print($GLOBALS['nonce']); ?> >
+				#soi_preview_container { margin-top: 24px; }
+				.soi-spinner {
+					display: inline-block;
+					width: 18px; height: 18px;
+					border: 3px solid #ccc;
+					border-top-color: #1976d2;
+					border-radius: 50%;
+					animation: soi-spin 0.8s linear infinite;
+					vertical-align: middle;
+					margin-right: 8px;
+				}
+				@keyframes soi-spin { to { transform: rotate(360deg); } }
+				#soi_upload_progress { margin-top: 8px; padding: 6px 0; font-size: 13px; }
+				#soi_upload_progress .progress-bar {
+					height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 6px; overflow: hidden;
+				}
+				#soi_upload_progress .progress-bar > div {
+					height: 100%; background: #1976d2; width: 0%; transition: width 0.2s;
+				}
+				.soi-status { padding: 10px 14px; border-radius: 4px; margin: 10px 0; font-size: 13px; }
+				.soi-status-success { background: #e6f4ea; color: #1e4620; }
+				.soi-status-error { background: #fce8e6; color: #762c2a; }
+				html.dark-mode .soi-status-success { background: #1b3a23 !important; color: #b7e1c0 !important; }
+				html.dark-mode .soi-status-error { background: #3a1f1d !important; color: #f5b8b3 !important; }
+
+				.soi-tabs {
+					display: flex; gap: 2px; margin: 12px 0 0 0; border-bottom: 1px solid #ccc;
+				}
+				html.dark-mode .soi-tabs { border-bottom-color: #3a3a5a !important; }
+				.soi-tab-button {
+					padding: 8px 16px; background: #f0f0f0; border: 1px solid #ccc; border-bottom: none;
+					cursor: pointer; font-size: 13px; margin-bottom: -1px; border-radius: 4px 4px 0 0;
+				}
+				html.dark-mode .soi-tab-button {
+					background: #1e1e3a !important; border-color: #3a3a5a !important; color: #e0e0e0 !important;
+				}
+				.soi-tab-active { background: #fff; border-bottom: 1px solid #fff; font-weight: bold; }
+				html.dark-mode .soi-tab-active { background: #16213e !important; }
+
+				.soi-tab-panel {
+					background: #fff; border: 1px solid #ccc; border-top: none; padding: 12px;
+					border-radius: 0 4px 4px 4px;
+				}
+				html.dark-mode .soi-tab-panel {
+					background: #16213e !important; border-color: #3a3a5a !important;
+				}
+
+				.soi-module-row {
+					display: grid;
+					grid-template-columns: 30px 130px 1fr 60px 60px 60px 1fr;
+					gap: 8px; align-items: center;
+					padding: 6px 0; border-bottom: 1px solid #eee;
+				}
+				html.dark-mode .soi-module-row { border-bottom-color: #2a2a4a !important; }
+				.soi-module-row label.soi-check { text-align: center; }
+				.soi-module-row input[type=text] { padding: 4px 6px; }
+				.soi-module-header {
+					font-weight: bold; background: #f5f5f5; padding: 6px 8px; margin-top: 8px;
+					border-radius: 3px; font-size: 12px;
+				}
+				html.dark-mode .soi-module-header { background: #2a2a4a !important; }
+
+				.soi-pages-grid {
+					display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+					gap: 8px;
+				}
+				.soi-page-card {
+					border: 1px solid #ccc; border-radius: 4px; overflow: hidden;
+					background: #fff;
+				}
+				html.dark-mode .soi-page-card { border-color: #3a3a5a !important; background: #16213e !important; }
+				.soi-page-card img {
+					width: 100%; height: auto; display: block; background: #f0f0f0;
+				}
+				.soi-page-card .soi-page-num {
+					padding: 4px 6px; font-size: 11px; color: #555; border-top: 1px solid #eee;
+				}
+				html.dark-mode .soi-page-card .soi-page-num { color: #b0b0c0 !important; border-top-color: #2a2a4a !important; }
+				.soi-page-card.has-modules { border-color: #1976d2; }
+				html.dark-mode .soi-page-card.has-modules { border-color: #7eb8ff !important; }
+
+				.soi-page-modal-bg {
+					position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999;
+					display: none; align-items: center; justify-content: center;
+				}
+				.soi-page-modal-bg.soi-open { display: flex; }
+				.soi-page-modal {
+					background: #fff; max-width: 92vw; max-height: 92vh; overflow: auto;
+					border-radius: 6px; padding: 12px; position: relative;
+				}
+				html.dark-mode .soi-page-modal { background: #1e1e3a !important; color: #e0e0e0 !important; }
+				.soi-page-modal img { max-width: 90vw; max-height: 80vh; }
+				.soi-page-modal-close {
+					position: absolute; top: 6px; right: 10px; cursor: pointer; font-size: 22px;
+					background: none; border: none;
+				}
+
+				.soi-anlage2-row {
+					display: grid; grid-template-columns: 130px 1fr;
+					gap: 8px; padding: 4px 0; border-bottom: 1px dashed #eee;
+				}
+				html.dark-mode .soi-anlage2-row { border-bottom-color: #2a2a4a !important; }
+
+				.soi-actions { margin-top: 20px; padding-top: 12px; border-top: 1px solid #ccc; display: flex; gap: 8px; }
+				html.dark-mode .soi-actions { border-top-color: #3a3a5a !important; }
+				.soi-btn-primary {
+					padding: 8px 16px; background: #1976d2; color: #fff; border: none;
+					border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;
+				}
+				.soi-btn-primary:hover { background: #1565c0; }
+				.soi-btn-primary:disabled { background: #999; cursor: not-allowed; }
+				.soi-btn-secondary {
+					padding: 8px 16px; background: #fff; color: #333; border: 1px solid #ccc;
+					border-radius: 4px; cursor: pointer; font-size: 13px;
+				}
+				html.dark-mode .soi-btn-secondary {
+					background: #2a2a4a !important; color: #e0e0e0 !important; border-color: #3a3a5a !important;
+				}
+			</style>
+
+			<div id="soi_page_modal" class="soi-page-modal-bg">
+				<div class="soi-page-modal">
+					<button type="button" class="soi-page-modal-close" onclick="soi_close_modal()">&times;</button>
+					<img id="soi_page_modal_img" src="" alt="" />
+				</div>
+			</div>
 
 			<h2>Bisherige Importe</h2>
 			<table>
@@ -677,16 +868,307 @@
 			</table>
 
 			<script nonce=<?php print($GLOBALS['nonce']); ?> >
-				(function(){
-					function update_mode() {
-						var m = document.getElementById('soi_studiengang_mode').value;
-						document.getElementById('existing_studiengang_box').style.display = (m === 'existing') ? '' : 'none';
-						document.getElementById('new_studiengang_box').style.display = (m === 'new') ? '' : 'none';
+			(function(){
+				function update_mode() {
+					var m = document.getElementById('soi_studiengang_mode').value;
+					document.getElementById('existing_studiengang_box').style.display = (m === 'existing') ? '' : 'none';
+					document.getElementById('new_studiengang_box').style.display = (m === 'new') ? '' : 'none';
+				}
+				var sel = document.getElementById('soi_studiengang_mode');
+				if(sel) sel.addEventListener('change', update_mode);
+				update_mode();
+
+				// ---------- AJAX-Upload + Live-Vorschau ----------
+				var SOI = {
+					data: null,
+					pageSize: 0,
+					currentImportId: null,
+				};
+
+				function $(id) { return document.getElementById(id); }
+
+				function setStatus(msg, type) {
+					var el = $('soi_preview_status');
+					if(!el) return;
+					el.className = 'soi-status ' + (type === 'error' ? 'soi-status-error' : 'soi-status-success');
+					el.style.display = msg ? '' : 'none';
+					el.innerHTML = msg;
+				}
+
+				function escapeHtml(s) {
+					if(s === null || s === undefined) return '';
+					return String(s).replace(/[&<>"']/g, function(c) {
+						return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+					});
+				}
+
+				function showSpinner(text) {
+					$('soi_upload_progress').style.display = '';
+					$('soi_upload_status').textContent = text || 'Wird verarbeitet…';
+				}
+				function hideSpinner() {
+					$('soi_upload_progress').style.display = 'none';
+				}
+
+				function renderModules(data) {
+					var container = $('soi_modules_list');
+					container.innerHTML = '';
+					var modules = data.modules || [];
+					$('soi_count_modules').textContent = modules.length;
+					if(!modules.length) {
+						container.innerHTML = '<p class="class_red">Keine Module erkannt.</p>';
+						return;
 					}
-					var sel = document.getElementById('soi_studiengang_mode');
-					if(sel) sel.addEventListener('change', update_mode);
-					update_mode();
-				})();
+					var bySection = {};
+					modules.forEach(function(m, i) {
+						var sec = m.section || 'Ohne Sektion';
+						if(!bySection[sec]) bySection[sec] = [];
+						bySection[sec].push({m: m, idx: i});
+					});
+					Object.keys(bySection).forEach(function(sec) {
+						var h = document.createElement('div');
+						h.className = 'soi-module-header';
+						h.textContent = sec + ' (' + bySection[sec].length + ' Modul' + (bySection[sec].length === 1 ? '' : 'e') + ')';
+						container.appendChild(h);
+						bySection[sec].forEach(function(item) {
+							var m = item.m;
+							var idx = item.idx;
+							var row = document.createElement('div');
+							row.className = 'soi-module-row';
+							row.dataset.modulIdx = idx;
+							row.innerHTML =
+								'<label class="soi-check"><input type="checkbox" class="soi-mod-include" ' + (m.modulnummer ? 'checked' : '') + ' /></label>' +
+								'<input type="text" class="soi-mod-nr" value="' + escapeHtml(m.modulnummer) + '" placeholder="Modulnr." />' +
+								'<input type="text" class="soi-mod-name" value="' + escapeHtml(m.name) + '" placeholder="Name" />' +
+								'<input type="text" class="soi-mod-lp" value="' + (m.lp !== null && m.lp !== undefined ? m.lp : '') + '" placeholder="LP" />' +
+								'<input type="text" class="soi-mod-sws" value="' + (m.sws_total !== null && m.sws_total !== undefined ? m.sws_total : '') + '" placeholder="SWS" />' +
+								'<input type="text" class="soi-mod-dauer" value="' + (m.dauer_semester !== null && m.dauer_semester !== undefined ? m.dauer_semester : '') + '" placeholder="Dauer" />' +
+								'<input type="text" class="soi-mod-pn" value="' + escapeHtml((m.pruefungstypen || []).join(', ')) + '" placeholder="Prüfungstypen (Komma-separiert)" />' +
+								'<a href="#" class="soi-mod-page-link" data-page="' + (SOI.pageMap && SOI.pageMap[m.modulnummer] ? SOI.pageMap[m.modulnummer] : '') + '">Seite</a>';
+							container.appendChild(row);
+						});
+					});
+
+					// Click handler für "Seite"-Links
+					Array.prototype.forEach.call(container.querySelectorAll('.soi-mod-page-link'), function(a) {
+						a.addEventListener('click', function(ev) {
+							ev.preventDefault();
+							var p = parseInt(a.dataset.page, 10);
+							if(p && p > 0) soi_show_page(p);
+						});
+					});
+				}
+
+				function renderAnlage2(data) {
+					var container = $('soi_anlage2_list');
+					container.innerHTML = '';
+					var rows = data.anlage2 || [];
+					$('soi_count_anlage2').textContent = rows.length;
+					if(!rows.length) {
+						container.innerHTML = '<p><i>Anlage 2 konnte nicht geparst werden (keine Tabelle gefunden).</i></p>';
+						return;
+					}
+					rows.forEach(function(r) {
+						var div = document.createElement('div');
+						div.className = 'soi-anlage2-row';
+						div.innerHTML =
+							'<b>' + escapeHtml(r.modulnummer) + '</b>' +
+							'<div>' + escapeHtml(r.name) + ' &mdash; LP: ' + (r.lp !== null && r.lp !== undefined ? r.lp : '?') +
+								(r.semester && r.semester.length ? ' &mdash; ' + r.semester.map(function(s) {
+									var sws = Object.keys(s.sws || {}).map(function(k) { return s.sws[k]; }).reduce(function(a,b){return a+b;}, 0);
+									return 'S' + s.semester + ': ' + sws + ' SWS, ' + s.pl_count + ' PL';
+								}).join(' &middot; ') : '') + '</div>';
+						container.appendChild(div);
+					});
+				}
+
+				function renderPages(data) {
+					var container = $('soi_pages_list');
+					container.innerHTML = '';
+					var pagesHtml = '<div class="soi-pages-grid">';
+					var numPages = data.page_count || 0;
+					var modulePages = data.modul_pages || {};
+					SOI.pageMap = {};
+					Object.keys(modulePages).forEach(function(modulnr) {
+						SOI.pageMap[modulnr] = modulePages[modulnr];
+					});
+					for(var p = 1; p <= numPages; p++) {
+						var hasMod = false;
+						Object.keys(modulePages).forEach(function(modulnr) {
+							if(modulePages[modulnr] === p) hasMod = true;
+						});
+						pagesHtml += '<div class="soi-page-card' + (hasMod ? ' has-modules' : '') + '" data-soi-page="' + p + '">' +
+							'<img src="data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&page=' + p + '" alt="Seite ' + p + '" loading="lazy" />' +
+							'<div class="soi-page-num">Seite ' + p + (hasMod ? ' &mdash; enthält Modul' : '') + '</div>' +
+							'</div>';
+					}
+					pagesHtml += '</div>';
+					container.innerHTML = pagesHtml;
+					Array.prototype.forEach.call(container.querySelectorAll('.soi-page-card'), function(card) {
+						card.addEventListener('click', function() {
+							soi_show_page(parseInt(card.dataset.soiPage, 10));
+						});
+					});
+				}
+
+				window.soi_show_page = function(p) {
+					var img = $('soi_page_modal_img');
+					img.src = 'data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&page=' + p;
+					$('soi_page_modal').classList.add('soi-open');
+				};
+				window.soi_close_modal = function() {
+					$('soi_page_modal').classList.remove('soi-open');
+				};
+
+				function renderPreview(data) {
+					SOI.data = data;
+					SOI.currentImportId = data.import_id;
+					$('soi_count_modules').textContent = (data.modules || []).length;
+					$('soi_count_anlage2').textContent = (data.anlage2 || []).length;
+					var cover = data.cover || {};
+					var meta = '<b>' + escapeHtml(data.filename || '') + '</b><br />' +
+						'SHA256: <code>' + escapeHtml(data.sha256 || '') + '</code><br />' +
+						'Studiengang: <b>' + escapeHtml((cover.program || data.studiengang_name) || '?') + '</b>' +
+						(cover.degree ? ' (' + escapeHtml(cover.degree) + ')' : '') + '<br />' +
+						'Größe: ' + ((data.size || 0)/1024).toFixed(1) + ' KB &middot; Text: ' + (data.text_length || 0) + ' Zeichen &middot; Module: ' + (data.modules || []).length + ' &middot; Anlage 2 Einträge: ' + (data.anlage2 || []).length;
+					$('soi_preview_meta').innerHTML = meta;
+					renderModules(data);
+					renderAnlage2(data);
+					renderPages(data);
+					$('soi_preview_container').style.display = '';
+					$('soi_btn_commit').disabled = false;
+				}
+
+				function uploadPdf(file) {
+					var fd = new FormData($('soi_upload_form'));
+					fd.set('pdf', file);
+					showSpinner('Lade hoch und analysiere PDF…');
+					setStatus('', '');
+					$('soi_preview_container').style.display = 'none';
+					$('soi_btn_commit').disabled = true;
+
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=upload&ajax=1', true);
+					xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+					xhr.upload.onprogress = function(e) {
+						if(e.lengthComputable) {
+							var pct = Math.round((e.loaded / e.total) * 100);
+							$('soi_upload_status').textContent = 'Lade hoch… ' + pct + '%';
+						}
+					};
+					xhr.onload = function() {
+						hideSpinner();
+						try {
+							var resp = JSON.parse(xhr.responseText);
+						} catch(e) {
+							setStatus('Server-Antwort war kein gültiges JSON.', 'error');
+							return;
+						}
+						if(!resp.ok) {
+							setStatus('Fehler: ' + escapeHtml(resp.error || 'Unbekannt'), 'error');
+							return;
+						}
+						setStatus('Analyse abgeschlossen — ' + (resp.modules || []).length + ' Module, ' + (resp.anlage2 || []).length + ' Anlage-2-Einträge.', 'success');
+						// Seitenzahl separat ermitteln
+						fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=analyze&id=' + resp.import_id, {credentials:'same-origin'})
+							.then(function(r){ return r.json(); })
+							.then(function(full) {
+								full.page_count = (full.modules && full.modules.length) ? Math.max.apply(null, Object.values(full.modul_pages || {}).concat([1])) : 1;
+								// Heuristik: wenn raw_text enthält Page-Counts, nimm das Maximum
+								renderPreview(full);
+							}).catch(function(e) {
+								renderPreview(resp);
+							});
+					};
+					xhr.onerror = function() {
+						hideSpinner();
+						setStatus('Netzwerkfehler beim Upload.', 'error');
+					};
+					xhr.send(fd);
+				}
+
+				var fileInput = $('soi_pdf_input');
+				if(fileInput) {
+					fileInput.addEventListener('change', function() {
+						if(fileInput.files && fileInput.files[0]) {
+							uploadPdf(fileInput.files[0]);
+						}
+					});
+				}
+
+				// Tab-Wechsel
+				Array.prototype.forEach.call(document.querySelectorAll('.soi-tab-button'), function(btn) {
+					btn.addEventListener('click', function() {
+						var tab = btn.dataset.soiTab;
+						Array.prototype.forEach.call(document.querySelectorAll('.soi-tab-button'), function(b) { b.classList.remove('soi-tab-active'); });
+						btn.classList.add('soi-tab-active');
+						Array.prototype.forEach.call(document.querySelectorAll('.soi-tab-panel'), function(p) { p.style.display = 'none'; });
+						$('soi_tab_' + tab).style.display = '';
+					});
+				});
+
+				// Commit-Button
+				var commitBtn = $('soi_btn_commit');
+				if(commitBtn) {
+					commitBtn.addEventListener('click', function() {
+						if(!SOI.data) return;
+						commitBtn.disabled = true;
+						var rows = document.querySelectorAll('#soi_modules_list .soi-module-row');
+						var modulesOut = [];
+						rows.forEach(function(row) {
+							modulesOut.push({
+								include: row.querySelector('.soi-mod-include').checked ? 1 : 0,
+								modulnummer: row.querySelector('.soi-mod-nr').value,
+								name: row.querySelector('.soi-mod-name').value,
+								lp: row.querySelector('.soi-mod-lp').value,
+								sws: row.querySelector('.soi-mod-sws').value,
+								dauer_semester: row.querySelector('.soi-mod-dauer').value,
+								pruefungstypen_str: row.querySelector('.soi-mod-pn').value
+							});
+						});
+						var fd = new FormData();
+						fd.set('soi_import_id', SOI.currentImportId);
+						fd.set('soi_create_pruefungsnummern', '1');
+						fd.set('soi_modules_v2', JSON.stringify(modulesOut));
+
+						setStatus('Importiere…', '');
+						fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=commit_v2', { method: 'POST', body: fd, credentials: 'same-origin' })
+							.then(function(r){ return r.json(); })
+							.then(function(resp) {
+								if(resp.ok) {
+									setStatus('Import abgeschlossen: ' + resp.modules_imported + ' Modul(e), ' + resp.pruefungsnummern_imported + ' Prüfungsnummer(n).', 'success');
+									commitBtn.disabled = false;
+									setTimeout(function() { window.location.href = 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=detail&id=' + SOI.currentImportId; }, 1500);
+								} else {
+									setStatus('Fehler: ' + escapeHtml(resp.error || 'Unbekannt'), 'error');
+									commitBtn.disabled = false;
+								}
+							}).catch(function(e) {
+								setStatus('Netzwerkfehler beim Commit.', 'error');
+								commitBtn.disabled = false;
+							});
+					});
+				}
+
+				// Abbrechen
+				var cancelBtn = $('soi_btn_cancel');
+				if(cancelBtn) {
+					cancelBtn.addEventListener('click', function() {
+						$('soi_preview_container').style.display = 'none';
+						setStatus('', '');
+						fileInput.value = '';
+					});
+				}
+
+				// Modal-Klick schließt
+				var modalBg = $('soi_page_modal');
+				if(modalBg) {
+					modalBg.addEventListener('click', function(e) {
+						if(e.target === modalBg) soi_close_modal();
+					});
+				}
+			})();
 			</script>
 <?php
 		} elseif($stage === 'upload') {
@@ -716,6 +1198,8 @@
 					$pdf_bytes = file_get_contents($pdf_path);
 					$sha = hash('sha256', $pdf_bytes);
 					$size = strlen($pdf_bytes);
+					// PDF in DB als Base64 speichern, um SQL-Injection durch Binärdaten zu vermeiden
+					$pdf_b64 = base64_encode($pdf_bytes);
 
 					// Text extrahieren
 					try {
@@ -760,16 +1244,53 @@
 							$create_pns = get_post('create_pruefungsnummern') ? 1 : 0;
 							$reuse = get_post('reuse_in_other_studiengaenge') ? 1 : 0;
 
-							$query = 'INSERT INTO `studienordnung_import` (studiengang_id, filename, pdf_sha256, pdf_size, pdf_data, raw_text, degree, program_name, modules_found, modules_imported, pruefungsnummern_imported, imported_by_user_id) VALUES ('.
-								esc($studiengang_id).', '.esc($filename).', '.esc($sha).', '.esc($size).', '.esc($pdf_bytes).', '.esc($raw_text).', '.
-								esc($cover['degree']).', '.esc($cover['program']).', '.esc(count($modules)).', 0, 0, '.esc($user_id).')';
+							// Geparste Daten für spätere Vorschau in notes ablegen
+							$parsed_payload = array(
+								'modules' => $modules,
+								'anlage2' => $anlage2,
+								'cover' => $cover,
+								'created_at' => date('c'),
+							);
+							$notes_json = json_encode($parsed_payload, JSON_UNESCAPED_UNICODE);
+
+							$query = 'INSERT INTO `studienordnung_import` (studiengang_id, filename, pdf_sha256, pdf_size, pdf_data, raw_text, degree, program_name, modules_found, modules_imported, pruefungsnummern_imported, imported_by_user_id, notes) VALUES ('.
+								esc($studiengang_id).', '.esc($filename).', '.esc($sha).', '.esc($size).', '.esc($pdf_b64).', '.esc($raw_text).', '.
+								esc($cover['degree']).', '.esc($cover['program']).', '.esc(count($modules)).', 0, 0, '.esc($user_id).', '.esc($notes_json).')';
 							$insert_result = rquery($query);
 							$import_row = get_single_row_from_query('SELECT id FROM `studienordnung_import` WHERE `pdf_sha256` = '.esc($sha).' ORDER BY id DESC LIMIT 1');
 							$import_id = (!is_null($import_row) && $import_row !== '' && $import_row !== false) ? (int)$import_row : 0;
 
 							if(!$import_id) {
+								if($is_ajax) {
+									header('Content-Type: application/json; charset=utf-8');
+									print json_encode(array('ok' => false, 'error' => 'Import-Eintrag konnte nicht angelegt werden.'.($insert_result === false ? ' (DB-Fehler)' : '')));
+									exit;
+								}
 								error('Import-Eintrag konnte nicht angelegt werden.'.($insert_result === false ? ' (Datenbank-Fehler beim INSERT)' : ''));
 								print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
+							} elseif($is_ajax) {
+								// Sofortige JSON-Antwort mit allen geparsten Daten + Seitenzuordnungen
+								$modul_pages = soi_locate_modules_in_pages($raw_text, $modules);
+								header('Content-Type: application/json; charset=utf-8');
+								print json_encode(array(
+									'ok' => true,
+									'import_id' => $import_id,
+									'filename' => $filename,
+									'sha256' => $sha,
+									'studiengang_id' => $studiengang_id,
+									'studiengang_name' => $cover['program'] ?: '',
+									'degree' => $cover['degree'] ?: '',
+									'modules' => $modules,
+									'anlage2' => $anlage2,
+									'modules_found' => count($modules),
+									'anlage2_found' => count($anlage2),
+									'modul_pages' => $modul_pages,
+									'create_pruefungsnummern' => $create_pns,
+									'reuse' => $reuse,
+									'text_length' => strlen($raw_text),
+									'size' => $size,
+								), JSON_UNESCAPED_UNICODE);
+								exit;
 							} elseif($auto_commit) {
 								// Direkt committen: in $_POST umkopieren und Stage auf 'commit' setzen
 								$_POST = array();
@@ -1030,7 +1551,9 @@
 				}
 
 				// PDF Download anbieten
-				print '<h3>Original-PDF</h3><p><a href="admin?page='.$GLOBALS['this_page_number'].'&stage=download&id='.$id.'">PDF herunterladen</a> ('.number_format(strlen($row['pdf_data'])/1024, 1).' KB)</p>';
+				$pdf_decoded = base64_decode($row['pdf_data'], true);
+				if($pdf_decoded === false) $pdf_decoded = $row['pdf_data'];
+				print '<h3>Original-PDF</h3><p><a href="admin?page='.$GLOBALS['this_page_number'].'&stage=download&id='.$id.'">PDF herunterladen</a> ('.number_format(strlen($pdf_decoded)/1024, 1).' KB)</p>';
 				print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück</a></p>';
 			}
 		} elseif($stage === 'download') {
@@ -1039,27 +1562,177 @@
 			if(!$row) {
 				warning('Nicht gefunden.');
 			} else {
+				$pdf_bin = base64_decode($row['pdf_data'], true);
+				if($pdf_bin === false) {
+					$pdf_bin = $row['pdf_data']; // Rückwärtskompatibilität für unverschlüsselte Einträge
+				}
 				header('Content-Type: application/pdf');
 				header('Content-Disposition: attachment; filename="'.preg_replace('/[^A-Za-z0-9._-]/', '_', $row['filename']).'"');
-				header('Content-Length: '.strlen($row['pdf_data']));
-				print $row['pdf_data'];
+				header('Content-Length: '.strlen($pdf_bin));
+				print $pdf_bin;
 				exit;
 			}
+		} elseif($stage === 'analyze') {
+			// AJAX: geparste Daten zu einem bestehenden Import-Eintrag zurückgeben.
+			header('Content-Type: application/json; charset=utf-8');
+			$id = (int)get_get('id');
+			$row = get_single_row_from_query_assoc('SELECT id, filename, raw_text, notes, studiengang_id, degree, program_name FROM `studienordnung_import` WHERE id = '.esc($id));
+			if(!$row) {
+				print json_encode(array('ok' => false, 'error' => 'Import nicht gefunden.'));
+				exit;
+			}
+			$payload = json_decode($row['notes'] ?? '', true);
+			$modules = is_array($payload) && isset($payload['modules']) ? $payload['modules'] : null;
+			$anlage2 = is_array($payload) && isset($payload['anlage2']) ? $payload['anlage2'] : null;
+			if($modules === null) {
+				$modules = soi_parse_modules($row['raw_text']);
+			}
+			if($anlage2 === null) {
+				$anlage2 = soi_parse_anlage2($row['raw_text']);
+			}
+			$cover = is_array($payload) && isset($payload['cover']) ? $payload['cover'] : array('degree' => $row['degree'], 'program' => $row['program_name']);
+			$modul_pages = soi_locate_modules_in_pages($row['raw_text'], $modules);
+			print json_encode(array(
+				'ok' => true,
+				'import_id' => (int)$row['id'],
+				'filename' => $row['filename'],
+				'studiengang_id' => (int)$row['studiengang_id'],
+				'studiengang_name' => $row['program_name'] ?? '',
+				'degree' => $row['degree'] ?? '',
+				'cover' => $cover,
+				'modules' => $modules,
+				'anlage2' => $anlage2,
+				'modul_pages' => $modul_pages,
+				'modules_found' => count($modules),
+				'anlage2_found' => count($anlage2),
+			), JSON_UNESCAPED_UNICODE);
+			exit;
+		} elseif($stage === 'page_image') {
+			// AJAX: Liefert PNG der Seite N eines Imports
+			$id = (int)get_get('id');
+			$page = (int)get_get('page');
+			if($page < 1) $page = 1;
+			$row = get_single_row_from_query_assoc('SELECT pdf_data FROM `studienordnung_import` WHERE id = '.esc($id));
+			if(!$row) {
+				header('HTTP/1.0 404 Not Found');
+				exit;
+			}
+			$pdf_bin = base64_decode($row['pdf_data'], true);
+			if($pdf_bin === false) $pdf_bin = $row['pdf_data'];
+			$png_path = soi_render_page($id, $pdf_bin, $page, 110);
+			if(!$png_path || !file_exists($png_path)) {
+				header('HTTP/1.0 500 Internal Server Error');
+				print 'Rendern fehlgeschlagen';
+				exit;
+			}
+			header('Content-Type: image/png');
+			header('Content-Length: '.filesize($png_path));
+			header('Cache-Control: private, max-age=86400');
+			readfile($png_path);
+			exit;
+		} elseif($stage === 'commit_v2') {
+			// AJAX: Vom Frontend bearbeitete Modul-Liste persistieren
+			header('Content-Type: application/json; charset=utf-8');
+			$import_id = (int)get_post('soi_import_id');
+			$create_pns = get_post('soi_create_pruefungsnummern') ? 1 : 0;
+			$modules_in = get_post('soi_modules_v2') ?: array();
+			$new_studiengang_name = trim((string)get_post('soi_new_studiengang_name'));
+
+			$import_row = get_single_row_from_query_assoc('SELECT studiengang_id, program_name, notes FROM `studienordnung_import` WHERE id = '.esc($import_id));
+			if(!$import_row) {
+				print json_encode(array('ok' => false, 'error' => 'Import-Eintrag nicht gefunden.'));
+				exit;
+			}
+
+			$studiengang_id = (int)$import_row['studiengang_id'];
+			if($studiengang_id <= 0 && $new_studiengang_name !== '') {
+				$studiengang_id = soi_ensure_studiengang($new_studiengang_name, '', 1);
+			}
+			if($studiengang_id <= 0) {
+				print json_encode(array('ok' => false, 'error' => 'Kein Studiengang wählbar. Bitte neuen anlegen.'));
+				exit;
+			}
+
+			$imported_modules = 0;
+			$imported_pns = 0;
+			$seen_pns = array();
+			$messages = array();
+
+			foreach($modules_in as $idx => $m) {
+				if(!is_array($m)) continue;
+				if(empty($m['include'])) continue;
+				$modulnummer = trim((string)($m['modulnummer'] ?? ''));
+				$name = trim((string)($m['name'] ?? ''));
+				if($modulnummer === '' || $name === '') continue;
+
+				$beschreibung_parts = array();
+				if(isset($m['lp']) && $m['lp'] !== '') $beschreibung_parts[] = 'LP: '.(int)$m['lp'];
+				if(isset($m['sws']) && $m['sws'] !== '' && $m['sws'] !== null) $beschreibung_parts[] = 'SWS: '.(float)$m['sws'];
+				if(isset($m['dauer_semester']) && $m['dauer_semester'] !== '') $beschreibung_parts[] = 'Dauer: '.(int)$m['dauer_semester'].' Sem.';
+				$beschreibung = mb_substr(implode('; ', $beschreibung_parts), 0, 500);
+
+				rquery('INSERT INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($name).', '.esc($studiengang_id).', '.esc($modulnummer).', '.esc($beschreibung).') ON DUPLICATE KEY UPDATE name=VALUES(name), beschreibung=VALUES(beschreibung)');
+
+				$mod_row = get_single_row_from_query('SELECT id FROM `modul` WHERE `studiengang_id` = '.esc($studiengang_id).' AND `abkuerzung` = '.esc($modulnummer).' LIMIT 1');
+				if(is_null($mod_row) || $mod_row === '' || $mod_row === false) {
+					$messages[] = 'Konnte modul_id für '.$modulnummer.' nicht ermitteln.';
+					continue;
+				}
+				$modul_id = (int)$mod_row;
+				$imported_modules++;
+
+				if($create_pns) {
+					$ptypes = array();
+					if(isset($m['pruefungstypen']) && is_array($m['pruefungstypen'])) {
+						$ptypes = $m['pruefungstypen'];
+					} elseif(isset($m['pruefungstypen_str']) && trim($m['pruefungstypen_str']) !== '') {
+						$ptypes = array_map('trim', explode(',', $m['pruefungstypen_str']));
+					}
+					if(!$ptypes) $ptypes = array('Klausurarbeit');
+					foreach($ptypes as $ptname) {
+						if(!$ptname) continue;
+						$pt_id = soi_ensure_pruefungstyp($ptname);
+						if(!$pt_id) continue;
+						$generated_nr = soi_generate_pruefungsnummer($modulnummer, $ptname, $m['lp'] ?? '', $seen_pns);
+						rquery('INSERT INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `modulbezeichnung`) VALUES ('.esc($generated_nr).', '.esc($modul_id).', '.esc($pt_id).', '.esc($modulnummer.' '.$name).')');
+						$pn_row = get_single_row_from_query('SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = '.esc($generated_nr).' LIMIT 1');
+						$pn_id = (!is_null($pn_row) && $pn_row !== '' && $pn_row !== false) ? (int)$pn_row : null;
+						rquery('INSERT INTO `pruefungsnummer_import` (import_id, modul_id, pruefungsnummer_id, generated_nr, pruefungstyp_name, lp) VALUES ('.esc($import_id).', '.esc($modul_id).', '.esc($pn_id).', '.esc($generated_nr).', '.esc($ptname).', '.esc($m['lp'] ?? null).')');
+						$imported_pns++;
+					}
+				}
+			}
+
+			rquery('UPDATE `studienordnung_import` SET `modules_imported` = '.esc($imported_modules).', `pruefungsnummern_imported` = '.esc($imported_pns).', `studiengang_id` = '.esc($studiengang_id).' WHERE `id` = '.esc($import_id));
+
+			print json_encode(array(
+				'ok' => true,
+				'import_id' => $import_id,
+				'modules_imported' => $imported_modules,
+				'pruefungsnummern_imported' => $imported_pns,
+				'studiengang_id' => $studiengang_id,
+				'messages' => $messages,
+			), JSON_UNESCAPED_UNICODE);
+			exit;
 		} else {
 			print '<p>Unbekannte Stage: '.htmlentities($stage).'</p>';
 		}
 ?>
+<?php if(!$is_ajax_stage): ?>
 	</div>
 <?php
-	foreach (array(
-			array('hint', 'blue'),
-			array('error', 'red'),
-			array('right_issue', 'red'),
-			array('warning', 'orange'),
-			array('message', 'blue'),
-			array('easter_egg', 'hotpink'),
-			array('success', 'green')
-		) as $msg) {
-		show_output($msg[0], $msg[1]);
+	endif;
+	if(!$is_ajax_stage) {
+		foreach (array(
+				array('hint', 'blue'),
+				array('error', 'red'),
+				array('right_issue', 'red'),
+				array('warning', 'orange'),
+				array('message', 'blue'),
+				array('easter_egg', 'hotpink'),
+				array('success', 'green')
+			) as $msg) {
+			show_output($msg[0], $msg[1]);
+		}
 	}
 ?>

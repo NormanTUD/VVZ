@@ -6,6 +6,43 @@ include_once("functions.php");
 $filename = 'admin';
 $GLOBALS['adminpage'] = 1;
 $page_title = $GLOBALS['university_name']." | Administration";
+
+// AJAX-Bypass: Wenn eine explizite AJAX-Anfrage kommt (X-Requested-With oder ?ajax=1)
+// und die Stage eine reine Daten-Antwort liefert, wird die komplette HTML-Chrome
+// (header.php, Navigation, footer.php) übersprungen. Damit JSON-Antworten nicht in HTML
+// eingebettet werden.
+$is_ajax_admin = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+	|| (isset($_GET['ajax']) && $_GET['ajax'] === '1');
+$ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2');
+if($is_ajax_admin && isset($_GET['stage']) && in_array($_GET['stage'], $ajax_only_stages, true)) {
+	include_once("selftest.php");
+	if(get_kunden_db_name() == "startpage") {
+		header('Content-Type: application/json; charset=utf-8');
+		print json_encode(array('ok' => false, 'error' => 'Nicht erlaubt.'));
+		exit(0);
+	}
+	if(!$GLOBALS['logged_in']) {
+		header('Content-Type: application/json; charset=utf-8');
+		print json_encode(array('ok' => false, 'error' => 'Nicht angemeldet.'));
+		exit(0);
+	}
+	$page_file = $GLOBALS['pages'][(int)get_get('page')][1] ?? null;
+	if(!$page_file) {
+		header('Content-Type: application/json; charset=utf-8');
+		print json_encode(array('ok' => false, 'error' => 'Seite nicht gefunden.'));
+		exit(0);
+	}
+	$page_file = dirname(__FILE__).'/pages/'.$page_file;
+	if(file_exists($page_file)) {
+		$GLOBALS['this_page_number'] = (int)get_get('page');
+		include($page_file);
+	} else {
+		header('Content-Type: application/json; charset=utf-8');
+		print json_encode(array('ok' => false, 'error' => 'Datei fehlt.'));
+	}
+	exit(0);
+}
+
 include("header.php");
 include_once("selftest.php");
 
