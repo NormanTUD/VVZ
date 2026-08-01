@@ -1735,6 +1735,37 @@
 				? $notes_payload['anlage2']
 				: array();
 
+			// Vom Frontend editierte Anlage-2-Zeilen in notes und in $anlage2_rows mergen
+			// (Code-basierter Match, nur eingecheckte Zeilen).
+			if(!empty($anlage2_in)) {
+				$anlage2_by_code = array();
+				foreach($anlage2_rows as $r) {
+					if(isset($r['modulnummer'])) $anlage2_by_code[trim((string)$r['modulnummer'])] = $r;
+				}
+				foreach($anlage2_in as $row) {
+					if(!is_array($row)) continue;
+					if(empty($row['include'])) continue;
+					$code = trim((string)($row['modulnummer'] ?? ''));
+					if($code === '') continue;
+					$sem = array();
+					if(isset($row['semester']) && is_array($row['semester'])) $sem = $row['semester'];
+					$anlage2_by_code[$code] = array(
+						'modulnummer' => $code,
+						'name' => trim((string)($row['name'] ?? '')),
+						'lp' => isset($row['lp']) ? (int)$row['lp'] : null,
+						'semester' => $sem,
+					);
+				}
+				$anlage2_rows = array_values($anlage2_by_code);
+
+				// notes.anlage2 aktualisieren (für spätere Detail-Ansicht).
+				if(is_array($notes_payload)) {
+					$notes_payload['anlage2'] = $anlage2_rows;
+					$notes_json_updated = json_encode(soi_sanitize_for_json($notes_payload), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
+					rquery('UPDATE `studienordnung_import` SET `notes` = '.esc($notes_json_updated).' WHERE `id` = '.esc($import_id));
+				}
+			}
+
 			foreach($modules_in as $idx => $m) {
 				if(!is_array($m)) continue;
 				if(empty($m['include'])) continue;

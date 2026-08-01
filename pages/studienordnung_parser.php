@@ -353,11 +353,24 @@ class SoiExtractor {
                         if(preg_match('/^[12]\.\s+/u', $nxt)) break;
                         if(preg_match('/^Modulnummer\b/u', $nxt)) break;
 
-                        // Modulnummer-Continuation: endet mit "-", nächste Zeile ist kurzer Token ohne Space.
-                        if(substr($code, -1) === '-' && preg_match('/^([A-Za-z0-9.*]+)\s*$/u', $nxt, $ccm) && mb_strlen($nxt) < 25 && strpos($nxt, ' ') === false) {
-                            $code .= $ccm[1];
-                            $i++;
-                            continue;
+                        // Modulnummer-Continuation: Code endet mit "-", erstes Token der Zeile ist alphanumerisch (kurz).
+                        // Das Token wird an die Modulnummer angehängt; der Rest der Zeile (z.B. "(email)") wird
+                        // in einer folgenden Iteration als Dozent-Anhang verarbeitet.
+                        if(substr($code, -1) === '-') {
+                            $first_token = strtok($nxt, " \t");
+                            if($first_token !== false && preg_match('/^[A-Za-z0-9.*\-]+$/u', $first_token) && mb_strlen($first_token) < 25) {
+                                $code .= $first_token;
+                                // Rest der Zeile (alles nach dem ersten Token) als nxt_raw neu setzen.
+                                $rest = trim(substr($nxt, mb_strlen($first_token)));
+                                if($rest !== '') {
+                                    $i++;
+                                    $nxt_raw = ' '.$rest;
+                                    $nxt = $rest;
+                                    continue;
+                                }
+                                $i++;
+                                continue;
+                            }
                         }
 
                         // Dozent-Email in Klammern auf nächster Zeile → an Dozent anhängen.
