@@ -1458,22 +1458,26 @@ class SoiExtractor {
                     'section' => $current_section,
                 ];
                 // Rest der Zeile (alles nach dem Code) zur Block-Sammlung. Wir versuchen
-                // verschiedene Position-Suchen: zuerst mit Space (für "VM 2" Pattern), dann
-                // ohne Space, dann einfach alles nach den ersten 8 Zeichen (falls Code mit Space
-                // irgendwo in der Mitte steht).
+                // den Code im Original-Format (mit Space) in der Zeile zu finden. Dazu
+                // versuchen wir, einen optionalen Space im letzten Buchstaben-/Ziffer-Paar
+                // wieder einzufügen (z.B. "VM2" → "VM 2") und danach zu suchen.
                 $after_code = '';
-                // Versuche: raw_code mit möglichen Space-Varianten finden.
-                if(preg_match('/^([A-Z][A-Za-z0-9.\-]+)\s([A-Z0-9.\-]+)$/', $modul_code, $rcm)) {
-                    $with_space = $rcm[1].' '.$rcm[2];
-                    $pos = strpos($line, $with_space);
-                    if($pos !== false) {
-                        $after_code = trim(substr($line, $pos + strlen($with_space)));
-                    }
+                $variants = array();
+                // 1) Code wie er ist (ohne Space).
+                $variants[] = $modul_code;
+                // 2) Mit Space vor dem letzten Buchstaben-/Ziffer-Block (z.B. "PHF-BA-KG-VM2" → "PHF-BA-KG-VM 2").
+                if(preg_match('/^(.*?)([A-Z]+)(\d+)$/', $modul_code, $vm)) {
+                    $variants[] = $vm[1].$vm[2].' '.$vm[3];
                 }
-                if($after_code === '') {
-                    $pos = strpos($line, $modul_code);
+                // 3) Mit Space vor dem letzten Ziffer-Block (z.B. "KG-EM1" → "KG-EM 1").
+                if(preg_match('/^(.*?)([A-Za-z]+)(\d+)$/', $modul_code, $vm2)) {
+                    $variants[] = $vm2[1].$vm2[2].' '.$vm2[3];
+                }
+                foreach($variants as $v) {
+                    $pos = strpos($line, $v);
                     if($pos !== false) {
-                        $after_code = trim(substr($line, $pos + strlen($modul_code)));
+                        $after_code = trim(substr($line, $pos + strlen($v)));
+                        break;
                     }
                 }
                 $after_code = preg_replace('/^\s+/u', '', $after_code);
