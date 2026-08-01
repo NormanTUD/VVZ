@@ -1104,12 +1104,6 @@
 							});
 					});
 				}
-							}).catch(function(e) {
-								setStatus('Netzwerkfehler beim Commit.', 'error');
-								commitBtn.disabled = false;
-							});
-					});
-				}
 
 				// Abbrechen
 				var cancelBtn = $('soi_btn_cancel');
