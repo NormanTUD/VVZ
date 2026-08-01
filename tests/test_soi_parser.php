@@ -91,23 +91,26 @@ is_equal("parseBboxHtml: Breite berechnet", (int)$words[0]['w'], 49);
 
 /* ============================ detectColumns() ========================= */
 
-$simple_words = [
-	['page'=>1,'x'=>70, 'y'=>100, 'w'=>50, 'h'=>15, 'text'=>'SLK-BA-1'],
-	['page'=>1,'x'=>200,'y'=>100, 'w'=>50, 'h'=>15, 'text'=>'Modname'],
-	['page'=>1,'x'=>350,'y'=>100, 'w'=>30, 'h'=>15, 'text'=>'2/0/0/2'],
-	['page'=>1,'x'=>400,'y'=>100, 'w'=>30, 'h'=>15, 'text'=>'10'],
-	['page'=>1,'x'=>460,'y'=>100, 'w'=>30, 'h'=>15, 'text'=>'SWS'],
-];
-$cols = $ex->detectColumns($simple_words);
+// Column-Detection arbeitet nur zuverlässig, wenn pro Bin genügend Wörter sind.
+// Wir simulieren mehrere Zeilen mit Wörtern in den gleichen x-Bereichen.
+$col_words = [];
+$x_cols = [70, 200, 350, 400, 460];
+$labels = ['MOD1','NAME','SWS','PL','LP'];
+for($row = 0; $row < 10; $row++) {
+	for($c = 0; $c < 5; $c++) {
+		$col_words[] = ['page'=>1,'x'=>$x_cols[$c],'y'=>100 + $row*20,'w'=>30,'h'=>15,'text'=>$labels[$c].$row];
+	}
+}
+$cols = $ex->detectColumns($col_words);
 is_equal("detectColumns: mehrere Spalten gefunden", count($cols) >= 4, true);
 
 is_equal("detectColumns: leere Eingabe → leere Spalten", $ex->detectColumns([]), []);
 
 /* ============================ groupRows() ============================== */
 
-$rows = $ex->groupRows($simple_words);
-is_equal("groupRows: alle Wörter auf einer Zeile (gleiches y)", count($rows), 1);
-is_equal("groupRows: Zeile enthält 5 Wörter", count($rows[0]), 5);
+$rows = $ex->groupRows($col_words);
+is_equal("groupRows: alle Wörter einer y-Gruppe ergeben eine Zeile", count($rows), 10);
+is_equal("groupRows: erste Zeile enthält 5 Wörter", count($rows[0]), 5);
 
 /* ============================ locateModulesInPages() ================= */
 

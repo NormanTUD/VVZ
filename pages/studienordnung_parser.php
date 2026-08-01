@@ -568,35 +568,42 @@ class SoiExtractor {
         if(empty($bins)) return [];
 
         $max_bin = max($bins);
-        // Schwelle: 30% des Maximums. Niedriger = mehr "leere" Spalten = mehr Splits.
-        $threshold = max(2, (int)floor($max_bin * 0.30));
+        // Schwelle: 30% des Maximums, mindestens 1 (sonst nichts erkannt bei einzelnen Wörtern).
+        $threshold = max(1, (int)floor($max_bin * 0.30));
 
         $cols = [];
-        $current_col_start = $min_x;
-        $current_col_end = $min_x;
-        $in_col = false;
+        $current_col_start = null;
+        $current_col_end = null;
         $sorted_bins = array_keys($bins);
         sort($sorted_bins);
+        $prev_bin = null;
         foreach($sorted_bins as $bin) {
             $bin_start = $min_x + $bin * $bin_size;
             $bin_end = $bin_start + $bin_size;
             $is_dense = ($bins[$bin] >= $threshold);
             if($is_dense) {
-                if($in_col) {
-                    $current_col_end = $bin_end;
-                } else {
-                    if($current_col_start < $current_col_end) {
-                        $cols[] = ['left' => $current_col_start, 'right' => $current_col_end, 'center' => ($current_col_start + $current_col_end) / 2];
-                    }
+                // Wenn es eine Lücke zum vorherigen dichten Bin gibt, aktuelle Spalte schließen.
+                $gap = ($prev_bin === null) ? 0 : ($bin - $prev_bin - 1);
+                if($current_col_start !== null && $gap > 2) {
+                    $cols[] = ['left' => $current_col_start, 'right' => $current_col_end, 'center' => ($current_col_start + $current_col_end) / 2];
+                    $current_col_start = null;
+                }
+                if($current_col_start === null) {
                     $current_col_start = $bin_start;
                     $current_col_end = $bin_end;
-                    $in_col = true;
+                } else {
+                    $current_col_end = $bin_end;
                 }
             } else {
-                $in_col = false;
+                // Bin unterhalb der Schwelle → aktuelle Spalte schließen.
+                if($current_col_start !== null) {
+                    $cols[] = ['left' => $current_col_start, 'right' => $current_col_end, 'center' => ($current_col_start + $current_col_end) / 2];
+                    $current_col_start = null;
+                }
             }
+            if($is_dense) $prev_bin = $bin;
         }
-        if($current_col_start < $current_col_end) {
+        if($current_col_start !== null) {
             $cols[] = ['left' => $current_col_start, 'right' => $current_col_end, 'center' => ($current_col_start + $current_col_end) / 2];
         }
 
@@ -903,9 +910,9 @@ class SoiExtractor {
         // First part is the name
         $module['name'] = $parts[0];
 
-        // Last part might be LP (single integer)
+        // Last part might be LP (single integer). Manche Module haben bis zu 70 LP.
         $last_part = end($parts);
-        if(preg_match('/^\d+$/', $last_part) && (int)$last_part > 0 && (int)$last_part <= 50) {
+        if(preg_match('/^\d+$/', $last_part) && (int)$last_part > 0 && (int)$last_part <= 200) {
             $module['lp'] = (int)$last_part;
             array_pop($parts);
         }
@@ -923,13 +930,22 @@ class SoiExtractor {
                     'sws' => $sws_parts,
                     'pl_count' => 0,
                 ];
-            } elseif(preg_match('/^\*+$/', $p)) {
-                // Wildcard "*/*/*/*" semester
-                $module['semester'][] = [
-                    'semester' => $semester_idx++,
-                    'sws' => ['*', '*', '*', '*'],
-                    'pl_count' => 0,
-                ];
+            } elseif(preg_match('/^\*+(?:\/\*+)+$/', $p) || preg_match('/^\*+$/', $p)) {
+                // Wildcard-Semester: "*/*/*/*" oder "****"
+                $star_count = substr_count($p, '*');
+                if($star_count > 1 && strpos($p, '/') !== false) {
+                    $module['semester'][] = [
+                        'semester' => $semester_idx++,
+                        'sws' => explode('/', $p),
+                        'pl_count' => 0,
+                    ];
+                } else {
+                    $module['semester'][] = [
+                        'semester' => $semester_idx++,
+                        'sws' => ['*', '*', '*', '*'],
+                        'pl_count' => 0,
+                    ];
+                }
             }
         }
         return $module;
