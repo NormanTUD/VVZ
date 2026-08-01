@@ -380,7 +380,8 @@ class SoiExtractor {
                             continue;
                         }
 
-                        // Eingerückte Zeile mit kurzem Text → wahrscheinlich Dozent-Folge (Name + Email).
+                        // Eingerückte Zeile mit kurzem Text → wahrscheinlich Dozent-Folge (Name + Email)
+                        // ODER: Modulname-Wrap (z.B. "für\nErgänzungsbereiche" oder "Sprache und\nKultur...").
                         if(strlen($nxt_raw) > 0 && $nxt_raw[0] === ' ') {
                             // Wenn die Zeile einen Email in Klammern enthält: nur den Email-Teil übernehmen,
                             // den Rest (z.B. umgebrochener Modulname) an Name anhängen.
@@ -388,18 +389,30 @@ class SoiExtractor {
                                 $email_part = '('.$em[1].')';
                                 $rest_text = trim(str_replace($email_part, '', $nxt));
                                 if($rest_text !== '' && $dozent !== '') {
-                                    // Kein Dozent hier → wahrscheinlich umgebrochener Modulname.
                                     $name = trim($name.' '.$rest_text);
                                 }
                                 $dozent = trim($dozent.' '.$email_part);
                                 $i++;
                                 continue;
                             }
-                            // Wenn die Zeile nur zwei Wörter (Vorname Nachname) enthält → Dozent-Folge.
-                            if(preg_match('/^[A-ZÄÖÜ][a-zäöüß\-]+\s+[A-ZÄÖÜ][a-zäöüß\-]+(?:\s+[A-ZÄÖÜ][a-zäöüß\.\-]+)?$/u', $nxt)
-                                && strlen($nxt) < 50) {
+                            // Wenn die Zeile wie ein Dozent-Name aussieht (Vorname Nachname, optional Titel).
+                            // Heuristik: 2-4 Großbuchstaben-getrennte Wörter, optional Titel davor.
+                            if(preg_match('/^(Prof\.|Dr\.|PD|PD\.|Juniorprof\.|Akad\.|\s)*([A-ZÄÖÜ][a-zäöüß\-]+)(\s+[A-ZÄÖÜ][a-zäöüß\-]+){1,3}$/u', $nxt)) {
                                 if($dozent !== '' && $nxt !== $dozent) $dozent = trim($dozent.' '.$nxt);
                                 elseif($dozent === '') $dozent = $nxt;
+                                $i++;
+                                continue;
+                            }
+                            // Wenn die Zeile überwiegend aus Text besteht (kein SWS/PL/LP) und
+                            // der aktuelle Name unvollständig wirkt (endet mit "für", ":", "-", "und", "/", etc.),
+                            // behandeln wir das als Modulname-Wrap.
+                            $looks_truncated = preg_match('/\b(für|und|oder|bei|mit|the|of|an|in|auf|zur|zum|des|der|die|das|von|aus|sowie|und|/|&|\:|\-)\s*$/iu', $name);
+                            $is_mostly_text = !preg_match('/^\s*\d+\s*(PL|SWS)?\s*$/i', $nxt)
+                                && !preg_match('/^\s*\d+\/\d+/', $nxt)
+                                && preg_match('/[A-Za-zÄÖÜäöüß]{3,}/u', $nxt)
+                                && mb_strlen($nxt) < 200;
+                            if($looks_truncated && $is_mostly_text) {
+                                $name = trim($name.' '.$nxt);
                                 $i++;
                                 continue;
                             }
