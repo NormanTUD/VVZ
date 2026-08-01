@@ -811,6 +811,35 @@ $ls = array(
 $det = soi_detect_voraussetzungen_for_modul($ls['B1'], $ls);
 is_equal("detect: Language Skills → Vorgänger", count($det), 1);
 
+/* ============================ Modulnummer-Continuation mit Digits ============================ */
+
+/* Regression: KathTh-BM1/KathTh-BM2 wurde als "KathTh-BM" geparst, weil der
+ * Continuation-Check reine Ziffern ausschloss. */
+if($has_pdf) {
+	$txt = "Anlage 1:
+Modulbeschreibungen
+
+KathTh-BM-        Name eins              Prof. Dr. X
+1                 Modulname 1
+                  Beschreibung
+KathTh-BM-        Name zwei              Prof. Dr. Y
+2                 Modulname 2
+                  Beschreibung
+
+Anlage 2:
+Studienablaufplan";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseModulesFromText($text);
+	$codes = array_map(function($m) { return $m['modulnummer']; }, $mods);
+	is_equal("Continuation: 2 Module erkannt", count($mods), 2);
+	is_equal("Continuation: KathTh-BM1 vollständig", in_array('KathTh-BM1', $codes), true);
+	is_equal("Continuation: KathTh-BM2 vollständig", in_array('KathTh-BM2', $codes), true);
+	// Kein "KathTh-BM-" ohne Suffix
+	is_equal("Continuation: kein abgeschnittener Code",
+		in_array('KathTh-BM-', $codes) || in_array('KathTh-BM', $codes), false);
+}
+
 /* ============================ find_anlage2 Edge-Cases ============================ */
 
 is_equal("find_anlage2: leeres Array → null", soi_find_anlage2_for_modul(array(), 'X'), null);
