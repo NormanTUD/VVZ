@@ -1303,28 +1303,40 @@ class SoiExtractor {
         };
 
         // Hilfsfunktion: Extrahiere PL-Marker aus Zeile (alle "N PL" oder "PL").
+        // ACHTUNG: Wir wollen NICHT "10\nPL" als "10 PL" interpretieren — daher matchen
+        // wir pro Zeile (mit /m Flag, das ^ und $ Zeilen-Anker macht).
         $extract_pl = function($line) {
-            // Variante 1: "N PL" mit Ziffer davor (Anzahl PLs)
-            if(preg_match_all('/(\d+)\s*PL\*?\b/i', $line, $m)) {
+            // Variante 1: "N PL" mit Ziffer davor (gleiche Zeile).
+            if(preg_match_all('/^(\d+)\s*PL\*?\b/im', $line, $m)) {
                 return array_map('intval', $m[1]);
             }
-            // Variante 2: nur "PL" ohne Ziffer → 1 PL annehmen.
-            if(preg_match('/\bPL\*?\b/i', $line)) return [1];
+            // Variante 2: nur "PL" ohne Ziffer (gleiche Zeile) → 1 PL annehmen.
+            if(preg_match_all('/^[^.\d]*?PL\*?\b/im', $line, $m)) {
+                $count = 0;
+                foreach($m[0] as $cell) {
+                    if(!preg_match('/\d/', $cell)) $count++;
+                }
+                if($count > 0) return array_fill(0, $count, 1);
+            }
             return [];
         };
 
         // Hilfsfunktion: Extrahiere LP (einzelne Zahl am Ende einer Zeile).
+        // LP ist die Zahl, die NICHT in einer SWS-Zelle (X/Y) und NICHT neben PL steht.
         $extract_lp = function($line) {
-            // Suche nach einer Zahl 1-200, die wie LP-Wert aussieht (am Zeilenende oder isoliert).
-            // Vermeide SWS-Zellen ("X/Y/Z") und PLs ("N PL").
-            $stripped = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b|\*+(?:\/\*+)*/', '', $line);
-            $stripped = preg_replace('/\d+\s*PL\*?\b/i', '', $stripped);
-            $stripped = trim($stripped);
-            if(preg_match('/(\d{1,3})\s*$/', $stripped, $m)) {
-                $val = (int)$m[1];
-                if($val >= 1 && $val <= 200) return $val;
+            $candidates = array();
+            foreach(preg_split('/\R/u', $line) as $line_i) {
+                // Vermeide SWS-Zellen und PL-Marker auf dieser Zeile.
+                $stripped = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b|\*+(?:\/\*+)*/', '', $line_i);
+                $stripped = preg_replace('/\b\d+\s*PL\*?/i', '', $stripped);
+                $stripped = trim($stripped);
+                if(preg_match('/\b(\d{1,3})\s*$/', $stripped, $m)) {
+                    $val = (int)$m[1];
+                    if($val >= 1 && $val <= 200) $candidates[] = $val;
+                }
             }
-            return null;
+            // Wenn mehrere LP-Werte gefunden wurden, nimm den letzten (typisch: am Zeilenende der Modul-Zeile).
+            return !empty($candidates) ? end($candidates) : null;
         };
 
         // Hilfsfunktion: Ist die Zeile ein Modulnummer-Header?
@@ -1434,6 +1446,8 @@ class SoiExtractor {
             if(preg_match('/Modul-?Nr\.|Modulname|V\/S\/T\/AK\/P/i', $trimmed) && mb_strlen($trimmed) < 100) {
                 continue;
             }
+            // Tabellen-Header "Modul-Nr." wird fälschlich als Code erkannt → explizit ausschließen.
+            if(preg_match('/^\s*Modul-?Nr\.\s*$/i', $trimmed)) continue;
             // Semester-Spalten-Header (1. Semester, 2. Semester, etc.)
             if(preg_match('/\d+\.\s*Semester/i', $trimmed)) {
                 continue;
@@ -1526,9 +1540,25 @@ class SoiExtractor {
         $valid = [];
         foreach($modules as $m) {
             $code = isset($m['modulnummer']) ? trim((string)$m['modulnummer']) : '';
+            $name = isset($m['name']) ? trim((string)$m['name']) : '';
             if($code === '' || strlen($code) < 5) continue;
             if(preg_match('/\s/', $code)) continue;
             if(!$this->isModulCode($code)) continue;
+            // Tabellenkopf "Modul-Nr." oder ähnliches explizit ausschließen.
+            if(stripos($code, 'modul') !== false) continue;
+            // Ausschluss: Modul-Nr. (Tabellenkopf), Typ-Bezeichner, Footer-Text.
+            if(stripos($name, 'Modul-Nr') !== false && strlen($name) < 100) continue;
+            if(stripos($name, 'Semesterwochenstunden') !== false
+                || stripos($name, 'Leistungspunkte') !== false
+                || stripos($name, 'V/S/T/AK/P') !== false
+                || stripos($name, 'V/S/T') !== false
+                || stripos($name, 'Prüfungsleistung gemäß') !== false
+                || stripos($name, 'Art der Lehrveranstaltung') !== false) continue;
+            // LP > 60 ist sehr ungewöhnlich für ein einzelnes Modul (typisch: 5-30).
+            $lp = isset($m['lp']) ? (int)$m['lp'] : 0;
+            if($lp > 60) continue;
+            // Sehr lange Namen sind oft Footer-/Legenden-Text.
+            if(mb_strlen($name) > 200) continue;
             $valid[] = $m;
         }
         return $valid;
