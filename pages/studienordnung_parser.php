@@ -72,15 +72,18 @@ class SoiExtractor {
      */
     public function extractAuto(string $pdf_path): array {
         $best = null;
-        $best_count = -1;
+        $best_score = -1;
         $results = [];
         foreach(['bbox', 'xml', 'html', 'layout', 'table', 'hybrid'] as $m) {
             try {
                 $r = $this->extract($pdf_path, $m);
                 $results[$m] = $r;
-                $c = is_array($r) && isset($r['modules']) ? count($r['modules']) : 0;
-                if($c > $best_count) {
-                    $best_count = $c;
+                // Score = modules + 2 * anlage2 (Anlage 2 ist die wertvollere Information).
+                $n_mod = is_array($r) && isset($r['modules']) ? count($r['modules']) : 0;
+                $n_a2 = is_array($r) && isset($r['anlage2']) ? count($r['anlage2']) : 0;
+                $score = $n_mod + (2 * $n_a2);
+                if($score > $best_score) {
+                    $best_score = $score;
                     $best = $r;
                     $best['method'] = $m;
                 }
@@ -89,7 +92,10 @@ class SoiExtractor {
             }
         }
         $best['_alternatives'] = array_map(function($r) {
-            return is_array($r) && isset($r['modules']) ? count($r['modules']) : (isset($r['error']) ? 'ERR: '.$r['error'] : 0);
+            if(!is_array($r)) return 0;
+            $n_mod = isset($r['modules']) ? count($r['modules']) : 0;
+            $n_a2 = isset($r['anlage2']) ? count($r['anlage2']) : 0;
+            return ['modules' => $n_mod, 'anlage2' => $n_a2];
         }, $results);
         return $best ?: ['error' => 'Keine Methode lieferte Ergebnisse'];
     }
@@ -102,8 +108,10 @@ class SoiExtractor {
         $out->method = $method;
 
         if($method === 'bbox') {
-            $out->full_text = shell_exec('pdftotext -bbox-layout '.escapeshellarg($pdf_path).' - 2>&1');
-            $out->words = $this->parseBboxHtml($out->full_text);
+            // full_text = layout-Output (für Regex-Parser), words = bbox-HTML-geparste Daten.
+            $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
+            $bbox_html = shell_exec('pdftotext -bbox-layout '.escapeshellarg($pdf_path).' - 2>&1');
+            $out->words = $this->parseBboxHtml((string)$bbox_html);
         } elseif($method === 'xml') {
             $tmp = tempnam(sys_get_temp_dir(), 'soixml_');
             if($tmp === false) {
@@ -117,6 +125,9 @@ class SoiExtractor {
             if($xml_content) {
                 $out->full_text = strip_tags($xml_content);
                 $out->elements = $this->parseXmlElements($xml_content);
+            } else {
+                // Fallback: layout-Text
+                $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
             }
         } elseif($method === 'html') {
             $tmp = tempnam(sys_get_temp_dir(), 'soihtml_');
@@ -129,21 +140,22 @@ class SoiExtractor {
             @unlink($tmp.'.html');
             if($html) {
                 $out->full_text = strip_tags($html);
+            } else {
+                $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
             }
         } elseif($method === 'layout') {
             $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
         } elseif($method === 'table') {
             $out->full_text = shell_exec('pdftotext -table '.escapeshellarg($pdf_path).' - 2>&1');
         } elseif($method === 'hybrid') {
-            // Load with layout (for full text)
+            // Layout-Text für Regex-Parser + bbox-Words für Tabellen-Extraktion.
             $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
-            // Also load with bbox for structured tables
             $bbox_html = shell_exec('pdftotext -bbox-layout '.escapeshellarg($pdf_path).' - 2>&1');
-            $out->words = $this->parseBboxHtml($bbox_html);
+            $out->words = $this->parseBboxHtml((string)$bbox_html);
         }
 
         // Split into pages (using form feed character)
-        $out->pages = explode("\f", $out->full_text);
+        $out->pages = explode("\f", (string)$out->full_text);
         return $out;
     }
 
@@ -212,24 +224,47 @@ class SoiExtractor {
     }
 
     /**
-     * Find the actual (non-TOC) occurrence of "Anlage X" by requiring the next text to be one of the expected labels.
+     * Find the actual (non-TOC) occurrence of "Anlage X" by requiring that one of the
+     * expected labels appears at the start of its own line shortly after the match.
+     *
+     * Reason: in pdftotext -layout output the TOC entry for "Anlage 2: Studienablaufplan"
+     * puts both phrases on the same logical line, separated by tabs. We must skip those.
      */
     private function findActualSectionStart(string $text, string $label, array $expected_next_lines): int {
         $offset = 0;
+        $best_pos = false;
         while(true) {
             $pos = mb_strpos($text, $label.':', $offset);
-            if($pos === false) return false;
-            // Check if the next non-empty line is one of expected labels
+            if($pos === false) break;
             $rest = mb_substr($text, $pos + mb_strlen($label) + 1);
-            $lines = preg_split('/\r\n|\r|\n/', $rest, 3);
-            $next_line = trim($lines[0] ?? '');
-            foreach($expected_next_lines as $exp) {
-                if(stripos($next_line, $exp) !== false) {
-                    return $pos;
+            $lines = preg_split('/\r\n|\r|\n/', $rest, 6);
+            foreach(array_slice($lines, 0, 5) as $idx => $line) {
+                $trimmed = trim($line);
+                if($trimmed === '') continue;
+                // Erwartet: "Studienablaufplan" steht am Zeilenanfang (allein oder mit Anlage 2: davor).
+                if($idx > 0) {
+                    foreach($expected_next_lines as $exp) {
+                        if(stripos($trimmed, $exp) !== false && preg_match('/^'.preg_quote($exp, '/').'/i', $trimmed)) {
+                            $best_pos = $pos;
+                            break 3;
+                        }
+                    }
                 }
+                // Wenn die erste nichtleere Zeile direkt mit dem erwarteten Label beginnt
+                // und das Label auf der gleichen Zeile wie "Anlage X:" steht → TOC-Eintrag → skip.
+                if($idx === 0) {
+                    foreach($expected_next_lines as $exp) {
+                        if(stripos($trimmed, $exp) !== false) {
+                            // Steht auf derselben Zeile wie "Anlage X:" → TOC.
+                            continue 2;
+                        }
+                    }
+                }
+                break; // Andere Zeile gefunden, die weder erwartet noch TOC ist.
             }
             $offset = $pos + 1;
         }
+        return $best_pos;
     }
 
     /**
@@ -261,12 +296,18 @@ class SoiExtractor {
         $known_labels = [
             'Qualifikationsziele', 'Inhalte',
             'Lehr- und Lernformen',
+            'Lehr- und',
+            'Lernformen',
             'Voraussetzungen für die Teilnahme',
             'Voraussetzungen',
-            'Verwendbarkeit',
             'Voraussetzungen für die Vergabe von Leistungspunkten',
+            'Voraussetzungen für',
+            'die Vergabe von',
+            'Leistungspunkten',
             'Leistungspunkte und Noten',
+            'Leistungspunkte',
             'Häufigkeit des Moduls',
+            'Häufigkeit des',
             'Arbeitsaufwand',
             'Dauer des Moduls',
         ];
@@ -281,8 +322,8 @@ class SoiExtractor {
             if($trimmed === '') continue;
 
             // Section headers like "1. Module des Kernbereichs"
-            if(preg_match('/^[12]\.\s+(Module\s+des\s+(?:Kern|Erg)/u', $trimmed)) {
-                $current_section = 'Kernbereich';
+            if(preg_match('/^[12]\.\s+(Module\s+des\s+(?:Kern|Erg))/u', $trimmed, $sm)) {
+                $current_section = (mb_stripos($sm[1], 'Erg') !== false) ? 'Ergänzungsbereich' : 'Kernbereich';
                 continue;
             }
             if(preg_match('/^[12]\.([0-9]+)\s+(.+)$/u', $trimmed, $m)) {
@@ -293,14 +334,34 @@ class SoiExtractor {
             // Table header
             if(preg_match('/^Modulnummer\s+Modulname/u', $trimmed)) continue;
 
-            // Module line: starts with modulnummer, then 2+ spaces, then name
+            // Module line: starts with modulnummer, then 2+ spaces, then name (and optional dozent).
             if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}(\S.{2,}?)\s{2,}(.+)$/u', $trimmed, $m)) {
                 if($this->isModulCode($m[1])) {
                     if($current) $modules[] = $current;
-                    $parts = preg_split('/\s{2,}/u', $m[3], 2);
-                    $name = $parts[0];
-                    $dozent = $parts[1] ?? '';
-                    // Strip trailing 3-digit number (sometimes left from year columns)
+                    $name = trim($m[2]);
+                    $dozent = trim($m[3]);
+                    // Name kann sich auf nächste Zeile fortsetzen (wrapped).
+                    $name_continued = '';
+                    while(isset($lines[$i+1])) {
+                        $nxt_raw = $lines[$i+1];
+                        $nxt = trim($nxt_raw);
+                        if($nxt === '') { $i++; continue; }
+                        // Stop, wenn die nächste Zeile ein Label, ein neuer Modulcode, eine Section,
+                        // eine Header-Zeile oder mit Whitespace eingerückt ist (Label-typisch).
+                        if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt)) break;
+                        if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}/u', $nxt, $cm) && $this->isModulCode($cm[1])) break;
+                        if(preg_match('/^[12]\.\s+/u', $nxt)) break;
+                        if(preg_match('/^Modulnummer\b/u', $nxt)) break;
+                        // Eingerückte Zeilen mit nur Text → Name-Continuation.
+                        if(strlen($nxt_raw) > 0 && $nxt_raw[0] === ' ' && strpos($nxt_raw, ' ') !== strlen(trim($nxt_raw))) {
+                            // Sieht aus wie ein eingerückter Wert (Label-Spalte).
+                            break;
+                        }
+                        $name_continued .= ' ' . $nxt;
+                        $i++;
+                    }
+                    if($name_continued !== '') $name = trim($name.' '.$name_continued);
+                    // Trailing junk entfernen (3+ aufeinanderfolgende Ziffern = Seitenzahl-Rest).
                     $name = preg_replace('/\s+\d{3,4}$/', '', $name);
                     $current = [
                         'modulnummer' => $m[1],
@@ -336,8 +397,8 @@ class SoiExtractor {
                 }
                 $current['fields'][$label] = trim($value);
                 // Extract specific values
-                if($label === 'Leistungspunkte und Noten') {
-                    if(preg_match('/(\d+)\s*Leistungspunkt/u', $value, $lm)) {
+                if($label === 'Leistungspunkte und Noten' || $label === 'Leistungspunkte') {
+                    if(preg_match('/(\d+)\s*Leistungspunkte/u', $value, $lm)) {
                         $current['lp'] = (int)$lm[1];
                     }
                 }
@@ -346,15 +407,20 @@ class SoiExtractor {
                         $current['dauer_semester'] = (int)$dm[1];
                     }
                 }
-                if($label === 'Lehr- und Lernformen' && !isset($current['fields']['Lehr- und'])) {
-                    // Lehrformen can be in "Lehr- und\nLernformen" or single line
-                    if(preg_match_all('/(\d+(?:[.,]\d+)?)\s*SWS/u', $value, $swsm)) {
+                if($label === 'Lehr- und Lernformen' || $label === 'Lehr- und' || $label === 'Lernformen') {
+                    // Wert wird ggf. unten noch um Folgezeilen erweitert; prüfe auch $current['fields']['Lehr- und'].
+                    $ll = $value;
+                    if(isset($current['fields']['Lernformen'])) $ll .= ' '.$current['fields']['Lernformen'];
+                    if(preg_match_all('/(\d+(?:[.,]\d+)?)\s*SWS/u', $ll, $swsm)) {
                         $sum = 0.0;
                         foreach($swsm[1] as $v) { $sum += (float)str_replace(',', '.', $v); }
                         $current['sws_total'] = $sum;
                     }
                 }
-                if($label === 'Voraussetzungen für die Vergabe von Leistungspunkten') {
+                if($label === 'Voraussetzungen für die Vergabe von Leistungspunkten'
+                    || $label === 'Voraussetzungen für'
+                    || $label === 'die Vergabe von'
+                    || $label === 'Leistungspunkten') {
                     $candidates = ['Klausurarbeit','Klausur','Mündliche Prüfung','mündliche Prüfung','Referat','Protokoll','Hausarbeit','Seminararbeit','Essay','Portfolio','Bericht','Vortrag','Thesenpapier','Bibliographie','Exposé','Rezension','Bachelorarbeit','Masterarbeit','Kolloquium'];
                     foreach($candidates as $cand) {
                         if(mb_stripos($value, $cand) !== false) {
@@ -429,23 +495,28 @@ class SoiExtractor {
         $words = $text->words;
         if(empty($words)) return [];
 
-        // Find Anlage 2 pages
-        $a2_pages = [];
-        $current_page = 0;
-        $in_a2 = false;
+        // Gruppiere Wörter nach Seite.
+        $by_page = [];
         foreach($words as $w) {
-            if($w['page'] != $current_page) {
-                $current_page = $w['page'];
-                $in_a2 = false;
+            if(!isset($by_page[$w['page']])) $by_page[$w['page']] = [];
+            $by_page[$w['page']][] = $w;
+        }
+        ksort($by_page, SORT_NUMERIC);
+
+        // Finde Seiten, auf denen "Anlage" UND "Studienablaufplan" als getrennte Wörter stehen
+        // (= echter Section-Header). Verhindert, dass der TOC-Eintrag auf Seite 1 als Start
+        // erkannt wird.
+        $a2_pages = [];
+        foreach($by_page as $page_num => $page_words) {
+            $has_anlage = false;
+            $has_studienablaufplan = false;
+            foreach($page_words as $w) {
+                $t = strtolower(trim($w['text']));
+                if($t === 'anlage') $has_anlage = true;
+                if($t === 'studienablaufplan') $has_studienablaufplan = true;
             }
-            if(!$in_a2) {
-                if(strtolower($w['text']) === 'studienablaufplan') {
-                    $in_a2 = true;
-                }
-            }
-            if($in_a2) {
-                if(!isset($a2_pages[$w['page']])) $a2_pages[$w['page']] = [];
-                $a2_pages[$w['page']][] = $w;
+            if($has_anlage && $has_studienablaufplan) {
+                $a2_pages[$page_num] = $page_words;
             }
         }
 
@@ -466,42 +537,75 @@ class SoiExtractor {
     }
 
     /**
-     * Detect column boundaries from x positions of words.
+     * Detect column boundaries from x positions of words using a histogram-based approach.
      * Returns array of columns sorted by left position.
+     *
+     * Algorithm:
+     *  1. Build a histogram of x positions (bin size = 15 pt).
+     *  2. Find local minima ("valleys") where word density drops sharply (< 30% of max).
+     *  3. Each valley is a column boundary.
+     *  4. Merge columns that are closer than 30 pt.
      */
     public function detectColumns(array $words): array {
-        // Get x positions
         $positions = [];
         foreach($words as $w) {
-            // Only meaningful words (skip pure numbers, very short)
             $text = trim($w['text']);
-            if(mb_strlen($text) < 2) continue;
-            $positions[] = $w['x'];
+            if(mb_strlen($text) < 1) continue;
+            $positions[] = (int)$w['x'];
         }
         if(empty($positions)) return [];
 
-        sort($positions);
-        // Cluster: positions within 10 units are in the same column
-        $cols = [];
-        $current_col_start = $positions[0];
-        $current_col_end = $positions[0];
+        // Histogramm mit Bin-Größe 15 pt.
+        $bin_size = 15;
+        $min_x = min($positions);
+        $max_x = max($positions);
+        $bins = [];
         foreach($positions as $p) {
-            if($p - $current_col_end < 8) {
-                $current_col_end = max($current_col_end, $p);
+            $bin = intdiv($p - $min_x, $bin_size);
+            if(!isset($bins[$bin])) $bins[$bin] = 0;
+            $bins[$bin]++;
+        }
+        if(empty($bins)) return [];
+
+        $max_bin = max($bins);
+        // Schwelle: 30% des Maximums. Niedriger = mehr "leere" Spalten = mehr Splits.
+        $threshold = max(2, (int)floor($max_bin * 0.30));
+
+        $cols = [];
+        $current_col_start = $min_x;
+        $current_col_end = $min_x;
+        $in_col = false;
+        $sorted_bins = array_keys($bins);
+        sort($sorted_bins);
+        foreach($sorted_bins as $bin) {
+            $bin_start = $min_x + $bin * $bin_size;
+            $bin_end = $bin_start + $bin_size;
+            $is_dense = ($bins[$bin] >= $threshold);
+            if($is_dense) {
+                if($in_col) {
+                    $current_col_end = $bin_end;
+                } else {
+                    if($current_col_start < $current_col_end) {
+                        $cols[] = ['left' => $current_col_start, 'right' => $current_col_end, 'center' => ($current_col_start + $current_col_end) / 2];
+                    }
+                    $current_col_start = $bin_start;
+                    $current_col_end = $bin_end;
+                    $in_col = true;
+                }
             } else {
-                $cols[] = ['left' => $current_col_start, 'right' => $current_col_end + 50, 'center' => ($current_col_start + $current_col_end) / 2];
-                $current_col_start = $p;
-                $current_col_end = $p;
+                $in_col = false;
             }
         }
-        $cols[] = ['left' => $current_col_start, 'right' => $current_col_end + 50, 'center' => ($current_col_start + $current_col_end) / 2];
+        if($current_col_start < $current_col_end) {
+            $cols[] = ['left' => $current_col_start, 'right' => $current_col_end, 'center' => ($current_col_start + $current_col_end) / 2];
+        }
 
-        // Merge columns that are too close (within 15 units of each other)
+        // Spalten, die näher als 30 pt beieinander liegen, zusammenführen.
         $merged = [];
         foreach($cols as $c) {
             if(empty($merged)) { $merged[] = $c; continue; }
             $last = &$merged[count($merged)-1];
-            if($c['left'] - $last['right'] < 15) {
+            if($c['left'] - $last['right'] < 30) {
                 $last['right'] = max($last['right'], $c['right']);
                 $last['center'] = ($last['left'] + $last['right']) / 2;
             } else {

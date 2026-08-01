@@ -1030,6 +1030,7 @@ $pure_test_files = array(
 	"test_more_functions.php",
 	"test_icon_helpers.php",
 	"test_extra_coverage.php",
+	"test_soi_parser.php",
 );
 
 foreach ($pure_test_files as $file) {

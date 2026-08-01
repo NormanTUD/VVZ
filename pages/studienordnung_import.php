@@ -376,7 +376,24 @@
 			// Übersicht der bisherigen Importe
 			$query = 'SELECT `id`, `filename`, `imported_at`, `program_name`, `degree`, `modules_found`, `modules_imported`, `pruefungsnummern_imported` FROM `studienordnung_import` ORDER BY `imported_at` DESC LIMIT 50';
 			$result = rquery($query);
+
+			// Fehlende externe Tools melden (pdftotext, pdftohtml, pdftoppm).
+			$missing_tools = soi_check_tools();
 ?>
+			<?php if(!empty($missing_tools)): ?>
+				<div class="class_red" style="padding:12px; border:2px solid #c00; margin:12px 0; background:#fee;">
+					<b>PDF-Extraktion nicht möglich:</b> Auf dem Server fehlt
+					<?php print htmlentities(implode(', ', $missing_tools)); ?>.
+					Bitte installieren Sie <b>poppler-utils</b>:
+					<ul style="margin:6px 0 0 24px;">
+						<li>Debian/Ubuntu: <code>apt-get install poppler-utils</code></li>
+						<li>Fedora/RHEL: <code>dnf install poppler-utils</code></li>
+						<li>Alpine: <code>apk add poppler-utils</code></li>
+						<li>macOS (Homebrew): <code>brew install poppler</code></li>
+					</ul>
+					Ohne diese Tools können Studienordnungen nicht analysiert werden.
+				</div>
+			<?php endif; ?>
 			<h2>Studienordnung (PDF) hochladen</h2>
 			<p>Hier kann eine Studienordnung (PDF) hochgeladen werden. Das System extrahiert automatisch Modulnummer, Modulname, ECTS-Leistungspunkte, Prüfungstypen und Studienverlauf (Anlage 2) und legt diese in der Datenbank an. Die Verarbeitung erfolgt live: nach der Auswahl der Datei wird sofort eine Vorschau mit allen erkannten Daten und Seitenvorschauen angezeigt.</p>
 			<form id="soi_upload_form" enctype="multipart/form-data" action="admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=upload&ajax=1" method="post">
@@ -1156,6 +1173,12 @@
 									$modul_id = (int)$mod_row;
 									$imported_modules++;
 
+									// Semester-Metadaten aus Anlage 2 persistieren.
+									$anlage2_match = soi_find_anlage2_for_modul($anlage2, $modulnummer);
+									if($anlage2_match) {
+										soi_persist_semester_metadata($modul_id, $anlage2_match);
+									}
+
 									if($commit_create_pns) {
 										$ptypes = isset($m_post['pruefungstypen']) && is_array($m_post['pruefungstypen']) ? $m_post['pruefungstypen'] : array('Klausurarbeit');
 										foreach($ptypes as $ptname) {
@@ -1274,9 +1297,13 @@
 			$reuse = get_post('reuse') ? 1 : 0;
 			$modules_post = get_post('modules') ?: array();
 
-			// Studiengang-ID aus Import holen
-			$row = get_single_row_from_query('SELECT studiengang_id FROM `studienordnung_import` WHERE id = '.esc($import_id));
-			$studiengang_id = (!is_null($row) && $row !== '' && $row !== false) ? (int)$row : 0;
+			// Studiengang-ID + Anlage 2 aus Import holen
+			$row = get_single_row_from_query_assoc('SELECT studiengang_id, notes FROM `studienordnung_import` WHERE id = '.esc($import_id));
+			$studiengang_id = (!is_null($row) && $row !== '' && $row !== false) ? (int)$row['studiengang_id'] : 0;
+			$notes_payload = (!is_null($row) && isset($row['notes'])) ? json_decode($row['notes'], true) : null;
+			$anlage2_rows = (is_array($notes_payload) && isset($notes_payload['anlage2']) && is_array($notes_payload['anlage2']))
+				? $notes_payload['anlage2']
+				: array();
 
 			if(!$studiengang_id) {
 				error('Import-Eintrag nicht gefunden.');
@@ -1284,6 +1311,7 @@
 				$imported_modules = 0;
 				$imported_pns = 0;
 				$seen_pns = array();
+				$semester_rows_written = 0;
 
 				foreach($modules_post as $idx => $m_post) {
 					if(empty($m_post['include'])) continue;
@@ -1306,6 +1334,15 @@
 					if(is_null($mod_row) || $mod_row === '' || $mod_row === false) continue;
 					$modul_id = (int)$mod_row;
 					$imported_modules++;
+
+					// Semester-Metadaten aus Anlage 2 persistieren.
+					$anlage2_match = soi_find_anlage2_for_modul($anlage2_rows, $modulnummer);
+					if($anlage2_match) {
+						if(isset($m_post['lp']) && $m_post['lp'] !== '' && is_numeric($m_post['lp'])) {
+							$anlage2_match['lp'] = (int)$m_post['lp'];
+						}
+						$semester_rows_written += soi_persist_semester_metadata($modul_id, $anlage2_match);
+					}
 
 					// Prüfungsnummern erzeugen
 					if($create_pns) {
@@ -1520,6 +1557,13 @@
 			$imported_pns = 0;
 			$seen_pns = array();
 			$messages = array();
+			$semester_rows_written = 0;
+
+			// Anlage-2-Rohtabelle aus notes-Payload laden (für Semester-Metadaten).
+			$notes_payload = json_decode($import_row['notes'] ?? '', true);
+			$anlage2_rows = (is_array($notes_payload) && isset($notes_payload['anlage2']) && is_array($notes_payload['anlage2']))
+				? $notes_payload['anlage2']
+				: array();
 
 			foreach($modules_in as $idx => $m) {
 				if(!is_array($m)) continue;
@@ -1543,6 +1587,16 @@
 				}
 				$modul_id = (int)$mod_row;
 				$imported_modules++;
+
+				// Semester-Metadaten aus Anlage 2 persistieren, falls vorhanden.
+				$anlage2_match = soi_find_anlage2_for_modul($anlage2_rows, $modulnummer);
+				if($anlage2_match) {
+					// Falls Frontend explizit ein lp sendet, das bevorzugen.
+					if(isset($m['lp']) && $m['lp'] !== '' && is_numeric($m['lp'])) {
+						$anlage2_match['lp'] = (int)$m['lp'];
+					}
+					$semester_rows_written += soi_persist_semester_metadata($modul_id, $anlage2_match);
+				}
 
 				if($create_pns) {
 					$ptypes = array();
@@ -1573,6 +1627,7 @@
 				'import_id' => $import_id,
 				'modules_imported' => $imported_modules,
 				'pruefungsnummern_imported' => $imported_pns,
+				'semester_metadata_rows' => $semester_rows_written,
 				'studiengang_id' => $studiengang_id,
 				'messages' => $messages,
 			), JSON_UNESCAPED_UNICODE);
