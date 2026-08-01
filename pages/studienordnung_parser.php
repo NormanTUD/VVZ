@@ -1280,156 +1280,236 @@ class SoiExtractor {
         $modules = [];
         $current = null;
         $current_section = 'Kernbereich';
+        $current_block_lines = [];  // Sammelt alle Zeilen, die zur aktuellen Zeile gehören
 
-        // Define column structure for splitting by whitespace
-        foreach($lines as $line) {
+        // Hilfsfunktion: Extrahiere SWS-Zellen aus einer Zeile (alle "X/Y/Z/W"-Sequenzen).
+        $extract_sws = function($line) {
+            $out = [];
+            if(preg_match_all('/\b\d+\/\d+(?:\/\d+)*\b|\*+(?:\/\*+)*/', $line, $m)) {
+                foreach($m[0] as $cell) {
+                    if(substr_count($cell, '*') > 0) {
+                        // Wildcard → als SWS mit Sternchen markieren
+                        $parts = explode('/', $cell);
+                        if(count($parts) === 1 && strpos($cell, '*') !== false) {
+                            $parts = array_fill(0, 4, '*');
+                        }
+                        $out[] = $parts;
+                    } else {
+                        $out[] = explode('/', $cell);
+                    }
+                }
+            }
+            return $out;
+        };
+
+        // Hilfsfunktion: Extrahiere PL-Marker aus Zeile (alle "N PL" oder "PL").
+        $extract_pl = function($line) {
+            // Variante 1: "N PL" mit Ziffer davor (Anzahl PLs)
+            if(preg_match_all('/(\d+)\s*PL\*?\b/i', $line, $m)) {
+                return array_map('intval', $m[1]);
+            }
+            // Variante 2: nur "PL" ohne Ziffer → 1 PL annehmen.
+            if(preg_match('/\bPL\*?\b/i', $line)) return [1];
+            return [];
+        };
+
+        // Hilfsfunktion: Extrahiere LP (einzelne Zahl am Ende einer Zeile).
+        $extract_lp = function($line) {
+            // Suche nach einer Zahl 1-200, die wie LP-Wert aussieht (am Zeilenende oder isoliert).
+            // Vermeide SWS-Zellen ("X/Y/Z") und PLs ("N PL").
+            $stripped = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b|\*+(?:\/\*+)*/', '', $line);
+            $stripped = preg_replace('/\d+\s*PL\*?\b/i', '', $stripped);
+            $stripped = trim($stripped);
+            if(preg_match('/(\d{1,3})\s*$/', $stripped, $m)) {
+                $val = (int)$m[1];
+                if($val >= 1 && $val <= 200) return $val;
+            }
+            return null;
+        };
+
+        // Hilfsfunktion: Ist die Zeile ein Modulnummer-Header?
+        // Modulnummer steht am Zeilenanfang (mit optionalem führenden Whitespace bis max 8 Zeichen).
+        $is_modul_header = function($line) use (&$is_modul_header) {
+            // Pattern: optional 1-8 spaces, dann Modulnummer mit optionalem internen Space
+            // (z.B. "EM 1"), dann gefolgt von Whitespace oder Zeilenende.
+            // Akzeptiert auch Codes, die mit Bindestrich enden (wrapped).
+            if(preg_match('/^(\s{0,8})([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)(?=\s|$)/u', $line, $m)) {
+                $raw_code = $m[2];
+                if(substr_count($raw_code, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw_code)) {
+                    $raw_code = preg_replace('/\s+/', '', $raw_code);
+                }
+                if($this->isModulCode($raw_code)) return $raw_code;
+                if(substr($raw_code, -1) === '-' && strlen($raw_code) >= 5 && preg_match('/^[A-Z]+(-[A-Z0-9]{1,4}){1,5}-$/', $raw_code)) {
+                    return $raw_code;
+                }
+            }
+            return false;
+        };
+
+        // Hilfsfunktion: Verarbeite die gesammelten Block-Zeilen einer Zeile.
+        $process_block = function() use (&$current, &$modules, &$current_block_lines, &$current_section, $extract_sws, $extract_pl, $extract_lp) {
+            if(empty($current_block_lines) || $current === null) return;
+            $joined = implode("\n", $current_block_lines);
+
+            // SWS-Zellen extrahieren (in Reihenfolge des Vorkommens).
+            $sws_cells = $extract_sws($joined);
+            if(!empty($sws_cells)) {
+                foreach($sws_cells as $idx => $sws) {
+                    if(!isset($current['semester'][$idx])) {
+                        $current['semester'][$idx] = ['semester' => $idx + 1, 'sws' => $sws, 'pl_count' => 0];
+                    } else {
+                        $current['semester'][$idx]['sws'] = $sws;
+                    }
+                }
+            }
+
+            // PL-Marker extrahieren.
+            $pl_values = $extract_pl($joined);
+            $n_sem = count($current['semester']);
+            $n_pl = count($pl_values);
+            if($n_pl > 0) {
+                if($n_sem === 0) {
+                    // Keine SWS-Zelle: nimm an, das PL gehört zum letzten Semester oder erstelle neues.
+                    $current['semester'][] = ['semester' => max(1, $n_pl), 'sws' => [], 'pl_count' => $pl_values[0]];
+                } else {
+                    // Verteile PLs rückwärts auf die Semester (typisch: PL steht rechts neben Semester).
+                    for($k = 0; $k < $n_pl && $k < $n_sem; $k++) {
+                        $idx = $n_sem - 1 - $k;
+                        $current['semester'][$idx]['pl_count'] = max(
+                            $current['semester'][$idx]['pl_count'],
+                            $pl_values[$n_pl - 1 - $k]
+                        );
+                    }
+                }
+            }
+
+            // LP extrahieren (nur wenn noch nicht gesetzt).
+            if($current['lp'] === null) {
+                $lp = $extract_lp($joined);
+                if($lp !== null) $current['lp'] = $lp;
+            }
+
+            // Name: alles was nicht SWS/PL/LP ist und nicht der Modulnummer entspricht.
+            $name_text = $joined;
+            // Entferne die Modulnummer-Zeile (falls vorhanden).
+            $name_text = preg_replace('/^.{0,80}' . preg_quote($current['modulnummer'], '/') . '.*$/m', '', $name_text);
+            // SWS-Zellen entfernen.
+            $name_text = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b|\*+(?:\/\*+)*/', ' ', $name_text);
+            // PL-Marker entfernen (mit oder ohne Zahl davor).
+            $name_text = preg_replace('/\b\d+\s*PL\*?\b/i', ' ', $name_text);
+            $name_text = preg_replace('/\bPL\*?\b/', ' ', $name_text);
+            // LP am Zeilenende entfernen (Zahl am Zeilenende, klein genug für LP).
+            $name_text = preg_replace('/\s+\d{1,3}\s*$/m', ' ', $name_text);
+            // SWS-Bemerkungen wie "2 SWS", "1 SWS" entfernen.
+            $name_text = preg_replace('/\b\d+\s*SWS\*?\b/i', ' ', $name_text);
+            $name_text = trim($name_text);
+            // Multi-line → single-line (Space-getrennt).
+            $name_text = preg_replace('/\s+/u', ' ', $name_text);
+            if($name_text !== '' && empty($current['name'])) {
+                $current['name'] = $name_text;
+            }
+        };
+
+        foreach($lines as $i => $line) {
             $trimmed = trim($line);
             if($trimmed === '') continue;
+
             // Section headers
             if(preg_match('/^1\.\s+Erg/u', $trimmed) || preg_match('/^2\.\s+Erg/u', $trimmed)) {
+                $process_block();
+                $current_block_lines = [];
+                if($current) { $modules[] = $current; $current = null; }
                 $current_section = 'Ergänzungsbereich';
                 continue;
             }
             if(preg_match('/^\d\.\d+\s+(.+)$/u', $trimmed, $m)) {
+                $process_block();
+                $current_block_lines = [];
+                if($current) { $modules[] = $current; $current = null; }
                 $current_section = trim($m[1]);
                 continue;
             }
-            // Modulnumber starts a new module entry
-            // Pattern: <code>   <name>...   <SWS cells>...   <LP>
-            // Modulnumber starts at column 0 with code pattern, then ≥2 spaces.
-            // Akzeptiert auch Codes, die mit "-" enden (werden unten fortgesetzt).
-            if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}(.+)$/u', $trimmed, $m)) {
-                $code_candidate = $m[1];
-                if(substr_count($code_candidate, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $code_candidate)) {
-                    $code_candidate = preg_replace('/\s+/', '', $code_candidate);
-                }
-                $is_valid = $this->isModulCode($code_candidate);
-                // Akzeptiere auch Codes, die mit Bindestrich enden, wenn der Code dem
-                // TU-Standard entspricht (3-4 Buchstaben-Segmente durch Bindestriche getrennt,
-                // mind. 2 Segmente, endet mit Bindestrich).
-                $is_potential_wrap = !$is_valid && substr($code_candidate, -1) === '-'
-                    && preg_match('/^[A-Z]+(-[A-Z0-9]{1,4}){1,5}-$/', $code_candidate);
-                if($is_valid || $is_potential_wrap) {
-                    if($current) $modules[] = $current;
-                    $current = $this->parseAnlage2Row($code_candidate, $m[2], $current_section);
-                    continue;
-                }
+
+            // Tabellen-Header (Modul-Nr., Modulname, etc.) → ignorieren
+            if(preg_match('/Modul-?Nr\.|Modulname|V\/S\/T\/AK\/P/i', $trimmed) && mb_strlen($trimmed) < 100) {
+                continue;
             }
-            // Modulnummer-Continuation: Code endet mit "-", erstes Token der Zeile ist kurz + alphanumerisch (+ . * -).
-            // Reine Zahlen (z.B. LP-Wert) zählen NICHT als Modulnummer-Fortsetzung.
+            // Semester-Spalten-Header (1. Semester, 2. Semester, etc.)
+            if(preg_match('/\d+\.\s*Semester/i', $trimmed)) {
+                continue;
+            }
+            // LP-Spalten-Header
+            if(preg_match('/^\(?M\)?\s*$|^\(?Mobilit/i', $trimmed)) continue;
+
+            // Modulnummer-Header?
+            $modul_code = $is_modul_header($line);
+            if($modul_code !== false) {
+                // Vorherigen Block abschließen.
+                $process_block();
+                $current_block_lines = [];
+
+                // Neuen Moduleintrag anlegen.
+                if($current) $modules[] = $current;
+                $current = [
+                    'modulnummer' => $modul_code,
+                    'name' => '',
+                    'lp' => null,
+                    'semester' => [],
+                    'section' => $current_section,
+                ];
+                // Rest der Zeile (alles nach dem Code) zur Block-Sammlung. Wir versuchen
+                // verschiedene Position-Suchen: zuerst mit Space (für "VM 2" Pattern), dann
+                // ohne Space, dann einfach alles nach den ersten 8 Zeichen (falls Code mit Space
+                // irgendwo in der Mitte steht).
+                $after_code = '';
+                // Versuche: raw_code mit möglichen Space-Varianten finden.
+                if(preg_match('/^([A-Z][A-Za-z0-9.\-]+)\s([A-Z0-9.\-]+)$/', $modul_code, $rcm)) {
+                    $with_space = $rcm[1].' '.$rcm[2];
+                    $pos = strpos($line, $with_space);
+                    if($pos !== false) {
+                        $after_code = trim(substr($line, $pos + strlen($with_space)));
+                    }
+                }
+                if($after_code === '') {
+                    $pos = strpos($line, $modul_code);
+                    if($pos !== false) {
+                        $after_code = trim(substr($line, $pos + strlen($modul_code)));
+                    }
+                }
+                $after_code = preg_replace('/^\s+/u', '', $after_code);
+                if($after_code !== '') $current_block_lines[] = $after_code;
+                continue;
+            }
+
+            // Modulnummer-Continuation (Code endet mit "-")
             if($current && substr($current['modulnummer'], -1) === '-') {
                 $first_token = strtok($trimmed, " \t");
                 if($first_token !== false
-                    && preg_match('/^[A-Za-z0-9.*\-]+$/u', $first_token)
-                    && mb_strlen($first_token) < 20
+                    && preg_match('/^[A-Za-z0-9.\-]+$/u', $first_token)
+                    && mb_strlen($first_token) < 25
                     && !preg_match('/^\d+$/', $first_token)) {
                     $current['modulnummer'] .= $first_token;
-                    // Verarbeite den Rest der Zeile manuell (gleiche Logik wie unten für
-                    // Name-Continuation, PL- und SWS-Zellen).
                     $rest = trim(substr($trimmed, mb_strlen($first_token)));
-                    if($rest !== '') {
-                        // PL-Zellen extrahieren.
-                        if(preg_match_all('/(\d+)\s*PL\b/i', $rest, $plm)) {
-                            $pl_values = array_map('intval', $plm[1]);
-                            $n_sem = count($current['semester']);
-                            $n_pl = count($pl_values);
-                            if($n_sem > 0 && $n_pl > 0) {
-                                for($k = 0; $k < $n_pl && $k < $n_sem; $k++) {
-                                    $idx = $n_sem - 1 - $k;
-                                    $current['semester'][$idx]['pl_count'] = max(
-                                        $current['semester'][$idx]['pl_count'],
-                                        $pl_values[$n_pl - 1 - $k]
-                                    );
-                                }
-                            }
-                        }
-                        // SWS-Zellen: wenn keine Semester existieren, neue anlegen.
-                        if(preg_match_all('/\b\d+\/\d+(?:\/\d+)*\b/', $rest, $swm)) {
-                            foreach($swm[0] as $idx => $swsc) {
-                                if(!isset($current['semester'][$idx])) {
-                                    $current['semester'][$idx] = ['semester' => $idx + 1, 'sws' => [], 'pl_count' => 0];
-                                }
-                                $current['semester'][$idx]['sws'] = explode('/', $swsc);
-                            }
-                        }
-                        // Alles, was nicht PL/SWS ist → an Name anhängen.
-                        $non_pl_sws = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b/', '', $rest);
-                        $non_pl_sws = preg_replace('/\b\d+\s*PL\b/i', '', $non_pl_sws);
-                        $non_pl_sws = trim($non_pl_sws);
-                        if($non_pl_sws !== '') {
-                            $current['name'] = trim(($current['name'] ?? '').' '.$non_pl_sws);
-                        }
-                    }
+                    if($rest !== '') $current_block_lines[] = $rest;
                     continue;
                 }
             }
-            // PL-Zeile: "X PL" oder "1 PL  2 PL"
-            if($current && preg_match('/^\s*(\d+)\s*PL\b/i', $trimmed)) {
-                // Mehrere PL pro Zeile möglich.
-                if(preg_match_all('/(\d+)\s*PL\b/i', $trimmed, $plm)) {
-                    $pl_values = array_map('intval', $plm[1]);
-                    $n_sem = count($current['semester']);
-                    $n_pl = count($pl_values);
-                    if($n_sem > 0 && $n_pl > 0) {
-                        // Verteile PLs auf die Semester, beginnend mit dem letzten.
-                        for($k = 0; $k < $n_pl && $k < $n_sem; $k++) {
-                            $idx = $n_sem - 1 - $k;
-                            $current['semester'][$idx]['pl_count'] = max(
-                                $current['semester'][$idx]['pl_count'],
-                                $pl_values[$n_pl - 1 - $k]
-                            );
-                        }
-                    }
-                }
-                continue;
-            }
-            // SWS-Continuation: Zeile enthält "/"-getrennte SWS-Werte.
-            if($current && preg_match('/^\s*[\d\/.]+\s*$/u', $trimmed) && count($current['semester']) > 0) {
-                $parts = preg_split('/\s+/u', trim($trimmed));
-                // Wenn die Zeile nur eine einzige Zahl ist (ohne "/") → LP.
-                if(count($parts) === 1 && preg_match('/^\d+$/', $parts[0])) {
-                    $current['lp'] = (int)$parts[0];
-                    continue;
-                }
-                // Sonst: SWS-Zellen anhängen.
-                $last_idx = count($current['semester']) - 1;
-                foreach($parts as $p) {
-                    if(preg_match('/^\d+\/\d+/', $p)) {
-                        $current['semester'][$last_idx]['sws'] = array_merge(
-                            $current['semester'][$last_idx]['sws'] ?? [],
-                            explode('/', $p)
-                        );
-                    } elseif(preg_match('/^[*]+$/', $p) || preg_match('/^[*]+\/[*]+/', $p)) {
-                        $current['semester'][$last_idx]['sws'] = array_merge(
-                            $current['semester'][$last_idx]['sws'] ?? [],
-                            explode('/', $p)
-                        );
-                    }
-                }
-                continue;
-            }
-            // Continuation line for current module's name
-            if($current && $trimmed !== '' && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer|Mindestens|Modulnummer)/u', $trimmed)) {
-                // Looks like a continuation of module name
-                $append = $trimmed;
-                $current['name'] = trim($current['name'].' '.$append);
-                continue;
-            }
+
+            // Alles andere → zur Block-Sammlung (Name + SWS + PL + LP)
+            $current_block_lines[] = $line;
         }
+        // Letzten Block verarbeiten.
+        $process_block();
         if($current) $modules[] = $current;
 
-        // Post-process: clean names
+        // Post-process: clean names und entferne offensichtliche Junk-Module.
         foreach($modules as &$m) {
-            // Remove trailing junk like "27" (page number) or "Bachelorarbeit" from name
-            if(preg_match('/^(.+?)\s+\d{1,3}$/', $m['name'], $nm)) {
-                // Only if the trailing number is small and looks like a page number
-                $last_num = (int)substr($m['name'], strrpos($m['name'], ' ')+1);
-                if($last_num < 250) {
-                    $m['name'] = $nm[1];
-                }
-            }
+            // Trailing junk entfernen
+            $m['name'] = trim(preg_replace('/\s+/', ' ', $m['name']));
+            // Sehr kurze Namen sind oft Header-Reste.
             $m['lp'] = $m['lp'] ?? null;
         }
+        unset($m);
         return $this->filterValidAnlage2($modules);
     }
 
