@@ -387,23 +387,36 @@ class SoiExtractor {
                             if($name !== '' && substr($name, -1) === '-' && preg_match('/^[a-zäöüß]/u', $nxt)) {
                                 $name = substr($name, 0, -1);
                             }
-                            // Dozent-Continuation: vorheriger Dozent endet mit "-" oder "(". → erste Spalte an
-                            // Dozent hängen, NUR wenn die Spalte wie eine Dozent-Fortsetzung aussieht
-                            // (startet mit Kleinbuchstabe oder mit einem typischen Email-Wort-Stück wie "ner.").
+                            // Dozent-Continuation: vorheriger Dozent endet mit "-" oder "(". → in dieser Zeile
+                            // können Name-Wrap (Spalte 1) und Dozent-Wrap (andere Spalten) gleichzeitig stehen.
                             if($dozent !== '' && (substr($dozent, -1) === '-' || substr($dozent, -1) === '(')) {
-                                $cont = trim((preg_split('/\s{2,}/u', $nxt, 2)[0] ?? $nxt));
-                                $looks_like_dozent_cont = $cont !== '' && (
-                                    preg_match('/^[a-zäöüß]/u', $cont)   // Kleinbuchstabe (z.B. "ner.", "geschäftsführender")
-                                    || preg_match('/^[\w\.\-]+@/u', $cont) // Email-Wort-Stück
-                                    || preg_match('/^(Böhmer|Peglau|Schwarke|Klinghardt|Walter|Bellini|Lieber|Tiller|Kupfer|Lenz|Häder|Boehmer|Mailbox)/u', $cont)
-                                );
-                                if($looks_like_dozent_cont) {
-                                    $dozent = trim($dozent.' '.$cont);
+                                // Suche in den 2+-Spalten-Segmenten der Zeile nach einem, das wie Dozent-Wrap
+                                // aussieht: enthält @, oder fängt mit einem Email-Fragment an.
+                                $segments = preg_split('/\s{2,}/u', $nxt);
+                                $name_cont = '';
+                                $dozent_cont = '';
+                                $found_dozent = false;
+                                foreach($segments as $seg) {
+                                    $seg = trim($seg);
+                                    if($seg === '') continue;
+                                    if(strpos($seg, '@') !== false) {
+                                        // Hat @ → Dozent-Wrap (Email-Continuation).
+                                        $dozent_cont .= ($dozent_cont ? ' ' : '').$seg;
+                                        $found_dozent = true;
+                                    } else {
+                                        // Kein @ → potentiell Name-Wrap.
+                                        $name_cont .= ($name_cont ? ' ' : '').$seg;
+                                    }
+                                }
+                                if($found_dozent) {
+                                    $dozent = trim($dozent.' '.$dozent_cont);
+                                    if($name_cont !== '') {
+                                        $name = trim($name.' '.$name_cont);
+                                    }
                                     $i++;
                                     continue;
                                 }
-                                // Sonst: das ist Name-Wrap, kein Dozent-Wrap. Wir machen weiter
-                                // mit dem normalen Name-Wrap-Pfad.
+                                // Sonst: das ist Name-Wrap. Wir machen weiter mit dem normalen Pfad.
                             }
                             // Wenn die Zeile einen Email in Klammern enthält: nur den Email-Teil übernehmen,
                             // den Rest (z.B. umgebrochener Modulname) an Name anhängen.
