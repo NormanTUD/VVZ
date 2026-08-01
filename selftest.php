@@ -274,6 +274,35 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 				} catch (\Throwable $e) { /* Migration nicht kritisch */ }
 			}
 
+			// modul_voraussetzung anlegen, falls noch nicht vorhanden (Aufbaumodule-Beziehungen).
+			if(table_exists($GLOBALS['dbname'], 'modul') && !table_exists($GLOBALS['dbname'], 'modul_voraussetzung')) {
+				try {
+					rquery("CREATE TABLE IF NOT EXISTS `modul_voraussetzung` (
+						`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+						`modul_id` int(10) unsigned NOT NULL,
+						`voraussetzung_modul_id` int(10) unsigned NOT NULL,
+						`import_id` int(10) unsigned DEFAULT NULL,
+						`typ` enum('empfohlen','pflicht','aufbauend') NOT NULL DEFAULT 'aufbauend',
+						`notiz` varchar(500) DEFAULT NULL,
+						PRIMARY KEY (`id`),
+						UNIQUE KEY `modul_voraussetzung_unique` (`modul_id`, `voraussetzung_modul_id`, `typ`),
+						KEY `voraussetzung_modul_id` (`voraussetzung_modul_id`),
+						KEY `import_id` (`import_id`),
+						CONSTRAINT `modul_voraussetzung_ibfk_1` FOREIGN KEY (`modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE,
+						CONSTRAINT `modul_voraussetzung_ibfk_2` FOREIGN KEY (`voraussetzung_modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE
+					) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+				} catch (\Throwable $e) { /* Tabelle ist optional */ }
+			}
+			// Foreign Key zu studienordnung_import erst nach Tabelle hinzufügen (Reihenfolge).
+			if(table_exists($GLOBALS['dbname'], 'modul_voraussetzung') && table_exists($GLOBALS['dbname'], 'studienordnung_import')) {
+				try {
+					$fk_exists = get_single_row_from_query("SELECT COUNT(*) FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = '".esc($GLOBALS['dbname'])."' AND TABLE_NAME = 'modul_voraussetzung' AND CONSTRAINT_NAME = 'modul_voraussetzung_ibfk_3'");
+					if((int)$fk_exists === 0) {
+						rquery("ALTER TABLE `modul_voraussetzung` ADD CONSTRAINT `modul_voraussetzung_ibfk_3` FOREIGN KEY (`import_id`) REFERENCES `studienordnung_import` (`id`) ON DELETE SET NULL");
+					}
+				} catch (\Throwable $e) { /* FK optional */ }
+			}
+
 			if(!table_exists_and_has_entries("page") && !already_initialized("page")) {
 				rquery(
 					"insert INTO `page` (id, name, file, show_in_navigation, parent, show_in_startpage) VALUES 

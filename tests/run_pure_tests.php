@@ -910,6 +910,20 @@ function multiple_esc_join ($data) {
 	}
 }
 
+// rquery mock: speichert alle SQL-Befehle in $GLOBALS['_soi_rquery_log'] für Test-Inspektion.
+$GLOBALS['_soi_rquery_log'] = array();
+function rquery ($sql) {
+	if(!isset($GLOBALS['_soi_rquery_log'])) $GLOBALS['_soi_rquery_log'] = array();
+	$GLOBALS['_soi_rquery_log'][] = (string)$sql;
+	// Simuliere, dass SELECTs nichts liefern — die Helper-Funktionen in studienordnung_import
+	// erwarten jedoch echte IDs zurück. Wir geben deshalb die letzte ID zurück, falls INSERT.
+	return 1;
+}
+
+// get_single_row_from_query mock: gibt null zurück, sofern nicht mit set_single_row_from_query überschrieben.
+function get_single_row_from_query ($sql) { return null; }
+function get_single_row_from_query_assoc ($sql) { return null; }
+
 function get_uni_name () {
 	return "db_vvz_".($GLOBALS["dbname"] ?? "test");
 }

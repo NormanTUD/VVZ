@@ -640,6 +640,22 @@ CREATE TABLE `einzelne_termine` (
   CONSTRAINT `modul_id_key` FOREIGN KEY (`modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
+'modul_voraussetzung' => 'create table if not exists `modul_voraussetzung` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `modul_id` int(10) unsigned NOT NULL,
+  `voraussetzung_modul_id` int(10) unsigned NOT NULL,
+  `import_id` int(10) unsigned DEFAULT NULL,
+  `typ` enum(\'empfohlen\',\'pflicht\',\'aufbauend\') NOT NULL DEFAULT \'aufbauend\',
+  `notiz` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `modul_voraussetzung_unique` (`modul_id`, `voraussetzung_modul_id`, `typ`),
+  KEY `voraussetzung_modul_id` (`voraussetzung_modul_id`),
+  KEY `import_id` (`import_id`),
+  CONSTRAINT `modul_voraussetzung_ibfk_1` FOREIGN KEY (`modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `modul_voraussetzung_ibfk_2` FOREIGN KEY (`voraussetzung_modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `modul_voraussetzung_ibfk_3` FOREIGN KEY (`import_id`) REFERENCES `studienordnung_import` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
+
 'customizations' => 'create table if not exists customizations (id int unsigned primary key AUTO_INCREMENT, humanname varchar(100), classname varchar(100), property varchar(100), val varchar(100), default_val varchar(100))',
 
 'initialized_db' => 'create table if not exists initialized_db (id int unsigned primary key AUTO_INCREMENT, name varchar(200) unique)',

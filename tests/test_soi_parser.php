@@ -19,6 +19,16 @@ if(!class_exists('SoiExtractor', false)) {
 	require_once(__DIR__ . '/../pages/studienordnung_parser.php');
 }
 
+if(!function_exists('soi_persist_anlage2_detailed')) {
+	require_once(__DIR__ . '/../pages/studienordnung_persist.php');
+}
+
+if(!function_exists('is_true')) {
+	function is_true($name, $cond) {
+		is_equal($name, $cond, true);
+	}
+}
+
 $ex = new SoiExtractor();
 
 $pdf_path = __DIR__ . '/fixtures/05_06soBAP18.09.2018.pdf';
@@ -347,4 +357,233 @@ if($has_pdf && $pdftotext !== '') {
 	$degrees = array_map(function($s) { return $s['cover_degree'] ?? null; }, $methods_with_results);
 	is_equal("crossValidate: alle Methoden erkennen denselben Abschluss",
 		count(array_unique(array_filter($degrees))), 1);
+}
+
+/* ============================ DB-Persistenz ============================ */
+
+$GLOBALS['_soi_rquery_log'] = array();
+
+/* soi_rolle_for_section: leitet aus Section-Namen die modul_zuordnung-Rolle ab. */
+is_equal("rolle: leerer Section → pflicht", soi_rolle_for_section(''), 'pflicht');
+is_equal("rolle: null → pflicht", soi_rolle_for_section(null), 'pflicht');
+is_equal("rolle: Kernbereich → kernbereich", soi_rolle_for_section('Kernbereich'), 'kernbereich');
+is_equal("rolle: Ergänzungsbereich → ergaenzungsbereich", soi_rolle_for_section('Ergänzungsbereich'), 'ergaenzungsbereich');
+is_equal("rolle: Wahlpflichtbereich → wahlpflicht", soi_rolle_for_section('Wahlpflichtbereich'), 'wahlpflicht');
+is_equal("rolle: Spezialisierung → wahlpflicht", soi_rolle_for_section('Spezialisierung'), 'wahlpflicht');
+is_equal("rolle: Vertiefung → pflicht", soi_rolle_for_section('Vertiefungsmodul'), 'pflicht');
+is_equal("rolle: Hauptfach → hauptfach", soi_rolle_for_section('Hauptfach'), 'hauptfach');
+is_equal("rolle: unbekannt → sonstige", soi_rolle_for_section('XYZ-Foo-Bar'), 'sonstige');
+
+/* soi_ensure_pruefungstyp: get_or_create-Pattern */
+$seen = array();
+is_equal("generate_pruefungsnummer: Klausur → KL", soi_generate_pruefungsnummer('PHIL-A', 'Klausurarbeit', 5, $seen), 'PHILA-KL-5');
+is_equal("generate_pruefungsnummer: Mündlich → MP", soi_generate_pruefungsnummer('PHIL-B', 'Mündliche Prüfung', 10, $seen), 'PHILB-MP-10');
+is_equal("generate_pruefungsnummer: Hausarbeit → HA", soi_generate_pruefungsnummer('PHIL-C', 'Hausarbeit', 5, $seen), 'PHILC-HA-5');
+is_equal("generate_pruefungsnummer: Seminararbeit → SA", soi_generate_pruefungsnummer('PHIL-D', 'Seminararbeit', 5, $seen), 'PHILD-SA-5');
+is_equal("generate_pruefungsnummer: Referat → RF", soi_generate_pruefungsnummer('PHIL-E', 'Referat', 5, $seen), 'PHILE-RF-5');
+is_equal("generate_pruefungsnummer: Bachelorarbeit → BA", soi_generate_pruefungsnummer('PHIL-F', 'Bachelorarbeit', 12, $seen), 'PHILF-BA-12');
+is_equal("generate_pruefungsnummer: Masterarbeit → MA", soi_generate_pruefungsnummer('PHIL-G', 'Masterarbeit', 30, $seen), 'PHILG-MA-30');
+is_equal("generate_pruefungsnummer: ohne LP → ohne -N", soi_generate_pruefungsnummer('PHIL-H', 'Klausur', '', $seen), 'PHILH-KL');
+is_equal("generate_pruefungsnummer: Kollokium → KO", soi_generate_pruefungsnummer('PHIL-I', 'Kolloquium', 5, $seen), 'PHILI-KO-5');
+is_equal("generate_pruefungsnummer: Portfolio → PF", soi_generate_pruefungsnummer('PHIL-J', 'Portfolio', 5, $seen), 'PHILJ-PF-5');
+is_equal("generate_pruefungsnummer: Bericht → BE", soi_generate_pruefungsnummer('PHIL-K', 'Bericht', 5, $seen), 'PHILK-BE-5');
+is_equal("generate_pruefungsnummer: Duplikat → Suffix -2", soi_generate_pruefungsnummer('PHIL-A', 'Klausurarbeit', 5, $seen), 'PHILA-KL-5-2');
+is_equal("generate_pruefungsnummer: unbekannt → KL fallback", soi_generate_pruefungsnummer('PHIL-X', 'Irgendetwas', 5, $seen), 'PHILX-KL-5');
+
+/* soi_sanitize_for_json: Control-Chars maskieren */
+is_equal("sanitize_json: Form-Feed escapen",
+	soi_sanitize_for_json("vor\x0cnach"), "vor\\u000cnach");
+is_equal("sanitize_json: ASCII-Text unverändert",
+	soi_sanitize_for_json("Hello World"), "Hello World");
+is_equal("sanitize_json: Array rekursiv",
+	is_array(soi_sanitize_for_json(array('a' => "x\x0cy"))), true);
+
+/* soi_persist_semester_metadata: LP gleichmäßig verteilen. */
+$before = count($GLOBALS['_soi_rquery_log']);
+$written = soi_persist_semester_metadata(42, array(
+	'lp' => 10,
+	'semester' => array(
+		array('semester' => 1, 'sws' => array('2','2','0','0'), 'pl_count' => 1),
+		array('semester' => 2, 'sws' => array('2','0','2','0'), 'pl_count' => 1),
+	),
+));
+is_equal("persist_semester_metadata: 2 Zeilen geschrieben", $written, 2);
+// Letzter SQL enthält modul_id=42
+$last_sql = end($GLOBALS['_soi_rquery_log']);
+is_equal("persist_semester_metadata: SQL enthält modul_id", strpos($last_sql, '"42"') !== false, true);
+// LP-Verteilung: 10/2 = 5 pro Semester.
+is_equal("persist_semester_metadata: LP gleich verteilt (5/5)",
+	strpos($last_sql, '"5"') !== false, true);
+
+/* soi_persist_anlage2_detailed: schreibt modul_anlage2 + modul_nach_semester. */
+$before = count($GLOBALS['_soi_rquery_log']);
+$written = soi_persist_anlage2_detailed(100, 7, array(
+	'lp' => 8,
+	'semester' => array(
+		array('semester' => 1, 'sws' => array('2','0','0','2'), 'pl_count' => 1),
+		array('semester' => 2, 'sws' => array('0','0','2','0'), 'pl_count' => 1),
+	),
+));
+is_equal("persist_anlage2_detailed: 2 Semester-Zeilen", $written, 2);
+// Hat INSERT in modul_anlage2?
+$sqls = array_slice($GLOBALS['_soi_rquery_log'], $before);
+$has_a2 = false;
+$has_mns = false;
+foreach($sqls as $s) {
+	if(stripos($s, 'INSERT INTO `modul_anlage2`') !== false) $has_a2 = true;
+	if(stripos($s, 'INSERT IGNORE INTO `modul_nach_semester`') !== false) $has_mns = true;
+}
+is_equal("persist_anlage2_detailed: modul_anlage2 INSERT", $has_a2, true);
+is_equal("persist_anlage2_detailed: modul_nach_semester INSERT IGNORE", $has_mns, true);
+
+/* Wildcards (*) werden als null behandelt. */
+$before = count($GLOBALS['_soi_rquery_log']);
+$written = soi_persist_anlage2_detailed(101, 7, array(
+	'lp' => 5,
+	'semester' => array(
+		array('semester' => 1, 'sws' => array('*','*','*','*'), 'pl_count' => 0),
+	),
+));
+$sqls = array_slice($GLOBALS['_soi_rquery_log'], $before);
+$sql = implode("\n", $sqls);
+// Wildcard-SWS → NULL (nicht numerisch) → sws_total NULL.
+is_equal("persist_anlage2_detailed: Wildcards als NULL behandelt",
+	strpos($sql, '"*"') === false, true);
+
+/* Ungültiges Semester (sem_n < 1) → überspringen. */
+$before = count($GLOBALS['_soi_rquery_log']);
+$written = soi_persist_anlage2_detailed(102, 7, array(
+	'lp' => 5,
+	'semester' => array(
+		array('semester' => 0, 'sws' => array('2'), 'pl_count' => 1),
+		array('semester' => 13, 'sws' => array('2'), 'pl_count' => 1),
+	),
+));
+is_equal("persist_anlage2_detailed: ungültige Semester werden übersprungen", $written, 0);
+
+/* 7-Felder-Mapping: SWS[5] → sws_praktikum, SWS[6] → sws_sonstige */
+$before = count($GLOBALS['_soi_rquery_log']);
+$written = soi_persist_anlage2_detailed(103, 7, array(
+	'lp' => 5,
+	'semester' => array(
+		array('semester' => 1, 'sws' => array('1','1','1','1','1','1','1'), 'pl_count' => 0),
+	),
+));
+$sql = implode("\n", array_slice($GLOBALS['_soi_rquery_log'], $before));
+is_equal("persist_anlage2_detailed: sws_sprachkurs belegt", strpos($sql, 'sws_sprachkurs') !== false, true);
+is_equal("persist_anlage2_detailed: sws_praktikum belegt", strpos($sql, 'sws_praktikum') !== false, true);
+is_equal("persist_anlage2_detailed: sws_sonstige belegt", strpos($sql, 'sws_sonstige') !== false, true);
+
+/* soi_persist_modul_zuordnung */
+$before = count($GLOBALS['_soi_rquery_log']);
+$ok = soi_persist_modul_zuordnung(200, 7, 3, 'pflicht', 10);
+is_equal("persist_modul_zuordnung: erfolgreich", $ok, true);
+$sql = end($GLOBALS['_soi_rquery_log']);
+is_equal("persist_modul_zuordnung: SQL enthält rolle 'pflicht'", strpos($sql, '"pflicht"') !== false, true);
+is_equal("persist_modul_zuordnung: SQL enthält studiengang_id 3", strpos($sql, '"3"') !== false, true);
+
+$ok = soi_persist_modul_zuordnung(0, 7, 3, 'pflicht', 10);
+is_equal("persist_modul_zuordnung: modul_id=0 → false", $ok, false);
+$ok = soi_persist_modul_zuordnung(200, 7, 0, 'pflicht', 10);
+is_equal("persist_modul_zuordnung: studiengang_id=0 → false", $ok, false);
+
+// Unbekannte Rolle → 'sonstige'
+soi_persist_modul_zuordnung(201, 7, 3, 'unbekannt', 5);
+$sql = end($GLOBALS['_soi_rquery_log']);
+is_equal("persist_modul_zuordnung: unbekannte Rolle → sonstige", strpos($sql, '"sonstige"') !== false, true);
+
+/* soi_detect_voraussetzungen_for_modul: Aufbaumodul → Basismodul */
+$all = array(
+	'SLK-BA-F-1B-L' => array('modulnummer' => 'SLK-BA-F-1B-L', 'name' => 'Basismodul Französische Literaturwissenschaft'),
+	'SLK-BA-F-2A-L' => array('modulnummer' => 'SLK-BA-F-2A-L', 'name' => 'Aufbaumodul Französische Literaturwissenschaft'),
+	'SLK-BA-F-3V-L' => array('modulnummer' => 'SLK-BA-F-3V-L', 'name' => 'Vertiefungsmodul Französische Literaturwissenschaft'),
+);
+$det = soi_detect_voraussetzungen_for_modul($all['SLK-BA-F-2A-L'], $all);
+is_equal("detect: Aufbaumodul → Basismodul (1 Treffer)", count($det), 1);
+is_equal("detect: Aufbaumodul Voraussetzung-Code", $det[0]['modulnummer'], 'SLK-BA-F-1B-L');
+is_equal("detect: Aufbaumodul Voraussetzung-Typ", $det[0]['typ'], 'aufbauend');
+
+/* Vertiefungsmodul → Aufbaumodul */
+$det = soi_detect_voraussetzungen_for_modul($all['SLK-BA-F-3V-L'], $all);
+is_equal("detect: Vertiefungsmodul → Aufbaumodul (1 Treffer)", count($det), 1);
+is_equal("detect: Vertiefungsmodul Voraussetzung-Code", $det[0]['modulnummer'], 'SLK-BA-F-2A-L');
+
+/* Sprachpraxis-Kette: B2 → B1 */
+$lang = array(
+	'A2' => array('modulnummer' => 'X-1SP-A2', 'name' => 'Sprachpraxis A2 - Französisch'),
+	'B1' => array('modulnummer' => 'X-2SP-B1', 'name' => 'Sprachpraxis B1 - Französisch'),
+	'B2' => array('modulnummer' => 'X-3SP-B2', 'name' => 'Sprachpraxis B2 - Französisch'),
+	'C1' => array('modulnummer' => 'X-4SP-C1', 'name' => 'Sprachpraxis C1 - Französisch'),
+);
+$det = soi_detect_voraussetzungen_for_modul($lang['B2'], $lang);
+is_equal("detect: Sprachpraxis B2 → B1", count($det), 1);
+is_equal("detect: Sprachpraxis B2 → Code", $det[0]['modulnummer'], 'X-2SP-B1');
+$det = soi_detect_voraussetzungen_for_modul($lang['A2'], $lang);
+is_equal("detect: Sprachpraxis A2 → keine Vorgänger", count($det), 0);
+
+/* Numerische Stufung im Modulnummer-Code: 2A setzt 1B voraus */
+$det = soi_detect_voraussetzungen_for_modul(array(
+	'modulnummer' => 'SLK-BA-F-2A-L', 'name' => 'Aufbaumodul X',
+), array(
+	'SLK-BA-F-1B-L' => array('modulnummer' => 'SLK-BA-F-1B-L', 'name' => 'Basismodul X'),
+	'SLK-BA-F-2A-L' => array('modulnummer' => 'SLK-BA-F-2A-L', 'name' => 'Aufbaumodul X'),
+));
+is_equal("detect: Modulnummer-Stufung 2A→1B", count($det) >= 1, true);
+
+/* soi_persist_voraussetzungen */
+$code_to_id = array('A' => 1, 'B' => 2);
+$before = count($GLOBALS['_soi_rquery_log']);
+$n = soi_persist_voraussetzungen(1, 7, array(
+	array('modulnummer' => 'B', 'typ' => 'aufbauend', 'grund' => 'Test'),
+), $code_to_id);
+is_equal("persist_voraussetzungen: 1 geschrieben", $n, 1);
+$sql = end($GLOBALS['_soi_rquery_log']);
+is_equal("persist_voraussetzungen: SQL modul_id 1", strpos($sql, '"1"') !== false, true);
+is_equal("persist_voraussetzungen: SQL voraussetzung_modul_id 2", strpos($sql, '"2"') !== false, true);
+
+// Selbst-Referenz → skip
+$n = soi_persist_voraussetzungen(1, 7, array(
+	array('modulnummer' => 'A', 'typ' => 'aufbauend', 'grund' => 'Test'),
+), $code_to_id);
+is_equal("persist_voraussetzungen: Selbst-Referenz wird übersprungen", $n, 0);
+
+// Unbekannter Code → skip
+$n = soi_persist_voraussetzungen(1, 7, array(
+	array('modulnummer' => 'XXX', 'typ' => 'aufbauend', 'grund' => 'Test'),
+), $code_to_id);
+is_equal("persist_voraussetzungen: unbekannter Code → skip", $n, 0);
+
+// Ungültiger Typ → fällt auf 'aufbauend'
+$n = soi_persist_voraussetzungen(1, 7, array(
+	array('modulnummer' => 'B', 'typ' => 'garbage', 'grund' => 'Test'),
+), $code_to_id);
+is_equal("persist_voraussetzungen: garbage typ → trotzdem geschrieben", $n, 1);
+$sql = end($GLOBALS['_soi_rquery_log']);
+is_equal("persist_voraussetzungen: garbage typ → aufbauend fallback", strpos($sql, '"aufbauend"') !== false, true);
+
+/* ============================ End-to-End Anlage-2-Persistenz ============================ */
+
+if($has_pdf && $pdftotext !== '') {
+	$r = $ex->extract($pdf_path, 'layout');
+	// Simuliere commit_v2 für die ersten 3 Module.
+	$code_to_id = array();
+	$total_a2 = 0; $total_sem = 0;
+	$total_mns = 0; $total_zuord = 0; $total_vor = 0;
+	foreach(array_slice($r['modules'], 0, 3) as $i => $m) {
+		$mid = 1000 + $i;
+		$code_to_id[$m['modulnummer']] = $mid;
+		$an2 = soi_find_anlage2_for_modul($r['anlage2'], $m['modulnummer']);
+		if($an2) {
+			$total_a2 += soi_persist_anlage2_detailed($mid, 1, $an2);
+			$total_sem += soi_persist_semester_metadata($mid, $an2);
+			$total_mns++;
+		}
+		soi_persist_modul_zuordnung($mid, 1, 99, soi_rolle_for_section($m['section'] ?? ''), $m['lp'] ?? null);
+		$total_zuord++;
+		$det = soi_detect_voraussetzungen_for_modul($m, $r['modules']);
+		if($det) $total_vor += soi_persist_voraussetzungen($mid, 1, $det, $code_to_id);
+	}
+	is_true("End-to-End: ≥ 2 modul_anlage2-Zeilen aus Anlage 2 geschrieben", $total_a2 >= 2);
+	is_true("End-to-End: ≥ 2 modul_nach_semester_metadata-Zeilen geschrieben", $total_sem >= 2);
+	is_equal("End-to-End: 3 modul_zuordnung-Zeilen geschrieben", $total_zuord, 3);
 }

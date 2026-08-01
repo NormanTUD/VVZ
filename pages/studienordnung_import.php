@@ -36,6 +36,11 @@
 		require_once(__DIR__ . '/studienordnung_parser.php');
 	}
 
+	/** Lädt die DB-Persistenz-Helper (ohne Page-Chrome, gut testbar). */
+	if(!function_exists('soi_persist_anlage2_detailed')) {
+		require_once(__DIR__ . '/studienordnung_persist.php');
+	}
+
 	/** Validiert, dass die Datei ein PDF ist (magic bytes). */
 	if(!function_exists('soi_is_pdf')) {
 		function soi_is_pdf($tmp_path) {
@@ -269,6 +274,228 @@
 				}
 			}
 			return null;
+		}
+	}
+
+	/** Leitet aus einem Section-Namen (z.B. "Kernbereich", "Ergänzungsbereich") die
+	 *  modul_zuordnung-Rolle ab. Fällt auf "pflicht" zurück, wenn nichts passt. */
+	if(!function_exists('soi_rolle_for_section')) {
+		function soi_rolle_for_section(?string $section): string {
+			$s = mb_strtolower(trim((string)$section));
+			if($s === '') return 'pflicht';
+			if(strpos($s, 'kernbereich') !== false) return 'kernbereich';
+			if(strpos($s, 'ergänzungsbereich') !== false || strpos($s, 'ergaenzungsbereich') !== false) return 'ergaenzungsbereich';
+			if(strpos($s, 'wahlpflicht') !== false) return 'wahlpflicht';
+			if(strpos($s, 'hauptfach') !== false) return 'hauptfach';
+			if(strpos($s, 'nebenfach') !== false) return 'nebenfach';
+			if(strpos($s, 'grundlagen') !== false) return 'pflicht';
+			if(strpos($s, 'aufbau') !== false) return 'pflicht';
+			if(strpos($s, 'vertiefung') !== false) return 'pflicht';
+			if(strpos($s, 'spezialisierung') !== false) return 'wahlpflicht';
+			if(strpos($s, 'einführung') !== false) return 'pflicht';
+			return 'sonstige';
+		}
+	}
+
+	/**
+	 * Persistiert die Detail-Anlage-2-Zeile in `modul_anlage2` (SWS aufgeschlüsselt nach Typ) und
+	 * `modul_nach_semester` (Modul pro Semester). Gibt die Anzahl der geschriebenen Zeilen zurück.
+	 *
+	 * Erwartet die Parser-Struktur:
+	 *   ['modulnummer' => 'X', 'lp' => 5, 'semester' => [
+	 *      ['semester' => 1, 'sws' => ['2','0','0','2'], 'pl_count' => 1],
+	 *      ...
+	 *   ]]
+	 */
+	if(!function_exists('soi_persist_anlage2_detailed')) {
+		function soi_persist_anlage2_detailed(int $modul_id, int $import_id, array $anlage2_row): int {
+			if($modul_id <= 0 || empty($anlage2_row['semester']) || !is_array($anlage2_row['semester'])) return 0;
+			$written = 0;
+			foreach($anlage2_row['semester'] as $sem) {
+				$sem_n = isset($sem['semester']) ? (int)$sem['semester'] : 0;
+				if($sem_n < 1 || $sem_n > 12) continue;
+				$sws = isset($sem['sws']) && is_array($sem['sws']) ? $sem['sws'] : array();
+
+				// SWS-Felder: max 7 Slots (vorlesung/uebung/seminar/tutorium/sprachkurs/praktikum/sonstige).
+				$fields = array('sws_vorlesung', 'sws_uebung', 'sws_seminar', 'sws_tutorium', 'sws_sprachkurs', 'sws_praktikum', 'sws_sonstige');
+				$values = array();
+				$total = 0.0;
+				for($i = 0; $i < 7; $i++) {
+					$v = isset($sws[$i]) ? trim((string)$sws[$i]) : '';
+					if($v !== '' && $v !== '*' && is_numeric($v)) {
+						$values[$fields[$i]] = (float)$v;
+						$total += (float)$v;
+					} else {
+						$values[$fields[$i]] = null;
+					}
+				}
+				$lp = isset($anlage2_row['lp']) && is_numeric($anlage2_row['lp']) ? (float)$anlage2_row['lp'] : null;
+				$pl_count = isset($sem['pl_count']) ? (int)$sem['pl_count'] : 0;
+
+				// modul_anlage2-Insert (UNIQUE(modul_id, semester) → ON DUPLICATE KEY UPDATE).
+				$cols = array('modul_id', 'import_id', 'semester');
+				$vals = array((int)$modul_id, (int)$import_id, (int)$sem_n);
+				$updates = array();
+				foreach($fields as $f) {
+					$cols[] = $f; $vals[] = $values[$f];
+					if($values[$f] !== null) $updates[] = "`$f` = VALUES(`$f`)";
+				}
+				$cols[] = 'sws_total'; $vals[] = $total > 0 ? $total : null;
+				$cols[] = 'pruefungsleistung'; $vals[] = $pl_count > 0 ? 'Ja' : null;
+				$cols[] = 'lp'; $vals[] = $lp;
+				if($total > 0) $updates[] = '`sws_total` = VALUES(`sws_total`)';
+				if($lp !== null) $updates[] = '`lp` = VALUES(`lp`)';
+				if($pl_count > 0) $updates[] = "`pruefungsleistung` = VALUES(`pruefungsleistung`)";
+
+				$col_list = '`'.implode('`,`', $cols).'`';
+				$val_list = implode(',', array_map('esc', $vals));
+				$sql = "INSERT INTO `modul_anlage2` ($col_list) VALUES ($val_list)";
+				if(!empty($updates)) $sql .= ' ON DUPLICATE KEY UPDATE '.implode(', ', $updates);
+				try {
+					rquery($sql);
+					$written++;
+				} catch(\Throwable $e) { /* Tabelle fehlt → still überspringen */ }
+
+				// modul_nach_semester: einfache Zuordnung (welches Semester).
+				try {
+					rquery('INSERT IGNORE INTO `modul_nach_semester` (`modul_id`, `semester`) VALUES ('.esc($modul_id).', '.esc($sem_n).')');
+				} catch(\Throwable $e) { /* Tabelle fehlt → überspringen */ }
+			}
+			return $written;
+		}
+	}
+
+	/** Persistiert modul_zuordnung (Modul → Studiengang mit Rolle).
+	 *  Pro (modul_id, ziel_studiengang_id, rolle) nur ein Eintrag. */
+	if(!function_exists('soi_persist_modul_zuordnung')) {
+		function soi_persist_modul_zuordnung(int $modul_id, int $import_id, int $studiengang_id, string $rolle, $lp = null): bool {
+			if($modul_id <= 0 || $studiengang_id <= 0) return false;
+			// Gültige Rollen prüfen.
+			$valid = array('kernbereich','ergaenzungsbereich','wahlpflicht','pflicht','hauptfach','nebenfach','sonstige');
+			if(!in_array($rolle, $valid, true)) $rolle = 'sonstige';
+			try {
+				rquery('INSERT INTO `modul_zuordnung` (`modul_id`, `import_id`, `ziel_studiengang_id`, `rolle`, `lp`) VALUES ('.
+					esc($modul_id).', '.esc($import_id).', '.esc($studiengang_id).', '.esc($rolle).', '.esc($lp).
+					') ON DUPLICATE KEY UPDATE `lp` = VALUES(`lp`)');
+				return true;
+			} catch(\Throwable $e) { return false; }
+		}
+	}
+
+	/** Erkennt aus Modulnamen Aufbaumuster und liefert Voraussetzungs-Empfehlungen.
+	 *  Heuristik:
+	 *    - "Aufbaumodul X"   → empfiehlt "Basismodul X" (gleicher Sprache/Thema)
+	 *    - "Vertiefungsmodul X" → empfiehlt "Aufbaumodul X", fallback "Basismodul X"
+	 *    - "Sprachpraxis N – Sprache" → empfiehlt vorhergehende Stufe (A2→B1→B2→C1)
+	 *    - "Spezialisierungsmodul X" → empfiehlt "Vertiefungsmodul X"
+	 *
+	 *  Rückgabe: Array von ['modulnummer' => X, 'grund' => '...'].
+	 *  Aufrufer resolved über modulnummer → modul_id.
+	 */
+	if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
+		function soi_detect_voraussetzungen_for_modul(array $mod, array $all_modules_by_code): array {
+			$out = array();
+			$name = isset($mod['name']) ? trim((string)$mod['name']) : '';
+			$code = isset($mod['modulnummer']) ? trim((string)$mod['modulnummer']) : '';
+			if($name === '' || $code === '') return $out;
+
+			// (1) Aufbau-/Vertiefungs-/Spezialisierungs-Muster.
+			// Extrahiere das "Thema" aus dem Namen (alles nach dem Typ-Wort).
+			$patterns = array(
+				array('typ' => 'Aufbaumodul',       'vor' => 'Basismodul',        'rel' => 'aufbauend'),
+				array('typ' => 'Vertiefungsmodul',  'vor' => 'Aufbaumodul',       'rel' => 'aufbauend'),
+				array('typ' => 'Spezialisierungsmodul', 'vor' => 'Vertiefungsmodul', 'rel' => 'empfohlen'),
+				array('typ' => 'Ergänzungsmodul',   'vor' => 'Basismodul',        'rel' => 'empfohlen'),
+			);
+			foreach($patterns as $p) {
+				if(stripos($name, $p['typ']) === false) continue;
+				// Thema = Name ohne Typ-Wort, getrimmt.
+				$them = trim(preg_replace('/^.*?' . preg_quote($p['typ'], '/') . '\s*[:\-–]?\s*/iu', '', $name));
+				if($them === '') continue;
+				foreach($all_modules_by_code as $other_code => $other) {
+					if($other_code === $code) continue;
+					$other_name = isset($other['name']) ? $other['name'] : '';
+					if(stripos($other_name, $p['vor']) !== false && stripos($other_name, $them) !== false) {
+						$out[] = array('modulnummer' => $other_code, 'typ' => $p['rel'], 'grund' => $p['typ'].' '.$them.' baut auf '.$p['vor'].' '.$them.' auf');
+						break;
+					}
+				}
+			}
+
+			// (2) Sprachpraxis-Stufen A2 → B1 → B2 → C1 (gleiche Sprache).
+			if(stripos($name, 'Sprachpraxis') !== false || stripos($name, 'Language') !== false || stripos($name, 'Language Skills') !== false || stripos($name, 'Language Components') !== false || stripos($name, 'Language Creativity') !== false) {
+				$stufen = array('A1' => 1, 'A2' => 2, 'B1' => 3, 'B2' => 4, 'C1' => 5, 'C2' => 6);
+				$found_stufe = null; $found_lang = null;
+				foreach($stufen as $s => $v) {
+					if(stripos($name, $s) !== false) { $found_stufe = $s; $found_lang = $s; break; }
+				}
+				if($found_stufe !== null) {
+					// Vorgänger-Stufe finden.
+					$stufen_keys = array_keys($stufen);
+					$idx = array_search($found_stufe, $stufen_keys);
+					if($idx > 0) {
+						$prev = $stufen_keys[$idx - 1];
+						foreach($all_modules_by_code as $other_code => $other) {
+							if($other_code === $code) continue;
+							$on = isset($other['name']) ? $other['name'] : '';
+							if(stripos($on, $prev) !== false && stripos($on, 'Sprachpraxis') !== false) {
+								$out[] = array('modulnummer' => $other_code, 'typ' => 'aufbauend', 'grund' => 'Sprachpraxis '.$prev.' ist Voraussetzung für '.$found_stufe);
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			// (3) Numerische Stufenfolge im Modulnummer-Code: X-1B → X-2A → X-3V (gleicher Fachcode).
+			if(preg_match('/^(.*?-)(?:1B|2A|3V|3S|3E|2V|1SP|2SP|3SP|4SP)/u', $code, $cm)) {
+				$prefix = $cm[1];
+				$current_level = null;
+				$levels = array('1B' => 1, '2A' => 2, '3V' => 3, '3S' => 3, '3E' => 3, '2V' => 2,
+					'1SP' => 1, '2SP' => 2, '3SP' => 3, '4SP' => 4);
+				foreach($levels as $l => $n) {
+					if(strpos($code, '-'.$l) !== false) { $current_level = $l; break; }
+				}
+				if($current_level !== null) {
+					$prev_levels = array();
+					foreach($levels as $l => $n) if($n < $levels[$current_level]) $prev_levels[] = $l;
+					rsort($prev_levels); // höchste zuerst
+					foreach($prev_levels as $pl) {
+						$prev_code = $prefix.$pl;
+						if(isset($all_modules_by_code[$prev_code])) {
+							$out[] = array('modulnummer' => $prev_code, 'typ' => 'aufbauend',
+								'grund' => 'Modulnummer-Stufung: '.$current_level.' setzt '.$pl.' voraus (gleicher Fachcode)');
+							break;
+						}
+					}
+				}
+			}
+			return $out;
+		}
+	}
+
+	/** Persistiert modul_voraussetzung-Einträge. Erwartet [['modulnummer','typ','grund']]. */
+	if(!function_exists('soi_persist_voraussetzungen')) {
+		function soi_persist_voraussetzungen(int $modul_id, int $import_id, array $items, array $code_to_id): int {
+			if($modul_id <= 0 || empty($items)) return 0;
+			$written = 0;
+			foreach($items as $it) {
+				$other_code = isset($it['modulnummer']) ? trim((string)$it['modulnummer']) : '';
+				$typ = isset($it['typ']) ? $it['typ'] : 'aufbauend';
+				$grund = isset($it['grund']) ? mb_substr($it['grund'], 0, 500) : null;
+				if(!isset($code_to_id[$other_code])) continue;
+				$other_id = (int)$code_to_id[$other_code];
+				if($other_id <= 0 || $other_id === $modul_id) continue;
+				$valid = array('empfohlen','pflicht','aufbauend');
+				if(!in_array($typ, $valid, true)) $typ = 'aufbauend';
+				try {
+					rquery('INSERT INTO `modul_voraussetzung` (`modul_id`, `voraussetzung_modul_id`, `import_id`, `typ`, `notiz`) VALUES ('.
+						esc($modul_id).', '.esc($other_id).', '.esc($import_id).', '.esc($typ).', '.esc($grund).
+						') ON DUPLICATE KEY UPDATE `notiz` = VALUES(`notiz`)');
+					$written++;
+				} catch(\Throwable $e) { /* Tabelle fehlt → skip */ }
+			}
+			return $written;
 		}
 	}
 
@@ -2170,6 +2397,10 @@
 			$seen_pns = array();
 			$messages = array();
 			$semester_rows_written = 0;
+			$anlage2_detailed_rows = 0;
+			$zuordnung_rows = 0;
+			$voraussetzung_rows = 0;
+			$code_to_modul_id = array(); // für modul_voraussetzung-Auflösung nach erstem Pass
 
 			// Anlage-2-Rohtabelle aus notes-Payload laden (für Semester-Metadaten).
 			$notes_payload = json_decode($import_row['notes'] ?? '', true);
@@ -2230,6 +2461,7 @@
 				}
 				$modul_id = (int)$mod_row;
 				$imported_modules++;
+				$code_to_modul_id[$modulnummer] = $modul_id;
 
 				// Semester-Metadaten aus Anlage 2 persistieren, falls vorhanden.
 				$anlage2_match = soi_find_anlage2_for_modul($anlage2_rows, $modulnummer);
@@ -2239,6 +2471,16 @@
 						$anlage2_match['lp'] = (int)$m['lp'];
 					}
 					$semester_rows_written += soi_persist_semester_metadata($modul_id, $anlage2_match);
+					// Detaillierte Anlage-2-Zeile (SWS aufgeschlüsselt nach Veranstaltungstyp).
+					$anlage2_detailed_rows += soi_persist_anlage2_detailed($modul_id, $import_id, $anlage2_match);
+				}
+
+				// Modul → Studiengang Zuordnung (Rolle aus Section ableiten).
+				$section = isset($m['section']) ? trim((string)$m['section']) : '';
+				$rolle = soi_rolle_for_section($section);
+				$lp = isset($m['lp']) && is_numeric($m['lp']) ? (float)$m['lp'] : null;
+				if(soi_persist_modul_zuordnung($modul_id, $import_id, $studiengang_id, $rolle, $lp)) {
+					$zuordnung_rows++;
 				}
 
 				if($create_pns) {
@@ -2265,12 +2507,32 @@
 
 			rquery('UPDATE `studienordnung_import` SET `modules_imported` = '.esc($imported_modules).', `pruefungsnummern_imported` = '.esc($imported_pns).', `studiengang_id` = '.esc($studiengang_id).' WHERE `id` = '.esc($import_id));
 
+			// Zweiter Pass: Aufbaumodule / Vertiefungs- / Sprachpraxis-Ketten erkennen.
+			if(!empty($code_to_modul_id)) {
+				$modules_by_code = array();
+				foreach($modules_in as $mm) {
+					if(is_array($mm) && !empty($mm['modulnummer'])) {
+						$modules_by_code[trim((string)$mm['modulnummer'])] = $mm;
+					}
+				}
+				foreach($code_to_modul_id as $code => $mid) {
+					if(!isset($modules_by_code[$code])) continue;
+					$detected = soi_detect_voraussetzungen_for_modul($modules_by_code[$code], $modules_by_code);
+					if($detected) {
+						$voraussetzung_rows += soi_persist_voraussetzungen($mid, $import_id, $detected, $code_to_modul_id);
+					}
+				}
+			}
+
 			print json_encode(array(
 				'ok' => true,
 				'import_id' => $import_id,
 				'modules_imported' => $imported_modules,
 				'pruefungsnummern_imported' => $imported_pns,
 				'semester_metadata_rows' => $semester_rows_written,
+				'anlage2_detailed_rows' => $anlage2_detailed_rows,
+				'zuordnung_rows' => $zuordnung_rows,
+				'voraussetzung_rows' => $voraussetzung_rows,
 				'studiengang_id' => $studiengang_id,
 				'messages' => $messages,
 			), JSON_UNESCAPED_UNICODE);
