@@ -249,10 +249,11 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 			$them = trim(preg_replace('/^.*?' . preg_quote($p['typ'], '/') . '\s*[:\-–]?\s*/iu', '', $name));
 			if($them === '') continue;
 			foreach($all_modules_by_code as $other_code => $other) {
-				if($other_code === $code) continue;
+				$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : $other_code;
+				if($other_num === $code) continue;
 				$other_name = isset($other['name']) ? $other['name'] : '';
 				if(stripos($other_name, $p['vor']) !== false && stripos($other_name, $them) !== false) {
-					$out[] = array('modulnummer' => $other_code, 'typ' => $p['rel'], 'grund' => $p['typ'].' '.$them.' baut auf '.$p['vor'].' '.$them.' auf');
+					$out[] = array('modulnummer' => $other_num, 'typ' => $p['rel'], 'grund' => $p['typ'].' '.$them.' baut auf '.$p['vor'].' '.$them.' auf');
 					break;
 				}
 			}
@@ -298,8 +299,14 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 				rsort($prev_levels);
 				foreach($prev_levels as $pl) {
 					$prev_code = $prefix.$pl;
-					if(isset($all_modules_by_code[$prev_code])) {
-						$out[] = array('modulnummer' => $prev_code, 'typ' => 'aufbauend',
+					// Suche per modulnummer (nicht per Array-Key, da Input verschiedene Keys haben kann).
+					$found_prev = null;
+					foreach($all_modules_by_code as $other) {
+						$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
+						if($other_num === $prev_code) { $found_prev = $other_num; break; }
+					}
+					if($found_prev !== null) {
+						$out[] = array('modulnummer' => $found_prev, 'typ' => 'aufbauend',
 							'grund' => 'Modulnummer-Stufung: '.$current_level.' setzt '.$pl.' voraus (gleicher Fachcode)');
 						break;
 					}
