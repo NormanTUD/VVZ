@@ -592,6 +592,40 @@ if($has_pdf && $pdftotext !== '') {
 	is_equal("End-to-End: 3 modul_zuordnung-Zeilen geschrieben", $total_zuord, 3);
 }
 
+/* ============================ Multi-PDF Integration (alle 3 Test-PDFs) ============================ */
+
+if($has_pdf && $pdftotext !== '') {
+	$pdfs = array(
+		'05_06soBAP18.09.2018.pdf' => 'Philosophie Bachelor (Original)',
+		'03_06soBA128.08.2023.pdf' => 'Politikwissenschaft Bachelor (Hauptfach-Format)',
+		'12_06soBA1228.08.2023.pdf' => 'Kunstgeschichte Bachelor (Hauptfach-Format)',
+	);
+	foreach($pdfs as $file => $label) {
+		$path = __DIR__ . '/fixtures/'.$file;
+		if(!file_exists($path)) continue;
+		echo "\n--- $label ($file) ---\n";
+		$r = $ex->extract($path, 'layout');
+		is_true("[$label] Cover.program nicht leer", !empty($r['cover']['program']));
+		is_true("[$label] Mindestens 5 Module", count($r['modules']) >= 5);
+		is_true("[$label] Mindestens 5 Anlage-2-Einträge", count($r['anlage2']) >= 5);
+		// Alle Module haben modulnummer
+		$valid_codes = 0;
+		foreach($r['modules'] as $m) {
+			if(!empty($m['modulnummer'])) $valid_codes++;
+		}
+		is_equal("[$label] Alle Module haben modulnummer", $valid_codes, count($r['modules']));
+		// Alle Module haben mindestens 3 Zeichen Name
+		$valid_names = 0;
+		foreach($r['modules'] as $m) {
+			if(mb_strlen(trim($m['name'] ?? '')) >= 3) $valid_names++;
+		}
+		is_true("[$label] Alle Module haben sinnvollen Namen (≥3 Zeichen)", $valid_names >= count($r['modules']) * 0.7);
+		// Coverage
+		$with_lp = count(array_filter($r['modules'], function($m){return !empty($m['lp']);}));
+		is_true("[$label] ≥ 80% Module mit LP", $with_lp >= count($r['modules']) * 0.8);
+	}
+}
+
 /* ============================ Persist-One-Module ============================ */
 
 $log_before = count($GLOBALS['_soi_rquery_log']);
