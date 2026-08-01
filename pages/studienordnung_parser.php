@@ -395,24 +395,62 @@ class SoiExtractor {
                                 $i++;
                                 continue;
                             }
-                            // Wenn die Zeile wie ein Dozent-Name aussieht (Vorname Nachname, optional Titel).
-                            // Heuristik: 2-4 Großbuchstaben-getrennte Wörter, optional Titel davor.
-                            if(preg_match('/^(Prof\.|Dr\.|PD|PD\.|Juniorprof\.|Akad\.|\s)*([A-ZÄÖÜ][a-zäöüß\-]+)(\s+[A-ZÄÖÜ][a-zäöüß\-]+){1,3}$/u', $nxt)) {
+                            // Wenn die Zeile wie ein Dozent-Name aussieht: "Prof. X Y Z" oder "Dr. X Y" oder
+                            // auch "Prof. für X Y" (mit "für"). Genau 2-5 Wörter, Großbuchstaben-getrennt.
+                            $looks_like_dozent_name = preg_match('/^(Prof\.|Dr\.|PD|PD\.|Juniorprof\.|Akad\.|Prof|Dr)(\.|\s|\b).*([A-ZÄÖÜ][a-zäöüß\.\-]+\s+){1,3}[A-ZÄÖÜ][a-zäöüß\.\-]+$/u', $nxt)
+                                && mb_strlen($nxt) < 80;
+                            if($looks_like_dozent_name) {
                                 if($dozent !== '' && $nxt !== $dozent) $dozent = trim($dozent.' '.$nxt);
                                 elseif($dozent === '') $dozent = $nxt;
                                 $i++;
                                 continue;
                             }
-                            // Wenn die Zeile überwiegend aus Text besteht (kein SWS/PL/LP) und
-                            // der aktuelle Name unvollständig wirkt (endet mit "für", ":", "-", "und", "/", etc.),
-                            // behandeln wir das als Modulname-Wrap.
-                            $looks_truncated = preg_match('/\b(für|und|oder|bei|mit|the|of|an|in|auf|zur|zum|des|der|die|das|von|aus|sowie|und|/|&|\:|\-)\s*$/iu', $name);
-                            $is_mostly_text = !preg_match('/^\s*\d+\s*(PL|SWS)?\s*$/i', $nxt)
-                                && !preg_match('/^\s*\d+\/\d+/', $nxt)
-                                && preg_match('/[A-Za-zÄÖÜäöüß]{3,}/u', $nxt)
-                                && mb_strlen($nxt) < 200;
-                            if($looks_truncated && $is_mostly_text) {
-                                $name = trim($name.' '.$nxt);
+                            // Standard-Fall: eingerückte Textzeile → Modulname-Wrap.
+                            // Wir nehmen nur das erste Spalten-Segment (vor 2+ Leerzeichen),
+                            // trennen aber ggf. am Ende Title-Case-Wörter ab, die wie eine Dozent-
+                            // Fortsetzung wirken (z.B. "Soziologie für Ergänzungsbereiche
+                            //   geschäftsführender Direktor" → "geschäftsführender Direktor" ist Dozent).
+                            $first_col = trim((preg_split('/\s{2,}/u', $nxt, 2)[0] ?? $nxt));
+                            $is_mostly_text = !preg_match('/^\s*\d+\s*(PL|SWS)?\s*$/i', $first_col)
+                                && !preg_match('/^\s*\d+\/\d+/', $first_col)
+                                && preg_match('/[A-Za-zÄÖÜäöüß]{3,}/u', $first_col)
+                                && mb_strlen($first_col) > 0
+                                && mb_strlen($first_col) < 200;
+                            if($is_mostly_text) {
+                                // Wenn die Zeile mit einem bekannten Dozent-/Titel-Wort endet (Direktor, Professor, Fakultät …)
+                                // UND der Dozent bereits gefüllt ist, behandeln wir den Teil ab dem letzten
+                                // "klein geschriebenen Funktionswort" als Dozent-Wrap.
+                                // Beispiel: "Soziologie für Ergänzungsbereiche geschäftsführender Direktor"
+                                //   → name_wrap: "Soziologie für Ergänzungsbereiche", dozent_tail: "geschäftsführender Direktor"
+                                if($dozent !== ''
+                                    && preg_match('/\b(Direktor|Direktorin|Professor|Dozent|Fakultät|Institut|Lehrstuhl|Lehrbereich|Sekretariat)\b\s*$/u', $first_col)
+                                    && !preg_match('/^([a-zäöüß][a-zäöüß\-]*\s+)?Geschäftsführend[er]*\b/i', $first_col)) {
+                                    // Vereinfachte Split-Logik ohne preg_match_all:
+                                    // Suche die letzten 1-3 Title-Case-Wörter per String-Parsing.
+                                    $tokens = preg_split('/\s+/u', $first_col);
+                                    $n = count($tokens);
+                                    $title_start = $n;
+                                    for($i = $n - 1; $i >= 0; $i--) {
+                                        $c = mb_substr($tokens[$i], 0, 1);
+                                        $is_title = ($c !== '' && $c === mb_strtoupper($c) && preg_match('/[A-Za-zÄÖÜäöüß]/', $c));
+                                        if($is_title) {
+                                            $title_start = $i;
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    if($title_start < $n && $title_start > 0 && ($n - $title_start) <= 3) {
+                                        $possible_dozent_tail = trim(implode(' ', array_slice($tokens, $title_start)));
+                                        $possible_name_wrap = trim(implode(' ', array_slice($tokens, 0, $title_start)));
+                                        if(mb_strlen($possible_name_wrap) >= 5 && mb_strlen($possible_dozent_tail) >= 3) {
+                                            $name = trim($name.' '.$possible_name_wrap);
+                                            $dozent = trim($dozent.' '.$possible_dozent_tail);
+                                            $i++;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                $name = trim($name.' '.$first_col);
                                 $i++;
                                 continue;
                             }
