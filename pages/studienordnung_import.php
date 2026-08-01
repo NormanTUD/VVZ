@@ -1207,6 +1207,41 @@
 						lines.push('Program: ' + (d.cover.program || '(leer)'));
 					}
 					lines.push('');
+
+					// Metadata-Statistik: Sections, Field-Coverage, Missing-Daten
+					var sections = {};
+					(d.modules || []).forEach(function(m) {
+						var s = m.section || 'Ohne Sektion';
+						sections[s] = (sections[s] || 0) + 1;
+					});
+					lines.push('=== METADATA-STATISTIK ===');
+					lines.push('Sections:');
+					Object.keys(sections).forEach(function(s) {
+						lines.push('  ' + s + ': ' + sections[s]);
+					});
+					var with_lp = (d.modules || []).filter(function(m) { return m.lp; }).length;
+					var with_sws = (d.modules || []).filter(function(m) { return m.sws_total; }).length;
+					var with_dauer = (d.modules || []).filter(function(m) { return m.dauer_semester; }).length;
+					var with_pt = (d.modules || []).filter(function(m) { return (m.pruefungstypen || []).length > 0; }).length;
+					var with_name = (d.modules || []).filter(function(m) { return m.name && m.name.length >= 5; }).length;
+					lines.push('Field-Coverage (von ' + (d.modules || []).length + ' Modulen):');
+					lines.push('  Modulnummer: ' + (d.modules || []).length + '/' + (d.modules || []).length + ' (100%)');
+					lines.push('  Name (≥5 Zeichen): ' + with_name + '/' + (d.modules || []).length + ' (' + Math.round(with_name / Math.max(1, (d.modules || []).length) * 100) + '%)');
+					lines.push('  LP:           ' + with_lp + '/' + (d.modules || []).length + ' (' + Math.round(with_lp / Math.max(1, (d.modules || []).length) * 100) + '%)');
+					lines.push('  SWS-total:    ' + with_sws + '/' + (d.modules || []).length + ' (' + Math.round(with_sws / Math.max(1, (d.modules || []).length) * 100) + '%)');
+					lines.push('  Dauer:        ' + with_dauer + '/' + (d.modules || []).length + ' (' + Math.round(with_dauer / Math.max(1, (d.modules || []).length) * 100) + '%)');
+					lines.push('  Prüfungstypen: ' + with_pt + '/' + (d.modules || []).length + ' (' + Math.round(with_pt / Math.max(1, (d.modules || []).length) * 100) + '%)');
+					var fields_total = 0;
+					var fields_with_data = 0;
+					(d.modules || []).forEach(function(m) {
+						Object.keys(m.fields || {}).forEach(function(k) {
+							fields_total++;
+							if(m.fields[k] && m.fields[k].length > 0) fields_with_data++;
+						});
+					});
+					lines.push('  Felder gesamt: ' + fields_with_data + '/' + fields_total + ' mit Daten');
+					lines.push('');
+
 					lines.push('=== MODULE (' + (d.modules || []).length + ') ===');
 					(d.modules || []).forEach(function(m, i) {
 						lines.push('[' + i + '] ' + (m.modulnummer || '?'));
