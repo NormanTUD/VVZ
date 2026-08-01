@@ -537,20 +537,23 @@ class SoiExtractor {
                         }
 
                         // Modulnummer-Continuation: Code endet mit "-", erstes Token der Zeile ist alphanumerisch (kurz).
-                        // Das Token wird an die Modulnummer angehängt; der Rest der Zeile (z.B. "(email)") wird
-                        // in einer folgenden Iteration als Dozent-Anhang verarbeitet.
+                        // Das Token wird an die Modulnummer angehängt; der Rest der Zeile (z.B. "(email)" oder
+                        // der umgebrochene Name) wird in lines[$i+1] eingefügt, damit die nächste Iteration
+                        // ihn als neue "nxt"-Zeile verarbeitet.
                         if(substr($code, -1) === '-') {
                             $first_token = strtok($nxt, " \t");
                             if($first_token !== false && preg_match('/^[A-Za-z0-9.*\-]+$/u', $first_token) && mb_strlen($first_token) < 25) {
                                 $code .= $first_token;
-                                // Rest der Zeile (alles nach dem ersten Token) als nxt_raw neu setzen.
+                                // Rest der Zeile (alles nach dem ersten Token) extrahieren.
                                 $rest = trim(substr($nxt, mb_strlen($first_token)));
                                 if($rest !== '') {
-                                    $i++;
-                                    $nxt_raw = ' '.$rest;
-                                    $nxt = $rest;
+                                    // Wir tauschen lines[$i+1] gegen den Rest aus, so dass die nächste
+                                    // Iteration den Rest als "nxt" bekommt. $i wird NICHT erhöht.
+                                    $rest_padded = str_pad($rest, max(mb_strlen($rest), 50), ' ', STR_PAD_LEFT);
+                                    $lines[$i+1] = $rest_padded;
                                     continue;
                                 }
+                                // Kein Rest: Zeile ist verarbeitet, weiter mit nächster.
                                 $i++;
                                 continue;
                             }
