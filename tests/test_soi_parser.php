@@ -798,3 +798,62 @@ is_equal("generate: lp=999 im Suffix", $nr, 'LONG-KL-999');
 /* Suffix mit Umlauten (deutsche Modulnummer) */
 $nr = soi_generate_pruefungsnummer('SLK-MÜ-A1', 'Klausur', 5, $seen);
 is_equal("generate: Umlaute im Suffix entfernt", $nr, 'SLKMA1-KL-5');
+
+/* ============================ Robustheit der Detection ============================ */
+
+/* Detection: gleiches Thema aber verschiedene Studiengangs-Prefixes → kein Match. */
+$all = array(
+	'SLK-BA-F-1B-L' => ['modulnummer' => 'SLK-BA-F-1B-L', 'name' => 'Basismodul Lit'],
+	'SLK-BA-F-2A-L' => ['modulnummer' => 'SLK-BA-F-2A-L', 'name' => 'Aufbaumodul Lit'],
+	'PhF-Phil-1B-X' => ['modulnummer' => 'PhF-Phil-1B-X', 'name' => 'Basismodul Lit'],
+	'PhF-Phil-2A-X' => ['modulnummer' => 'PhF-Phil-2A-X', 'name' => 'Aufbaumodul Lit'],
+);
+$det = soi_detect_voraussetzungen_for_modul($all['PhF-Phil-2A-X'], $all);
+is_equal("detect: PhF-Aufbau → PhF-Basis (nicht SLK)", count($det), 1);
+is_equal("detect: PhF-Aufbau Voraussetzung-Code", $det[0]['modulnummer'], 'PhF-Phil-1B-X');
+
+$det = soi_detect_voraussetzungen_for_modul($all['SLK-BA-F-2A-L'], $all);
+is_equal("detect: SLK-Aufbau → SLK-Basis (nicht PhF)", count($det), 1);
+is_equal("detect: SLK-Aufbau Voraussetzung-Code", $det[0]['modulnummer'], 'SLK-BA-F-1B-L');
+
+/* Detection mit unterschiedlich langen Prefixes (SLK-BA matched SLK-BA-R-F). */
+$all = array(
+	'SLK-BA-R-F-1B-L' => ['modulnummer' => 'SLK-BA-R-F-1B-L', 'name' => 'Basismodul Französische Literaturwissenschaft'],
+	'SLK-BA-R-F-2A-L' => ['modulnummer' => 'SLK-BA-R-F-2A-L', 'name' => 'Aufbaumodul Französische Literaturwissenschaft'],
+);
+$det = soi_detect_voraussetzungen_for_modul($all['SLK-BA-R-F-2A-L'], $all);
+is_equal("detect: SLK-BA-R-F-2A → SLK-BA-R-F-1B (Präfix-Mismatch toleriert)", count($det), 1);
+
+/* ============================ Cross-Validation der Detection ============================ */
+
+/* Vollständiger Detection-Durchlauf mit Parser-Output (echtes PDF). */
+if($has_pdf && $pdftotext !== '') {
+	$r = $ex->extract($pdf_path, 'layout');
+	$det_count = 0;
+	$auf_count = 0; $ver_count = 0; $sp_count = 0;
+	foreach($r['modules'] as $m) {
+		$det = soi_detect_voraussetzungen_for_modul($m, $r['modules']);
+		if($det) {
+			$det_count++;
+			if(stripos($m['name'], 'Aufbaumodul') !== false) $auf_count++;
+			if(stripos($m['name'], 'Vertiefungsmodul') !== false) $ver_count++;
+			if(stripos($m['name'], 'Sprachpraxis') !== false) $sp_count++;
+		}
+	}
+	is_equal("PDF: ≥ 10 Module mit Voraussetzungen", $det_count >= 10, true);
+	is_equal("PDF: ≥ 1 Aufbaumodul mit Voraussetzung", $auf_count >= 1, true);
+	is_equal("PDF: ≥ 1 Vertiefungsmodul mit Voraussetzung", $ver_count >= 1, true);
+	is_equal("PDF: ≥ 5 Sprachpraxis-Module mit Voraussetzung", $sp_count >= 5, true);
+
+	// Validiere: alle erkannten Modulnummern existieren auch im Modul-Set.
+	$valid_codes = array();
+	foreach($r['modules'] as $m) $valid_codes[$m['modulnummer']] = true;
+	$invalid_count = 0;
+	foreach($r['modules'] as $m) {
+		$det = soi_detect_voraussetzungen_for_modul($m, $r['modules']);
+		foreach($det as $d) {
+			if(!isset($valid_codes[$d['modulnummer']])) $invalid_count++;
+		}
+	}
+	is_equal("PDF: Alle erkannten Voraussetzungen verweisen auf existierende Module", $invalid_count, 0);
+}
