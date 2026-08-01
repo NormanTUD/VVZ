@@ -363,6 +363,8 @@
 	// -------- Seitenlogik --------
 
 	$stage = get_get('stage') ?: 'list';
+	// Stages, die keinen HTML-Chrome ausgeben (AJAX-Bypass).
+	$ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2', 'debug_text');
 	$user_id = isset($GLOBALS['logged_in_user_id']) ? (int)$GLOBALS['logged_in_user_id'] : null;
 	$institute = create_institute_array();
 
