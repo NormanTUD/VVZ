@@ -72,6 +72,17 @@
 			$method = in_array($method, SoiExtractor::METHODS, true) ? $method : 'auto';
 			$extractor = new SoiExtractor();
 			$result = $extractor->extract($pdf_path, $method);
+
+			// PDF-Seitenzahl via pdfinfo ermitteln (Fallback: count der Layout-Pages).
+			$page_count = 0;
+			$pdfinfo = trim((string)@shell_exec('command -v pdfinfo 2>/dev/null'));
+			if($pdfinfo !== '') {
+				$info_out = @shell_exec(escapeshellcmd($pdfinfo).' '.escapeshellarg($pdf_path).' 2>/dev/null');
+				if($info_out && preg_match('/^Pages:\s+(\d+)/m', $info_out, $pm)) {
+					$page_count = (int)$pm[1];
+				}
+			}
+
 			if(!is_array($result) || isset($result['error'])) {
 				return array(
 					'method' => $method,
@@ -81,6 +92,7 @@
 					'modules_count' => 0,
 					'anlage2_count' => 0,
 					'text_length' => 0,
+					'page_count' => $page_count,
 					'errors' => array(isset($result['error']) ? $result['error'] : 'Unbekannter Extraktionsfehler'),
 					'__raw_text' => '',
 					'__pages' => array(),
@@ -92,6 +104,8 @@
 			$layout = $extractor->load($pdf_path, 'layout');
 			$result['__raw_text'] = $layout->full_text;
 			$result['__pages'] = $layout->pages;
+			if($page_count === 0) $page_count = count($layout->pages);
+			$result['__page_count'] = $page_count;
 			$result['__modul_pages'] = $extractor->locateModulesInPages($layout, $result['modules'] ?? array());
 			return $result;
 		}
@@ -745,22 +759,121 @@
 					container.innerHTML = '';
 					var rows = data.anlage2 || [];
 					$('soi_count_anlage2').textContent = rows.length;
+					SOI.anlage2Data = [];
 					if(!rows.length) {
 						container.innerHTML = '<p><i>Anlage 2 konnte nicht geparst werden (keine Tabelle gefunden).</i></p>';
 						return;
 					}
-					rows.forEach(function(r) {
-						var div = document.createElement('div');
-						div.className = 'soi-anlage2-row';
-						div.innerHTML =
-							'<b>' + escapeHtml(r.modulnummer) + '</b>' +
-							'<div>' + escapeHtml(r.name) + ' &mdash; LP: ' + (r.lp !== null && r.lp !== undefined ? r.lp : '?') +
-								(r.semester && r.semester.length ? ' &mdash; ' + r.semester.map(function(s) {
-									var sws = Object.keys(s.sws || {}).map(function(k) { return s.sws[k]; }).reduce(function(a,b){return a+b;}, 0);
-									return 'S' + s.semester + ': ' + sws + ' SWS, ' + s.pl_count + ' PL';
-								}).join(' &middot; ') : '') + '</div>';
-						container.appendChild(div);
+					// Tabelle aufbauen.
+					var tbl = document.createElement('table');
+					tbl.className = 'soi-a2-table';
+					// Kopf: Include | Modul-Nr. | Name | LP | Sem1 SWS | Sem1 PL | ... | Sem6 PL | Seite
+					var thead = document.createElement('thead');
+					var trh = document.createElement('tr');
+					function th(label, cls) {
+						var c = document.createElement('th');
+						c.textContent = label;
+						if(cls) c.className = cls;
+						return c;
+					}
+					trh.appendChild(th('?', 'a2-check'));
+					trh.appendChild(th('Modul-Nr.'));
+					trh.appendChild(th('Name'));
+					trh.appendChild(th('LP'));
+					for(var s = 1; s <= 6; s++) {
+						trh.appendChild(th('S'+s+' SWS', 'a2-sws'));
+						trh.appendChild(th('S'+s+' PL', 'a2-pl'));
+					}
+					trh.appendChild(th('Seite', 'a2-page'));
+					thead.appendChild(trh);
+					tbl.appendChild(thead);
+
+					var tbody = document.createElement('tbody');
+					rows.forEach(function(r, idx) {
+						var tr = document.createElement('tr');
+						tr.dataset.a2idx = idx;
+
+						// SWS/PL pro Semester vorbereiten (max 6 Semester).
+						var sem = Array.isArray(r.semester) ? r.semester : [];
+						var semByIdx = {};
+						for(var i = 0; i < sem.length; i++) {
+							semByIdx[sem[i].semester] = sem[i];
+						}
+						var swsArr = [];
+						var plArr = [];
+						for(var s = 1; s <= 6; s++) {
+							var semN = semByIdx[s];
+							var sws = '';
+							var pl = '';
+							if(semN) {
+								if(Array.isArray(semN.sws)) {
+									sws = semN.sws.map(function(v){return String(v);}).join('/');
+								} else if(semN.sws && typeof semN.sws === 'object') {
+									// Assoziatives Array → nach Index sortieren.
+									var keys = Object.keys(semN.sws).sort(function(a,b){return Number(a)-Number(b);});
+									sws = keys.map(function(k){return String(semN.sws[k]);}).join('/');
+								}
+								pl = (semN.pl_count != null) ? String(semN.pl_count) : '';
+							}
+							swsArr.push(sws);
+							plArr.push(pl);
+						}
+						// Editable Zellen.
+						function tdInput(value, cls, type, ph) {
+							var c = document.createElement('td');
+							if(cls) c.className = cls;
+							var inp = document.createElement('input');
+							inp.type = type || 'text';
+							inp.value = (value === null || value === undefined) ? '' : String(value);
+							inp.placeholder = ph || '';
+							c.appendChild(inp);
+							return c;
+						}
+						// Checkbox.
+						var tdCheck = document.createElement('td');
+						tdCheck.className = 'a2-check';
+						var cb = document.createElement('input');
+						cb.type = 'checkbox';
+						cb.className = 'a2-include';
+						cb.checked = true;
+						tdCheck.appendChild(cb);
+						tr.appendChild(tdCheck);
+
+						tr.appendChild(tdInput(r.modulnummer, 'a2-nr', 'text', 'Modulnr.'));
+						tr.appendChild(tdInput(r.name, 'a2-name', 'text', 'Modulname'));
+						tr.appendChild(tdInput(r.lp, 'a2-lp', 'number', 'LP'));
+						for(var s = 1; s <= 6; s++) {
+							tr.appendChild(tdInput(swsArr[s-1], 'a2-sws', 'text', 'z.B. 2/0/0/2'));
+							tr.appendChild(tdInput(plArr[s-1], 'a2-pl', 'number', 'PL'));
+						}
+						// Page link.
+						var tdPage = document.createElement('td');
+						tdPage.className = 'a2-page';
+						var code = (r.modulnummer || '').trim();
+						var page = (SOI.pageMap && SOI.pageMap[code]) ? SOI.pageMap[code] : '';
+						if(page) {
+							var a = document.createElement('a');
+							a.href = '#';
+							a.textContent = 'S. ' + page;
+							a.addEventListener('click', function(ev){ ev.preventDefault(); soi_show_page(page); });
+							tdPage.appendChild(a);
+						} else {
+							tdPage.textContent = '–';
+						}
+						tr.appendChild(tdPage);
+
+						tbody.appendChild(tr);
+						SOI.anlage2Data.push({
+							include: true,
+							modulnummer: r.modulnummer || '',
+							name: r.name || '',
+							lp: (r.lp !== null && r.lp !== undefined) ? r.lp : '',
+							sws: swsArr,
+							pl: plArr,
+						});
 					});
+					tbl.appendChild(tbody);
+					container.appendChild(tbl);
 				}
 
 				function renderPages(data) {
@@ -851,12 +964,13 @@
 							return;
 						}
 						setStatus('Analyse abgeschlossen — ' + (resp.modules || []).length + ' Module, ' + (resp.anlage2 || []).length + ' Anlage-2-Einträge.', 'success');
-						// Seitenzahl separat ermitteln
+						// Detaildaten + Seitenzahl vom Server holen.
 						fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=analyze&id=' + resp.import_id, {credentials:'same-origin'})
 							.then(function(r){ return r.json(); })
 							.then(function(full) {
-								full.page_count = (full.modules && full.modules.length) ? Math.max.apply(null, Object.values(full.modul_pages || {}).concat([1])) : 1;
-								// Heuristik: wenn raw_text enthält Page-Counts, nimm das Maximum
+								if(!full.page_count && full.modules && full.modules.length) {
+									full.page_count = Math.max.apply(null, Object.values(full.modul_pages || {}).concat([1]));
+								}
 								renderPreview(full);
 							}).catch(function(e) {
 								renderPreview(resp);
@@ -908,23 +1022,57 @@
 								pruefungstypen_str: row.querySelector('.soi-mod-pn').value
 							});
 						});
+						// Anlage-2-Tabelle serialisieren.
+						var anlage2Out = [];
+						var a2Rows = document.querySelectorAll('#soi_anlage2_list tbody tr');
+						a2Rows.forEach(function(row) {
+							var nrInput = row.querySelector('td.a2-nr input');
+							var nameInput = row.querySelector('td.a2-name input');
+							var lpInput = row.querySelector('td.a2-lp input');
+							var swsInputs = row.querySelectorAll('td.a2-sws input');
+							var plInputs = row.querySelectorAll('td.a2-pl input');
+							var semester = [];
+							for(var s = 0; s < 6; s++) {
+								var swsVal = swsInputs[s] ? swsInputs[s].value.trim() : '';
+								var plVal = plInputs[s] ? plInputs[s].value.trim() : '';
+								var swsArr = swsVal === '' ? [] : swsVal.split('/');
+								var plN = plVal === '' ? 0 : parseInt(plVal, 10);
+								if(swsArr.length > 0 || plN > 0) {
+									semester.push({semester: s+1, sws: swsArr, pl_count: plN});
+								}
+							}
+							anlage2Out.push({
+								include: row.querySelector('td.a2-check input').checked ? 1 : 0,
+								modulnummer: nrInput ? nrInput.value.trim() : '',
+								name: nameInput ? nameInput.value.trim() : '',
+								lp: lpInput && lpInput.value !== '' ? parseInt(lpInput.value, 10) : null,
+								semester: semester,
+							});
+						});
 						var fd = new FormData();
 						fd.set('soi_import_id', SOI.currentImportId);
 						fd.set('soi_create_pruefungsnummern', '1');
 						fd.set('soi_modules_v2', JSON.stringify(modulesOut));
+						fd.set('soi_anlage2_v2', JSON.stringify(anlage2Out));
 
 						setStatus('Importiere…', '');
 						fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=commit_v2', { method: 'POST', body: fd, credentials: 'same-origin' })
 							.then(function(r){ return r.json(); })
 							.then(function(resp) {
 								if(resp.ok) {
-									setStatus('Import abgeschlossen: ' + resp.modules_imported + ' Modul(e), ' + resp.pruefungsnummern_imported + ' Prüfungsnummer(n).', 'success');
+									setStatus('Import abgeschlossen: ' + resp.modules_imported + ' Modul(e), ' + resp.pruefungsnummern_imported + ' Prüfungsnummer(n), ' + (resp.semester_metadata_rows||0) + ' Semester-Metadaten-Zeilen.', 'success');
 									commitBtn.disabled = false;
 									setTimeout(function() { window.location.href = 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=detail&id=' + SOI.currentImportId; }, 1500);
 								} else {
 									setStatus('Fehler: ' + escapeHtml(resp.error || 'Unbekannt'), 'error');
 									commitBtn.disabled = false;
 								}
+							}).catch(function(e) {
+								setStatus('Netzwerkfehler beim Commit.', 'error');
+								commitBtn.disabled = false;
+							});
+					});
+				}
 							}).catch(function(e) {
 								setStatus('Netzwerkfehler beim Commit.', 'error');
 								commitBtn.disabled = false;
@@ -1069,6 +1217,7 @@
 								'method' => isset($extract_method_used) ? $extract_method_used : $extract_method,
 								'alternatives' => isset($extraction['_alternatives']) ? $extraction['_alternatives'] : null,
 								'modul_pages' => isset($modul_pages_by_code) ? $modul_pages_by_code : array(),
+								'page_count' => isset($extraction['__page_count']) ? (int)$extraction['__page_count'] : 0,
 								'created_at' => date('c'),
 							);
 							$parsed_payload = soi_sanitize_for_json($parsed_payload);
@@ -1114,9 +1263,10 @@
 									'anlage2' => soi_sanitize_for_json($anlage2),
 									'modules_found' => count($modules),
 									'anlage2_found' => count($anlage2),
-									'modul_pages' => $modul_pages,
-									'extract_method' => isset($extract_method_used) ? $extract_method_used : $extract_method,
-									'extract_alternatives' => isset($extraction['_alternatives']) ? $extraction['_alternatives'] : null,
+								'modul_pages' => $modul_pages,
+								'page_count' => isset($extraction['__page_count']) ? (int)$extraction['__page_count'] : 0,
+								'extract_method' => isset($extract_method_used) ? $extract_method_used : $extract_method,
+								'extract_alternatives' => isset($extraction['_alternatives']) ? $extraction['_alternatives'] : null,
 									'create_pruefungsnummern' => $create_pns,
 									'reuse' => $reuse,
 									'text_length' => strlen($raw_text),
@@ -1482,6 +1632,16 @@
 				$modul_pages = soi_locate_modules_in_pages($row['raw_text'], $modules);
 			}
 
+			// Page-Count: zuerst aus notes, dann aus Re-Extract, sonst aus raw_text.
+			$page_count = 0;
+			if(is_array($payload) && isset($payload['page_count']) && (int)$payload['page_count'] > 0) {
+				$page_count = (int)$payload['page_count'];
+			} elseif(isset($re) && isset($re['__page_count'])) {
+				$page_count = (int)$re['__page_count'];
+			} else {
+				$page_count = substr_count((string)($row['raw_text'] ?? ''), "\f") + 1;
+			}
+
 			print json_encode(array(
 				'ok' => true,
 				'import_id' => (int)$row['id'],
@@ -1493,6 +1653,7 @@
 				'modules' => soi_sanitize_for_json($modules),
 				'anlage2' => soi_sanitize_for_json($anlage2),
 				'modul_pages' => $modul_pages,
+				'page_count' => $page_count,
 				'modules_found' => count($modules),
 				'anlage2_found' => count($anlage2),
 				'extract_method' => $extract_method,
@@ -1535,6 +1696,15 @@
 				$modules_in = $modules_raw;
 			} else {
 				$modules_in = array();
+			}
+			// Anlage 2 (vom Frontend editiert).
+			$anlage2_raw = get_post('soi_anlage2_v2');
+			$anlage2_in = array();
+			if(is_string($anlage2_raw)) {
+				$d2 = json_decode($anlage2_raw, true);
+				$anlage2_in = is_array($d2) ? $d2 : array();
+			} elseif(is_array($anlage2_raw)) {
+				$anlage2_in = $anlage2_raw;
 			}
 			$new_studiengang_name = trim((string)get_post('soi_new_studiengang_name'));
 

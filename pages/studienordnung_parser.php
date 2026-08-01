@@ -335,36 +335,65 @@ class SoiExtractor {
             if(preg_match('/^Modulnummer\s+Modulname/u', $trimmed)) continue;
 
             // Module line: starts with modulnummer, then 2+ spaces, then name (and optional dozent).
+            // Modulnummer kann mit "-" enden → wird auf nächster Zeile fortgesetzt (z.B. "SLK-BA-R-F-\n1B-K").
             if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}(\S.{2,}?)\s{2,}(.+)$/u', $trimmed, $m)) {
                 if($this->isModulCode($m[1])) {
                     if($current) $modules[] = $current;
+                    $code = $m[1];
                     $name = trim($m[2]);
                     $dozent = trim($m[3]);
-                    // Name kann sich auf nächste Zeile fortsetzen (wrapped).
-                    $name_continued = '';
+                    // Folgezeilen: Modulnummer-Continuation, Dozent-Email, Name-Wrap.
                     while(isset($lines[$i+1])) {
                         $nxt_raw = $lines[$i+1];
                         $nxt = trim($nxt_raw);
                         if($nxt === '') { $i++; continue; }
-                        // Stop, wenn die nächste Zeile ein Label, ein neuer Modulcode, eine Section,
-                        // eine Header-Zeile oder mit Whitespace eingerückt ist (Label-typisch).
+                        // Stop-Kriterien.
                         if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt)) break;
                         if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}/u', $nxt, $cm) && $this->isModulCode($cm[1])) break;
                         if(preg_match('/^[12]\.\s+/u', $nxt)) break;
                         if(preg_match('/^Modulnummer\b/u', $nxt)) break;
-                        // Eingerückte Zeilen mit nur Text → Name-Continuation.
-                        if(strlen($nxt_raw) > 0 && $nxt_raw[0] === ' ' && strpos($nxt_raw, ' ') !== strlen(trim($nxt_raw))) {
-                            // Sieht aus wie ein eingerückter Wert (Label-Spalte).
+
+                        // Modulnummer-Continuation: endet mit "-", nächste Zeile ist kurzer Token ohne Space.
+                        if(substr($code, -1) === '-' && preg_match('/^([A-Za-z0-9.*]+)\s*$/u', $nxt, $ccm) && mb_strlen($nxt) < 25 && strpos($nxt, ' ') === false) {
+                            $code .= $ccm[1];
+                            $i++;
+                            continue;
+                        }
+
+                        // Dozent-Email in Klammern auf nächster Zeile → an Dozent anhängen.
+                        if(preg_match('/^\([^\)]*@[^\)]+\)\s*$/u', $nxt)) {
+                            $dozent = trim($dozent.' '.$nxt);
+                            $i++;
+                            continue;
+                        }
+
+                        // Eingerückte Zeile mit kurzem Text → wahrscheinlich Dozent-Folge (Name + Email).
+                        if(strlen($nxt_raw) > 0 && $nxt_raw[0] === ' ') {
+                            if(preg_match('/[A-Za-z][A-Za-z\.\-]+\s+[A-Za-z][A-Za-z\.\-]+/u', $nxt) || strpos($nxt, '@') !== false) {
+                                if($dozent !== '' && $nxt !== $dozent) $dozent = trim($dozent.' '.$nxt);
+                                elseif($dozent === '') $dozent = $nxt;
+                                $i++;
+                                continue;
+                            }
                             break;
                         }
-                        $name_continued .= ' ' . $nxt;
+
+                        // Label-Start → abbrechen.
+                        if(preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', $nxt)) break;
+
+                        // Default: Name fortsetzen.
+                        $name = trim($name.' '.$nxt);
                         $i++;
                     }
-                    if($name_continued !== '') $name = trim($name.' '.$name_continued);
                     // Trailing junk entfernen (3+ aufeinanderfolgende Ziffern = Seitenzahl-Rest).
                     $name = preg_replace('/\s+\d{3,4}$/', '', $name);
+                    // Falls Email in Klammern im Namen gelandet ist, in Dozent verschieben.
+                    if(preg_match('/^(.+?)\s+\(([^)]+@[^)]+)\)\s*$/u', $name, $nm)) {
+                        $name = trim($nm[1]);
+                        $dozent = trim($dozent.' ('.$nm[2].')');
+                    }
                     $current = [
-                        'modulnummer' => $m[1],
+                        'modulnummer' => $code,
                         'name' => $name,
                         'dozent' => $dozent,
                         'section' => $current_section,
@@ -435,7 +464,31 @@ class SoiExtractor {
             }
         }
         if($current) $modules[] = $current;
-        return $modules;
+        // Guardrail: offensichtlich ungültige Module herausfiltern.
+        return $this->filterValidModules($modules);
+    }
+
+    /**
+     * Entfernt offensichtlich kaputte Module aus dem Ergebnis.
+     * Ein Modul ist ungültig wenn:
+     *  - modulnummer leer oder kürzer als 5 Zeichen
+     *  - name leer oder kürzer als 3 Zeichen
+     *  - modulnummer enthält Whitespace
+     *
+     * @return array Gültige Module.
+     */
+    public function filterValidModules(array $modules): array {
+        $valid = [];
+        foreach($modules as $m) {
+            $code = isset($m['modulnummer']) ? trim((string)$m['modulnummer']) : '';
+            $name = isset($m['name']) ? trim((string)$m['name']) : '';
+            if($code === '' || strlen($code) < 5) continue;
+            if(preg_match('/\s/', $code)) continue;
+            if(!$this->isModulCode($code)) continue;
+            if($name === '' || mb_strlen($name) < 3) continue;
+            $valid[] = $m;
+        }
+        return $valid;
     }
 
     /**
@@ -533,7 +586,7 @@ class SoiExtractor {
             $modules = $this->extractModulesFromRows($rows, $cols);
             $all_modules = array_merge($all_modules, $modules);
         }
-        return $all_modules;
+        return $this->filterValidAnlage2($all_modules);
     }
 
     /**
@@ -707,17 +760,21 @@ class SoiExtractor {
                     'semester' => [],
                 ];
                 $current_y_max = max(array_column($row, 'y'));
-            } elseif($current && mb_strlen($modul_clean) > 0 && $modul_clean !== $current['modulnummer']) {
-                // Could be continuation of module number (e.g., wrap)
-                if(preg_match('/^[A-Za-z0-9-]+$/', $modul_clean)) {
-                    // Likely continuation - append
-                    $current['modulnummer'] .= $modul_clean;
-                }
+            } elseif($current && mb_strlen($modul_clean) > 0
+                && substr($current['modulnummer'], -1) === '-'
+                && preg_match('/^[A-Za-z0-9.*]+$/', $modul_clean)
+                && mb_strlen($modul_clean) < 20) {
+                // Modulnummer-Continuation: vorherige Modulnummer endet mit "-".
+                $current['modulnummer'] .= $modul_clean;
             }
 
-            // Modulname could be on subsequent lines - check if row.y > current_y_max and we have name
-            if($current && empty($current['name']) && isset($cells[1]) && mb_strlen($cells[1]) > 3) {
-                $current['name'] = $cells[1];
+            // Modulname wird auf der nächsten Zeile (gleiche Spalte) ergänzt,
+            // falls die Zelle in Spalte 1 (Name) noch leer ist.
+            if($current && (empty($current['name']) || mb_strlen($current['name']) < 3)
+                && isset($cells[$modul_col + 1]) && mb_strlen($cells[$modul_col + 1]) > 3
+                && $this->row_y_greater_than($row, $current_y_max)) {
+                $current['name'] = trim(($current['name'] ?? '').' '.$cells[$modul_col + 1]);
+                $current_y_max = max($current_y_max, max(array_column($row, 'y')));
             }
 
             // Process cells for SWS / PL / LP
@@ -771,6 +828,19 @@ class SoiExtractor {
         }
         ksort($semesters);
         $module['semester'] = array_values($semesters);
+    }
+
+    /**
+     * Helper: prüft, ob die Y-Positionen der Wörter in $row alle größer als $y_max sind.
+     * Wird verwendet, um zu erkennen, ob eine Zeile "unter" der bisherigen Modulname-Zeile liegt.
+     */
+    public function row_y_greater_than(array $row, float $y_max): bool {
+        foreach($row as $w) {
+            if(isset($w['y']) && (float)$w['y'] <= $y_max + 2) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -856,22 +926,58 @@ class SoiExtractor {
                     continue;
                 }
             }
-            // Continuation line for current module's name (no modulnummer pattern)
-            if($current && $trimmed !== '' && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer|Mindestens)/u', $trimmed)) {
-                // Looks like a continuation of module name OR SWS/PL continuation
-                $append = $trimmed;
-                // If line is "X PL" it's a PL row for last seen semester
-                if(preg_match('/^(\d+)\s*PL\s*$/i', $trimmed, $plm)) {
-                    if(!empty($current['semester'])) {
-                        $current['semester'][count($current['semester'])-1]['pl_count'] = max(
-                            $current['semester'][count($current['semester'])-1]['pl_count'],
-                            (int)$plm[1]
+            // Modulnummer-Continuation: Code endet mit "-", nächste Zeile ist kurzer Token ohne Space.
+            if($current && substr($current['modulnummer'], -1) === '-'
+                && preg_match('/^([A-Za-z0-9.*]+)\s*$/u', $trimmed, $ccm)
+                && mb_strlen($trimmed) < 25 && strpos($trimmed, ' ') === false) {
+                $current['modulnummer'] .= $ccm[1];
+                continue;
+            }
+            // PL-Zeile: "X PL" oder "1 PL  2 PL"
+            if($current && preg_match('/^\s*(\d+)\s*PL\b/i', $trimmed)) {
+                // Mehrere PL pro Zeile möglich.
+                if(preg_match_all('/(\d+)\s*PL\b/i', $trimmed, $plm)) {
+                    $pl_values = array_map('intval', $plm[1]);
+                    $n_sem = count($current['semester']);
+                    $n_pl = count($pl_values);
+                    if($n_sem > 0 && $n_pl > 0) {
+                        // Verteile PLs auf die Semester, beginnend mit dem letzten.
+                        for($k = 0; $k < $n_pl && $k < $n_sem; $k++) {
+                            $idx = $n_sem - 1 - $k;
+                            $current['semester'][$idx]['pl_count'] = max(
+                                $current['semester'][$idx]['pl_count'],
+                                $pl_values[$n_pl - 1 - $k]
+                            );
+                        }
+                    }
+                }
+                continue;
+            }
+            // SWS-Continuation: Zeile enthält "/"-getrennte SWS-Werte.
+            if($current && preg_match('/^\s*[\d\/.]+\s*$/u', $trimmed) && count($current['semester']) > 0) {
+                // Anhängen an SWS-Spalten des letzten Semester-Eintrags.
+                $parts = preg_split('/\s+/u', trim($trimmed));
+                $last_idx = count($current['semester']) - 1;
+                foreach($parts as $p) {
+                    if(preg_match('/^\d+\/\d+/', $p)) {
+                        $current['semester'][$last_idx]['sws'] = array_merge(
+                            $current['semester'][$last_idx]['sws'] ?? [],
+                            explode('/', $p)
+                        );
+                    } elseif(preg_match('/^[*]+$/', $p) || preg_match('/^[*]+\/[*]+/', $p)) {
+                        $current['semester'][$last_idx]['sws'] = array_merge(
+                            $current['semester'][$last_idx]['sws'] ?? [],
+                            explode('/', $p)
                         );
                     }
-                } elseif(empty($current['sws_seen'])) {
-                    // Likely continuation of module name
-                    $current['name'] = trim($current['name'].' '.$append);
                 }
+                continue;
+            }
+            // Continuation line for current module's name
+            if($current && $trimmed !== '' && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer|Mindestens|Modulnummer)/u', $trimmed)) {
+                // Looks like a continuation of module name
+                $append = $trimmed;
+                $current['name'] = trim($current['name'].' '.$append);
                 continue;
             }
         }
@@ -889,7 +995,24 @@ class SoiExtractor {
             }
             $m['lp'] = $m['lp'] ?? null;
         }
-        return $modules;
+        return $this->filterValidAnlage2($modules);
+    }
+
+    /**
+     * Filter für Anlage-2-Zeilen. Anlage 2 hat weniger strikte Anforderungen als
+     * Anlage 1 (manche Module haben keinen vollständigen Namen in der Tabelle).
+     * Wir verwerfen nur offensichtlichen Müll.
+     */
+    public function filterValidAnlage2(array $modules): array {
+        $valid = [];
+        foreach($modules as $m) {
+            $code = isset($m['modulnummer']) ? trim((string)$m['modulnummer']) : '';
+            if($code === '' || strlen($code) < 5) continue;
+            if(preg_match('/\s/', $code)) continue;
+            if(!$this->isModulCode($code)) continue;
+            $valid[] = $m;
+        }
+        return $valid;
     }
 
     /**
