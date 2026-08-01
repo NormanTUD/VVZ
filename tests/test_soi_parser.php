@@ -587,3 +587,214 @@ if($has_pdf && $pdftotext !== '') {
 	is_true("End-to-End: ≥ 2 modul_nach_semester_metadata-Zeilen geschrieben", $total_sem >= 2);
 	is_equal("End-to-End: 3 modul_zuordnung-Zeilen geschrieben", $total_zuord, 3);
 }
+
+/* ============================ Persist-One-Module ============================ */
+
+$log_before = count($GLOBALS['_soi_rquery_log']);
+$res = soi_persist_one_module(7, 99, array(
+	'modulnummer' => 'PHIL-X',
+	'name' => 'Test-Modul',
+	'lp' => 5,
+	'sws' => 4,
+	'dauer_semester' => 1,
+	'section' => 'Kernbereich',
+), array(
+	array(
+		'modulnummer' => 'PHIL-X',
+		'name' => 'Test-Modul',
+		'lp' => 5,
+		'semester' => array(
+			array('semester' => 1, 'sws' => array('2','2','0','0'), 'pl_count' => 1),
+		),
+	),
+));
+is_equal("persist_one_module: modul_id > 0", $res['modul_id'] > 0, true);
+is_equal("persist_one_module: 1 Semester-Zeile", $res['semester_rows'], 1);
+is_equal("persist_one_module: 1 Anlage2-Zeile", $res['anlage2_rows'], 1);
+is_equal("persist_one_module: zuordnung_ok", $res['zuordnung_ok'], true);
+$log = array_slice($GLOBALS['_soi_rquery_log'], $log_before);
+$log_str = implode("\n", $log);
+is_equal("persist_one_module: modul INSERT", strpos($log_str, 'INSERT INTO `modul`') !== false, true);
+is_equal("persist_one_module: modul_anlage2 INSERT", strpos($log_str, 'INSERT INTO `modul_anlage2`') !== false, true);
+is_equal("persist_one_module: modul_nach_semester INSERT", strpos($log_str, 'INSERT IGNORE INTO `modul_nach_semester`') !== false, true);
+is_equal("persist_one_module: modul_nach_semester_metadata INSERT", strpos($log_str, 'INSERT INTO `modul_nach_semester_metadata`') !== false, true);
+is_equal("persist_one_module: modul_zuordnung INSERT", strpos($log_str, 'INSERT INTO `modul_zuordnung`') !== false, true);
+is_equal("persist_one_module: rolle 'kernbereich'", strpos($log_str, '"kernbereich"') !== false, true);
+
+/* modulnummer ohne Anlage-2-Match → keine Semester-Zeilen, aber Modul+Zuordnung trotzdem. */
+$log_before = count($GLOBALS['_soi_rquery_log']);
+$res = soi_persist_one_module(8, 99, array(
+	'modulnummer' => 'PHIL-Y',
+	'name' => 'Test-Y',
+	'lp' => 3,
+	'section' => 'Ergänzungsbereich',
+), array());
+is_equal("persist_one_module ohne Anlage2: modul_id > 0", $res['modul_id'] > 0, true);
+is_equal("persist_one_module ohne Anlage2: semester_rows = 0", $res['semester_rows'], 0);
+is_equal("persist_one_module ohne Anlage2: anlage2_rows = 0", $res['anlage2_rows'], 0);
+is_equal("persist_one_module ohne Anlage2: zuordnung_ok", $res['zuordnung_ok'], true);
+$log = implode("\n", array_slice($GLOBALS['_soi_rquery_log'], $log_before));
+is_equal("persist_one_module ohne Anlage2: rolle 'ergaenzungsbereich'", strpos($log, '"ergaenzungsbereich"') !== false, true);
+
+/* Leeres Modul-Array → modul_id = 0. */
+$res = soi_persist_one_module(9, 99, array('modulnummer' => '', 'name' => ''), array());
+is_equal("persist_one_module: leerer Input → modul_id = 0", $res['modul_id'], 0);
+
+/* Unicode-Name. */
+$res = soi_persist_one_module(10, 99, array(
+	'modulnummer' => 'PHIL-UNICODE',
+	'name' => 'Théorie und Méthode – Théologie der Religion',
+	'lp' => 5,
+	'section' => 'Kernbereich',
+), array());
+is_equal("persist_one_module: Unicode-Name → modul_id > 0", $res['modul_id'] > 0, true);
+$log = implode("\n", array_slice($GLOBALS['_soi_rquery_log'], $log_before));
+is_equal("persist_one_module: Unicode im SQL", strpos($log, 'Théorie') !== false, true);
+
+/* ============================ Create-Pruefungsnummern ============================ */
+
+$log_before = count($GLOBALS['_soi_rquery_log']);
+$seen = array();
+$count = soi_create_pruefungsnummern_for_module(11, 500, 'PHIL-Z', 'Test-Z',
+	array('Klausurarbeit', 'Mündliche Prüfung', 'Hausarbeit'), 5, $seen);
+is_equal("create_pns: 3 Prüfungsnummern", $count, 3);
+$log = implode("\n", array_slice($GLOBALS['_soi_rquery_log'], $log_before));
+is_equal("create_pns: pruefungsnummer INSERT", strpos($log, 'INSERT INTO `pruefungsnummer`') !== false, true);
+is_equal("create_pns: pruefungsnummer_import INSERT", strpos($log, 'INSERT INTO `pruefungsnummer_import`') !== false, true);
+is_equal("create_pns: 3 pruefungsnummer-Inserts",
+	substr_count($log, 'INSERT INTO `pruefungsnummer`') === 3, true);
+is_equal("create_pns: 3 pruefungsnummer_import-Inserts",
+	substr_count($log, 'INSERT INTO `pruefungsnummer_import`') === 3, true);
+
+/* Leere Prüfungstypen-Liste → 0 PNs. */
+$count = soi_create_pruefungsnummern_for_module(11, 500, 'PHIL-Z', 'Test-Z', array(), 5, $seen);
+is_equal("create_pns: leere Liste → 0", $count, 0);
+
+/* modul_id = 0 → 0 PNs. */
+$count = soi_create_pruefungsnummern_for_module(11, 0, 'PHIL-Z', 'Test-Z', array('Klausur'), 5, $seen);
+is_equal("create_pns: modul_id=0 → 0", $count, 0);
+
+/* Whitespace in Prüfungstypen wird getrimmt. */
+$count = soi_create_pruefungsnummern_for_module(11, 500, 'PHIL-Q', 'Test-Q',
+	array('  Klausurarbeit  ', '', '  '), 5, $seen);
+is_equal("create_pns: whitespace wird getrimmt", $count, 1);
+
+/* Doppelte Prüfungstypen werden dedupliziert. */
+$seen = array();
+$count = soi_create_pruefungsnummern_for_module(11, 501, 'PHIL-D', 'Test-D',
+	array('Klausurarbeit', 'Klausurarbeit', 'Klausurarbeit'), 5, $seen);
+is_equal("create_pns: Duplikate werden gezählt (jeder erzeugt eigene PN)", $count, 3);
+
+/* ============================ Idempotenz ============================ */
+
+/* Persist_one_module zweimal aufrufen → modul_id bleibt gleich, kein Crash. */
+$res1 = soi_persist_one_module(99, 999, array('modulnummer' => 'IDEM-1', 'name' => 'Idem 1', 'lp' => 5), array());
+$res2 = soi_persist_one_module(99, 999, array('modulnummer' => 'IDEM-1', 'name' => 'Idem 1 (Update)', 'lp' => 6), array());
+is_equal("persist_one_module idempotent: modul_id gleich", $res1['modul_id'], $res2['modul_id']);
+
+/* persist_anlage2_detailed zweimal → 2 Rows, kein Crash (ON DUPLICATE KEY UPDATE). */
+$res = soi_persist_anlage2_detailed($res1['modul_id'], 99, array(
+	'lp' => 5,
+	'semester' => array(
+		array('semester' => 1, 'sws' => array('2','0','0','2'), 'pl_count' => 1),
+	),
+));
+is_equal("persist_anlage2 idempotent: 1 Zeile (zweiter Aufruf)", $res, 1);
+
+/* ============================ Section-Edge-Cases ============================ */
+
+is_equal("rolle: 'Vertiefungsmodul X' → pflicht", soi_rolle_for_section('Vertiefungsmodul X'), 'pflicht');
+is_equal("rolle: 'Spezialisierung X' → wahlpflicht", soi_rolle_for_section('Spezialisierung X'), 'wahlpflicht');
+is_equal("rolle: 'Grundlagen' → pflicht", soi_rolle_for_section('Grundlagen'), 'pflicht');
+is_equal("rolle: 'Aufbaumodul' → pflicht", soi_rolle_for_section('Aufbaumodul'), 'pflicht');
+is_equal("rolle: 'Einführung in X' → pflicht", soi_rolle_for_section('Einführung in X'), 'pflicht');
+is_equal("rolle: 'Nebenfach Anglistik' → nebenfach", soi_rolle_for_section('Nebenfach Anglistik'), 'nebenfach');
+is_equal("rolle: 'Hauptfach Romanistik' → hauptfach", soi_rolle_for_section('Hauptfach Romanistik'), 'hauptfach');
+is_equal("rolle: 'Ergänzungsbereich Germanistik' → ergaenzungsbereich", soi_rolle_for_section('Ergänzungsbereich Germanistik'), 'ergaenzungsbereich');
+
+/* ============================ detect_voraussetzungen: Edge-Cases ============================ */
+
+/* Leere all_modules_by_code. */
+$det = soi_detect_voraussetzungen_for_modul(
+	array('modulnummer' => 'X-2A-L', 'name' => 'Aufbaumodul X'),
+	array()
+);
+is_equal("detect: leere all_modules → 0", count($det), 0);
+
+/* Modulnummer ohne erkennbares Level → keine numerische Erkennung. */
+$det = soi_detect_voraussetzungen_for_modul(
+	array('modulnummer' => 'PHIL-9999', 'name' => 'Irgendwas'),
+	array('PHIL-9999' => array('modulnummer' => 'PHIL-9999', 'name' => 'Irgendwas'))
+);
+is_equal("detect: kein erkennbares Level → 0", count($det), 0);
+
+/* Spezialisierungsmodul → Vertiefungsmodul. */
+$det = soi_detect_voraussetzungen_for_modul(
+	array('modulnummer' => 'X-3S-L', 'name' => 'Spezialisierungsmodul Lit'),
+	array(
+		'X-3V-L' => array('modulnummer' => 'X-3V-L', 'name' => 'Vertiefungsmodul Lit'),
+		'X-3S-L' => array('modulnummer' => 'X-3S-L', 'name' => 'Spezialisierungsmodul Lit'),
+	)
+);
+is_equal("detect: Spezialisierungsmodul → Vertiefungsmodul", count($det), 1);
+is_equal("detect: Spezialisierungsmodul Typ", $det[0]['typ'], 'empfohlen');
+
+/* Ergänzungsmodul → Basismodul. */
+$det = soi_detect_voraussetzungen_for_modul(
+	array('modulnummer' => 'X-3E-L', 'name' => 'Ergänzungsmodul Lit'),
+	array(
+		'X-1B-L' => array('modulnummer' => 'X-1B-L', 'name' => 'Basismodul Lit'),
+		'X-3E-L' => array('modulnummer' => 'X-3E-L', 'name' => 'Ergänzungsmodul Lit'),
+	)
+);
+is_equal("detect: Ergänzungsmodul → Basismodul", count($det), 1);
+
+/* Pattern ohne 'Thema' → kein Match (z.B. nur "Aufbaumodul" ohne Subjekt). */
+$det = soi_detect_voraussetzungen_for_modul(
+	array('modulnummer' => 'X-2A', 'name' => 'Aufbaumodul'),
+	array()
+);
+is_equal("detect: Aufbaumodul ohne Thema → 0", count($det), 0);
+
+/* Sprachpraxis C1 → B2. */
+$lang = array(
+	'B2' => array('modulnummer' => 'X-3SP-B2', 'name' => 'Sprachpraxis B2 - Französisch'),
+	'C1' => array('modulnummer' => 'X-4SP-C1', 'name' => 'Sprachpraxis C1 - Französisch'),
+);
+$det = soi_detect_voraussetzungen_for_modul($lang['C1'], $lang);
+is_equal("detect: Sprachpraxis C1 → B2", count($det), 1);
+is_equal("detect: Sprachpraxis C1 → Code", $det[0]['modulnummer'], 'X-3SP-B2');
+
+/* Language Skills (statt Sprachpraxis) wird auch erkannt. */
+$ls = array(
+	'A2' => array('modulnummer' => 'X-1SP-A2', 'name' => 'Language Components A2'),
+	'B1' => array('modulnummer' => 'X-2SP-B1', 'name' => 'Language Skills B1'),
+);
+$det = soi_detect_voraussetzungen_for_modul($ls['B1'], $ls);
+is_equal("detect: Language Skills → Vorgänger", count($det), 1);
+
+/* ============================ find_anlage2 Edge-Cases ============================ */
+
+is_equal("find_anlage2: leeres Array → null", soi_find_anlage2_for_modul(array(), 'X'), null);
+is_equal("find_anlage2: nicht gefunden → null",
+	soi_find_anlage2_for_modul(array(array('modulnummer' => 'Y', 'name' => '')), 'X'), null);
+$found = soi_find_anlage2_for_modul(array(array('modulnummer' => 'X ', 'name' => 'A')), 'X');
+is_equal("find_anlage2: mit Trim vergleichen", $found !== null, true);
+is_equal("find_anlage2: richtige Zeile gefunden", $found['name'], 'A');
+
+/* ============================ generate_pruefungsnummer Edge-Cases ============================ */
+
+$seen = array();
+/* Groß-/Kleinschreibung tolerant */
+is_equal("generate: lowercase 'klausur' → KL", soi_generate_pruefungsnummer('X', 'klausur', 5, $seen), 'X-KL-5');
+is_equal("generate: 'MÜNDLICHE PRÜFUNG' → MP", soi_generate_pruefungsnummer('Y', 'MÜNDLICHE PRÜFUNG', 5, $seen), 'Y-MP-5');
+/* Sonderzeichen im Suffix werden entfernt */
+is_equal("generate: Sonderzeichen im Suffix entfernt", soi_generate_pruefungsnummer('PHIL A.B', 'Klausur', 5, $seen), 'PHILAB-KL-5');
+/* lp = 0 → kein -0 Suffix */
+is_equal("generate: lp=0 (falsy) → ohne LP-Suffix", soi_generate_pruefungsnummer('Z', 'Klausur', 0, $seen), 'Z-KL');
+/* Sehr lange lp-Werte */
+$nr = soi_generate_pruefungsnummer('LONG', 'Klausur', 999, $seen);
+is_equal("generate: lp=999 im Suffix", $nr, 'LONG-KL-999');
+/* Suffix mit Umlauten (deutsche Modulnummer) */
+$nr = soi_generate_pruefungsnummer('SLK-MÜ-A1', 'Klausur', 5, $seen);
+is_equal("generate: Umlaute im Suffix entfernt", $nr, 'SLKMÜA1-KL-5');

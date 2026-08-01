@@ -911,18 +911,94 @@ function multiple_esc_join ($data) {
 }
 
 // rquery mock: speichert alle SQL-Befehle in $GLOBALS['_soi_rquery_log'] für Test-Inspektion.
+// Zusätzlich: AUTO_INCREMENT-Counter + SELECT-Spy für einfache Persistenz-Tests.
 $GLOBALS['_soi_rquery_log'] = array();
+$GLOBALS['_soi_next_id'] = 1000;
+$GLOBALS['_soi_studiengang_seen'] = array(); // name → id
+$GLOBALS['_soi_pruefungstyp_seen'] = array(); // name → id
+$GLOBALS['_soi_modul_seen'] = array(); // (studiengang_id, abkuerzung) → id
+$GLOBALS['_soi_pn_seen'] = array(); // pruefungsnummer → id
+
 function rquery ($sql) {
 	if(!isset($GLOBALS['_soi_rquery_log'])) $GLOBALS['_soi_rquery_log'] = array();
 	$GLOBALS['_soi_rquery_log'][] = (string)$sql;
-	// Simuliere, dass SELECTs nichts liefern — die Helper-Funktionen in studienordnung_import
-	// erwarten jedoch echte IDs zurück. Wir geben deshalb die letzte ID zurück, falls INSERT.
+	// INSERT pruefungstyp: aus Name eine ID generieren.
+	if(preg_match('/INSERT INTO `pruefungstyp` \(`name`\) VALUES \(([^)]+)\)/', $sql, $m)) {
+		$name = trim($m[1], '"');
+		if(!isset($GLOBALS['_soi_pruefungstyp_seen'][$name])) {
+			$GLOBALS['_soi_next_id']++;
+			$GLOBALS['_soi_pruefungstyp_seen'][$name] = $GLOBALS['_soi_next_id'];
+		}
+		return 1;
+	}
+	// INSERT studiengang.
+	if(preg_match('/INSERT INTO `studiengang` .* VALUES \(([^,]+),/', $sql, $m)) {
+		$name = trim($m[1], '"');
+		if(!isset($GLOBALS['_soi_studiengang_seen'][$name])) {
+			$GLOBALS['_soi_next_id']++;
+			$GLOBALS['_soi_studiengang_seen'][$name] = $GLOBALS['_soi_next_id'];
+		}
+		return 1;
+	}
+	// INSERT modul: ON DUPLICATE KEY generiert ID.
+	if(preg_match('/INSERT INTO `modul` .* VALUES \(([^,]+),([^,]+),([^,]+),/', $sql, $m)) {
+		$studiengang_id = (int)trim($m[2], '"');
+		$abkuerzung = trim($m[3], '"');
+		$key = $studiengang_id.'|'.$abkuerzung;
+		if(!isset($GLOBALS['_soi_modul_seen'][$key])) {
+			$GLOBALS['_soi_next_id']++;
+			$GLOBALS['_soi_modul_seen'][$key] = $GLOBALS['_soi_next_id'];
+		}
+		return 1;
+	}
+	// INSERT pruefungsnummer: ID generieren.
+	if(preg_match('/INSERT INTO `pruefungsnummer` .* VALUES \(([^,]+),/', $sql, $m)) {
+		$pnr = trim($m[1], '"');
+		if(!isset($GLOBALS['_soi_pn_seen'][$pnr])) {
+			$GLOBALS['_soi_next_id']++;
+			$GLOBALS['_soi_pn_seen'][$pnr] = $GLOBALS['_soi_next_id'];
+		}
+		return 1;
+	}
 	return 1;
 }
 
-// get_single_row_from_query mock: gibt null zurück, sofern nicht mit set_single_row_from_query überschrieben.
-function get_single_row_from_query ($sql) { return null; }
+function get_single_row_from_query ($sql) {
+	// SELECT id FROM pruefungstyp WHERE name = 'X'
+	if(preg_match("/SELECT id FROM `pruefungstyp` WHERE `name` = (.+) LIMIT 1/", $sql, $m)) {
+		$name = trim($m[1], '"');
+		return isset($GLOBALS['_soi_pruefungstyp_seen'][$name]) ? $GLOBALS['_soi_pruefungstyp_seen'][$name] : null;
+	}
+	// SELECT id FROM studiengang WHERE name = 'X' LIMIT 1
+	if(preg_match("/SELECT id FROM `studiengang` WHERE `name` = (.+) LIMIT 1/", $sql, $m)) {
+		$name = trim($m[1], '"');
+		return isset($GLOBALS['_soi_studiengang_seen'][$name]) ? $GLOBALS['_soi_studiengang_seen'][$name] : null;
+	}
+	// SELECT id FROM modul WHERE studiengang_id = 'X' AND abkuerzung = 'Y'
+	if(preg_match("/SELECT id FROM `modul` WHERE `studiengang_id` = (.+) AND `abkuerzung` = (.+) LIMIT 1/", $sql, $m)) {
+		$studiengang_id = (int)trim($m[1], '"');
+		$abkuerzung = trim($m[2], '"');
+		$key = $studiengang_id.'|'.$abkuerzung;
+		return isset($GLOBALS['_soi_modul_seen'][$key]) ? $GLOBALS['_soi_modul_seen'][$key] : null;
+	}
+	// SELECT id FROM pruefungsnummer WHERE pruefungsnummer = 'X'
+	if(preg_match("/SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = (.+) LIMIT 1/", $sql, $m)) {
+		$pnr = trim($m[1], '"');
+		return isset($GLOBALS['_soi_pn_seen'][$pnr]) ? $GLOBALS['_soi_pn_seen'][$pnr] : null;
+	}
+	return null;
+}
+
 function get_single_row_from_query_assoc ($sql) { return null; }
+
+function reset_soi_test_state () {
+	$GLOBALS['_soi_rquery_log'] = array();
+	$GLOBALS['_soi_next_id'] = 1000;
+	$GLOBALS['_soi_studiengang_seen'] = array();
+	$GLOBALS['_soi_pruefungstyp_seen'] = array();
+	$GLOBALS['_soi_modul_seen'] = array();
+	$GLOBALS['_soi_pn_seen'] = array();
+}
 
 function get_uni_name () {
 	return "db_vvz_".($GLOBALS["dbname"] ?? "test");
