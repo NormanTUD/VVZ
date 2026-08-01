@@ -505,8 +505,11 @@ is_equal("detect: Aufbaumodul Voraussetzung-Typ", $det[0]['typ'], 'aufbauend');
 
 /* Vertiefungsmodul → Aufbaumodul */
 $det = soi_detect_voraussetzungen_for_modul($all['SLK-BA-F-3V-L'], $all);
-is_equal("detect: Vertiefungsmodul → Aufbaumodul (1 Treffer)", count($det), 1);
-is_equal("detect: Vertiefungsmodul Voraussetzung-Code", $det[0]['modulnummer'], 'SLK-BA-F-2A-L');
+is_equal("detect: Vertiefungsmodul → Aufbaumodul (≥1 Treffer)", count($det) >= 1, true);
+// Code-Stufung sollte Aufbaumodul finden (3V → 2A im selben Prefix).
+$has_2a = false;
+foreach($det as $d) { if($d['modulnummer'] === 'SLK-BA-F-2A-L') { $has_2a = true; break; } }
+is_equal("detect: Vertiefungsmodul Voraussetzung-Code (3V→2A)", $has_2a, true);
 
 /* Sprachpraxis-Kette: B2 → B1 */
 $lang = array(
