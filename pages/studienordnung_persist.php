@@ -331,3 +331,71 @@ if(!function_exists('soi_persist_voraussetzungen')) {
 		return $written;
 	}
 }
+
+/** Persistiert ein einzelnes Modul in einem Rutsch: modul + anlage2 + zuordnung.
+ *  Wird von beiden Commit-Pfaden (AJAX + Form) verwendet.
+ *  Liefert ['modul_id' => N, 'semester_rows' => N, 'anlage2_rows' => N, 'zuordnung_ok' => bool].
+ */
+if(!function_exists('soi_persist_one_module')) {
+	function soi_persist_one_module(int $import_id, int $studiengang_id, array $m, array $anlage2_rows): array {
+		$out = array('modul_id' => 0, 'semester_rows' => 0, 'anlage2_rows' => 0, 'zuordnung_ok' => false, 'pns' => 0);
+		$modulnummer = trim((string)($m['modulnummer'] ?? ''));
+		$name = trim((string)($m['name'] ?? ''));
+		if($modulnummer === '' || $name === '') return $out;
+
+		$beschreibung_parts = array();
+		if(isset($m['lp']) && $m['lp'] !== '' && is_numeric($m['lp'])) $beschreibung_parts[] = 'LP: '.(int)$m['lp'];
+		if(isset($m['sws']) && $m['sws'] !== '' && $m['sws'] !== null && is_numeric($m['sws'])) $beschreibung_parts[] = 'SWS: '.(float)$m['sws'];
+		if(isset($m['dauer_semester']) && $m['dauer_semester'] !== '' && is_numeric($m['dauer_semester'])) $beschreibung_parts[] = 'Dauer: '.(int)$m['dauer_semester'].' Sem.';
+		$beschreibung = mb_substr(implode('; ', $beschreibung_parts), 0, 500);
+
+		rquery('INSERT INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.
+			esc($name).', '.esc($studiengang_id).', '.esc($modulnummer).', '.esc($beschreibung).
+			') ON DUPLICATE KEY UPDATE name=VALUES(name), beschreibung=VALUES(beschreibung)');
+
+		$mod_row = get_single_row_from_query('SELECT id FROM `modul` WHERE `studiengang_id` = '.esc($studiengang_id).
+			' AND `abkuerzung` = '.esc($modulnummer).' LIMIT 1');
+		if(is_null($mod_row) || $mod_row === '' || $mod_row === false) return $out;
+		$modul_id = (int)$mod_row;
+		$out['modul_id'] = $modul_id;
+
+		$anlage2_match = soi_find_anlage2_for_modul($anlage2_rows, $modulnummer);
+		if($anlage2_match) {
+			if(isset($m['lp']) && $m['lp'] !== '' && is_numeric($m['lp'])) {
+				$anlage2_match['lp'] = (int)$m['lp'];
+			}
+			$out['semester_rows'] = soi_persist_semester_metadata($modul_id, $anlage2_match);
+			$out['anlage2_rows'] = soi_persist_anlage2_detailed($modul_id, $import_id, $anlage2_match);
+		}
+
+		$rolle = soi_rolle_for_section(isset($m['section']) ? (string)$m['section'] : '');
+		$lp = isset($m['lp']) && is_numeric($m['lp']) ? (float)$m['lp'] : null;
+		$out['zuordnung_ok'] = soi_persist_modul_zuordnung($modul_id, $import_id, $studiengang_id, $rolle, $lp);
+
+		return $out;
+	}
+}
+
+/** Erzeugt Prüfungsnummern für ein Modul und schreibt sie in pruefungsnummer + pruefungsnummer_import.
+ *  Liefert Anzahl erzeugter PNs zurück. */
+if(!function_exists('soi_create_pruefungsnummern_for_module')) {
+	function soi_create_pruefungsnummern_for_module(int $import_id, int $modul_id, string $modulnummer, string $name, array $pruefungstypen, $lp, array &$seen_pns): int {
+		if($modul_id <= 0) return 0;
+		$count = 0;
+		foreach($pruefungstypen as $ptname) {
+			if(!is_string($ptname) || trim($ptname) === '') continue;
+			$ptname = trim($ptname);
+			$pt_id = soi_ensure_pruefungstyp($ptname);
+			if(!$pt_id) continue;
+			$generated_nr = soi_generate_pruefungsnummer($modulnummer, $ptname, $lp ?? '', $seen_pns);
+			rquery('INSERT INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `modulbezeichnung`) VALUES ('.
+				esc($generated_nr).', '.esc($modul_id).', '.esc($pt_id).', '.esc($modulnummer.' '.$name).')');
+			$pn_row = get_single_row_from_query('SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = '.esc($generated_nr).' LIMIT 1');
+			$pn_id = (!is_null($pn_row) && $pn_row !== '' && $pn_row !== false) ? (int)$pn_row : null;
+			rquery('INSERT INTO `pruefungsnummer_import` (import_id, modul_id, pruefungsnummer_id, generated_nr, pruefungstyp_name, lp) VALUES ('.
+				esc($import_id).', '.esc($modul_id).', '.esc($pn_id).', '.esc($generated_nr).', '.esc($ptname).', '.esc($lp).')');
+			$count++;
+		}
+		return $count;
+	}
+}
