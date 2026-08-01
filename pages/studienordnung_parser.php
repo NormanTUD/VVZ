@@ -467,6 +467,7 @@ class SoiExtractor {
             'Leistungspunkte und Noten',
             'Leistungspunkte und',
             'Leistungspunkte',
+            'Verwendbarkeit',
             'Häufigkeit des Moduls',
             'Häufigkeit des',
             'Arbeitsaufwand',
@@ -790,6 +791,21 @@ class SoiExtractor {
             }
         }
         if($current) $modules[] = $current;
+        // Section-Post-Processing: Wenn noch keine Section erkannt wurde, leite sie aus
+        // der "Verwendbarkeit"-Beschreibung ab (Pflichtmodul/Wahlpflichtmodul/Ergänzungsmodul).
+        foreach($modules as &$m) {
+            if(!empty($m['section'])) continue;
+            $vt = isset($m['verwendbarkeit_text']) ? $m['verwendbarkeit_text'] : '';
+            if($vt === '') continue;
+            if(preg_match('/Wahlpflichtmodul|ergänzungsbereich|Wahlpflichtbereich|Ergänzungsbereich/u', $vt)) {
+                $m['section'] = 'Wahlpflicht';
+            } elseif(preg_match('/Pflichtmodul|Kernbereich/u', $vt)) {
+                $m['section'] = 'Kernbereich';
+            } elseif(preg_match('/Ergänzungsmodul|Allgemeine\s+Qualifikationen|AQUA/u', $vt)) {
+                $m['section'] = 'Allgemeine Qualifikationen';
+            }
+        }
+        unset($m);
         // Guardrail: offensichtlich ungültige Module herausfiltern.
         return $this->filterValidModules($modules);
     }
