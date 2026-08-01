@@ -492,7 +492,27 @@
 				</div>
 				<div class="soi-actions">
 					<button type="button" id="soi_btn_commit" class="soi-btn-primary">Auswahl in Datenbank eintragen</button>
+					<button type="button" id="soi_btn_debug" class="soi-btn-secondary">Debug-Log</button>
 					<button type="button" id="soi_btn_cancel" class="soi-btn-secondary">Abbrechen</button>
+				</div>
+			</div>
+
+			<!-- Debug-Log Modal -->
+			<div id="soi_debug_modal" class="soi-modal" style="display:none;">
+				<div class="soi-modal-content soi-modal-wide">
+					<div class="soi-modal-header">
+						<h3>Debug-Log</h3>
+						<div>
+							<button type="button" id="soi_btn_copy_log" class="soi-btn-secondary">📋 In Zwischenablage kopieren</button>
+							<button type="button" id="soi_btn_download_log" class="soi-btn-secondary">💾 Als .txt speichern</button>
+							<button type="button" onclick="soi_close_debug()" class="soi-btn-secondary">Schließen</button>
+						</div>
+					</div>
+					<p style="font-size:11px; color:#666; margin:6px 0;">
+						Bei Parser-Problemen: kopiere diesen Text und schicke ihn an den Entwickler.
+						Er enthält alle relevanten Daten + einen Auszug des PDF-Rohtexts.
+					</p>
+					<pre id="soi_debug_log" style="max-height:70vh; overflow:auto; background:#fafafa; border:1px solid #ccc; padding:10px; font-size:11px; font-family:monospace; white-space:pre-wrap; word-wrap:break-word;"></pre>
 				</div>
 			</div>
 
@@ -593,6 +613,36 @@
 					position: absolute; top: 6px; right: 10px; cursor: pointer; font-size: 22px;
 					background: none; border: none;
 				}
+
+				/* Debug-Log Modal */
+				.soi-modal {
+					position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999;
+					display: none; align-items: center; justify-content: center;
+				}
+				.soi-modal.soi-open { display: flex; }
+				.soi-modal-content {
+					background: #fff; max-width: 80vw; max-height: 90vh; overflow: hidden;
+					border-radius: 6px; padding: 16px; position: relative; display: flex; flex-direction: column;
+				}
+				.soi-modal-wide { max-width: 92vw; width: 1100px; }
+				html.dark-mode .soi-modal-content { background: #1e1e3a !important; color: #e0e0e0 !important; }
+				.soi-modal-header {
+					display: flex; justify-content: space-between; align-items: center; gap: 8px;
+					margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ddd;
+				}
+				html.dark-mode .soi-modal-header { border-bottom-color: #3a3a5a !important; }
+				.soi-modal-header h3 { margin: 0; }
+				#soi_debug_log {
+					font-family: 'Courier New', Courier, monospace; font-size: 11px; line-height: 1.4;
+					white-space: pre-wrap; word-wrap: break-word;
+					background: #fafafa; border: 1px solid #ddd; padding: 10px; border-radius: 4px;
+				}
+				html.dark-mode #soi_debug_log { background: #14142a !important; border-color: #3a3a5a !important; }
+				#soi_debug_log .ok { color: #2e7d32; }
+				#soi_debug_log .err { color: #c62828; font-weight: bold; }
+				#soi_debug_log .warn { color: #ef6c00; }
+				#soi_debug_log .head { background: #e3f2fd; padding: 1px 4px; border-radius: 2px; font-weight: bold; }
+				html.dark-mode #soi_debug_log .head { background: #1e3a5f !important; color: #b3e5fc !important; }
 
 				.soi-anlage2-row {
 					display: grid; grid-template-columns: 130px 1fr;
@@ -1120,6 +1170,145 @@
 				if(modalBg) {
 					modalBg.addEventListener('click', function(e) {
 						if(e.target === modalBg) soi_close_modal();
+					});
+				}
+
+				// Debug-Log
+				window.soi_build_debug_log = function() {
+					if(!SOI.data) return '(noch keine Daten — bitte erst PDF hochladen)';
+					var d = SOI.data;
+					var lines = [];
+					var now = new Date().toISOString();
+					lines.push('=== STUDIENORDNUNG DEBUG-LOG ===');
+					lines.push('Generiert: ' + now);
+					lines.push('Import-ID:  ' + (d.import_id || '?'));
+					lines.push('Filename:   ' + (d.filename || '?'));
+					lines.push('SHA256:     ' + (d.sha256 || '?'));
+					lines.push('Größe:      ' + (d.size ? (d.size/1024).toFixed(1) + ' KB' : '?'));
+					lines.push('Page count: ' + (d.page_count || '?'));
+					lines.push('Extract method: ' + (d.extract_method || '?'));
+					if(d.extract_alternatives) {
+						lines.push('Alternatives (Module, Anlage 2):');
+						Object.keys(d.extract_alternatives).forEach(function(k){
+							var v = d.extract_alternatives[k];
+							if(typeof v === 'object' && v !== null) {
+								lines.push('  ' + k + ': modules=' + v.modules + ', anlage2=' + v.anlage2);
+							} else {
+								lines.push('  ' + k + ': ' + v);
+							}
+						});
+					}
+					lines.push('');
+					lines.push('=== COVER ===');
+					if(d.cover) {
+						lines.push('Degree:  ' + (d.cover.degree || '(leer)'));
+						lines.push('Program: ' + (d.cover.program || '(leer)'));
+					}
+					lines.push('');
+					lines.push('=== MODULE (' + (d.modules || []).length + ') ===');
+					(d.modules || []).forEach(function(m, i) {
+						lines.push('[' + i + '] ' + (m.modulnummer || '?'));
+						lines.push('  Name:       ' + (m.name || ''));
+						lines.push('  Dozent:     ' + (m.dozent || ''));
+						lines.push('  Section:    ' + (m.section || ''));
+						lines.push('  LP:         ' + (m.lp !== null && m.lp !== undefined ? m.lp : '(leer)'));
+						lines.push('  SWS-total:  ' + (m.sws_total !== null && m.sws_total !== undefined ? m.sws_total : '(leer)'));
+						lines.push('  Dauer:      ' + (m.dauer_semester !== null && m.dauer_semester !== undefined ? m.dauer_semester : '(leer)'));
+						lines.push('  PTypen:     ' + ((m.pruefungstypen || []).join(', ') || '(leer)'));
+						// Bei fehlenden Werten markieren, damit der Entwickler das schnell findet.
+						var issues = [];
+						if(!m.lp) issues.push('LP?');
+						if(!m.sws_total) issues.push('SWS?');
+						if(!(m.pruefungstypen || []).length) issues.push('PT?');
+						if(!m.name || m.name.length < 5) issues.push('Name-kurz?');
+						if(issues.length) lines.push('  ⚠ ' + issues.join(' '));
+						lines.push('');
+					});
+					lines.push('=== ANLAGE 2 (' + (d.anlage2 || []).length + ') ===');
+					(d.anlage2 || []).forEach(function(a, i) {
+						var sem = (a.semester || []).map(function(s) {
+							return 'S' + s.semester + '(' + (s.sws || []).join('/') + '/' + (s.pl_count || 0) + 'PL)';
+						}).join(' ');
+						lines.push('[' + i + '] ' + (a.modulnummer || '?') + ' | ' + (a.name || '') + ' | LP=' + (a.lp || '?') + ' | ' + (sem || '(keine Sem)'));
+					});
+					lines.push('');
+					return lines.join('\n');
+				};
+
+				window.soi_open_debug = function() {
+					if(!SOI.currentImportId) {
+						alert('Bitte zuerst ein PDF hochladen.');
+						return;
+					}
+					var pre = $('soi_debug_log');
+					pre.textContent = '(Log wird geladen …)';
+					$('soi_debug_modal').classList.add('soi-open');
+
+					// Roh-Text + notes-Payload vom Server holen.
+					fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=debug_text&id=' + SOI.currentImportId, {credentials:'same-origin'})
+						.then(function(r){ return r.text(); })
+						.then(function(txt) {
+							var log = soi_build_debug_log();
+							log += '\n=== RAW TEXT (erste 4000 Zeichen) ===\n';
+							log += txt.length > 4000 ? txt.substring(0, 4000) + '\n…(gekürzt, ' + txt.length + ' Zeichen gesamt)' : txt;
+							pre.textContent = log;
+						})
+						.catch(function(e) {
+							pre.textContent = soi_build_debug_log() + '\n\n(Fehler beim Laden des Raw-Texts: ' + e + ')';
+						});
+				};
+				window.soi_close_debug = function() {
+					$('soi_debug_modal').classList.remove('soi-open');
+				};
+
+				var debugBtn = $('soi_btn_debug');
+				if(debugBtn) {
+					debugBtn.addEventListener('click', soi_open_debug);
+				}
+				var copyLogBtn = $('soi_btn_copy_log');
+				if(copyLogBtn) {
+					copyLogBtn.addEventListener('click', function() {
+						var txt = $('soi_debug_log').textContent;
+						if(navigator.clipboard && navigator.clipboard.writeText) {
+							navigator.clipboard.writeText(txt).then(function() {
+								copyLogBtn.textContent = '✓ Kopiert!';
+								setTimeout(function(){ copyLogBtn.textContent = '📋 In Zwischenablage kopieren'; }, 1500);
+							}).catch(function() {
+								fallbackCopy(txt);
+							});
+						} else {
+							fallbackCopy(txt);
+						}
+					});
+				}
+				function fallbackCopy(txt) {
+					var ta = document.createElement('textarea');
+					ta.value = txt;
+					ta.style.position = 'fixed'; ta.style.opacity = '0';
+					document.body.appendChild(ta);
+					ta.select();
+					try { document.execCommand('copy'); } catch(e) {}
+					document.body.removeChild(ta);
+				}
+				var downloadLogBtn = $('soi_btn_download_log');
+				if(downloadLogBtn) {
+					downloadLogBtn.addEventListener('click', function() {
+						var txt = $('soi_debug_log').textContent;
+						var blob = new Blob([txt], {type: 'text/plain;charset=utf-8'});
+						var url = URL.createObjectURL(blob);
+						var a = document.createElement('a');
+						a.href = url;
+						a.download = 'soi_debug_' + (SOI.currentImportId || 'unknown') + '.txt';
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+						URL.revokeObjectURL(url);
+					});
+				}
+				var debugModal = $('soi_debug_modal');
+				if(debugModal) {
+					debugModal.addEventListener('click', function(e) {
+						if(e.target === debugModal) soi_close_debug();
 					});
 				}
 			})();
@@ -1684,6 +1873,27 @@
 				'extract_method' => $extract_method,
 				'extract_alternatives' => $extract_alternatives,
 			), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
+			exit;
+		} elseif($stage === 'debug_text') {
+			// AJAX: Liefert den geparsten Rohtext eines Imports als text/plain.
+			$id = (int)get_get('id');
+			header('Content-Type: text/plain; charset=utf-8');
+			$row = get_single_row_from_query_assoc('SELECT pdf_data, raw_text, notes FROM `studienordnung_import` WHERE id = '.esc($id));
+			if(!$row) { print "(Import #$id nicht gefunden)\n"; exit; }
+			// Versuche zuerst raw_text (vom Upload gespeichert); sonst neu extrahieren.
+			$raw = (string)($row['raw_text'] ?? '');
+			if($raw === '') {
+				$pdf_bin = base64_decode($row['pdf_data'] ?? '', true);
+				if($pdf_bin === false) $pdf_bin = $row['pdf_data'] ?? '';
+				$tmp_pdf = tempnam(sys_get_temp_dir(), 'soi_dbg_').'.pdf';
+				if(file_put_contents($tmp_pdf, $pdf_bin) !== false) {
+					$raw = (string)@shell_exec('pdftotext -layout '.escapeshellarg($tmp_pdf).' - 2>/dev/null');
+					@unlink($tmp_pdf);
+				}
+			}
+			// Notiz: form feed (\f) → sichtbar machen.
+			$raw = str_replace("\f", "\n<<PAGE BREAK>>\n", $raw);
+			print $raw;
 			exit;
 		} elseif($stage === 'page_image') {
 			// AJAX: Liefert PNG der Seite N eines Imports

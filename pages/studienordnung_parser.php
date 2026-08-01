@@ -424,22 +424,29 @@ class SoiExtractor {
                                 //   → name_wrap: "Soziologie für Ergänzungsbereiche", dozent_tail: "geschäftsführender Direktor"
                                 if($dozent !== ''
                                     && preg_match('/\b(Direktor|Direktorin|Professor|Dozent|Fakultät|Institut|Lehrstuhl|Lehrbereich|Sekretariat)\b\s*$/u', $first_col)
-                                    && !preg_match('/^([a-zäöüß][a-zäöüß\-]*\s+)?Geschäftsführend[er]*\b/i', $first_col)) {
-                                    // Vereinfachte Split-Logik ohne preg_match_all:
-                                    // Suche die letzten 1-3 Title-Case-Wörter per String-Parsing.
+                                    && !preg_match('/^([a-zäöüß][a-zäöüß\-]*\s+)?Geschäftsführend[er]*\b/u', $first_col)) {
+                                    // Split-Logik: vom Ende her scannen.
+                                    // 1. Erkenne 1-3 Title-Case-Wörter am Ende (z.B. "Direktor" oder
+                                    //    "geschäftsführender Direktor" wenn davor ein lowercase Wort steht).
+                                    // 2. NICHT weiter rückwärts gehen, wenn wir auf ein lowercase Wort gestoßen sind.
                                     $tokens = preg_split('/\s+/u', $first_col);
                                     $n = count($tokens);
                                     $title_start = $n;
-                                    for($i = $n - 1; $i >= 0; $i--) {
-                                        $c = mb_substr($tokens[$i], 0, 1);
+                                    for($k = $n - 1; $k >= 0; $k--) {
+                                        $c = mb_substr($tokens[$k], 0, 1);
                                         $is_title = ($c !== '' && $c === mb_strtoupper($c) && preg_match('/[A-Za-zÄÖÜäöüß]/', $c));
+                                        $is_lower = ($c !== '' && $c === mb_strtolower($c) && preg_match('/[a-zäöüß]/', $c));
                                         if($is_title) {
-                                            $title_start = $i;
+                                            $title_start = $k;
+                                        } elseif($is_lower && $title_start < $n) {
+                                            // Lowercase Wort direkt vor Title-case Block → das lowercase Wort mitnehmen.
+                                            $title_start = $k;
+                                            break;
                                         } else {
                                             break;
                                         }
                                     }
-                                    if($title_start < $n && $title_start > 0 && ($n - $title_start) <= 3) {
+                                    if($title_start < $n && $title_start > 0 && ($n - $title_start) <= 4) {
                                         $possible_dozent_tail = trim(implode(' ', array_slice($tokens, $title_start)));
                                         $possible_name_wrap = trim(implode(' ', array_slice($tokens, 0, $title_start)));
                                         if(mb_strlen($possible_name_wrap) >= 5 && mb_strlen($possible_dozent_tail) >= 3) {
