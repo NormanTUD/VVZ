@@ -420,7 +420,19 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 					'grund' => $lbl.' setzt Vorgänger-Stufe voraus (gleicher Fachcode)');
 			}
 		}
-		return $out;
+
+		// Deduplizieren: Wenn Name-Pattern und Code-Pattern denselben Vorgänger finden,
+		// behalten wir nur einen Eintrag.
+		$seen_codes = array();
+		$dedup = array();
+		foreach($out as $entry) {
+			$key = $entry['modulnummer'].'|'.$entry['typ'];
+			if(!isset($seen_codes[$key])) {
+				$seen_codes[$key] = true;
+				$dedup[] = $entry;
+			}
+		}
+		return $dedup;
 	}
 }
 
