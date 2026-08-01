@@ -1500,12 +1500,15 @@ class SoiExtractor {
             }
 
             // Modulnummer-Continuation (Code endet mit "-")
+            // Wichtig: Auch einzelne Ziffern (z.B. "1", "2") MÜSSEN als Continuation akzeptiert
+            // werden, wenn die vorherige Modulnummer mit "-" endet (z.B. "KathTh-BM-" + "1" →
+            // "KathTh-BM1"). Sonst werden Codes wie "PHF-BA-POL-AM-" + "FORSCHUNG" ebenfalls nicht
+            // zusammengefügt. Frühere Logik schloss Ziffern explizit aus → Bug.
             if($current && substr($current['modulnummer'], -1) === '-') {
                 $first_token = strtok($trimmed, " \t");
                 if($first_token !== false
                     && preg_match('/^[A-Za-z0-9.\-]+$/u', $first_token)
-                    && mb_strlen($first_token) < 25
-                    && !preg_match('/^\d+$/', $first_token)) {
+                    && mb_strlen($first_token) < 25) {
                     $current['modulnummer'] .= $first_token;
                     $rest = trim(substr($trimmed, mb_strlen($first_token)));
                     if($rest !== '') $current_block_lines[] = $rest;
