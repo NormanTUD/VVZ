@@ -290,9 +290,14 @@
 	 */
 	if(!function_exists('soi_render_page')) {
 		function soi_render_page($import_id, $pdf_data, $page_number, $dpi = 110) {
+			// Safeguards: DPI und Seitenzahl begrenzen.
+			$dpi = max(20, min(220, (int)$dpi));
+			$page_number = max(1, min(9999, (int)$page_number));
+
+			// Pro DPI-Stufe eigene Cache-Datei (sonst würde 110-DPI 50-DPI-Datei „verschlucken").
 			$dir = $GLOBALS['datadir'].'imported_so/'.intval($import_id).'/pages';
 			if(!is_dir($dir)) { @mkdir($dir, 0775, true); }
-			$png = $dir.'/page_'.intval($page_number).'.png';
+			$png = $dir.'/page_'.intval($page_number).'_dpi'.intval($dpi).'.png';
 			if(file_exists($png) && filesize($png) > 0) return $png;
 
 			// PDF in temporäre Datei schreiben, pdftoppm darauf anwenden
@@ -300,6 +305,27 @@
 			if($tmp_pdf === false) return null;
 			$tmp_pdf .= '.pdf';
 			if(file_put_contents($tmp_pdf, $pdf_data) === false) { @unlink($tmp_pdf); return null; }
+
+			// Cache-Lock: parallel Requests für gleiche Seite → nur einmal rendern.
+			$lock = $dir.'/.lock_'.intval($page_number).'_dpi'.intval($dpi);
+			$lock_fp = @fopen($lock, 'c');
+			if($lock_fp) {
+				$got_lock = flock($lock_fp, LOCK_SH); // shared read: kein blocking
+				// shared lock acquired: png probably already exists by other request
+				clearstatcache(true, $png);
+				if($got_lock && file_exists($png) && filesize($png) > 0) {
+					fclose($lock_fp); @unlink($lock);
+					return $png;
+				}
+				// not yet rendered: upgrade to exclusive
+				flock($lock_fp, LOCK_UN);
+				flock($lock_fp, LOCK_EX);
+				clearstatcache(true, $png);
+				if(file_exists($png) && filesize($png) > 0) {
+					flock($lock_fp, LOCK_UN); fclose($lock_fp); @unlink($lock);
+					return $png;
+				}
+			}
 
 			$cmd = escapeshellcmd('pdftoppm') .
 				' -png -r '.intval($dpi) .
@@ -310,15 +336,25 @@
 			$out = @shell_exec($cmd.' 2>&1');
 			@unlink($tmp_pdf);
 
-			// pdftoppm schreibt "page_N.png" (1-basiert), wir wollen explizit page_<n>.png
-			$generated = $dir.'/page-'.str_pad($page_number, 3, '0', STR_PAD_LEFT).'.png';
-			if(!file_exists($generated)) {
-				$generated = $dir.'/page-'.$page_number.'.png';
-			}
-			if(file_exists($generated)) {
+			// pdftoppm schreibt "page-N.png" oder "page_N.png" je nach Version
+			$candidates = array(
+				$dir.'/page-'.str_pad($page_number, 3, '0', STR_PAD_LEFT).'.png',
+				$dir.'/page-'.$page_number.'.png',
+				$dir.'/page_'.str_pad($page_number, 3, '0', STR_PAD_LEFT).'.png',
+				$dir.'/page_'.$page_number.'.png',
+			);
+			$generated = null;
+			foreach($candidates as $c) { if(file_exists($c) && filesize($c) > 0) { $generated = $c; break; } }
+
+			if($generated !== null) {
 				if($generated !== $png) @rename($generated, $png);
+				if($lock_fp) { flock($lock_fp, LOCK_UN); fclose($lock_fp); @unlink($lock); }
 				return $png;
 			}
+			if($lock_fp) { flock($lock_fp, LOCK_UN); fclose($lock_fp); @unlink($lock); }
+			// Fallback: alte Datei ohne DPI-Suffix liefern, falls vorhanden (Backwards-Compat)
+			$legacy = $dir.'/page_'.intval($page_number).'.png';
+			if(file_exists($legacy) && filesize($legacy) > 0) return $legacy;
 			return null;
 		}
 	}
@@ -490,6 +526,12 @@
 					<div id="soi_anlage2_list"></div>
 				</div>
 				<div class="soi-tab-panel" id="soi_tab_pages" style="display:none;">
+					<div class="soi-pages-toolbar" style="margin-bottom:10px;display:flex;align-items:center;gap:10px;">
+						<label style="font-size:13px;color:#555;">Vorschau-Größe:</label>
+						<button type="button" id="soi_size_small" class="soi-btn-toggle soi-active" onclick="soi_set_thumb_size('small')">Klein (lazy)</button>
+						<button type="button" id="soi_size_medium" class="soi-btn-toggle" onclick="soi_set_thumb_size('medium')">Mittel</button>
+						<span style="font-size:12px;color:#888;">Klick auf Kachel = vergrößerte Anzeige.</span>
+					</div>
 					<div id="soi_pages_list"></div>
 				</div>
 				<div class="soi-actions">
@@ -587,11 +629,13 @@
 				}
 				.soi-page-card {
 					border: 1px solid #ccc; border-radius: 4px; overflow: hidden;
-					background: #fff;
+					background: #fff; cursor: pointer;
+					transition: transform 0.1s, box-shadow 0.1s;
 				}
+				.soi-page-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 				html.dark-mode .soi-page-card { border-color: #3a3a5a !important; background: #16213e !important; }
 				.soi-page-card img {
-					width: 100%; height: auto; display: block; background: #f0f0f0;
+					width: 100%; height: 200px; object-fit: contain; display: block; background: #f0f0f0;
 				}
 				.soi-page-card .soi-page-num {
 					padding: 4px 6px; font-size: 11px; color: #555; border-top: 1px solid #eee;
@@ -599,6 +643,17 @@
 				html.dark-mode .soi-page-card .soi-page-num { color: #b0b0c0 !important; border-top-color: #2a2a4a !important; }
 				.soi-page-card.has-modules { border-color: #1976d2; }
 				html.dark-mode .soi-page-card.has-modules { border-color: #7eb8ff !important; }
+
+				.soi-btn-toggle {
+					padding: 4px 10px; font-size: 12px;
+					background: #f0f0f0; border: 1px solid #ccc; border-radius: 3px;
+					cursor: pointer; color: #333;
+				}
+				.soi-btn-toggle.soi-active {
+					background: #1976d2; color: white; border-color: #1976d2;
+				}
+				html.dark-mode .soi-btn-toggle { background: #2a2a4a; border-color: #3a3a5a; color: #ddd; }
+				html.dark-mode .soi-btn-toggle.soi-active { background: #7eb8ff; color: #16213e; }
 
 				.soi-page-modal-bg {
 					position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999;
@@ -962,36 +1017,74 @@
 				function renderPages(data) {
 					var container = $('soi_pages_list');
 					container.innerHTML = '';
-					var pagesHtml = '<div class="soi-pages-grid">';
-					var numPages = data.page_count || 0;
-					var modulePages = data.modul_pages || {};
-					SOI.pageMap = {};
+				var pagesHtml = '<div class="soi-pages-grid">';
+				var numPages = data.page_count || 0;
+				var modulePages = data.modul_pages || {};
+				SOI.pageMap = {};
+				Object.keys(modulePages).forEach(function(modulnr) {
+					SOI.pageMap[modulnr] = modulePages[modulnr];
+				});
+				// Größen-Toggle: small/medium. Default small, damit 200+ Seiten nicht alle in voller Größe laden.
+				var size = SOI.thumbSize || 'small';
+				for(var p = 1; p <= numPages; p++) {
+					var hasMod = false;
 					Object.keys(modulePages).forEach(function(modulnr) {
-						SOI.pageMap[modulnr] = modulePages[modulnr];
+						if(modulePages[modulnr] === p) hasMod = true;
 					});
-					for(var p = 1; p <= numPages; p++) {
-						var hasMod = false;
-						Object.keys(modulePages).forEach(function(modulnr) {
-							if(modulePages[modulnr] === p) hasMod = true;
+					var src = 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p + '&size=' + size;
+					pagesHtml += '<div class="soi-page-card' + (hasMod ? ' has-modules' : '') + '" data-soi-page="' + p + '">' +
+						'<img class="soi-thumb" data-src="' + src + '" src="data:image/svg+xml;utf8,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 110%22&gt;&lt;rect width=%22100%25%22 height=%22100%25%22 fill=%22%23eee%22/&gt;&lt;/svg&gt;" alt="Seite ' + p + '" />' +
+						'<div class="soi-page-num">Seite ' + p + (hasMod ? ' &mdash; enthält Modul' : '') + '</div>' +
+						'</div>';
+				}
+				pagesHtml += '</div>';
+				container.innerHTML = pagesHtml;
+
+				// Lazy-Loading: IntersectionObserver lädt Bilder erst, wenn sie ins Viewport scrollen.
+				if(window.IntersectionObserver) {
+					var io = new IntersectionObserver(function(entries) {
+						entries.forEach(function(e) {
+							if(e.isIntersecting) {
+								var img = e.target;
+								if(img.dataset.src && !img.src.includes('stage=page_image')) {
+									img.src = img.dataset.src;
+									img.removeAttribute('data-src');
+									io.unobserve(img);
+								}
+							}
 						});
-						pagesHtml += '<div class="soi-page-card' + (hasMod ? ' has-modules' : '') + '" data-soi-page="' + p + '">' +
-							'<img src="admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p + '" alt="Seite ' + p + '" loading="lazy" />' +
-							'<div class="soi-page-num">Seite ' + p + (hasMod ? ' &mdash; enthält Modul' : '') + '</div>' +
-							'</div>';
-					}
-					pagesHtml += '</div>';
-					container.innerHTML = pagesHtml;
-					Array.prototype.forEach.call(container.querySelectorAll('.soi-page-card'), function(card) {
-						card.addEventListener('click', function() {
-							soi_show_page(parseInt(card.dataset.soiPage, 10));
-						});
+					}, {rootMargin: '300px 0px', threshold: 0.01});
+					Array.prototype.forEach.call(container.querySelectorAll('.soi-thumb'), function(img) { io.observe(img); });
+				} else {
+					// Fallback: alle Bilder direkt laden.
+					Array.prototype.forEach.call(container.querySelectorAll('.soi-thumb'), function(img) {
+						img.src = img.dataset.src;
+						img.removeAttribute('data-src');
 					});
 				}
 
+				// Click-Handler
+				Array.prototype.forEach.call(container.querySelectorAll('.soi-page-card'), function(card) {
+					card.addEventListener('click', function() {
+						soi_show_page(parseInt(card.dataset.soiPage, 10));
+					});
+				});
+			}
+
 			window.soi_show_page = function(p) {
 				var img = $('soi_page_modal_img');
-				img.src = 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p;
+				img.src = 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p + '&size=medium';
 				$('soi_page_modal').classList.add('soi-open');
+			};
+			window.soi_set_thumb_size = function(size) {
+				SOI.thumbSize = size;
+				var container = $('soi_pages_container');
+				if(SOI.data) renderPages(SOI.data);
+				// Toggle-Buttons visuell markieren
+				['small','medium'].forEach(function(s) {
+					var btn = document.getElementById('soi_size_' + s);
+					if(btn) btn.classList.toggle('soi-active', s === size);
+				});
 			};
 				window.soi_close_modal = function() {
 					$('soi_page_modal').classList.remove('soi-open');
@@ -2006,6 +2099,14 @@
 			$id = (int)get_get('id');
 			$page = (int)(get_get('pdf_page') ?: get_get('page'));
 			if($page < 1) $page = 1;
+
+			// Größenstufe: small=Thumbnail (~50 DPI), medium=Modal-Vorschau (~110 DPI), large=High-DPI (~180 DPI).
+			$size = strtolower((string)get_get('size', 'medium'));
+			$dpi = 110;
+			if($size === 'small') $dpi = 50;
+			elseif($size === 'large') $dpi = 180;
+			elseif($size === 'medium') $dpi = 110;
+
 			$row = get_single_row_from_query_assoc('SELECT pdf_data FROM `studienordnung_import` WHERE id = '.esc($id));
 			if(!$row) {
 				header('HTTP/1.0 404 Not Found');
@@ -2013,7 +2114,7 @@
 			}
 			$pdf_bin = base64_decode($row['pdf_data'], true);
 			if($pdf_bin === false) $pdf_bin = $row['pdf_data'];
-			$png_path = soi_render_page($id, $pdf_bin, $page, 110);
+			$png_path = soi_render_page($id, $pdf_bin, $page, $dpi);
 			if(!$png_path || !file_exists($png_path)) {
 				header('HTTP/1.0 500 Internal Server Error');
 				print 'Rendern fehlgeschlagen';
