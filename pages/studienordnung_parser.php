@@ -278,8 +278,20 @@ class SoiExtractor {
             $out->words = $this->parseBboxHtml((string)$bbox_html);
         }
 
-        // Split into pages (using form feed character)
-        $out->pages = explode("\f", (string)$out->full_text);
+        // Split into pages (using form feed character), then clean any residual \f from lines.
+        // pdftotext setzt \f sowohl zwischen Seiten ALS auch gelegentlich an Zeilenanfänge (z.B.
+        // wenn ein Label direkt nach einem Seitenumbruch steht). Wir entfernen \f aus jeder Zeile,
+        // BEHALTEN aber die Seiten-Trennung.
+        $raw_pages = explode("\f", (string)$out->full_text);
+        $clean_pages = array();
+        foreach($raw_pages as $pg) {
+            // \f aus jeder Zeile entfernen (sowohl am Anfang als auch mittendrin).
+            $lines = preg_split('/\R/u', $pg);
+            $clean_lines = array_map(function($l) { return str_replace("\f", '', $l); }, $lines);
+            $clean_pages[] = implode("\n", $clean_lines);
+        }
+        $out->pages = $clean_pages;
+        $out->full_text = implode("\n", $clean_pages);
         return $out;
     }
 
@@ -429,6 +441,7 @@ class SoiExtractor {
             'die Vergabe von',
             'Leistungspunkten',
             'Leistungspunkte und Noten',
+            'Leistungspunkte und',
             'Leistungspunkte',
             'Häufigkeit des Moduls',
             'Häufigkeit des',
@@ -460,10 +473,18 @@ class SoiExtractor {
 
             // Module line: starts with modulnummer, then 2+ spaces, then name (and optional dozent).
             // Modulnummer kann mit "-" enden → wird auf nächster Zeile fortgesetzt (z.B. "SLK-BA-R-F-\n1B-K").
-            if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}(\S.{2,}?)\s{2,}(.+)$/u', $trimmed, $m)) {
-                if($this->isModulCode($m[1])) {
+            // Modulnummer darf EINEN einzelnen internen Space enthalten (z.B. "PHF-BA-KG-EM 1"), der dann entfernt wird.
+            if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}(\S.{2,}?)\s{2,}(.+)$/u', $trimmed, $m)) {
+                // Wenn das erste Capture-Group einen einzelnen internen Space hat, normalisieren.
+                $raw_code = $m[1];
+                if(substr_count($raw_code, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw_code)) {
+                    $code_candidate = preg_replace('/\s+/', '', $raw_code);
+                } else {
+                    $code_candidate = $raw_code;
+                }
+                if($this->isModulCode($code_candidate)) {
                     if($current) $modules[] = $current;
-                    $code = $m[1];
+                    $code = $code_candidate;
                     $name = trim($m[2]);
                     $dozent = trim($m[3]);
                     // Folgezeilen: Modulnummer-Continuation, Dozent-Email, Name-Wrap.
@@ -473,9 +494,23 @@ class SoiExtractor {
                         if($nxt === '') { $i++; continue; }
                         // Stop-Kriterien.
                         if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt)) break;
-                        if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}/u', $nxt, $cm) && $this->isModulCode($cm[1])) break;
+                        if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}/u', $nxt, $cm)) {
+                            $raw = $cm[1];
+                            if(substr_count($raw, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw)) {
+                                $raw = preg_replace('/\s+/', '', $raw);
+                            }
+                            if($this->isModulCode($raw)) break;
+                        }
                         if(preg_match('/^[12]\.\s+/u', $nxt)) break;
                         if(preg_match('/^Modulnummer\b/u', $nxt)) break;
+
+                        // Alternative Modulnummer in Klammern (z.B. "(SLK-BA-KG-EM1)" auf Folgezeile).
+                        // Wird ignoriert — die alternative Code wird in einer späteren Verarbeitung ggf.
+                        // als Sekundärschlüssel gespeichert. Für jetzt: Zeile überspringen.
+                        if(preg_match('/^\(([A-Z][A-Za-z0-9.\-]{3,})\)\s{2,}/u', $nxt)) {
+                            $i++;
+                            continue;
+                        }
 
                         // Modulnummer-Continuation: Code endet mit "-", erstes Token der Zeile ist alphanumerisch (kurz).
                         // Das Token wird an die Modulnummer angehängt; der Rest der Zeile (z.B. "(email)") wird
@@ -677,14 +712,20 @@ class SoiExtractor {
                     $nxt = trim($lines[$i+1]);
                     if($nxt === '') { $i++; continue; }
                     if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt)) break;
-                    if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}/u', $nxt, $cm) && $this->isModulCode($cm[1])) break;
+                    if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}/u', $nxt, $cm)) {
+                        $raw = $cm[1];
+                        if(substr_count($raw, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw)) {
+                            $raw = preg_replace('/\s+/', '', $raw);
+                        }
+                        if($this->isModulCode($raw)) break;
+                    }
                     if(preg_match('/^[12]\.\s+/u', $nxt)) break;
                     $value .= ' ' . $nxt;
                     $i++;
                 }
                 $current['fields'][$label] = trim($value);
                 // Extract specific values
-                if($label === 'Leistungspunkte und Noten' || $label === 'Leistungspunkte') {
+                if($label === 'Leistungspunkte und Noten' || $label === 'Leistungspunkte und' || $label === 'Leistungspunkte') {
                     if(preg_match('/(\d+)\s*Leistungspunkte/u', $value, $lm)) {
                         $current['lp'] = (int)$lm[1];
                     }
@@ -755,10 +796,19 @@ class SoiExtractor {
     public function isModulCode(string $s): bool {
         // Module codes typically: prefix-institute-program-number with - separators
         // Must contain at least one dash, mostly uppercase + digits, length 4-40
+        $s = trim($s);
         if(strlen($s) < 4 || strlen($s) > 40) return false;
         if(strpos($s, '-') === false) return false;
         // Must start with letter
         if(!preg_match('/^[A-Za-z]/', $s)) return false;
+        // Tolerate single internal space (z.B. "PHF-BA-KG-EM 1" → "PHF-BA-KG-EM1")
+        // und Punkte (z.B. "SLK-BA-R-F-1SP-B2.1.1"). Spaces inside werden entfernt.
+        $s_norm = preg_replace('/\s+/', '', $s);
+        if($s_norm !== $s && strpos($s, ' ') !== false) {
+            // Nur einzelne Spaces sind erlaubt.
+            if(preg_match('/\s{2,}/', $s)) return false;
+        }
+        $s = $s_norm;
         // Most chars should be uppercase or digits
         $upper_count = 0;
         $lower_count = 0;
@@ -1191,8 +1241,11 @@ class SoiExtractor {
             // Pattern: <code>   <name>...   <SWS cells>...   <LP>
             // Modulnumber starts at column 0 with code pattern, then ≥2 spaces.
             // Akzeptiert auch Codes, die mit "-" enden (werden unten fortgesetzt).
-            if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}(.+)$/u', $trimmed, $m)) {
+            if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}(.+)$/u', $trimmed, $m)) {
                 $code_candidate = $m[1];
+                if(substr_count($code_candidate, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $code_candidate)) {
+                    $code_candidate = preg_replace('/\s+/', '', $code_candidate);
+                }
                 $is_valid = $this->isModulCode($code_candidate);
                 // Akzeptiere auch Codes, die mit Bindestrich enden, wenn der Code dem
                 // TU-Standard entspricht (3-4 Buchstaben-Segmente durch Bindestriche getrennt,
