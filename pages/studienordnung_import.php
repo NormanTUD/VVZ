@@ -1628,25 +1628,37 @@
 						var txt = results[0];
 						var cv = results[1];
 						var log = soi_build_debug_log();
-						log += '\n=== CROSS-VALIDATION (6 Methoden, 5 Checks) ===\n';
-						if(cv && cv.ok) {
-							log += 'Konsistenz: ' + (cv.all_consistent ? '✓ ALLE METHODEN KONSISTENT' : '⚠ METHODEN UNTERSCHEIDEN SICH') + '\n';
-							log += '\nMethod-Statistik:\n';
+						log += '\n=== CROSS-VALIDATION (≥5 Methoden, ≥4 müssen übereinstimmen) ===\n';
+						if(!cv || cv.error) {
+							log += '✗ FEHLER: ' + (cv && cv.error ? cv.error : 'Cross-Validation fehlgeschlagen') + '\n';
+						} else {
+							var ac = cv.agreement_count || 0;
+							log += 'Methoden mit gültigem Ergebnis: ' + ac + '\n';
+							if(cv.all_confirmed) {
+								log += '✓ ALLE PFLICHTFELDER BESTÄTIGT (modules_count + cover)\n';
+							} else {
+								log += '⚠ NICHT ALLE PFLICHTFELDER BESTÄTIGT — Ergebnis ist UNSICHER\n';
+							}
+							log += '\nKanonische Werte (≥4-agrement):\n';
+							var cons = cv.consensus || {};
+							Object.keys(cons).forEach(function(k) {
+								var v = cons[k];
+								var display = (typeof v === 'string') ? v : JSON.stringify(v);
+								if(display && display.length > 80) display = display.substring(0, 80) + '…';
+								log += '  ' + k + ': ' + display + '\n';
+							});
+							log += '\nMethod-Statistik (Roh-Werte pro Methode):\n';
 							Object.keys(cv.method_stats || {}).forEach(function(m) {
 								var s = cv.method_stats[m];
-								if(s.error) { log += '  ' + m.padEnd(7) + ' ERROR: ' + s.error + '\n'; return; }
-								log += '  ' + m.padEnd(7) + ' modules=' + s.modules_count + ', a2=' + s.anlage2_count + ', cover=' + (s.cover_degree || '?') + '/' + (s.cover_program || '?') + '\n';
+								if(s.error) { log += '  ' + m.padEnd(8) + ' ERROR: ' + s.error + '\n'; return; }
+								log += '  ' + m.padEnd(8) + ' modules=' + s.modules_count + ', a2=' + s.anlage2_count + ', cover=' + (s.cover_degree || '?') + '\n';
 							});
 							log += '\nKonsistenz-Checks:\n';
 							(cv.checks || []).forEach(function(c) {
-								log += '  ' + c.name + ': ' + (c.ok ? '✓ OK' : '⚠ FAIL') + '\n';
-								Object.keys(c.details || {}).forEach(function(k) {
-									var v = c.details[k];
-									log += '    ' + k + ': ' + (typeof v === 'object' ? JSON.stringify(v) : v) + '\n';
-								});
+								var status = c.ok ? '✓ OK' : '⚠ FAIL';
+								var valStr = (c.value !== null && c.value !== undefined) ? (' → "' + (typeof c.value === 'string' && c.value.length > 60 ? c.value.substring(0, 60) + '…' : c.value) + '"') : '';
+								log += '  ' + c.name + ' [' + (c.agreement || 0) + '/' + ac + ']' + valStr + ': ' + status + '\n';
 							});
-						} else {
-							log += 'Fehler: ' + (cv && cv.error ? cv.error : 'unbekannt') + '\n';
 						}
 						log += '\n=== RAW TEXT (erste 4000 Zeichen) ===\n';
 						log += txt.length > 4000 ? txt.substring(0, 4000) + '\n…(gekürzt, ' + txt.length + ' Zeichen gesamt)' : txt;

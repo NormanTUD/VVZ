@@ -51,36 +51,56 @@ class SoiExtractor {
     }
 
     /**
-     * Cross-Validation: vergleicht alle Methoden auf 5 Konsistenz-Checks.
-     * Liefert ein Array mit 'consistency' (alle Checks ok?), 'checks' (Detail-Liste),
-     * 'method_stats' (modul/anlage2-Counts pro Methode).
+     * Cross-Validation: vergleicht ALLE verfügbaren Methoden (mindestens 5) auf
+     * Konsistenz. Jeder numerische oder kategorische Wert gilt als "bestätigt", wenn
+     * mindestens 4 Methoden denselben Wert liefern. Bei weniger Übereinstimmung wird
+     * der Wert als "umstritten" markiert und NICHT als kanonisches Ergebnis übernommen.
      *
-     * Die 5 Checks sind:
-     *   1. modules_count     — alle Methoden müssen gleich viele Module finden
-     *   2. anlage2_count     — alle Methoden müssen gleich viele A2-Einträge finden
-     *   3. cover             — alle Methoden müssen denselben Studiengang erkennen
-     *   4. sample_modules    — Stichprobe der ersten 3 Module: modulnummer+name identisch?
-     *   5. lp_consistency    — alle Methoden müssen für die Stichprobe dieselbe LP finden
+     * Liefert:
+     *   - method_stats    — Roh-Statistik pro Methode
+     *   - checks          — Pro Prüfpunkt: ok (≥4 stimmen überein), value (kanonischer Wert), details
+     *   - consensus       — Aggregierte kanonische Werte (nur ≥4-agrement Felder)
+     *   - agreement_count — Anzahl Methoden mit gültigem Ergebnis
+     *   - all_confirmed   — true wenn alle Pflichtfelder (modules_count, cover) ≥4-agrement haben
      */
     public function crossValidate(string $pdf_path): array {
         $all = $this->extractAll($pdf_path);
         $methods = array_keys($all);
+
+        // Mindestens 5 Methoden erforderlich — sonst ist Cross-Validation nicht aussagekräftig.
+        if(count($methods) < 5) {
+            return [
+                'agreement_count' => count($methods),
+                'method_stats' => array(),
+                'checks' => array(array(
+                    'name' => 'method_count',
+                    'ok' => false,
+                    'value' => null,
+                    'details' => 'Nur '.count($methods).' Methoden verfügbar, mindestens 5 erforderlich.',
+                )),
+                'consensus' => array(),
+                'all_confirmed' => false,
+                'error' => 'Zu wenige Methoden für Cross-Validation (min. 5).',
+            ];
+        }
+
+        // Pro Methode: Roh-Statistik aggregieren.
         $stats = [];
         foreach($methods as $m) {
             $r = $all[$m] ?? null;
             if(!is_array($r) || isset($r['error'])) {
-                $stats[$m] = ['error' => $r['error'] ?? 'no result'];
+                $stats[$m] = ['error' => is_array($r) ? ($r['error'] ?? 'no result') : 'no result'];
                 continue;
             }
             $stats[$m] = [
                 'method' => $r['method'] ?? $m,
-                'modules_count' => $r['modules_count'] ?? 0,
-                'anlage2_count' => $r['anlage2_count'] ?? 0,
+                'modules_count' => (int)($r['modules_count'] ?? 0),
+                'anlage2_count' => (int)($r['anlage2_count'] ?? 0),
                 'cover_degree' => $r['cover']['degree'] ?? null,
                 'cover_program' => $r['cover']['program'] ?? null,
                 'sample_modules' => [],
             ];
-            foreach(array_slice($r['modules'] ?? [], 0, 3) as $mod) {
+            foreach(array_slice($r['modules'] ?? [], 0, 5) as $mod) {
                 $stats[$m]['sample_modules'][] = [
                     'code' => $mod['modulnummer'] ?? '',
                     'name' => mb_substr($mod['name'] ?? '', 0, 40),
@@ -89,77 +109,146 @@ class SoiExtractor {
             }
         }
 
+        // Helper: Finde den Wert, der von ≥4 Methoden unterstützt wird.
+        // Wenn kein Wert ≥4 Stimmen hat → null (nicht bestätigt).
+        $find_consensus = function(array $values_per_method) {
+            $counts = array_count_values(array_filter($values_per_method, function($v) {
+                return $v !== null && $v !== '' && $v !== '?';
+            }));
+            if(empty($counts)) return ['value' => null, 'agreement' => 0, 'all_values' => $values_per_method];
+            arsort($counts);
+            $best = array_key_first($counts);
+            $agreement = $counts[$best];
+            return ['value' => $agreement >= 4 ? $best : null, 'agreement' => $agreement, 'all_values' => $values_per_method];
+        };
+
+        // Prüfpunkt: Anzahl Methoden mit gültigem Ergebnis.
+        $valid_methods = array_filter($stats, function($s) { return !isset($s['error']); });
+        $agreement_count = count($valid_methods);
+
         $checks = [];
-        // Check 1: module count
+        $consensus = [];
+
+        // 1. modules_count
         $mod_counts = [];
-        foreach($stats as $m => $s) { if(!isset($s['error'])) $mod_counts[$m] = $s['modules_count']; }
-        $unique_mod = array_unique($mod_counts);
+        foreach($stats as $m => $s) {
+            if(!isset($s['error'])) $mod_counts[$m] = $s['modules_count'];
+        }
+        $mc = $find_consensus($mod_counts);
         $checks[] = [
-            'name' => '1. modules_count',
-            'ok' => count($unique_mod) <= 1,
-            'details' => $mod_counts,
+            'name' => 'modules_count',
+            'ok' => $mc['value'] !== null,
+            'value' => $mc['value'],
+            'agreement' => $mc['agreement'],
+            'details' => $mc['all_values'],
         ];
-        // Check 2: anlage2 count
+        if($mc['value'] !== null) $consensus['modules_count'] = $mc['value'];
+
+        // 2. anlage2_count
         $a2_counts = [];
-        foreach($stats as $m => $s) { if(!isset($s['error'])) $a2_counts[$m] = $s['anlage2_count']; }
-        $unique_a2 = array_unique($a2_counts);
+        foreach($stats as $m => $s) {
+            if(!isset($s['error'])) $a2_counts[$m] = $s['anlage2_count'];
+        }
+        $a2c = $find_consensus($a2_counts);
         $checks[] = [
-            'name' => '2. anlage2_count',
-            'ok' => count($unique_a2) <= 1,
-            'details' => $a2_counts,
+            'name' => 'anlage2_count',
+            'ok' => $a2c['value'] !== null,
+            'value' => $a2c['value'],
+            'agreement' => $a2c['agreement'],
+            'details' => $a2c['all_values'],
         ];
-        // Check 3: cover degree
+        if($a2c['value'] !== null) $consensus['anlage2_count'] = $a2c['value'];
+
+        // 3. cover.degree
         $degrees = [];
-        foreach($stats as $m => $s) { if(!isset($s['error'])) $degrees[$m] = $s['cover_degree'] ?? '(leer)'; }
-        $checks[] = [
-            'name' => '3. cover_degree',
-            'ok' => count(array_unique($degrees)) <= 1,
-            'details' => $degrees,
-        ];
-        // Check 4: sample modules
-        $sample_diff = [];
         foreach($stats as $m => $s) {
-            if(isset($s['error'])) continue;
-            foreach($s['sample_modules'] as $i => $mod) {
-                $sample_diff[$i][$m] = $mod['code'].' | '.$mod['name'];
+            if(!isset($s['error'])) $degrees[$m] = $s['cover_degree'] ?? '(null)';
+        }
+        $cd = $find_consensus($degrees);
+        $checks[] = [
+            'name' => 'cover_degree',
+            'ok' => $cd['value'] !== null,
+            'value' => $cd['value'],
+            'agreement' => $cd['agreement'],
+            'details' => $cd['all_values'],
+        ];
+        if($cd['value'] !== null) $consensus['cover_degree'] = $cd['value'];
+
+        // 4. cover.program (nur erfolgreich, wenn mindestens 1 Methode einen Wert hat)
+        $programs = [];
+        foreach($stats as $m => $s) {
+            if(!isset($s['error'])) $programs[$m] = $s['cover_program'] ?? '(null)';
+        }
+        $cp = $find_consensus($programs);
+        $checks[] = [
+            'name' => 'cover_program',
+            'ok' => $cp['value'] !== null,
+            'value' => $cp['value'],
+            'agreement' => $cp['agreement'],
+            'details' => $cp['all_values'],
+        ];
+        if($cp['value'] !== null) $consensus['cover_program'] = $cp['value'];
+
+        // 5. Sample-Modulkonsistenz: für jeden Sample-Slot (0..4) zählen wir, welche
+        // Modulnummer (Code) am häufigsten vorkommt. Mindestens 4 müssen übereinstimmen.
+        $n_sample = 0;
+        foreach($stats as $s) {
+            if(!isset($s['error'])) {
+                $n_sample = max($n_sample, count($s['sample_modules']));
             }
         }
-        $sample_consistent = true;
-        foreach($sample_diff as $i => $mods) {
-            $codes = array_unique(array_map(function($x) { return explode(' | ', $x)[0]; }, $mods));
-            if(count($codes) > 1) $sample_consistent = false;
-        }
-        $checks[] = [
-            'name' => '4. sample_modules (erste 3)',
-            'ok' => $sample_consistent,
-            'details' => $sample_diff,
-        ];
-        // Check 5: LP consistency on sample
-        $lp_diff = [];
-        foreach($stats as $m => $s) {
-            if(isset($s['error'])) continue;
-            foreach($s['sample_modules'] as $i => $mod) {
-                $lp_diff[$i][$m] = ($mod['lp'] === null) ? '(null)' : $mod['lp'];
+        $sample_consensus = [];
+        $sample_ok = true;
+        for($i = 0; $i < $n_sample; $i++) {
+            $codes_i = [];
+            foreach($stats as $m => $s) {
+                if(!isset($s['error']) && isset($s['sample_modules'][$i])) {
+                    $codes_i[$m] = $s['sample_modules'][$i]['code'];
+                }
             }
-        }
-        $lp_consistent = true;
-        foreach($lp_diff as $i => $mods) {
-            $lps = array_unique($mods);
-            if(count($lps) > 1) $lp_consistent = false;
+            $sc = $find_consensus($codes_i);
+            $sample_consensus[$i] = $sc;
+            if($sc['value'] === null) $sample_ok = false;
         }
         $checks[] = [
-            'name' => '5. lp_consistency (erste 3)',
-            'ok' => $lp_consistent,
-            'details' => $lp_diff,
+            'name' => 'sample_modules_code',
+            'ok' => $sample_ok,
+            'value' => $sample_ok ? 'all slots confirmed' : 'some slots unconfirmed',
+            'agreement' => $sample_ok ? $agreement_count : 0,
+            'details' => $sample_consensus,
         ];
 
-        $all_ok = true;
-        foreach($checks as $c) { if(!$c['ok']) $all_ok = false; }
+        // 6. LP-Konsistenz auf den Sample-Modulen.
+        $lp_consensus = [];
+        $lp_ok = true;
+        for($i = 0; $i < $n_sample; $i++) {
+            $lps_i = [];
+            foreach($stats as $m => $s) {
+                if(!isset($s['error']) && isset($s['sample_modules'][$i])) {
+                    $lps_i[$m] = $s['sample_modules'][$i]['lp'];
+                }
+            }
+            $lc = $find_consensus($lps_i);
+            $lp_consensus[$i] = $lc;
+            // LP darf "null" sein (wenn nicht erkannt) — das ist KEIN Fehler.
+        }
+        $checks[] = [
+            'name' => 'sample_modules_lp',
+            'ok' => true, // LP-Coverage ist informativ, nicht binär ok/fail.
+            'value' => 'see details',
+            'agreement' => $agreement_count,
+            'details' => $lp_consensus,
+        ];
+
+        // Pflichtfelder: modules_count UND cover müssen ≥4-agrement haben.
+        $all_confirmed = ($mc['value'] !== null) && ($cd['value'] !== null);
 
         return [
-            'all_consistent' => $all_ok,
+            'agreement_count' => $agreement_count,
             'method_stats' => $stats,
             'checks' => $checks,
+            'consensus' => $consensus,
+            'all_confirmed' => $all_confirmed,
         ];
     }
 

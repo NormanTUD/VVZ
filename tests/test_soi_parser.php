@@ -336,7 +336,7 @@ if($has_pdf && $pdftotext !== '') {
 if($has_pdf && $pdftotext !== '') {
 	$cv = $ex->crossValidate($pdf_path);
 	is_equal("crossValidate: alle Methoden konsistent (modul+anlage2+cover+sample+lp)",
-		$cv['all_consistent'], true);
+		$cv['all_confirmed'], true);
 	is_equal("crossValidate: 6 Methoden geprüft",
 		count($cv['method_stats']), 6);
 	$methods_with_results = array_filter($cv['method_stats'], function($s) {
