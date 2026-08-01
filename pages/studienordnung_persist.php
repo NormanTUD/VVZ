@@ -341,83 +341,83 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 			}
 		}
 
-		// Generische Stufung aus kurzen Buchstaben-Codes (typisch TU-TUD):
-		// "-BM-" (Basismodul, level 1), "-AM-" (Aufbaumodul, level 2),
-		// "-VM-" / "-V-" (Vertiefungsmodul, level 3), "-SM-" / "-S-" (Spezialisierung, level 4).
-		// "-WP-" / "-W-" (Wahlpflicht), "-AQ-" / "-AQUA" (Allgemeine Qualifikationen).
-		// Funktioniert für Codes wie "PHF-BA-POL-BM-SYS" / "-AM-SYS" / "-VM-XYZ".
-		if(preg_match('/-(BM|AM|VM|SM|WP|AQ|AQUA|V|W|S|A|E)(-[A-Z][A-Z0-9]+)?$/u', $code, $lm)) {
-			$level_code = $lm[1];
-			$subj_code = isset($lm[2]) ? $lm[2] : '';
-			$level_map = array(
-				'BM' => 1, 'V' => 1, 'W' => 1, 'S' => 1, 'A' => 1, 'E' => 1,
-				'AM' => 2, 'VM' => 3, 'SM' => 4, 'WP' => 5, 'AQ' => 0, 'AQUA' => 0,
-			);
-			$lvl = isset($level_map[$level_code]) ? $level_map[$level_code] : null;
-			if($lvl !== null && $lvl > 0) {
-				// Voraussetzung ist das Modul mit dem gleichen Sub-Code auf der nächst-niedrigeren Stufe.
-				// Stufung: BM(1) < AM(2) < VM(3) < SM(4).
-				$chains = array(
-					array(2, 'BM'), // AM → BM
-					array(3, 'AM'), // VM → AM
-					array(4, 'VM'), // SM → VM
+		// Generische Stufung über Modulnummer-Pattern. TU-typische Hierarchie:
+		//   1B / BM  (Basis, level 1)
+		//   2A / AM  (Aufbau, level 2)
+		//   2V       (Vertiefung auf Aufbau-Niveau, level 2 — setzt 1B voraus)
+		//   3V / VM  (Vertiefung, level 3 — setzt 2A voraus)
+		//   3S / SM  (Spezialisierung auf Vertiefungs-Niveau, level 3)
+		//   4S / 4SP (Spezialisierung, level 4 — setzt 3V voraus)
+		// Wir extrahieren das Level (Zahl + Buchstabe) und suchen nach einem Modul mit
+		// dem gleichen Prefix aber niedrigerem Level.
+		$prefix = '';
+		$level_num = null;
+		$level_letter = null;
+		$subj_after_level = '';
+		if(preg_match('/^(.*?)-(BM|AM|VM|SM|WP|SP)(-(.+))?$/u', $code, $mm)) {
+			$prefix = $mm[1];
+			$lvl_abbr = $mm[2];
+			$subj_after_level = isset($mm[4]) ? '-'.$mm[4] : '';
+			$abbrev_to_num = array('BM' => 1, 'AM' => 2, 'VM' => 3, 'SM' => 4, 'WP' => 5, 'SP' => 1);
+			$abbrev_to_letter = array('BM' => 'B', 'AM' => 'A', 'VM' => 'V', 'SM' => 'S', 'WP' => 'W', 'SP' => 'S');
+			$level_num = $abbrev_to_num[$lvl_abbr];
+			$level_letter = $abbrev_to_letter[$lvl_abbr];
+		} elseif(preg_match('/^(.*?)-([1-4][BVASE])(-(.+))?$/u', $code, $mm2)) {
+			$prefix = $mm2[1];
+			$digit = (int)$mm2[2][0];
+			$lett = $mm2[2][1];
+			$subj_after_level = isset($mm2[4]) ? '-'.$mm2[4] : '';
+			$level_num = $digit;
+			$level_letter = $lett;
+		} elseif(preg_match('/^(.*?)-([1-4]SP)(-(.+))?$/u', $code, $mm2)) {
+			$prefix = $mm2[1];
+			$digit = (int)$mm2[2][0];
+			$level_num = $digit;
+			$level_letter = 'S';
+			$subj_after_level = isset($mm2[4]) ? '-'.$mm2[4] : '';
+		}
+
+		if($prefix !== '' && $level_num !== null && $level_num > 1) {
+			// Suche nach einem Vorgänger-Modul: gleicher Prefix + niedrigeres Level
+			// (akzeptiere alle Buchstaben, da Vorgänger-Stufe meist einen anderen
+			// Level-Buchstaben hat, z.B. "2V" → Vorgänger "1B").
+			$prev_levels = array();
+			for($lv = 1; $lv < $level_num; $lv++) {
+				$prev_levels[] = $lv;
+			}
+			rsort($prev_levels); // neueste zuerst (z.B. bei 3V → erst 2A/2V, dann 1B)
+
+			$found = null;
+			$found_relation = null;
+			foreach($prev_levels as $prev_lv) {
+				// Versuche mit identischem Subject, beliebigem Buchstaben: prefix-<prev_lv><B/A/V/S>-<subj>
+				if($subj_after_level !== '' && $subj_after_level !== '-') {
+					$base = $prefix.'-'.$prev_lv;
+					foreach(array('B','A','V','S','E','W') as $lt) {
+						$candidate = $base.$lt.$subj_after_level;
+						foreach($all_modules_by_code as $other) {
+							$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
+							if($other_num === $candidate) { $found = $other_num; $found_relation = 'aufbauend'; break 3; }
+						}
+					}
+				}
+				// Versuche ohne Subject: prefix-<prev_lv>- oder prefix-<prev_lv><B/A/V/S>-
+				foreach(array($prefix.'-'.$prev_lv.'-', $prefix.'-'.$prev_lv) as $cand) {
+					foreach($all_modules_by_code as $other) {
+						$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
+						if($cand !== '' && $other_num === $cand) { $found = $other_num; $found_relation = 'aufbauend'; break 3; }
+					}
+				}
+			}
+
+			if($found !== null) {
+				$level_label = array(
+					'B' => 'Basismodul', 'A' => 'Aufbaumodul', 'V' => 'Vertiefungsmodul',
+					'S' => 'Spezialisierungsmodul', 'E' => 'Ergänzungsmodul', 'W' => 'Wahlpflicht',
 				);
-				// Wenn das aktuelle Level AM ist: finde BM mit gleichem Sub-Code
-				if($lvl === 2) {
-					$prev_lc = 'BM';
-					$prefix_match = preg_quote($code, '/');
-					if(preg_match('/^(.*?)-AM/u', $code, $pm)) {
-						$prefix = $pm[1];
-						$prev_code = $prefix.'-BM'.$subj_code;
-						// Suche prev_code in all_modules_by_code
-						$found = null;
-						foreach($all_modules_by_code as $other) {
-							$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
-							if($other_num === $prev_code) { $found = $other_num; break; }
-						}
-						// Fallback: nur BM mit beliebigem Sub-Code im selben Prefix
-						if($found === null) {
-							foreach($all_modules_by_code as $other) {
-								$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
-								if(strpos($other_num, $prefix.'-BM-') === 0) { $found = $other_num; break; }
-							}
-						}
-						if($found !== null) {
-							$out[] = array('modulnummer' => $found, 'typ' => 'aufbauend',
-								'grund' => 'Aufbaumodul setzt Basismodul voraus (gleicher Fachcode)');
-						}
-					}
-				}
-				// VM → AM
-				elseif($lvl === 3) {
-					if(preg_match('/^(.*?)-VM/u', $code, $pm)) {
-						$prefix = $pm[1];
-						$found = null;
-						foreach($all_modules_by_code as $other) {
-							$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
-							if(strpos($other_num, $prefix.'-AM-') === 0) { $found = $other_num; break; }
-						}
-						if($found !== null) {
-							$out[] = array('modulnummer' => $found, 'typ' => 'aufbauend',
-								'grund' => 'Vertiefungsmodul setzt Aufbaumodul voraus (gleicher Fachcode)');
-						}
-					}
-				}
-				// SM → VM
-				elseif($lvl === 4) {
-					if(preg_match('/^(.*?)-SM/u', $code, $pm)) {
-						$prefix = $pm[1];
-						$found = null;
-						foreach($all_modules_by_code as $other) {
-							$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
-							if(strpos($other_num, $prefix.'-VM-') === 0) { $found = $other_num; break; }
-						}
-						if($found !== null) {
-							$out[] = array('modulnummer' => $found, 'typ' => 'empfohlen',
-								'grund' => 'Spezialisierungsmodul setzt Vertiefungsmodul voraus');
-						}
-					}
-				}
+				$lbl = isset($level_label[$level_letter]) ? $level_label[$level_letter] : ('Stufe '.$level_num);
+				$out[] = array('modulnummer' => $found, 'typ' => $found_relation,
+					'grund' => $lbl.' setzt Vorgänger-Stufe voraus (gleicher Fachcode)');
 			}
 		}
 		return $out;
