@@ -18,6 +18,11 @@ $ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2', 'debug
 // und vom <img>-Tag ohne XHR-Header geladen werden).
 $binary_stages = array('page_image');
 $current_stage = isset($_GET['stage']) ? $_GET['stage'] : '';
+// Bei Binary-Stages auch dann als AJAX behandeln, wenn kein XHR-Header gesetzt ist
+// (z.B. <img src="…">), damit die Seiten-Datei selbst keinen HTML-Chrome ausgibt.
+if(in_array($current_stage, $binary_stages, true)) {
+	$is_ajax_admin = true;
+}
 $needs_ajax_bypass = in_array($current_stage, $binary_stages, true)
 	|| ($is_ajax_admin && in_array($current_stage, $ajax_only_stages, true));
 if($needs_ajax_bypass) {
