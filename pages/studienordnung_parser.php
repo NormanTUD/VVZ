@@ -856,10 +856,12 @@ class SoiExtractor {
             else if($c >= '0' && $c <= '9') $digit_count++;
         }
         if($upper_count < 2) return false; // at least 2 uppercase letters
-        // Codes dürfen rein aus Buchstaben+Bindestrichen bestehen, wenn sie mit "-" enden
-        // (Continuation-Fall). Ansonsten brauchen wir Ziffern oder Kleinbuchstaben als
-        // Eindeutigkeitsmerkmal (verhindert Match auf reine Wörter wie "Modulnummer").
-        if(!$has_trailing_dash && $digit_count === 0 && $lower_count === 0) return false;
+        // Codes dürfen aus Buchstaben+Bindestrichen bestehen — viele TU-Codes haben KEINE
+        // Ziffern (z.B. "BM-SYS", "AM-FORSCHUNG", "AM-WP", "PHF-POL-BM-IP"). Wir lehnen
+        // nur dann ab, wenn der Code exakt einem deutschen Wort ähnelt (siehe unten).
+        // Frühere Logik verlangte Ziffern oder Kleinbuchstaben — das hat diese legitimen
+        // Codes fälschlich abgelehnt.
+        if($dash_count < 1) return false; // mind. 1 Bindestrich
         return true;
     }
 
