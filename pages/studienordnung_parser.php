@@ -912,11 +912,17 @@ class SoiExtractor {
         $valid = [];
         foreach($modules as $m) {
             $code = isset($m['modulnummer']) ? trim((string)$m['modulnummer']) : '';
+            // Continuation-Reste entfernen: "X-1" (mit Bindestrich VOR der letzten Ziffer) → "X1".
+            $code = preg_replace('/-(\d+)$/', '$1', $code);
+            // Auch reine trailing-dashes (sollten nicht vorkommen, aber sicherheitshalber).
+            $code = rtrim($code, '-');
             $name = isset($m['name']) ? trim((string)$m['name']) : '';
             if($code === '' || strlen($code) < 5) continue;
             if(preg_match('/\s/', $code)) continue;
             if(!$this->isModulCode($code)) continue;
             if($name === '' || mb_strlen($name) < 3) continue;
+            // Cleanup-Code zurück ins Module-Array schreiben.
+            $m['modulnummer'] = $code;
             $valid[] = $m;
         }
         return $valid;
