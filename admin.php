@@ -13,7 +13,7 @@ $page_title = $GLOBALS['university_name']." | Administration";
 // eingebettet werden.
 $is_ajax_admin = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
 	|| (isset($_GET['ajax']) && $_GET['ajax'] === '1');
-$ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2');
+$ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2', 'debug_text');
 if($is_ajax_admin && isset($_GET['stage']) && in_array($_GET['stage'], $ajax_only_stages, true)) {
 	include_once("selftest.php");
 	if(get_kunden_db_name() == "startpage") {

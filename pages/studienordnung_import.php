@@ -973,7 +973,7 @@
 							if(modulePages[modulnr] === p) hasMod = true;
 						});
 						pagesHtml += '<div class="soi-page-card' + (hasMod ? ' has-modules' : '') + '" data-soi-page="' + p + '">' +
-							'<img src="data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p + '" alt="Seite ' + p + '" loading="lazy" />' +
+							'<img src="admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p + '" alt="Seite ' + p + '" loading="lazy" />' +
 							'<div class="soi-page-num">Seite ' + p + (hasMod ? ' &mdash; enthält Modul' : '') + '</div>' +
 							'</div>';
 					}
@@ -988,7 +988,7 @@
 
 			window.soi_show_page = function(p) {
 				var img = $('soi_page_modal_img');
-				img.src = 'data/admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p;
+				img.src = 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=page_image&id=' + SOI.currentImportId + '&pdf_page=' + p;
 				$('soi_page_modal').classList.add('soi-open');
 			};
 				window.soi_close_modal = function() {
