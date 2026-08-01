@@ -652,8 +652,7 @@ CREATE TABLE `einzelne_termine` (
   KEY `voraussetzung_modul_id` (`voraussetzung_modul_id`),
   KEY `import_id` (`import_id`),
   CONSTRAINT `modul_voraussetzung_ibfk_1` FOREIGN KEY (`modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `modul_voraussetzung_ibfk_2` FOREIGN KEY (`voraussetzung_modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `modul_voraussetzung_ibfk_3` FOREIGN KEY (`import_id`) REFERENCES `studienordnung_import` (`id`) ON DELETE SET NULL
+  CONSTRAINT `modul_voraussetzung_ibfk_2` FOREIGN KEY (`voraussetzung_modul_id`) REFERENCES `modul` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 
 'customizations' => 'create table if not exists customizations (id int unsigned primary key AUTO_INCREMENT, humanname varchar(100), classname varchar(100), property varchar(100), val varchar(100), default_val varchar(100))',

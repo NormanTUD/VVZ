@@ -293,14 +293,26 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 					) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 				} catch (\Throwable $e) { /* Tabelle ist optional */ }
 			}
-			// Foreign Key zu studienordnung_import erst nach Tabelle hinzufügen (Reihenfolge).
+			// Foreign Key zu studienordnung_import: erst hinzufügen, wenn die referenzierte
+			// Tabelle existiert UND der Constraint noch nicht existiert. Wir lesen das per
+			// SHOW CREATE TABLE (robuster als information_schema, das von GRANTs abhängt).
 			if(table_exists($GLOBALS['dbname'], 'modul_voraussetzung') && table_exists($GLOBALS['dbname'], 'studienordnung_import')) {
+				$fk_already = false;
 				try {
-					$fk_exists = get_single_row_from_query("SELECT COUNT(*) FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = '".esc($GLOBALS['dbname'])."' AND TABLE_NAME = 'modul_voraussetzung' AND CONSTRAINT_NAME = 'modul_voraussetzung_ibfk_3'");
-					if((int)$fk_exists === 0) {
-						rquery("ALTER TABLE `modul_voraussetzung` ADD CONSTRAINT `modul_voraussetzung_ibfk_3` FOREIGN KEY (`import_id`) REFERENCES `studienordnung_import` (`id`) ON DELETE SET NULL");
+					$show = get_single_row_from_query_assoc("SHOW CREATE TABLE `modul_voraussetzung`");
+					if(is_array($show) && isset($show['Create Table'])) {
+						$fk_already = (strpos($show['Create Table'], 'modul_voraussetzung_ibfk_3') !== false);
 					}
-				} catch (\Throwable $e) { /* FK optional */ }
+				} catch (\Throwable $e) { /* SHOW CREATE fehlgeschlagen → wir versuchen es trotzdem */ }
+				if(!$fk_already) {
+					try {
+						rquery("ALTER TABLE `modul_voraussetzung` ADD CONSTRAINT `modul_voraussetzung_ibfk_3` FOREIGN KEY (`import_id`) REFERENCES `studienordnung_import` (`id`) ON DELETE SET NULL");
+					} catch (\Throwable $e) {
+						// FK konnte nicht angelegt werden (z.B. weil er schon existiert aber wir
+						// es nicht erkannt haben, oder Rechte fehlen). Wir schlucken den Fehler
+						// bewusst, damit die Seite nicht crasht.
+					}
+				}
 			}
 
 			if(!table_exists_and_has_entries("page") && !already_initialized("page")) {

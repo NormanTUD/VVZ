@@ -325,18 +325,43 @@ class SoiExtractor {
     public function parseCover(SoiPdfText $text): array {
         $degree = null;
         $program = null;
+        // Soft-Hyphen + Whitespace + Linebreak entfernen, damit mehrzeilige Cover-Texte
+        // wie "Geis­tes-, Kultur- und Sozialwissenschaften" wieder zusammenkommen.
+        $clean = preg_replace('/­/u', '', $text->full_text); // Soft-Hyphen raus
+        $clean = preg_replace('/[ \t]+/u', ' ', $clean);
+
+        // Wir suchen primär im Anfang der Datei (erste 4000 Zeichen). In späteren Paragraphen
+        // wie §1 tauchen oft zusätzliche Erwähnungen wie "Sie ergänzt die Studienordnung für
+        // den Bachelorstudiengang X" auf, die unsere Patterns fälschlich matchen würden.
+        $head = mb_substr($clean, 0, 4000);
+
         // Pattern 1: "Studienordnung für den Bachelorstudiengang X"
-        if(preg_match('/Studienordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)(?:studiengang)?\s+([^\n\r]+)/u', $text->full_text, $m)) {
+        if(preg_match('/Studienordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)(?:studiengang)?\s+([^\n\r]+)/u', $head, $m)) {
             $degree = trim($m[1]);
             $program = trim(preg_replace('/\s+/', ' ', $m[2]));
         }
         // Pattern 2: "Prüfungsordnung für den Bachelorstudiengang X"
-        if(!$program && preg_match('/Prüfungsordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)(?:studiengang)?\s+([^\n\r]+)/u', $text->full_text, $m)) {
+        if(!$program && preg_match('/Prüfungsordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)(?:studiengang)?\s+([^\n\r]+)/u', $head, $m)) {
             $degree = trim($m[1]);
             $program = trim(preg_replace('/\s+/', ' ', $m[2]));
         }
-        // Pattern 3: just "Studienordnung für X"
-        if(!$program && preg_match('/Studienordnung\s+f[uü]r\s+den\s+([^\n\r]+)/u', $text->full_text, $m)) {
+        // Pattern 3: "Studienordnung für das Erste Hauptfach X im Bachelorstudiengang Y"
+        // → Subject = X, Program = Y, Degree = Bachelor
+        if(!$program && preg_match('/Studienordnung\s+(?:für|des)\s+das\s+(?:Erste|Zweite|Dritte)?\s*(?:Hauptfach|Nebenfach)?\s*([^\n\r]+?)\s+im\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)studiengang\s+([^\n\r]+)/u', $head, $m)) {
+            $degree = trim($m[2]);
+            // Subject als Prefix im Programm übernehmen (z.B. "Hauptfach Politikwissenschaft")
+            $subject = trim($m[1]);
+            $full_prog = trim($m[3]);
+            // Wenn das Subject "Hauptfach X" enthält, ergänze es vor dem Programm.
+            if(stripos($subject, 'Hauptfach') !== false || stripos($subject, 'Nebenfach') !== false) {
+                $program = $subject.' / '.$full_prog;
+            } else {
+                $program = $full_prog;
+            }
+            $program = trim(preg_replace('/\s+/', ' ', $program));
+        }
+        // Pattern 4: just "Studienordnung für X" (Fallback)
+        if(!$program && preg_match('/Studienordnung\s+f[uü]r\s+(?:den|das|die)\s+([^\n\r]+)/u', $head, $m)) {
             $program = trim(preg_replace('/\s+/', ' ', $m[1]));
         }
         // Clean trailing junk like "Vom 18. September 2018"
