@@ -498,14 +498,14 @@
 			</div>
 
 			<!-- Debug-Log Modal -->
-			<div id="soi_debug_modal" class="soi-modal" style="display:none;">
+			<div id="soi_debug_modal" class="soi-modal">
 				<div class="soi-modal-content soi-modal-wide">
 					<div class="soi-modal-header">
 						<h3>Debug-Log</h3>
 						<div>
 							<button type="button" id="soi_btn_copy_log" class="soi-btn-secondary">📋 In Zwischenablage kopieren</button>
 							<button type="button" id="soi_btn_download_log" class="soi-btn-secondary">💾 Als .txt speichern</button>
-							<button type="button" onclick="soi_close_debug()" class="soi-btn-secondary">Schließen</button>
+							<button type="button" id="soi_btn_close_debug" class="soi-btn-secondary">Schließen</button>
 						</div>
 					</div>
 					<p style="font-size:11px; color:#666; margin:6px 0;">
@@ -1236,34 +1236,59 @@
 				};
 
 				window.soi_open_debug = function() {
-					if(!SOI.currentImportId) {
-						alert('Bitte zuerst ein PDF hochladen.');
+					var pre = $('soi_debug_log');
+					var modal = $('soi_debug_modal');
+					if(!modal) {
+						alert('Debug-Modal fehlt im DOM.');
 						return;
 					}
-					var pre = $('soi_debug_log');
-					pre.textContent = '(Log wird geladen …)';
-					$('soi_debug_modal').classList.add('soi-open');
+					// Modal SOFORT anzeigen, damit der User Feedback bekommt.
+					modal.classList.add('soi-open');
+					modal.style.display = 'flex';
+					if(pre) pre.textContent = '(Log wird geladen …)';
+
+					if(!SOI.currentImportId) {
+						if(pre) pre.textContent = '(noch kein PDF hochgeladen — Button hat keine Daten)';
+						return;
+					}
 
 					// Roh-Text + notes-Payload vom Server holen.
 					fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=debug_text&id=' + SOI.currentImportId, {credentials:'same-origin'})
-						.then(function(r){ return r.text(); })
+						.then(function(r){
+							if(!r.ok) throw new Error('HTTP ' + r.status);
+							return r.text();
+						})
 						.then(function(txt) {
 							var log = soi_build_debug_log();
 							log += '\n=== RAW TEXT (erste 4000 Zeichen) ===\n';
 							log += txt.length > 4000 ? txt.substring(0, 4000) + '\n…(gekürzt, ' + txt.length + ' Zeichen gesamt)' : txt;
-							pre.textContent = log;
+							if(pre) pre.textContent = log;
 						})
 						.catch(function(e) {
-							pre.textContent = soi_build_debug_log() + '\n\n(Fehler beim Laden des Raw-Texts: ' + e + ')';
+							if(pre) pre.textContent = soi_build_debug_log() + '\n\n(Fehler beim Laden des Raw-Texts: ' + e + ')';
 						});
 				};
 				window.soi_close_debug = function() {
-					$('soi_debug_modal').classList.remove('soi-open');
+					var modal = $('soi_debug_modal');
+					if(modal) {
+						modal.classList.remove('soi-open');
+						modal.style.display = 'none';
+					}
 				};
 
 				var debugBtn = $('soi_btn_debug');
 				if(debugBtn) {
-					debugBtn.addEventListener('click', soi_open_debug);
+					debugBtn.addEventListener('click', function(ev) {
+						ev.preventDefault();
+						soi_open_debug();
+					});
+				}
+				var closeDebugBtn = $('soi_btn_close_debug');
+				if(closeDebugBtn) {
+					closeDebugBtn.addEventListener('click', function(ev) {
+						ev.preventDefault();
+						soi_close_debug();
+					});
 				}
 				var copyLogBtn = $('soi_btn_copy_log');
 				if(copyLogBtn) {

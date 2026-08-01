@@ -14,7 +14,13 @@ $page_title = $GLOBALS['university_name']." | Administration";
 $is_ajax_admin = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
 	|| (isset($_GET['ajax']) && $_GET['ajax'] === '1');
 $ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2', 'debug_text');
-if($is_ajax_admin && isset($_GET['stage']) && in_array($_GET['stage'], $ajax_only_stages, true)) {
+// Stages, die IMMER den HTML-Chrome überspringen müssen (z.B. weil sie Binärdaten liefern
+// und vom <img>-Tag ohne XHR-Header geladen werden).
+$binary_stages = array('page_image');
+$current_stage = isset($_GET['stage']) ? $_GET['stage'] : '';
+$needs_ajax_bypass = in_array($current_stage, $binary_stages, true)
+	|| ($is_ajax_admin && in_array($current_stage, $ajax_only_stages, true));
+if($needs_ajax_bypass) {
 	include_once("selftest.php");
 	if(get_kunden_db_name() == "startpage") {
 		header('Content-Type: application/json; charset=utf-8');
