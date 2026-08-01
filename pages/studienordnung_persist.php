@@ -248,10 +248,14 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 			if(stripos($name, $p['typ']) === false) continue;
 			$them = trim(preg_replace('/^.*?' . preg_quote($p['typ'], '/') . '\s*[:\-–]?\s*/iu', '', $name));
 			if($them === '') continue;
-			// Modulnummer-Studiengangs-Prefix: alles vor der numerischen Stufe.
-			// Beispiele: "SLK-BA-F-2A-L" → "SLK-BA-F-", "PhF-Phil-2A-X" → "PhF-Phil-".
+			// Modulnummer-Studiengangs-Prefix: alles vor dem ersten Segment, das mit Ziffer beginnt.
+			// Beispiele: "SLK-BA-F-2A-L" → "SLK-BA-F", "PhF-Phil-2A-X" → "PhF-Phil",
+			// "INF-B-101-a" → "INF-B", "MA-PHYS-2024-Q1" → "MA-PHYS-2024".
+			// Wir nutzen daher "kürzeste nicht-leere Sequenz gefolgt von -<Ziffer>" — das ist die
+			// minimal-informative Prefix-Distanz zwischen Modulen verschiedener Studiengänge
+			// und gleichzeitig robust gegenüber beliebigen Fakultäts-/Studiengangs-Codes.
 			$own_studiengang_prefix = '';
-			if(preg_match('/^([A-Za-z]+(?:[-A-Za-z0-9]+)*?)(?:-\d|$)/u', $code, $pm)) {
+			if(preg_match('/^(.+?)(?:-[0-9])/u', $code, $pm)) {
 				$own_studiengang_prefix = $pm[1];
 			}
 			foreach($all_modules_by_code as $other_code => $other) {
@@ -259,14 +263,12 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 				if($other_num === $code) continue;
 				$other_name = isset($other['name']) ? $other['name'] : '';
 				if(stripos($other_name, $p['vor']) === false || stripos($other_name, $them) === false) continue;
-				// Studiengangs-Prefix muss passen.
+				// Studiengangs-Prefix muss passen (oder einer ist Anfang des anderen).
 				if($own_studiengang_prefix !== '') {
 					$other_studiengang_prefix = '';
-					if(preg_match('/^([A-Za-z]+(?:[-A-Za-z0-9]+)*?)(?:-\d|$)/u', $other_num, $opm)) {
+					if(preg_match('/^(.+?)(?:-[0-9])/u', $other_num, $opm)) {
 						$other_studiengang_prefix = $opm[1];
 					}
-					// Prefix muss gleich sein ODER einer ist Anfang des anderen
-					// (z.B. "SLK-BA" matched "SLK-BA-R" und "SLK-BA-G"; "PhF" matched "PhF-Phil").
 					if($own_studiengang_prefix !== $other_studiengang_prefix
 						&& strpos($other_studiengang_prefix.'-', $own_studiengang_prefix.'-') !== 0
 						&& strpos($own_studiengang_prefix.'-', $other_studiengang_prefix.'-') !== 0) {
@@ -304,11 +306,17 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 			}
 		}
 
-		if(preg_match('/^(.*?-)(?:1B|2A|3V|3S|3E|2V|1SP|2SP|3SP|4SP)/u', $code, $cm)) {
+		if(preg_match('/^(.*?)-(?:1B|2A|3V|3S|3E|2V|1SP|2SP|3SP|4SP|2B|3A|4B|2S|3P)/u', $code, $cm)) {
 			$prefix = $cm[1];
 			$current_level = null;
-			$levels = array('1B' => 1, '2A' => 2, '3V' => 3, '3S' => 3, '3E' => 3, '2V' => 2,
-				'1SP' => 1, '2SP' => 2, '3SP' => 3, '4SP' => 4);
+			// Generische Level-Map (TU-typisch): Buchstabe kennzeichnet Schwierigkeit,
+			// Ziffer die Stufe. Niedrigere Ziffer = Voraussetzung.
+			$levels = array(
+				'1B' => 1, '1SP' => 1, '1E' => 1,
+				'2A' => 2, '2V' => 2, '2SP' => 2, '2B' => 2, '2S' => 2, '2E' => 2,
+				'3V' => 3, '3S' => 3, '3E' => 3, '3A' => 3, '3SP' => 3, '3P' => 3,
+				'4V' => 4, '4SP' => 4, '4B' => 4, '4A' => 4,
+			);
 			foreach($levels as $l => $n) {
 				if(strpos($code, '-'.$l) !== false) { $current_level = $l; break; }
 			}
@@ -317,7 +325,7 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 				foreach($levels as $l => $n) if($n < $levels[$current_level]) $prev_levels[] = $l;
 				rsort($prev_levels);
 				foreach($prev_levels as $pl) {
-					$prev_code = $prefix.$pl;
+					$prev_code = $prefix.'-'.$pl;
 					// Suche per modulnummer (nicht per Array-Key, da Input verschiedene Keys haben kann).
 					$found_prev = null;
 					foreach($all_modules_by_code as $other) {
