@@ -1463,7 +1463,14 @@
 							.then(function(r){ return r.json(); })
 							.then(function(resp) {
 								if(resp.ok) {
-									setStatus('Import abgeschlossen: ' + resp.modules_imported + ' Modul(e), ' + resp.pruefungsnummern_imported + ' Prüfungsnummer(n), ' + (resp.semester_metadata_rows||0) + ' Semester-Metadaten-Zeilen.', 'success');
+									setStatus(
+									'Import abgeschlossen: ' + resp.modules_imported + ' Modul(e), ' +
+									resp.pruefungsnummern_imported + ' Prüfungsnummer(n), ' +
+									(resp.semester_metadata_rows||0) + ' Semester-Metadaten, ' +
+									(resp.anlage2_detailed_rows||0) + ' Anlage-2-Detail, ' +
+									(resp.zuordnung_rows||0) + ' Zuordnungen, ' +
+									(resp.voraussetzung_rows||0) + ' Voraussetzungen.',
+									'success');
 									commitBtn.disabled = false;
 									setTimeout(function() { window.location.href = 'admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=detail&id=' + SOI.currentImportId; }, 1500);
 								} else {
