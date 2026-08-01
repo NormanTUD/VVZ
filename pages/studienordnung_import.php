@@ -2088,37 +2088,25 @@
 				$imported_pns = 0;
 				$seen_pns = array();
 				$semester_rows_written = 0;
+				$anlage2_detailed_rows = 0;
+				$zuordnung_rows = 0;
+				$voraussetzung_rows = 0;
+				$code_to_modul_id = array();
 
 				foreach($modules_post as $idx => $m_post) {
-					if(empty($m_post['include'])) continue;
+					if(!is_array($m_post) || empty($m_post['include'])) continue;
 					$modulnummer = trim((string)($m_post['modulnummer'] ?? ''));
 					$name = trim((string)($m_post['name'] ?? ''));
 					if($modulnummer === '' || $name === '') continue;
 
-					// Beschreibung aus SWS / LP / Dauer / Lehre zusammenbauen
-					$beschreibung_parts = array();
-					if(isset($m_post['lp']) && $m_post['lp'] !== '') $beschreibung_parts[] = 'LP: '.(int)$m_post['lp'];
-					if(isset($m_post['sws']) && $m_post['sws'] !== '') $beschreibung_parts[] = 'SWS: '.htmlentities($m_post['sws']);
-					if(isset($m_post['dauer_semester']) && $m_post['dauer_semester'] !== '') $beschreibung_parts[] = 'Dauer: '.(int)$m_post['dauer_semester'].' Sem.';
-					$beschreibung = mb_substr(implode('; ', $beschreibung_parts), 0, 500);
-
-					// Modul anlegen
-					$query = 'INSERT INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($name).', '.esc($studiengang_id).', '.esc($modulnummer).', '.esc($beschreibung).') ON DUPLICATE KEY UPDATE name=VALUES(name), beschreibung=VALUES(beschreibung)';
-					rquery($query);
-
-					$mod_row = get_single_row_from_query('SELECT id FROM `modul` WHERE `studiengang_id` = '.esc($studiengang_id).' AND `abkuerzung` = '.esc($modulnummer).' LIMIT 1');
-					if(is_null($mod_row) || $mod_row === '' || $mod_row === false) continue;
-					$modul_id = (int)$mod_row;
+					$res = soi_persist_one_module($import_id, $studiengang_id, $m_post, $anlage2_rows);
+					if($res['modul_id'] <= 0) continue;
+					$modul_id = $res['modul_id'];
 					$imported_modules++;
-
-					// Semester-Metadaten aus Anlage 2 persistieren.
-					$anlage2_match = soi_find_anlage2_for_modul($anlage2_rows, $modulnummer);
-					if($anlage2_match) {
-						if(isset($m_post['lp']) && $m_post['lp'] !== '' && is_numeric($m_post['lp'])) {
-							$anlage2_match['lp'] = (int)$m_post['lp'];
-						}
-						$semester_rows_written += soi_persist_semester_metadata($modul_id, $anlage2_match);
-					}
+					$code_to_modul_id[$modulnummer] = $modul_id;
+					$semester_rows_written += $res['semester_rows'];
+					$anlage2_detailed_rows += $res['anlage2_rows'];
+					if($res['zuordnung_ok']) $zuordnung_rows++;
 
 					// Prüfungsnummern erzeugen
 					if($create_pns) {
@@ -2129,16 +2117,24 @@
 							$ptypes = array_map('trim', explode(',', $m_post['pruefungstypen_str']));
 						}
 						if(!$ptypes) $ptypes = array('Klausurarbeit');
-						foreach($ptypes as $ptname) {
-							if($ptname === '') continue;
-							$pt_id = soi_ensure_pruefungstyp($ptname);
-							if(!$pt_id) continue;
-							$generated_nr = soi_generate_pruefungsnummer($modulnummer, $ptname, $m_post['lp'] ?? '', $seen_pns);
-							rquery('INSERT INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `modulbezeichnung`) VALUES ('.esc($generated_nr).', '.esc($modul_id).', '.esc($pt_id).', '.esc($modulnummer.' '.$name).')');
-							$pn_row = get_single_row_from_query('SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = '.esc($generated_nr).' LIMIT 1');
-							$pn_id = (!is_null($pn_row) && $pn_row !== '' && $pn_row !== false) ? (int)$pn_row : null;
-							rquery('INSERT INTO `pruefungsnummer_import` (import_id, modul_id, pruefungsnummer_id, generated_nr, pruefungstyp_name, lp) VALUES ('.esc($import_id).', '.esc($modul_id).', '.esc($pn_id).', '.esc($generated_nr).', '.esc($ptname).', '.esc($m_post['lp'] ?? null).')');
-							$imported_pns++;
+						$lp = isset($m_post['lp']) && is_numeric($m_post['lp']) ? (float)$m_post['lp'] : null;
+						$imported_pns += soi_create_pruefungsnummern_for_module($import_id, $modul_id, $modulnummer, $name, $ptypes, $lp, $seen_pns);
+					}
+				}
+
+				// Zweiter Pass: Voraussetzungen.
+				if(!empty($code_to_modul_id)) {
+					$modules_by_code = array();
+					foreach($modules_post as $mm) {
+						if(is_array($mm) && !empty($mm['modulnummer'])) {
+							$modules_by_code[trim((string)$mm['modulnummer'])] = $mm;
+						}
+					}
+					foreach($code_to_modul_id as $code => $mid) {
+						if(!isset($modules_by_code[$code])) continue;
+						$detected = soi_detect_voraussetzungen_for_modul($modules_by_code[$code], $modules_by_code);
+						if($detected) {
+							$voraussetzung_rows += soi_persist_voraussetzungen($mid, $import_id, $detected, $code_to_modul_id);
 						}
 					}
 				}
@@ -2147,7 +2143,7 @@
 				rquery('UPDATE `studienordnung_import` SET `modules_imported` = '.esc($imported_modules).', `pruefungsnummern_imported` = '.esc($imported_pns).' WHERE `id` = '.esc($import_id));
 
 				unset($_SESSION['soi_preview']);
-				success('Import abgeschlossen: '.$imported_modules.' Modul(e), '.$imported_pns.' Prüfungsnummer(n) angelegt.');
+				success('Import abgeschlossen: '.$imported_modules.' Modul(e), '.$imported_pns.' Prüfungsnummer(n), '.$anlage2_detailed_rows.' Anlage-2-Detail, '.$zuordnung_rows.' Zuordnung(en), '.$voraussetzung_rows.' Voraussetzung(en) angelegt.');
 				print '<p><a href="admin?page='.$GLOBALS['this_page_number'].'">Zurück zur Übersicht</a> &middot; <a href="admin?page='.$GLOBALS['this_page_number'].'&stage=detail&id='.$import_id.'">Details ansehen</a></p>';
 			}
 		} elseif($stage === 'detail') {
@@ -2449,46 +2445,21 @@
 			foreach($modules_in as $idx => $m) {
 				if(!is_array($m)) continue;
 				if(empty($m['include'])) continue;
-				$modulnummer = trim((string)($m['modulnummer'] ?? ''));
-				$name = trim((string)($m['name'] ?? ''));
-				if($modulnummer === '' || $name === '') continue;
 
-				$beschreibung_parts = array();
-				if(isset($m['lp']) && $m['lp'] !== '') $beschreibung_parts[] = 'LP: '.(int)$m['lp'];
-				if(isset($m['sws']) && $m['sws'] !== '' && $m['sws'] !== null) $beschreibung_parts[] = 'SWS: '.(float)$m['sws'];
-				if(isset($m['dauer_semester']) && $m['dauer_semester'] !== '') $beschreibung_parts[] = 'Dauer: '.(int)$m['dauer_semester'].' Sem.';
-				$beschreibung = mb_substr(implode('; ', $beschreibung_parts), 0, 500);
-
-				rquery('INSERT INTO `modul` (`name`, `studiengang_id`, `abkuerzung`, `beschreibung`) VALUES ('.esc($name).', '.esc($studiengang_id).', '.esc($modulnummer).', '.esc($beschreibung).') ON DUPLICATE KEY UPDATE name=VALUES(name), beschreibung=VALUES(beschreibung)');
-
-				$mod_row = get_single_row_from_query('SELECT id FROM `modul` WHERE `studiengang_id` = '.esc($studiengang_id).' AND `abkuerzung` = '.esc($modulnummer).' LIMIT 1');
-				if(is_null($mod_row) || $mod_row === '' || $mod_row === false) {
-					$messages[] = 'Konnte modul_id für '.$modulnummer.' nicht ermitteln.';
+				$res = soi_persist_one_module($import_id, $studiengang_id, $m, $anlage2_rows);
+				if($res['modul_id'] <= 0) {
+					$modulnummer = trim((string)($m['modulnummer'] ?? ''));
+					if($modulnummer !== '') $messages[] = 'Konnte modul_id für '.$modulnummer.' nicht ermitteln.';
 					continue;
 				}
-				$modul_id = (int)$mod_row;
+				$modul_id = $res['modul_id'];
+				$modulnummer = trim((string)($m['modulnummer'] ?? ''));
+				$name = trim((string)($m['name'] ?? ''));
 				$imported_modules++;
 				$code_to_modul_id[$modulnummer] = $modul_id;
-
-				// Semester-Metadaten aus Anlage 2 persistieren, falls vorhanden.
-				$anlage2_match = soi_find_anlage2_for_modul($anlage2_rows, $modulnummer);
-				if($anlage2_match) {
-					// Falls Frontend explizit ein lp sendet, das bevorzugen.
-					if(isset($m['lp']) && $m['lp'] !== '' && is_numeric($m['lp'])) {
-						$anlage2_match['lp'] = (int)$m['lp'];
-					}
-					$semester_rows_written += soi_persist_semester_metadata($modul_id, $anlage2_match);
-					// Detaillierte Anlage-2-Zeile (SWS aufgeschlüsselt nach Veranstaltungstyp).
-					$anlage2_detailed_rows += soi_persist_anlage2_detailed($modul_id, $import_id, $anlage2_match);
-				}
-
-				// Modul → Studiengang Zuordnung (Rolle aus Section ableiten).
-				$section = isset($m['section']) ? trim((string)$m['section']) : '';
-				$rolle = soi_rolle_for_section($section);
-				$lp = isset($m['lp']) && is_numeric($m['lp']) ? (float)$m['lp'] : null;
-				if(soi_persist_modul_zuordnung($modul_id, $import_id, $studiengang_id, $rolle, $lp)) {
-					$zuordnung_rows++;
-				}
+				$semester_rows_written += $res['semester_rows'];
+				$anlage2_detailed_rows += $res['anlage2_rows'];
+				if($res['zuordnung_ok']) $zuordnung_rows++;
 
 				if($create_pns) {
 					$ptypes = array();
@@ -2498,17 +2469,8 @@
 						$ptypes = array_map('trim', explode(',', $m['pruefungstypen_str']));
 					}
 					if(!$ptypes) $ptypes = array('Klausurarbeit');
-					foreach($ptypes as $ptname) {
-						if(!$ptname) continue;
-						$pt_id = soi_ensure_pruefungstyp($ptname);
-						if(!$pt_id) continue;
-						$generated_nr = soi_generate_pruefungsnummer($modulnummer, $ptname, $m['lp'] ?? '', $seen_pns);
-						rquery('INSERT INTO `pruefungsnummer` (`pruefungsnummer`, `modul_id`, `pruefungstyp_id`, `modulbezeichnung`) VALUES ('.esc($generated_nr).', '.esc($modul_id).', '.esc($pt_id).', '.esc($modulnummer.' '.$name).')');
-						$pn_row = get_single_row_from_query('SELECT id FROM `pruefungsnummer` WHERE `pruefungsnummer` = '.esc($generated_nr).' LIMIT 1');
-						$pn_id = (!is_null($pn_row) && $pn_row !== '' && $pn_row !== false) ? (int)$pn_row : null;
-						rquery('INSERT INTO `pruefungsnummer_import` (import_id, modul_id, pruefungsnummer_id, generated_nr, pruefungstyp_name, lp) VALUES ('.esc($import_id).', '.esc($modul_id).', '.esc($pn_id).', '.esc($generated_nr).', '.esc($ptname).', '.esc($m['lp'] ?? null).')');
-						$imported_pns++;
-					}
+					$lp = isset($m['lp']) && is_numeric($m['lp']) ? (float)$m['lp'] : null;
+					$imported_pns += soi_create_pruefungsnummern_for_module($import_id, $modul_id, $modulnummer, $name, $ptypes, $lp, $seen_pns);
 				}
 			}
 
