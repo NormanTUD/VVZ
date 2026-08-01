@@ -340,6 +340,86 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 				}
 			}
 		}
+
+		// Generische Stufung aus kurzen Buchstaben-Codes (typisch TU-TUD):
+		// "-BM-" (Basismodul, level 1), "-AM-" (Aufbaumodul, level 2),
+		// "-VM-" / "-V-" (Vertiefungsmodul, level 3), "-SM-" / "-S-" (Spezialisierung, level 4).
+		// "-WP-" / "-W-" (Wahlpflicht), "-AQ-" / "-AQUA" (Allgemeine Qualifikationen).
+		// Funktioniert für Codes wie "PHF-BA-POL-BM-SYS" / "-AM-SYS" / "-VM-XYZ".
+		if(preg_match('/-(BM|AM|VM|SM|WP|AQ|AQUA|V|W|S|A|E)(-[A-Z][A-Z0-9]+)?$/u', $code, $lm)) {
+			$level_code = $lm[1];
+			$subj_code = isset($lm[2]) ? $lm[2] : '';
+			$level_map = array(
+				'BM' => 1, 'V' => 1, 'W' => 1, 'S' => 1, 'A' => 1, 'E' => 1,
+				'AM' => 2, 'VM' => 3, 'SM' => 4, 'WP' => 5, 'AQ' => 0, 'AQUA' => 0,
+			);
+			$lvl = isset($level_map[$level_code]) ? $level_map[$level_code] : null;
+			if($lvl !== null && $lvl > 0) {
+				// Voraussetzung ist das Modul mit dem gleichen Sub-Code auf der nächst-niedrigeren Stufe.
+				// Stufung: BM(1) < AM(2) < VM(3) < SM(4).
+				$chains = array(
+					array(2, 'BM'), // AM → BM
+					array(3, 'AM'), // VM → AM
+					array(4, 'VM'), // SM → VM
+				);
+				// Wenn das aktuelle Level AM ist: finde BM mit gleichem Sub-Code
+				if($lvl === 2) {
+					$prev_lc = 'BM';
+					$prefix_match = preg_quote($code, '/');
+					if(preg_match('/^(.*?)-AM/u', $code, $pm)) {
+						$prefix = $pm[1];
+						$prev_code = $prefix.'-BM'.$subj_code;
+						// Suche prev_code in all_modules_by_code
+						$found = null;
+						foreach($all_modules_by_code as $other) {
+							$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
+							if($other_num === $prev_code) { $found = $other_num; break; }
+						}
+						// Fallback: nur BM mit beliebigem Sub-Code im selben Prefix
+						if($found === null) {
+							foreach($all_modules_by_code as $other) {
+								$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
+								if(strpos($other_num, $prefix.'-BM-') === 0) { $found = $other_num; break; }
+							}
+						}
+						if($found !== null) {
+							$out[] = array('modulnummer' => $found, 'typ' => 'aufbauend',
+								'grund' => 'Aufbaumodul setzt Basismodul voraus (gleicher Fachcode)');
+						}
+					}
+				}
+				// VM → AM
+				elseif($lvl === 3) {
+					if(preg_match('/^(.*?)-VM/u', $code, $pm)) {
+						$prefix = $pm[1];
+						$found = null;
+						foreach($all_modules_by_code as $other) {
+							$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
+							if(strpos($other_num, $prefix.'-AM-') === 0) { $found = $other_num; break; }
+						}
+						if($found !== null) {
+							$out[] = array('modulnummer' => $found, 'typ' => 'aufbauend',
+								'grund' => 'Vertiefungsmodul setzt Aufbaumodul voraus (gleicher Fachcode)');
+						}
+					}
+				}
+				// SM → VM
+				elseif($lvl === 4) {
+					if(preg_match('/^(.*?)-SM/u', $code, $pm)) {
+						$prefix = $pm[1];
+						$found = null;
+						foreach($all_modules_by_code as $other) {
+							$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : '';
+							if(strpos($other_num, $prefix.'-VM-') === 0) { $found = $other_num; break; }
+						}
+						if($found !== null) {
+							$out[] = array('modulnummer' => $found, 'typ' => 'empfohlen',
+								'grund' => 'Spezialisierungsmodul setzt Vertiefungsmodul voraus');
+						}
+					}
+				}
+			}
+		}
 		return $out;
 	}
 }
