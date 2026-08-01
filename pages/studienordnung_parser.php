@@ -931,18 +931,30 @@ class SoiExtractor {
             }
             // Modulnumber starts a new module entry
             // Pattern: <code>   <name>...   <SWS cells>...   <LP>
-            // Modulnumber starts at column 0 with code pattern, then ≥2 spaces
+            // Modulnumber starts at column 0 with code pattern, then ≥2 spaces.
+            // Akzeptiert auch Codes, die mit "-" enden (werden unten fortgesetzt).
             if(preg_match('/^([A-Z][A-Za-z0-9-]{3,})\s{2,}(.+)$/u', $trimmed, $m)) {
-                if($this->isModulCode($m[1])) {
+                $code_candidate = $m[1];
+                $is_valid = $this->isModulCode($code_candidate);
+                // Akzeptiere auch Codes, die mit Bindestrich enden, wenn der Code dem
+                // TU-Standard entspricht (3-4 Buchstaben-Segmente durch Bindestriche getrennt,
+                // mind. 2 Segmente, endet mit Bindestrich).
+                $is_potential_wrap = !$is_valid && substr($code_candidate, -1) === '-'
+                    && preg_match('/^[A-Z]+(-[A-Z0-9]{1,4}){1,5}-$/', $code_candidate);
+                if($is_valid || $is_potential_wrap) {
                     if($current) $modules[] = $current;
-                    $current = $this->parseAnlage2Row($m[1], $m[2], $current_section);
+                    $current = $this->parseAnlage2Row($code_candidate, $m[2], $current_section);
                     continue;
                 }
             }
             // Modulnummer-Continuation: Code endet mit "-", erstes Token der Zeile ist kurz + alphanumerisch (+ . * -).
+            // Reine Zahlen (z.B. LP-Wert) zählen NICHT als Modulnummer-Fortsetzung.
             if($current && substr($current['modulnummer'], -1) === '-') {
                 $first_token = strtok($trimmed, " \t");
-                if($first_token !== false && preg_match('/^[A-Za-z0-9.*\-]+$/u', $first_token) && mb_strlen($first_token) < 20) {
+                if($first_token !== false
+                    && preg_match('/^[A-Za-z0-9.*\-]+$/u', $first_token)
+                    && mb_strlen($first_token) < 20
+                    && !preg_match('/^\d+$/', $first_token)) {
                     $current['modulnummer'] .= $first_token;
                     // Verarbeite den Rest der Zeile manuell (gleiche Logik wie unten für
                     // Name-Continuation, PL- und SWS-Zellen).
@@ -963,16 +975,13 @@ class SoiExtractor {
                                 }
                             }
                         }
-                        // SWS-Zellen anhängen (an den letzten Semester-Eintrag).
+                        // SWS-Zellen: wenn keine Semester existieren, neue anlegen.
                         if(preg_match_all('/\b\d+\/\d+(?:\/\d+)*\b/', $rest, $swm)) {
-                            $last_idx = count($current['semester']) - 1;
-                            if($last_idx >= 0) {
-                                foreach($swm[0] as $swsc) {
-                                    $current['semester'][$last_idx]['sws'] = array_merge(
-                                        $current['semester'][$last_idx]['sws'] ?? [],
-                                        explode('/', $swsc)
-                                    );
+                            foreach($swm[0] as $idx => $swsc) {
+                                if(!isset($current['semester'][$idx])) {
+                                    $current['semester'][$idx] = ['semester' => $idx + 1, 'sws' => [], 'pl_count' => 0];
                                 }
+                                $current['semester'][$idx]['sws'] = explode('/', $swsc);
                             }
                         }
                         // Alles, was nicht PL/SWS ist → an Name anhängen.
@@ -1008,8 +1017,13 @@ class SoiExtractor {
             }
             // SWS-Continuation: Zeile enthält "/"-getrennte SWS-Werte.
             if($current && preg_match('/^\s*[\d\/.]+\s*$/u', $trimmed) && count($current['semester']) > 0) {
-                // Anhängen an SWS-Spalten des letzten Semester-Eintrags.
                 $parts = preg_split('/\s+/u', trim($trimmed));
+                // Wenn die Zeile nur eine einzige Zahl ist (ohne "/") → LP.
+                if(count($parts) === 1 && preg_match('/^\d+$/', $parts[0])) {
+                    $current['lp'] = (int)$parts[0];
+                    continue;
+                }
+                // Sonst: SWS-Zellen anhängen.
                 $last_idx = count($current['semester']) - 1;
                 foreach($parts as $p) {
                     if(preg_match('/^\d+\/\d+/', $p)) {
