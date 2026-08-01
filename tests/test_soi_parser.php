@@ -797,4 +797,4 @@ $nr = soi_generate_pruefungsnummer('LONG', 'Klausur', 999, $seen);
 is_equal("generate: lp=999 im Suffix", $nr, 'LONG-KL-999');
 /* Suffix mit Umlauten (deutsche Modulnummer) */
 $nr = soi_generate_pruefungsnummer('SLK-MÜ-A1', 'Klausur', 5, $seen);
-is_equal("generate: Umlaute im Suffix entfernt", $nr, 'SLKMÜA1-KL-5');
+is_equal("generate: Umlaute im Suffix entfernt", $nr, 'SLKMA1-KL-5');

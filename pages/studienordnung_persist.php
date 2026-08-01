@@ -273,7 +273,9 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 						$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : $other_code;
 						if($other_num === $code) continue;
 						$on = isset($other['name']) ? $other['name'] : '';
-						if(stripos($on, $prev) !== false && stripos($on, 'Sprachpraxis') !== false) {
+						// Match: enthält Sprachpraxis ODER Language (Skills/Components/Creativity).
+						$is_lang_other = (stripos($on, 'Sprachpraxis') !== false || stripos($on, 'Language') !== false);
+						if(stripos($on, $prev) !== false && $is_lang_other) {
 							$out[] = array('modulnummer' => $other_num, 'typ' => 'aufbauend', 'grund' => 'Sprachpraxis '.$prev.' ist Voraussetzung für '.$found_stufe);
 							break;
 						}

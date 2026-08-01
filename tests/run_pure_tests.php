@@ -941,9 +941,9 @@ function rquery ($sql) {
 		return 1;
 	}
 	// INSERT modul: ON DUPLICATE KEY generiert ID.
-	if(preg_match('/INSERT INTO `modul` .* VALUES \(([^,]+),([^,]+),([^,]+),/', $sql, $m)) {
-		$studiengang_id = (int)trim($m[2], '"');
-		$abkuerzung = trim($m[3], '"');
+	if(preg_match('/INSERT INTO `modul` .* VALUES \(\s*"([^"]*)"\s*,\s*"([^"]*)"\s*,\s*"([^"]*)"/', $sql, $m)) {
+		$studiengang_id = (int)$m[2];
+		$abkuerzung = $m[3];
 		$key = $studiengang_id.'|'.$abkuerzung;
 		if(!isset($GLOBALS['_soi_modul_seen'][$key])) {
 			$GLOBALS['_soi_next_id']++;
