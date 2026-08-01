@@ -13,7 +13,7 @@ $page_title = $GLOBALS['university_name']." | Administration";
 // eingebettet werden.
 $is_ajax_admin = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
 	|| (isset($_GET['ajax']) && $_GET['ajax'] === '1');
-$ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2', 'debug_text');
+$ajax_only_stages = array('upload', 'analyze', 'page_image', 'commit_v2', 'debug_text', 'cross_validate');
 // Stages, die IMMER den HTML-Chrome überspringen müssen (z.B. weil sie Binärdaten liefern
 // und vom <img>-Tag ohne XHR-Header geladen werden).
 $binary_stages = array('page_image');

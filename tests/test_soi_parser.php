@@ -320,3 +320,31 @@ if($has_pdf && $pdftotext !== '') {
 	}
 	is_equal("Integration: kein Modul mit Email im Namen", $name_has_email, 0);
 }
+
+/* ============================ Cross-Validation ============================ */
+
+if($has_pdf && $pdftotext !== '') {
+	$cv = $ex->crossValidate($pdf_path);
+	is_equal("crossValidate: alle Methoden konsistent (modul+anlage2+cover+sample+lp)",
+		$cv['all_consistent'], true);
+	is_equal("crossValidate: 6 Methoden geprüft",
+		count($cv['method_stats']), 6);
+	$methods_with_results = array_filter($cv['method_stats'], function($s) {
+		return !isset($s['error']);
+	});
+	is_equal("crossValidate: alle 6 Methoden liefern Ergebnis (kein Fehler)",
+		count($methods_with_results), 6);
+	$module_counts = array_map(function($s) {
+		return $s['modules_count'] ?? 0;
+	}, $methods_with_results);
+	is_equal("crossValidate: alle Methoden finden gleich viele Module",
+		count(array_unique($module_counts)), 1);
+	$a2_counts = array_map(function($s) {
+		return $s['anlage2_count'] ?? 0;
+	}, $methods_with_results);
+	is_equal("crossValidate: alle Methoden finden gleich viele Anlage-2-Einträge",
+		count(array_unique($a2_counts)), 1);
+	$degrees = array_map(function($s) { return $s['cover_degree'] ?? null; }, $methods_with_results);
+	is_equal("crossValidate: alle Methoden erkennen denselben Abschluss",
+		count(array_unique(array_filter($degrees))), 1);
+}

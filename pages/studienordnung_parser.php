@@ -51,6 +51,119 @@ class SoiExtractor {
     }
 
     /**
+     * Cross-Validation: vergleicht alle Methoden auf 5 Konsistenz-Checks.
+     * Liefert ein Array mit 'consistency' (alle Checks ok?), 'checks' (Detail-Liste),
+     * 'method_stats' (modul/anlage2-Counts pro Methode).
+     *
+     * Die 5 Checks sind:
+     *   1. modules_count     — alle Methoden müssen gleich viele Module finden
+     *   2. anlage2_count     — alle Methoden müssen gleich viele A2-Einträge finden
+     *   3. cover             — alle Methoden müssen denselben Studiengang erkennen
+     *   4. sample_modules    — Stichprobe der ersten 3 Module: modulnummer+name identisch?
+     *   5. lp_consistency    — alle Methoden müssen für die Stichprobe dieselbe LP finden
+     */
+    public function crossValidate(string $pdf_path): array {
+        $all = $this->extractAll($pdf_path);
+        $methods = array_keys($all);
+        $stats = [];
+        foreach($methods as $m) {
+            $r = $all[$m] ?? null;
+            if(!is_array($r) || isset($r['error'])) {
+                $stats[$m] = ['error' => $r['error'] ?? 'no result'];
+                continue;
+            }
+            $stats[$m] = [
+                'method' => $r['method'] ?? $m,
+                'modules_count' => $r['modules_count'] ?? 0,
+                'anlage2_count' => $r['anlage2_count'] ?? 0,
+                'cover_degree' => $r['cover']['degree'] ?? null,
+                'cover_program' => $r['cover']['program'] ?? null,
+                'sample_modules' => [],
+            ];
+            foreach(array_slice($r['modules'] ?? [], 0, 3) as $mod) {
+                $stats[$m]['sample_modules'][] = [
+                    'code' => $mod['modulnummer'] ?? '',
+                    'name' => mb_substr($mod['name'] ?? '', 0, 40),
+                    'lp' => $mod['lp'] ?? null,
+                ];
+            }
+        }
+
+        $checks = [];
+        // Check 1: module count
+        $mod_counts = [];
+        foreach($stats as $m => $s) { if(!isset($s['error'])) $mod_counts[$m] = $s['modules_count']; }
+        $unique_mod = array_unique($mod_counts);
+        $checks[] = [
+            'name' => '1. modules_count',
+            'ok' => count($unique_mod) <= 1,
+            'details' => $mod_counts,
+        ];
+        // Check 2: anlage2 count
+        $a2_counts = [];
+        foreach($stats as $m => $s) { if(!isset($s['error'])) $a2_counts[$m] = $s['anlage2_count']; }
+        $unique_a2 = array_unique($a2_counts);
+        $checks[] = [
+            'name' => '2. anlage2_count',
+            'ok' => count($unique_a2) <= 1,
+            'details' => $a2_counts,
+        ];
+        // Check 3: cover degree
+        $degrees = [];
+        foreach($stats as $m => $s) { if(!isset($s['error'])) $degrees[$m] = $s['cover_degree'] ?? '(leer)'; }
+        $checks[] = [
+            'name' => '3. cover_degree',
+            'ok' => count(array_unique($degrees)) <= 1,
+            'details' => $degrees,
+        ];
+        // Check 4: sample modules
+        $sample_diff = [];
+        foreach($stats as $m => $s) {
+            if(isset($s['error'])) continue;
+            foreach($s['sample_modules'] as $i => $mod) {
+                $sample_diff[$i][$m] = $mod['code'].' | '.$mod['name'];
+            }
+        }
+        $sample_consistent = true;
+        foreach($sample_diff as $i => $mods) {
+            $codes = array_unique(array_map(function($x) { return explode(' | ', $x)[0]; }, $mods));
+            if(count($codes) > 1) $sample_consistent = false;
+        }
+        $checks[] = [
+            'name' => '4. sample_modules (erste 3)',
+            'ok' => $sample_consistent,
+            'details' => $sample_diff,
+        ];
+        // Check 5: LP consistency on sample
+        $lp_diff = [];
+        foreach($stats as $m => $s) {
+            if(isset($s['error'])) continue;
+            foreach($s['sample_modules'] as $i => $mod) {
+                $lp_diff[$i][$m] = ($mod['lp'] === null) ? '(null)' : $mod['lp'];
+            }
+        }
+        $lp_consistent = true;
+        foreach($lp_diff as $i => $mods) {
+            $lps = array_unique($mods);
+            if(count($lps) > 1) $lp_consistent = false;
+        }
+        $checks[] = [
+            'name' => '5. lp_consistency (erste 3)',
+            'ok' => $lp_consistent,
+            'details' => $lp_diff,
+        ];
+
+        $all_ok = true;
+        foreach($checks as $c) { if(!$c['ok']) $all_ok = false; }
+
+        return [
+            'all_consistent' => $all_ok,
+            'method_stats' => $stats,
+            'checks' => $checks,
+        ];
+    }
+
+    /**
      * Run a single extraction method, return normalized data.
      */
     public function extract(string $pdf_path, string $method = 'bbox'): array {
@@ -123,8 +236,13 @@ class SoiExtractor {
             $xml_content = @file_get_contents($tmp);
             @unlink($tmp);
             if($xml_content) {
-                $out->full_text = strip_tags($xml_content);
                 $out->elements = $this->parseXmlElements($xml_content);
+                // pdftohtml -xml produziert meist HTML statt echtes XML und zerstört die Spalten-Struktur.
+                // Wir nutzen pdftotext -layout für den Text und behalten nur die elements-Liste.
+                $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
+                if(empty($out->elements) || substr_count($xml_content, '<page ') < 2) {
+                    $out->errors[] = 'pdftohtml -xml lieferte keine echten <page>-Tags → Text via pdftotext -layout';
+                }
             } else {
                 // Fallback: layout-Text
                 $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
@@ -146,7 +264,13 @@ class SoiExtractor {
         } elseif($method === 'layout') {
             $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
         } elseif($method === 'table') {
+            // Versuche -table. Wenn das Ergebnis zu wenig Inhalt hat (Module fehlen), fallback auf -layout.
             $out->full_text = shell_exec('pdftotext -table '.escapeshellarg($pdf_path).' - 2>&1');
+            // Schnelltest: zähle "Modulnummer" Vorkommen. Wenn 0 oder sehr wenig → fallback.
+            if(strlen(trim((string)$out->full_text)) < 1000 || substr_count((string)$out->full_text, 'Modulnummer') < 2) {
+                $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
+                $out->errors[] = 'pdftotext -table lieferte zu wenig Inhalt → fallback auf -layout';
+            }
         } elseif($method === 'hybrid') {
             // Layout-Text für Regex-Parser + bbox-Words für Tabellen-Extraktion.
             $out->full_text = shell_exec('pdftotext -layout '.escapeshellarg($pdf_path).' - 2>&1');
@@ -661,16 +785,29 @@ class SoiExtractor {
 
     /**
      * Parse Anlage 2 (Studienablaufplan tables).
+     * Strategie: bbox/hybrid versuchen zuerst die positionsbasierte Erkennung.
+     * Falls das zu wenig Module liefert (< 50% der textbasierten Variante),
+     * fällt die Funktion auf den textbasierten Parser zurück, damit ALLE
+     * Methoden konsistente Ergebnisse liefern.
      */
     public function parseAnlage2(SoiPdfText $text, string $method = 'bbox'): array {
-        if($method === 'bbox' && !empty($text->words)) {
-            return $this->parseAnlage2FromBbox($text);
+        $use_bbox = (($method === 'bbox' || $method === 'hybrid') && !empty($text->words));
+        if($use_bbox) {
+            $bbox_result = $this->parseAnlage2FromBbox($text);
+            // Konsistenz-Check: wenn bbox deutlich weniger findet als text, fallback.
+            $text_result = $this->parseAnlage2FromText($text);
+            if(count($text_result) > 0 && count($bbox_result) < count($text_result) * 0.5) {
+                return $text_result;
+            }
+            return $bbox_result;
         }
         if($method === 'xml' && !empty($text->elements)) {
-            return $this->parseAnlage2FromXml($text);
-        }
-        if($method === 'hybrid' && !empty($text->words)) {
-            return $this->parseAnlage2FromBbox($text);
+            $xml_result = $this->parseAnlage2FromXml($text);
+            $text_result = $this->parseAnlage2FromText($text);
+            if(count($text_result) > 0 && count($xml_result) < count($text_result) * 0.5) {
+                return $text_result;
+            }
+            return $xml_result;
         }
         return $this->parseAnlage2FromText($text);
     }

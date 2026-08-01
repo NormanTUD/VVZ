@@ -1254,21 +1254,44 @@
 						return;
 					}
 
-					// Roh-Text + notes-Payload vom Server holen.
-					fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=debug_text&id=' + SOI.currentImportId, {credentials:'same-origin'})
+					// Roh-Text + Cross-Validation parallel vom Server holen.
+					var txtP = fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=debug_text&id=' + SOI.currentImportId, {credentials:'same-origin'})
 						.then(function(r){
 							if(!r.ok) throw new Error('HTTP ' + r.status);
 							return r.text();
-						})
-						.then(function(txt) {
-							var log = soi_build_debug_log();
-							log += '\n=== RAW TEXT (erste 4000 Zeichen) ===\n';
-							log += txt.length > 4000 ? txt.substring(0, 4000) + '\n…(gekürzt, ' + txt.length + ' Zeichen gesamt)' : txt;
-							if(pre) pre.textContent = log;
-						})
-						.catch(function(e) {
-							if(pre) pre.textContent = soi_build_debug_log() + '\n\n(Fehler beim Laden des Raw-Texts: ' + e + ')';
 						});
+					var cvP = fetch('admin?page=<?php print $GLOBALS['this_page_number']; ?>&stage=cross_validate&id=' + SOI.currentImportId, {credentials:'same-origin'})
+						.then(function(r){ return r.json(); });
+					Promise.all([txtP, cvP]).then(function(results) {
+						var txt = results[0];
+						var cv = results[1];
+						var log = soi_build_debug_log();
+						log += '\n=== CROSS-VALIDATION (6 Methoden, 5 Checks) ===\n';
+						if(cv && cv.ok) {
+							log += 'Konsistenz: ' + (cv.all_consistent ? '✓ ALLE METHODEN KONSISTENT' : '⚠ METHODEN UNTERSCHEIDEN SICH') + '\n';
+							log += '\nMethod-Statistik:\n';
+							Object.keys(cv.method_stats || {}).forEach(function(m) {
+								var s = cv.method_stats[m];
+								if(s.error) { log += '  ' + m.padEnd(7) + ' ERROR: ' + s.error + '\n'; return; }
+								log += '  ' + m.padEnd(7) + ' modules=' + s.modules_count + ', a2=' + s.anlage2_count + ', cover=' + (s.cover_degree || '?') + '/' + (s.cover_program || '?') + '\n';
+							});
+							log += '\nKonsistenz-Checks:\n';
+							(cv.checks || []).forEach(function(c) {
+								log += '  ' + c.name + ': ' + (c.ok ? '✓ OK' : '⚠ FAIL') + '\n';
+								Object.keys(c.details || {}).forEach(function(k) {
+									var v = c.details[k];
+									log += '    ' + k + ': ' + (typeof v === 'object' ? JSON.stringify(v) : v) + '\n';
+								});
+							});
+						} else {
+							log += 'Fehler: ' + (cv && cv.error ? cv.error : 'unbekannt') + '\n';
+						}
+						log += '\n=== RAW TEXT (erste 4000 Zeichen) ===\n';
+						log += txt.length > 4000 ? txt.substring(0, 4000) + '\n…(gekürzt, ' + txt.length + ' Zeichen gesamt)' : txt;
+						if(pre) pre.textContent = log;
+					}).catch(function(e) {
+						if(pre) pre.textContent = soi_build_debug_log() + '\n\n(Fehler beim Laden: ' + e + ')';
+					});
 				};
 				window.soi_close_debug = function() {
 					var modal = $('soi_debug_modal');
@@ -1921,6 +1944,27 @@
 			// Notiz: form feed (\f) → sichtbar machen.
 			$raw = str_replace("\f", "\n<<PAGE BREAK>>\n", $raw);
 			print $raw;
+			exit;
+		} elseif($stage === 'cross_validate') {
+			// AJAX: Cross-Validation über alle 6 Methoden + Konsistenz-Checks.
+			header('Content-Type: application/json; charset=utf-8');
+			$id = (int)get_get('id');
+			$row = get_single_row_from_query_assoc('SELECT pdf_data FROM `studienordnung_import` WHERE id = '.esc($id));
+			if(!$row) {
+				print json_encode(array('ok' => false, 'error' => 'Import nicht gefunden.'));
+				exit;
+			}
+			$pdf_bin = base64_decode($row['pdf_data'] ?? '', true);
+			if($pdf_bin === false) $pdf_bin = $row['pdf_data'] ?? '';
+			$tmp_pdf = tempnam(sys_get_temp_dir(), 'soi_cv_').'.pdf';
+			if(file_put_contents($tmp_pdf, $pdf_bin) === false) {
+				print json_encode(array('ok' => false, 'error' => 'PDF konnte nicht geschrieben werden.'));
+				exit;
+			}
+			$ex = new SoiExtractor();
+			$cv = $ex->crossValidate($tmp_pdf);
+			@unlink($tmp_pdf);
+			print json_encode(array('ok' => true) + $cv, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_IGNORE);
 			exit;
 		} elseif($stage === 'page_image') {
 			// AJAX: Liefert PNG der Seite N eines Imports
