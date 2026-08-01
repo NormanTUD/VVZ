@@ -1611,8 +1611,11 @@ class SoiExtractor {
                 }
             }
 
-            // Alles andere → zur Block-Sammlung (Name + SWS + PL + LP)
-            $current_block_lines[] = $line;
+            // Alles andere → zur Block-Sammlung (Name + SWS + PL + LP).
+            // Fußnoten-Marker am Zeilenanfang entfernen (z.B. "1*  dul: Einführung..." → "dul: Einführung..."),
+            // sonst landen Ziffern wie "1*" versehentlich im Modulnamen.
+            $cleaned_line = preg_replace('/^\s*\d+\*?\.?\s+/u', '', $line, 1);
+            $current_block_lines[] = $cleaned_line !== '' ? $cleaned_line : $line;
         }
         // Letzten Block verarbeiten.
         $process_block();
