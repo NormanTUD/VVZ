@@ -469,7 +469,18 @@ class SoiExtractor {
                         if(preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', $nxt)) break;
 
                         // Default: Name fortsetzen.
+                        // 1. Soft-Hyphen am Zeilenende entfernen ("Spa-\nnische" → "Spanische").
+                        // 2. Keine Duplikate anhängen.
+                        if($name !== '' && substr($name, -1) === '-' && preg_match('/^[a-zäöüß]/u', $nxt)) {
+                            $name = substr($name, 0, -1);
+                        }
                         $name = trim($name.' '.$nxt);
+                        // Falls der neue Wrap identisch zum letzten Token ist, nichts anhängen.
+                        $last_token = '';
+                        if(preg_match('/(\S+)$/u', $name, $lt)) $last_token = $lt[1];
+                        if($last_token !== '' && $last_token === $nxt) {
+                            // Wrap ist nur Wiederholung — nichts tun.
+                        }
                         $i++;
                     }
                     // Trailing junk entfernen (3+ aufeinanderfolgende Ziffern = Seitenzahl-Rest).
@@ -478,6 +489,12 @@ class SoiExtractor {
                     if(preg_match('/^(.+?)\s+\(([^)]+@[^)]+)\)\s*$/u', $name, $nm)) {
                         $name = trim($nm[1]);
                         $dozent = trim($dozent.' ('.$nm[2].')');
+                    }
+                    // Falls Dozent mit ":" endet (z.B. "antike Sprache:"), ist das wahrscheinlich
+                    // der abgeschnittene Modulname. Wir verschieben alles vor dem ":" in den Namen.
+                    if(preg_match('/^(.+):(\s*\S.*)$/u', $dozent, $dm)) {
+                        $name = trim($name.' '.$dm[1].':');
+                        $dozent = trim($dm[2]);
                     }
                     $current = [
                         'modulnummer' => $code,
