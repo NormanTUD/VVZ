@@ -382,12 +382,28 @@ class SoiExtractor {
 
                         // Eingerückte Zeile mit kurzem Text → wahrscheinlich Dozent-Folge (Name + Email).
                         if(strlen($nxt_raw) > 0 && $nxt_raw[0] === ' ') {
-                            if(preg_match('/[A-Za-z][A-Za-z\.\-]+\s+[A-Za-z][A-Za-z\.\-]+/u', $nxt) || strpos($nxt, '@') !== false) {
+                            // Wenn die Zeile einen Email in Klammern enthält: nur den Email-Teil übernehmen,
+                            // den Rest (z.B. umgebrochener Modulname) an Name anhängen.
+                            if(preg_match('/\(([^)]+@[^)]+)\)/u', $nxt, $em)) {
+                                $email_part = '('.$em[1].')';
+                                $rest_text = trim(str_replace($email_part, '', $nxt));
+                                if($rest_text !== '' && $dozent !== '') {
+                                    // Kein Dozent hier → wahrscheinlich umgebrochener Modulname.
+                                    $name = trim($name.' '.$rest_text);
+                                }
+                                $dozent = trim($dozent.' '.$email_part);
+                                $i++;
+                                continue;
+                            }
+                            // Wenn die Zeile nur zwei Wörter (Vorname Nachname) enthält → Dozent-Folge.
+                            if(preg_match('/^[A-ZÄÖÜ][a-zäöüß\-]+\s+[A-ZÄÖÜ][a-zäöüß\-]+(?:\s+[A-ZÄÖÜ][a-zäöüß\.\-]+)?$/u', $nxt)
+                                && strlen($nxt) < 50) {
                                 if($dozent !== '' && $nxt !== $dozent) $dozent = trim($dozent.' '.$nxt);
                                 elseif($dozent === '') $dozent = $nxt;
                                 $i++;
                                 continue;
                             }
+                            // Sonst: nichts übernehmen.
                             break;
                         }
 

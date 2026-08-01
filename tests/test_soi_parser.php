@@ -254,3 +254,69 @@ if($pdftotext === '' && $pdftohtml === '' && $pdftoppm === '') {
 } else {
 	is_equal("Sentinel: mindestens ein Poppler-Tool vorhanden", 1, 1);
 }
+
+/* ============================ filterValidModules ======================== */
+
+$valid = $ex->filterValidModules([
+	['modulnummer' => 'SLK-BA-KP-3S-AL', 'name' => 'Spezialisierung'],
+	['modulnummer' => '', 'name' => 'Empty code'],
+	['modulnummer' => 'ABC', 'name' => 'Too short'],
+	['modulnummer' => 'SLK BA KP', 'name' => 'Whitespace in code'],
+	['modulnummer' => 'PhF-Phil-BA-PM1', 'name' => ''],
+	['modulnummer' => 'PhF-Phil-BA-PM2', 'name' => '   '],
+	['modulnummer' => 'SLK-BA-G-2B-DAF', 'name' => 'Basismodul DAF'],
+]);
+is_equal("filterValidModules: 2 gültige Module übrig", count($valid), 2);
+is_equal("filterValidModules: behält SLK-BA-KP-3S-AL",
+	in_array('SLK-BA-KP-3S-AL', array_column($valid, 'modulnummer'), true), true);
+
+/* ============================ filterValidAnlage2 ======================= */
+
+$valid_a2 = $ex->filterValidAnlage2([
+	['modulnummer' => 'SLK-BA-A-1B-S'],
+	['modulnummer' => 'SLK-BA-R-F-1B-K*'],
+	['modulnummer' => ''],
+	['modulnummer' => 'X'],
+	['modulnummer' => 'SLK BA R F'], // whitespace
+	['modulnummer' => 'SLK-BA-R-F-2SP-B2.1.2*'],
+]);
+is_equal("filterValidAnlage2: 3 gültige Zeilen übrig", count($valid_a2), 3);
+
+/* ============================ row_y_greater_than ======================= */
+
+is_equal("row_y_greater_than: alle y > threshold = true",
+	$ex->row_y_greater_than([['y' => 100.0], ['y' => 110.0]], 50.0), true);
+is_equal("row_y_greater_than: y ≤ threshold = false",
+	$ex->row_y_greater_than([['y' => 50.0], ['y' => 110.0]], 50.0), false);
+is_equal("row_y_greater_than: leeres row = true",
+	$ex->row_y_greater_than([], 50.0), true);
+
+/* ============================ Integration: Module-Datenqualität ======== */
+
+if($has_pdf && $pdftotext !== '') {
+	$r = $ex->extract($pdf_path, 'layout');
+
+	// Mindestens 60 Module mit modulnummer+name+LP.
+	$complete = 0;
+	foreach($r['modules'] as $m) {
+		if(!empty($m['modulnummer']) && !empty($m['name']) && isset($m['lp']) && $m['lp'] > 0) $complete++;
+	}
+	is_equal("Integration: ≥ 60 Module mit modulnummer+name+LP", $complete >= 60, true);
+
+	// Anlage 2 hat ≥ 80 Einträge (nach Romanistik-Wrap-Fix).
+	is_equal("Integration: Anlage 2 hat ≥ 80 Einträge", $r['anlage2_count'] >= 80, true);
+
+	// Modulnummer mit Wrap: SLK-BA-R-F-1SP-B2.1.1 (komplett, nicht getrennt).
+	$found_spr = false;
+	foreach($r['modules'] as $m) {
+		if(($m['modulnummer'] ?? '') === 'SLK-BA-R-F-1SP-B2.1.1') { $found_spr = true; break; }
+	}
+	is_equal("Integration: SLK-BA-R-F-1SP-B2.1.1 vollständig gefunden", $found_spr, true);
+
+	// Dozent enthält keine Email in Klammern + gleichzeitig im Namen.
+	$name_has_email = 0;
+	foreach($r['modules'] as $m) {
+		if(preg_match('/\([^)]+@[^)]+\)/', $m['name'] ?? '')) $name_has_email++;
+	}
+	is_equal("Integration: kein Modul mit Email im Namen", $name_has_email, 0);
+}
