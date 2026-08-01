@@ -383,6 +383,10 @@ class SoiExtractor {
                         // Eingerückte Zeile mit kurzem Text → wahrscheinlich Dozent-Folge (Name + Email)
                         // ODER: Modulname-Wrap (z.B. "für\nErgänzungsbereiche" oder "Sprache und\nKultur...").
                         if(strlen($nxt_raw) > 0 && $nxt_raw[0] === ' ') {
+                            // Soft-Hyphen-Korrektur: "Spa-\nnische" → "Spanische"
+                            if($name !== '' && substr($name, -1) === '-' && preg_match('/^[a-zäöüß]/u', $nxt)) {
+                                $name = substr($name, 0, -1);
+                            }
                             // Wenn die Zeile einen Email in Klammern enthält: nur den Email-Teil übernehmen,
                             // den Rest (z.B. umgebrochener Modulname) an Name anhängen.
                             if(preg_match('/\(([^)]+@[^)]+)\)/u', $nxt, $em)) {
@@ -469,11 +473,6 @@ class SoiExtractor {
                         if(preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', $nxt)) break;
 
                         // Default: Name fortsetzen.
-                        // 1. Soft-Hyphen am Zeilenende entfernen ("Spa-\nnische" → "Spanische").
-                        // 2. Keine Duplikate anhängen.
-                        if($name !== '' && substr($name, -1) === '-' && preg_match('/^[a-zäöüß]/u', $nxt)) {
-                            $name = substr($name, 0, -1);
-                        }
                         $name = trim($name.' '.$nxt);
                         // Falls der neue Wrap identisch zum letzten Token ist, nichts anhängen.
                         $last_token = '';
