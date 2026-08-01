@@ -939,12 +939,18 @@ class SoiExtractor {
                     continue;
                 }
             }
-            // Modulnummer-Continuation: Code endet mit "-", nächste Zeile ist kurzer Token ohne Space.
-            if($current && substr($current['modulnummer'], -1) === '-'
-                && preg_match('/^([A-Za-z0-9.*]+)\s*$/u', $trimmed, $ccm)
-                && mb_strlen($trimmed) < 25 && strpos($trimmed, ' ') === false) {
-                $current['modulnummer'] .= $ccm[1];
-                continue;
+            // Modulnummer-Continuation: Code endet mit "-", erstes Token der Zeile ist kurz + alphanumerisch (+ . * -).
+            if($current && substr($current['modulnummer'], -1) === '-') {
+                $first_token = strtok($trimmed, " \t");
+                if($first_token !== false && preg_match('/^[A-Za-z0-9.*\-]+$/u', $first_token) && mb_strlen($first_token) < 20) {
+                    $current['modulnummer'] .= $first_token;
+                    // Rest der Zeile (alles nach dem ersten Token) als Name-Continuation verarbeiten.
+                    $rest = trim(substr($trimmed, mb_strlen($first_token)));
+                    if($rest !== '' && !preg_match('/^\d+\s*\/\s*\d+/u', $rest) && !preg_match('/^\d+\s*PL/i', $rest)) {
+                        $current['name'] = trim(($current['name'] ?? '').' '.$rest);
+                    }
+                    continue;
+                }
             }
             // PL-Zeile: "X PL" oder "1 PL  2 PL"
             if($current && preg_match('/^\s*(\d+)\s*PL\b/i', $trimmed)) {
