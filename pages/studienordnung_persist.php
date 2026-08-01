@@ -248,14 +248,34 @@ if(!function_exists('soi_detect_voraussetzungen_for_modul')) {
 			if(stripos($name, $p['typ']) === false) continue;
 			$them = trim(preg_replace('/^.*?' . preg_quote($p['typ'], '/') . '\s*[:\-–]?\s*/iu', '', $name));
 			if($them === '') continue;
+			// Modulnummer-Studiengangs-Prefix: die ersten 2-3 Segmente (z.B. "SLK-BA-" oder "PhF-").
+			// Das verhindert false positives zwischen verschiedenen Studiengängen, lässt aber
+			// Romanistik/Frankreich-Varianten (SLK-BA-R vs SLK-BA-R-F) zu.
+			$own_studiengang_prefix = '';
+			if(preg_match('/^([A-Z]+(?:-[A-Z]+){1,3})/', $code, $pm)) {
+				$own_studiengang_prefix = $pm[1];
+			}
 			foreach($all_modules_by_code as $other_code => $other) {
 				$other_num = isset($other['modulnummer']) ? trim((string)$other['modulnummer']) : $other_code;
 				if($other_num === $code) continue;
 				$other_name = isset($other['name']) ? $other['name'] : '';
-				if(stripos($other_name, $p['vor']) !== false && stripos($other_name, $them) !== false) {
-					$out[] = array('modulnummer' => $other_num, 'typ' => $p['rel'], 'grund' => $p['typ'].' '.$them.' baut auf '.$p['vor'].' '.$them.' auf');
-					break;
+				if(stripos($other_name, $p['vor']) === false || stripos($other_name, $them) === false) continue;
+				// Studiengangs-Prefix muss passen.
+				if($own_studiengang_prefix !== '') {
+					$other_studiengang_prefix = '';
+					if(preg_match('/^([A-Z]+(?:-[A-Z]+){1,3})/', $other_num, $opm)) {
+						$other_studiengang_prefix = $opm[1];
+					}
+					// Prefix muss gleich sein ODER einer ist Anfang des anderen
+					// (z.B. "SLK-BA" matched "SLK-BA-R" und "SLK-BA-G").
+					if($own_studiengang_prefix !== $other_studiengang_prefix
+						&& strpos($other_studiengang_prefix.'-', $own_studiengang_prefix.'-') !== 0
+						&& strpos($own_studiengang_prefix.'-', $other_studiengang_prefix.'-') !== 0) {
+						continue;
+					}
 				}
+				$out[] = array('modulnummer' => $other_num, 'typ' => $p['rel'], 'grund' => $p['typ'].' '.$them.' baut auf '.$p['vor'].' '.$them.' auf');
+				break;
 			}
 		}
 
