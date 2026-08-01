@@ -335,8 +335,22 @@ class SoiExtractor {
         // den Bachelorstudiengang X" auf, die unsere Patterns fälschlich matchen würden.
         $head = mb_substr($clean, 0, 4000);
 
-        // Pattern 1: "Studienordnung für den Bachelorstudiengang X"
-        if(preg_match('/Studienordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)(?:studiengang)?\s+([^\n\r]+)/u', $head, $m)) {
+        // Pattern 0 (zuerst): "Studienordnung für das Erste Hauptfach X im Bachelorstudiengang Y"
+        // → Subject = "Hauptfach X", Program = Y, Degree = Bachelor. Diese Pattern hat Vorrang,
+        // weil sie sehr spezifisch ist und nicht in §1-Wiederholungen vorkommt.
+        if(preg_match('/Studienordnung\s+(?:für|des)\s+das\s+(?:(Erste|Zweite|Dritte)\s+)?(Hauptfach|Nebenfach)\s+([^\n\r]+?)\s+im\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)studiengang\s+([^\n\r]+)/u', $head, $m)) {
+            $ord = trim($m[1] ?? '');
+            $fac = trim($m[2]);
+            $subj = trim($m[3]);
+            $degree = trim($m[4]);
+            $full_prog = trim($m[5]);
+            $subject_full = ($ord !== '' ? $ord.' ' : '').$fac.' '.$subj;
+            $program = $subject_full.' / '.$full_prog;
+            $program = trim(preg_replace('/\s+/', ' ', $program));
+        }
+        // Pattern 1: "Studienordnung für den Bachelorstudiengang X" (klassische Form).
+        // Nur anwenden, wenn Pattern 0 nichts gefunden hat.
+        if(!$program && preg_match('/Studienordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)(?:studiengang)?\s+([^\n\r]+)/u', $head, $m)) {
             $degree = trim($m[1]);
             $program = trim(preg_replace('/\s+/', ' ', $m[2]));
         }
@@ -344,21 +358,6 @@ class SoiExtractor {
         if(!$program && preg_match('/Prüfungsordnung\s+(?:für|des)\s+den\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)(?:studiengang)?\s+([^\n\r]+)/u', $head, $m)) {
             $degree = trim($m[1]);
             $program = trim(preg_replace('/\s+/', ' ', $m[2]));
-        }
-        // Pattern 3: "Studienordnung für das Erste Hauptfach X im Bachelorstudiengang Y"
-        // → Subject = X, Program = Y, Degree = Bachelor
-        if(!$program && preg_match('/Studienordnung\s+(?:für|des)\s+das\s+(?:Erste|Zweite|Dritte)?\s*(?:Hauptfach|Nebenfach)?\s*([^\n\r]+?)\s+im\s+(Bachelor|Master|Diplom|Staats\s*examen|Lehramt)studiengang\s+([^\n\r]+)/u', $head, $m)) {
-            $degree = trim($m[2]);
-            // Subject als Prefix im Programm übernehmen (z.B. "Hauptfach Politikwissenschaft")
-            $subject = trim($m[1]);
-            $full_prog = trim($m[3]);
-            // Wenn das Subject "Hauptfach X" enthält, ergänze es vor dem Programm.
-            if(stripos($subject, 'Hauptfach') !== false || stripos($subject, 'Nebenfach') !== false) {
-                $program = $subject.' / '.$full_prog;
-            } else {
-                $program = $full_prog;
-            }
-            $program = trim(preg_replace('/\s+/', ' ', $program));
         }
         // Pattern 4: just "Studienordnung für X" (Fallback)
         if(!$program && preg_match('/Studienordnung\s+f[uü]r\s+(?:den|das|die)\s+([^\n\r]+)/u', $head, $m)) {
@@ -834,6 +833,15 @@ class SoiExtractor {
             if(preg_match('/\s{2,}/', $s)) return false;
         }
         $s = $s_norm;
+        // Trailing dash (wrapped modulnummer) ist erlaubt — das wird in der Modulnummer-
+        // Continuation-Logik unten wieder zusammengefügt.
+        $has_trailing_dash = (substr($s, -1) === '-');
+        if($has_trailing_dash) $s = substr($s, 0, -1);
+        // Mindestens 2 Bindestriche nötig, damit einzelne Wörter wie "Modul-Nr." oder
+        // "Bachelor-Arbeit" nicht fälschlich als Modulnummer erkannt werden.
+        // Ausnahme: trailing-dash-Continuation ("PHF-BA-POL-" → 3 dashes before trim → OK).
+        $dash_count = substr_count($s, '-');
+        if($dash_count < 1) return false;
         // Most chars should be uppercase or digits
         $upper_count = 0;
         $lower_count = 0;
@@ -845,7 +853,10 @@ class SoiExtractor {
             else if($c >= '0' && $c <= '9') $digit_count++;
         }
         if($upper_count < 2) return false; // at least 2 uppercase letters
-        if($digit_count === 0 && $lower_count === 0) return false; // must have digits or lowercase
+        // Codes dürfen rein aus Buchstaben+Bindestrichen bestehen, wenn sie mit "-" enden
+        // (Continuation-Fall). Ansonsten brauchen wir Ziffern oder Kleinbuchstaben als
+        // Eindeutigkeitsmerkmal (verhindert Match auf reine Wörter wie "Modulnummer").
+        if(!$has_trailing_dash && $digit_count === 0 && $lower_count === 0) return false;
         return true;
     }
 
