@@ -387,6 +387,16 @@ class SoiExtractor {
                             if($name !== '' && substr($name, -1) === '-' && preg_match('/^[a-zäöüß]/u', $nxt)) {
                                 $name = substr($name, 0, -1);
                             }
+                            // Dozent-Continuation: vorheriger Dozent endet mit "-" oder "(". → ganze Zeile an Dozent hängen.
+                            if($dozent !== '' && (substr($dozent, -1) === '-' || substr($dozent, -1) === '(')) {
+                                // Nur das erste Spalten-Segment übernehmen (Rest ist nächster Modul).
+                                $cont = trim((preg_split('/\s{2,}/u', $nxt, 2)[0] ?? $nxt));
+                                if($cont !== '') {
+                                    $dozent = trim($dozent.' '.$cont);
+                                }
+                                $i++;
+                                continue;
+                            }
                             // Wenn die Zeile einen Email in Klammern enthält: nur den Email-Teil übernehmen,
                             // den Rest (z.B. umgebrochener Modulname) an Name anhängen.
                             if(preg_match('/\(([^)]+@[^)]+)\)/u', $nxt, $em)) {
