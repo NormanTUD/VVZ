@@ -944,10 +944,44 @@ class SoiExtractor {
                 $first_token = strtok($trimmed, " \t");
                 if($first_token !== false && preg_match('/^[A-Za-z0-9.*\-]+$/u', $first_token) && mb_strlen($first_token) < 20) {
                     $current['modulnummer'] .= $first_token;
-                    // Rest der Zeile (alles nach dem ersten Token) als Name-Continuation verarbeiten.
+                    // Verarbeite den Rest der Zeile manuell (gleiche Logik wie unten für
+                    // Name-Continuation, PL- und SWS-Zellen).
                     $rest = trim(substr($trimmed, mb_strlen($first_token)));
-                    if($rest !== '' && !preg_match('/^\d+\s*\/\s*\d+/u', $rest) && !preg_match('/^\d+\s*PL/i', $rest)) {
-                        $current['name'] = trim(($current['name'] ?? '').' '.$rest);
+                    if($rest !== '') {
+                        // PL-Zellen extrahieren.
+                        if(preg_match_all('/(\d+)\s*PL\b/i', $rest, $plm)) {
+                            $pl_values = array_map('intval', $plm[1]);
+                            $n_sem = count($current['semester']);
+                            $n_pl = count($pl_values);
+                            if($n_sem > 0 && $n_pl > 0) {
+                                for($k = 0; $k < $n_pl && $k < $n_sem; $k++) {
+                                    $idx = $n_sem - 1 - $k;
+                                    $current['semester'][$idx]['pl_count'] = max(
+                                        $current['semester'][$idx]['pl_count'],
+                                        $pl_values[$n_pl - 1 - $k]
+                                    );
+                                }
+                            }
+                        }
+                        // SWS-Zellen anhängen (an den letzten Semester-Eintrag).
+                        if(preg_match_all('/\b\d+\/\d+(?:\/\d+)*\b/', $rest, $swm)) {
+                            $last_idx = count($current['semester']) - 1;
+                            if($last_idx >= 0) {
+                                foreach($swm[0] as $swsc) {
+                                    $current['semester'][$last_idx]['sws'] = array_merge(
+                                        $current['semester'][$last_idx]['sws'] ?? [],
+                                        explode('/', $swsc)
+                                    );
+                                }
+                            }
+                        }
+                        // Alles, was nicht PL/SWS ist → an Name anhängen.
+                        $non_pl_sws = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b/', '', $rest);
+                        $non_pl_sws = preg_replace('/\b\d+\s*PL\b/i', '', $non_pl_sws);
+                        $non_pl_sws = trim($non_pl_sws);
+                        if($non_pl_sws !== '') {
+                            $current['name'] = trim(($current['name'] ?? '').' '.$non_pl_sws);
+                        }
                     }
                     continue;
                 }
