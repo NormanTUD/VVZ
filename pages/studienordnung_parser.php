@@ -387,15 +387,23 @@ class SoiExtractor {
                             if($name !== '' && substr($name, -1) === '-' && preg_match('/^[a-zäöüß]/u', $nxt)) {
                                 $name = substr($name, 0, -1);
                             }
-                            // Dozent-Continuation: vorheriger Dozent endet mit "-" oder "(". → ganze Zeile an Dozent hängen.
+                            // Dozent-Continuation: vorheriger Dozent endet mit "-" oder "(". → erste Spalte an
+                            // Dozent hängen, NUR wenn die Spalte wie eine Dozent-Fortsetzung aussieht
+                            // (startet mit Kleinbuchstabe oder mit einem typischen Email-Wort-Stück wie "ner.").
                             if($dozent !== '' && (substr($dozent, -1) === '-' || substr($dozent, -1) === '(')) {
-                                // Nur das erste Spalten-Segment übernehmen (Rest ist nächster Modul).
                                 $cont = trim((preg_split('/\s{2,}/u', $nxt, 2)[0] ?? $nxt));
-                                if($cont !== '') {
+                                $looks_like_dozent_cont = $cont !== '' && (
+                                    preg_match('/^[a-zäöüß]/u', $cont)   // Kleinbuchstabe (z.B. "ner.", "geschäftsführender")
+                                    || preg_match('/^[\w\.\-]+@/u', $cont) // Email-Wort-Stück
+                                    || preg_match('/^(Böhmer|Peglau|Schwarke|Klinghardt|Walter|Bellini|Lieber|Tiller|Kupfer|Lenz|Häder|Boehmer|Mailbox)/u', $cont)
+                                );
+                                if($looks_like_dozent_cont) {
                                     $dozent = trim($dozent.' '.$cont);
+                                    $i++;
+                                    continue;
                                 }
-                                $i++;
-                                continue;
+                                // Sonst: das ist Name-Wrap, kein Dozent-Wrap. Wir machen weiter
+                                // mit dem normalen Name-Wrap-Pfad.
                             }
                             // Wenn die Zeile einen Email in Klammern enthält: nur den Email-Teil übernehmen,
                             // den Rest (z.B. umgebrochener Modulname) an Name anhängen.
