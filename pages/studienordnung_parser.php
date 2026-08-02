@@ -1560,16 +1560,22 @@ class SoiExtractor {
                 $nxt = trim($nxt_raw);
                 if($nxt !== '' && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', $nxt)) {
                     $first_token = strtok($nxt, " \t");
+                    // WICHTIG: Token MUSS wie ein Code-Continuationsteil aussehen:
+                    // - muss mindestens einen Buchstaben enthalten (reine Ziffern wie "10" sind LP-Werte, KEINE Code-Teile)
+                    // - optional mit führendem/r Fußnoten-Marker(n) (*, **) — diese werden hier NICHT mitgematcht,
+                    //   weil die Continuation darunter liegt (z.B. "PB2*" → first_token ohne * = "PB2").
+                    $clean_token = rtrim($first_token, '*.'); // Fußnoten-Marker entfernen
                     if($first_token !== false
                         && preg_match('/^[A-Za-z0-9.\-]+$/u', $first_token)
-                        && mb_strlen($first_token) < 25) {
+                        && preg_match('/[A-Za-z]/', $clean_token)
+                        && mb_strlen($clean_token) < 25) {
                         $rest_after = trim(substr($nxt, mb_strlen($first_token)));
                         // Wenn der Token wie ein vollständiger Modulnummer-Header aussieht
                         // (z.B. "LIT-1-ERW" mit eigener SWS-Spalte), wird der unten
                         // stehende Modulnummer-Header-Pfad genommen.
                         $looks_like_new_module = strlen($rest_after) > 10 && preg_match('/\d+\/\d+/', $rest_after);
                         if(!$looks_like_new_module) {
-                            $current['modulnummer'] .= $first_token;
+                            $current['modulnummer'] .= $clean_token;
                             if($rest_after !== '') $current_block_lines[] = $rest_after;
                             continue;
                         }
