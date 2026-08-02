@@ -951,11 +951,11 @@ class SoiExtractor {
         // Continuation-Logik unten wieder zusammengefügt.
         $has_trailing_dash = (substr($s, -1) === '-');
         if($has_trailing_dash) $s = substr($s, 0, -1);
-        // Mindestens 2 Bindestriche nötig, damit einzelne Wörter wie "Modul-Nr." oder
-        // "Bachelor-Arbeit" nicht fälschlich als Modulnummer erkannt werden.
-        // Ausnahme: trailing-dash-Continuation ("PHF-BA-POL-" → 3 dashes before trim → OK).
+        // Mindestens 1 Bindestrich nötig (entweder im Code selbst ODER als trailing dash).
+        // So werden kurze Codes wie "POL-" (trailing dash) und "PhF-BA-POL" (internes dash) erkannt.
         $dash_count = substr_count($s, '-');
-        if($dash_count < 1) return false;
+        $effective_dash_count = $dash_count + ($has_trailing_dash ? 1 : 0);
+        if($effective_dash_count < 1) return false;
         // Most chars should be uppercase or digits
         $upper_count = 0;
         $lower_count = 0;
@@ -972,7 +972,8 @@ class SoiExtractor {
         // nur dann ab, wenn der Code exakt einem deutschen Wort ähnelt (siehe unten).
         // Frühere Logik verlangte Ziffern oder Kleinbuchstaben — das hat diese legitimen
         // Codes fälschlich abgelehnt.
-        if($dash_count < 1) return false; // mind. 1 Bindestrich
+        // Berücksichtige auch trailing-dash-Continuation als gültigen "dash".
+        if($effective_dash_count < 1) return false; // mind. 1 Bindestrich (echt oder trailing)
         return true;
     }
 
