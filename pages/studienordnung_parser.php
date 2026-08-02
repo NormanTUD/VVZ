@@ -1687,6 +1687,10 @@ class SoiExtractor {
                     }
                 }
                 $after_code = preg_replace('/^\s+/u', '', $after_code);
+                // pdftotext-Artifact: einzelner Großbuchstabe + mehrere Whitespace + Name
+                // (z.B. "PhF-Phil-BA-SM2 S Mensch und Gesellschaft" — "S" ist der Beginn
+                // der SWS-Spalte, der mit dem Modulnamen verschmolzen wurde).
+                $after_code = preg_replace('/^[A-Z]\s{2,}/u', '', $after_code);
                 if($after_code !== '') $current_block_lines[] = $after_code;
                 continue;
             }
