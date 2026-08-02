@@ -1560,14 +1560,19 @@ class SoiExtractor {
                 $nxt = trim($nxt_raw);
                 if($nxt !== '' && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', $nxt)) {
                     $first_token = strtok($nxt, " \t");
-                    // WICHTIG: Token MUSS wie ein Code-Continuationsteil aussehen:
-                    // - muss mindestens einen Buchstaben enthalten (reine Ziffern wie "10" sind LP-Werte, KEINE Code-Teile)
-                    // - optional mit führendem/r Fußnoten-Marker(n) (*, **) — diese werden hier NICHT mitgematcht,
-                    //   weil die Continuation darunter liegt (z.B. "PB2*" → first_token ohne * = "PB2").
+                    // WICHTIG: Continuation-Token MUSS wie ein Code-Teil aussehen.
+                    // Heuristik (um "Sprachgeschichte" als Namen-Wrap zu erkennen):
+                    //   - Footnote-Marker im ersten Token (z.B. "PB2*", "KLIN**", "LIT-1-ERW*") ODER
+                    //   - Digit im ersten Token (z.B. "LIT-1", "SPR-2-ERW", "DAF1") ODER
+                    //   - Sehr kurzer Token (≤ 4 Zeichen) wie "DAF", "LIT", "SPR", "LK" ohne Fußnote.
                     $clean_token = rtrim($first_token, '*.'); // Fußnoten-Marker entfernen
+                    $has_footnote_marker = preg_match('/\*+/', $first_token);
+                    $has_digit = preg_match('/\d/', $clean_token);
+                    $is_short_code = mb_strlen($clean_token) <= 4 && !preg_match('/^[A-Z][a-z]+/', $clean_token);
                     if($first_token !== false
                         && preg_match('/^[A-Za-z0-9.\-]+$/u', $first_token)
                         && preg_match('/[A-Za-z]/', $clean_token)
+                        && ($has_footnote_marker || $has_digit || $is_short_code)
                         && mb_strlen($clean_token) < 25) {
                         $rest_after = trim(substr($nxt, mb_strlen($first_token)));
                         // Wenn der Token wie ein vollständiger Modulnummer-Header aussieht
