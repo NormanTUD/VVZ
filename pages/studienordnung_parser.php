@@ -1395,6 +1395,12 @@ class SoiExtractor {
                     }
                 }
             }
+            // Sonderformat: "N Wochen" / "N Semesterwochenstunden" (Berufspraktikum etc.).
+            if(preg_match_all('/\b(\d+)\s+(Wochen|Semesterwochenstunden?|SWS)\b/u', $line, $wm)) {
+                foreach($wm[1] as $weeks) {
+                    $out[] = [(string)$weeks, '0', '0', '0']; // Dummy-SWS-Zelle
+                }
+            }
             return $out;
         };
 
@@ -1527,6 +1533,8 @@ class SoiExtractor {
             $name_text = preg_replace('/\s+\d{1,3}\s*$/m', ' ', $name_text);
             // SWS-Bemerkungen wie "2 SWS", "1 SWS" entfernen.
             $name_text = preg_replace('/\b\d+\s*SWS\*?\b/i', ' ', $name_text);
+            // Sonderformate wie "4 Wochen" (Berufspraktikum) oder "2 Semesterwochenstunden" entfernen.
+            $name_text = preg_replace('/\b\d+\s+(Wochen|Semesterwochenstunden?)\b/ui', ' ', $name_text);
             $name_text = trim($name_text);
             // Multi-line → single-line (Space-getrennt).
             $name_text = preg_replace('/\s+/u', ' ', $name_text);
