@@ -1743,15 +1743,20 @@ class SoiExtractor {
                     }
                 }
                 // No-digit Continuation: Code enthält KEINE Ziffer (z.B. "KathTh-BM") und die
-                // Zeile beginnt mit einer einzelnen Ziffer + Fußnoten-Marker (z.B. "1* dul:...").
+                // Zeile beginnt mit einer einzelnen Ziffer + Fußnoten-Marker (z.B. "1* dul:..." oder
+                // "1** Praxis" oder "2***").
                 elseif(!preg_match('/\d/', $current['modulnummer'])) {
-                    if(preg_match('/^\s*(\d+)\*?\.?\s+/u', $line, $lm)) {
+                    if(preg_match('/^\s*(\d+)\*+\.?\.?\s+/u', $line, $lm)) {
                         $current['modulnummer'] .= $lm[1];
+                        // Auch $cleaned_line aktualisieren, damit der Fußnoten-Marker NICHT im Namen landet.
+                        $cleaned_line = preg_replace('/^\s*\d+\*+\.?\.?\s+/u', '', $line, 1);
+                        $line = $cleaned_line;
                     }
                 }
             }
             // Fußnoten-Marker am Zeilenanfang entfernen (z.B. "1*  dul: Einführung..." → "dul: Einführung...").
-            $cleaned_line = preg_replace('/^\s*\d+\*?\.?\s+/u', '', $cleaned_line, 1);
+            // Auch mehrfache Sterne (1**, 1***) und Punkte (1., 2.) werden hier entfernt.
+            $cleaned_line = preg_replace('/^\s*\d+\*+\.?\.?\s+/u', '', $cleaned_line, 1);
             $current_block_lines[] = $cleaned_line !== '' ? $cleaned_line : $line;
         }
         // Letzten Block verarbeiten.
