@@ -1440,7 +1440,8 @@ class SoiExtractor {
             // Pattern: optional 1-8 spaces, dann Modulnummer mit optionalem internen Space+Token.
             // WICHTIG: der optionale zweite Token darf NUR ein kurzer Digitsuffix sein (z.B. "KathTh-BM 1"),
             // NICHT ein langes Wort (z.B. "KathTh-BM Kirchengeschichte" → Name, nicht Code).
-            // Akzeptiert auch Codes, die mit Bindestrich enden (wrapped).
+            // Akzeptiert auch Codes mit Fußnoten-Marker am Ende (z.B. "SLK-BA-A-2V-S*") und
+            // Codes, die mit Bindestrich enden (wrapped).
             if(preg_match('/^(\s{0,8})([A-Z][A-Za-z0-9.\-]+(?:\s\d{1,3})?)(?=\s|$)/u', $line, $m)) {
                 $raw_code = $m[2];
                 if(substr_count($raw_code, ' ') === 1 && preg_match('/^[A-Za-z0-9.\-]+\s\d{1,3}$/u', $raw_code)) {
@@ -1450,6 +1451,11 @@ class SoiExtractor {
                 if(substr($raw_code, -1) === '-' && strlen($raw_code) >= 5 && preg_match('/^[A-Z]+(-[A-Z0-9]{1,4}){1,5}-$/', $raw_code)) {
                     return $raw_code;
                 }
+            }
+            // Mit Fußnoten-Marker: "SLK-BA-A-2V-S*" → Code "SLK-BA-A-2V-S".
+            if(preg_match('/^(\s{0,8})([A-Z][A-Za-z0-9.\-]+)(\*+)(?=\s|$)/u', $line, $m2)) {
+                $raw_code2 = $m2[1].$m2[2];
+                if($this->isModulCode($m2[2])) return $m2[2];
             }
             return false;
         };
@@ -1569,17 +1575,37 @@ class SoiExtractor {
                     $has_footnote_marker = preg_match('/\*+/', $first_token);
                     $has_digit = preg_match('/\d/', $clean_token);
                     $is_short_code = mb_strlen($clean_token) <= 4 && !preg_match('/^[A-Z][a-z]+/', $clean_token);
+                    // Zusätzliche Heuristik: Wenn das zusammengesetzte Modul (current + token)
+                    // ein gültiger Modulcode ist UND die Gesamtlänge plausibel ist, ist der Token
+                    // ein Code-Teil. Das fängt Fälle wie "PhF-NT-" + "Griech" → "PhF-NT-Griech" ab.
+                    $combined = $current['modulnummer'] . $clean_token;
+                    $is_code_continuation = $this->isModulCode($combined)
+                        && mb_strlen($clean_token) <= 8
+                        && mb_strlen($combined) <= 20
+                        && !preg_match('/^[A-Z][a-z]{6,}/', $clean_token);
                     if($first_token !== false
-                        && preg_match('/^[A-Za-z0-9.\-]+$/u', $first_token)
+                        && preg_match('/^[A-Za-z0-9.\-*]+$/u', $first_token)
                         && preg_match('/[A-Za-z]/', $clean_token)
-                        && ($has_footnote_marker || $has_digit || $is_short_code)
+                        && ($has_footnote_marker || $has_digit || $is_short_code || $is_code_continuation)
                         && mb_strlen($clean_token) < 25) {
                         $rest_after = trim(substr($nxt, mb_strlen($first_token)));
-                        // Wenn der Token wie ein vollständiger Modulnummer-Header aussieht
-                        // (z.B. "LIT-1-ERW" mit eigener SWS-Spalte), wird der unten
-                        // stehende Modulnummer-Header-Pfad genommen.
-                        $looks_like_new_module = strlen($rest_after) > 10 && preg_match('/\d+\/\d+/', $rest_after);
-                        if(!$looks_like_new_module) {
+                        // Wenn der Token wie ein vollständiger Modulnummer-Header aussieht,
+                        // wird der unten stehende Modulnummer-Header-Pfad genommen.
+                        // Wir prüfen: beginnt das erste Wort des Rests mit einem gültigen
+                        // Modul-Code (z.B. "LIT-1-ERW" + "Kultur..." → neues Modul)?
+                        $rest_first_word = strtok($rest_after, " \t");
+                        $looks_like_new_module = $rest_first_word !== false
+                            && preg_match('/^[A-Za-z]/', $rest_first_word)
+                            && preg_match('/\d/', $rest_first_word)
+                            && $this->isModulCode(rtrim($rest_first_word, '*.'))
+                            && strlen($rest_after) > 15;
+                        // Wenn der Token selbst ein gültiger Modulnummer-Header wäre UND kein
+                        // Fußnoten-Marker angehängt ist UND kein Name-Text folgt, ist es ein
+                        // NEUER Modulheader, keine Continuation.
+                        // Beispiel: "SLK-BA-G-1B-" ohne * und ohne Rest → neuer Header.
+                        // Beispiel: "LIT-1*" mit Rest → Continuation.
+                        $looks_like_own_module_header = !$has_footnote_marker && $rest_after === '' && $this->isModulCode($clean_token);
+                        if(!$looks_like_new_module && !$looks_like_own_module_header) {
                             $current['modulnummer'] .= $clean_token;
                             if($rest_after !== '') $current_block_lines[] = $rest_after;
                             continue;
