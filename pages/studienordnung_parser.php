@@ -588,10 +588,10 @@ class SoiExtractor {
             // Module line: starts with modulnummer, then 2+ spaces, then name (and optional dozent).
             // Modulnummer kann mit "-" enden → wird auf nächster Zeile fortgesetzt (z.B. "SLK-BA-R-F-\n1B-K").
             // Modulnummer darf EINEN einzelnen internen Space enthalten (z.B. "PHF-BA-KG-EM 1"), der dann entfernt wird.
-            if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}(\S.{2,}?)\s{2,}(.+)$/u', $trimmed, $m)) {
+            if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Za-z0-9.\-]+)?)\s{2,}(\S.{2,}?)\s{2,}(.+)$/u', $trimmed, $m)) {
                 // Wenn das erste Capture-Group einen einzelnen internen Space hat, normalisieren.
                 $raw_code = $m[1];
-                if(substr_count($raw_code, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw_code)) {
+                if(substr_count($raw_code, ' ') === 1 && preg_match('/^[A-Za-z0-9.\-]+\s[A-Za-z0-9.\-]+$/u', $raw_code)) {
                     $code_candidate = preg_replace('/\s+/', '', $raw_code);
                 } else {
                     $code_candidate = $raw_code;
@@ -608,9 +608,9 @@ class SoiExtractor {
                         if($nxt === '') { $i++; continue; }
                         // Stop-Kriterien.
                         if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt)) break;
-                        if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}/u', $nxt, $cm)) {
+                        if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Za-z0-9.\-]+)?)\s{2,}/u', $nxt, $cm)) {
                             $raw = $cm[1];
-                            if(substr_count($raw, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw)) {
+                            if(substr_count($raw, ' ') === 1 && preg_match('/^[A-Za-z0-9.\-]+\s[A-Za-z0-9.\-]+$/u', $raw)) {
                                 $raw = preg_replace('/\s+/', '', $raw);
                             }
                             if($this->isModulCode($raw)) break;
@@ -829,9 +829,9 @@ class SoiExtractor {
                     $nxt = trim($lines[$i+1]);
                     if($nxt === '') { $i++; continue; }
                     if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt)) break;
-                    if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)\s{2,}/u', $nxt, $cm)) {
+                    if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Za-z0-9.\-]+)?)\s{2,}/u', $nxt, $cm)) {
                         $raw = $cm[1];
-                        if(substr_count($raw, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw)) {
+                        if(substr_count($raw, ' ') === 1 && preg_match('/^[A-Za-z0-9.\-]+\s[A-Za-z0-9.\-]+$/u', $raw)) {
                             $raw = preg_replace('/\s+/', '', $raw);
                         }
                         if($this->isModulCode($raw)) break;
@@ -1437,12 +1437,13 @@ class SoiExtractor {
         // Hilfsfunktion: Ist die Zeile ein Modulnummer-Header?
         // Modulnummer steht am Zeilenanfang (mit optionalem führenden Whitespace bis max 8 Zeichen).
         $is_modul_header = function($line) use (&$is_modul_header) {
-            // Pattern: optional 1-8 spaces, dann Modulnummer mit optionalem internen Space
-            // (z.B. "EM 1"), dann gefolgt von Whitespace oder Zeilenende.
+            // Pattern: optional 1-8 spaces, dann Modulnummer mit optionalem internen Space+Token.
+            // WICHTIG: der optionale zweite Token darf NUR ein kurzer Digitsuffix sein (z.B. "KathTh-BM 1"),
+            // NICHT ein langes Wort (z.B. "KathTh-BM Kirchengeschichte" → Name, nicht Code).
             // Akzeptiert auch Codes, die mit Bindestrich enden (wrapped).
-            if(preg_match('/^(\s{0,8})([A-Z][A-Za-z0-9.\-]+(?:\s[A-Z0-9.\-]+)?)(?=\s|$)/u', $line, $m)) {
+            if(preg_match('/^(\s{0,8})([A-Z][A-Za-z0-9.\-]+(?:\s\d{1,3})?)(?=\s|$)/u', $line, $m)) {
                 $raw_code = $m[2];
-                if(substr_count($raw_code, ' ') === 1 && preg_match('/^[A-Z0-9.\-]+\s[A-Z0-9.\-]+$/u', $raw_code)) {
+                if(substr_count($raw_code, ' ') === 1 && preg_match('/^[A-Za-z0-9.\-]+\s\d{1,3}$/u', $raw_code)) {
                     $raw_code = preg_replace('/\s+/', '', $raw_code);
                 }
                 if($this->isModulCode($raw_code)) return $raw_code;
@@ -1550,6 +1551,32 @@ class SoiExtractor {
             // LP-Spalten-Header
             if(preg_match('/^\(?M\)?\s*$|^\(?Mobilit/i', $trimmed)) continue;
 
+            // Vor Modulnummer-Header-Check: Wenn der aktuelle Code mit Bindestrich endet,
+            // könnte die nächste Zeile eine Continuation sein (z.B. "SLK-BA-G-1B-" + "LIT-1-ERW").
+            // Wir prüfen das ZUERST, bevor der Modulnummer-Header-Match die Zeile fälschlich
+            // als neues Modul erkennt.
+            if($current && substr($current['modulnummer'], -1) === '-') {
+                $nxt_raw = $line;
+                $nxt = trim($nxt_raw);
+                if($nxt !== '' && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', $nxt)) {
+                    $first_token = strtok($nxt, " \t");
+                    if($first_token !== false
+                        && preg_match('/^[A-Za-z0-9.\-]+$/u', $first_token)
+                        && mb_strlen($first_token) < 25) {
+                        $rest_after = trim(substr($nxt, mb_strlen($first_token)));
+                        // Wenn der Token wie ein vollständiger Modulnummer-Header aussieht
+                        // (z.B. "LIT-1-ERW" mit eigener SWS-Spalte), wird der unten
+                        // stehende Modulnummer-Header-Pfad genommen.
+                        $looks_like_new_module = strlen($rest_after) > 10 && preg_match('/\d+\/\d+/', $rest_after);
+                        if(!$looks_like_new_module) {
+                            $current['modulnummer'] .= $first_token;
+                            if($rest_after !== '') $current_block_lines[] = $rest_after;
+                            continue;
+                        }
+                    }
+                }
+            }
+
             // Modulnummer-Header?
             $modul_code = $is_modul_header($line);
             if($modul_code !== false) {
@@ -1594,27 +1621,19 @@ class SoiExtractor {
                 continue;
             }
 
-            // Modulnummer-Continuation (Code endet mit "-")
-            // Wichtig: Auch einzelne Ziffern (z.B. "1", "2") MÜSSEN als Continuation akzeptiert
-            // werden, wenn die vorherige Modulnummer mit "-" endet (z.B. "KathTh-BM-" + "1" →
-            // "KathTh-BM1"). Sonst werden Codes wie "PHF-BA-POL-AM-" + "FORSCHUNG" ebenfalls nicht
-            // zusammengefügt. Frühere Logik schloss Ziffern explizit aus → Bug.
-            if($current && substr($current['modulnummer'], -1) === '-') {
-                $first_token = strtok($trimmed, " \t");
-                if($first_token !== false
-                    && preg_match('/^[A-Za-z0-9.\-]+$/u', $first_token)
-                    && mb_strlen($first_token) < 25) {
-                    $current['modulnummer'] .= $first_token;
-                    $rest = trim(substr($trimmed, mb_strlen($first_token)));
-                    if($rest !== '') $current_block_lines[] = $rest;
-                    continue;
+            // Alles andere → zur Block-Sammlung (Name + SWS + PL + LP).
+            // Smart-Continuation: Wenn der aktuelle Code KEINE Ziffer enthält und die Zeile
+            // mit einer einzelnen Ziffer beginnt (z.B. "1* dul: ..."), dann ist die Ziffer
+            // der Level-Indikator (z.B. "KathTh-BM 1"). Wir hängen die Ziffer an den Code an,
+            // BEVOR wir den Fußnoten-Marker strippen.
+            $cleaned_line = $line;
+            if($current && !preg_match('/\d/', $current['modulnummer']) && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', trim($line))) {
+                if(preg_match('/^\s*(\d+)\*?\.?\s+/u', $line, $lm)) {
+                    $current['modulnummer'] .= $lm[1];
                 }
             }
-
-            // Alles andere → zur Block-Sammlung (Name + SWS + PL + LP).
-            // Fußnoten-Marker am Zeilenanfang entfernen (z.B. "1*  dul: Einführung..." → "dul: Einführung..."),
-            // sonst landen Ziffern wie "1*" versehentlich im Modulnamen.
-            $cleaned_line = preg_replace('/^\s*\d+\*?\.?\s+/u', '', $line, 1);
+            // Fußnoten-Marker am Zeilenanfang entfernen (z.B. "1*  dul: Einführung..." → "dul: Einführung...").
+            $cleaned_line = preg_replace('/^\s*\d+\*?\.?\s+/u', '', $cleaned_line, 1);
             $current_block_lines[] = $cleaned_line !== '' ? $cleaned_line : $line;
         }
         // Letzten Block verarbeiten.
