@@ -1743,14 +1743,22 @@ class SoiExtractor {
                     }
                 }
                 // No-digit Continuation: Code enthält KEINE Ziffer (z.B. "KathTh-BM") und die
-                // Zeile beginnt mit einer einzelnen Ziffer + Fußnoten-Marker (z.B. "1* dul:..." oder
-                // "1** Praxis" oder "2***").
+                // Zeile beginnt mit einer einzelnen Ziffer, optional gefolgt von Fußnoten-Markern
+                // (z.B. "1 dul:...", "1* dul:...", "1** Praxis", "2***").
                 elseif(!preg_match('/\d/', $current['modulnummer'])) {
-                    if(preg_match('/^\s*(\d+)\*+\.?\.?\s+/u', $line, $lm)) {
-                        $current['modulnummer'] .= $lm[1];
-                        // Auch $cleaned_line aktualisieren, damit der Fußnoten-Marker NICHT im Namen landet.
-                        $cleaned_line = preg_replace('/^\s*\d+\*+\.?\.?\s+/u', '', $line, 1);
-                        $line = $cleaned_line;
+                    if(preg_match('/^\s*(\d+)\*?\.?\s+/u', $line, $lm)) {
+                        // Nur fortfahren, wenn danach KEINE SWS-Zelle und KEINE LP-ähnliche Zeile kommt
+                        // (wir wollen nicht versehentlich die "1 PL" Zeile als Code-Continuation
+                        // interpretieren — SWS/PL-Zeilen werden unten separat behandelt).
+                        $rest_check = ltrim(substr($line, strlen($lm[0])));
+                        $looks_like_pl_or_sws = preg_match('/^\d+\s*PL\b/i', $rest_check)
+                            || preg_match('/^\d+\/\d+/', $rest_check);
+                        if(!$looks_like_pl_or_sws) {
+                            $current['modulnummer'] .= $lm[1];
+                            // Auch $cleaned_line aktualisieren, damit der Fußnoten-Marker NICHT im Namen landet.
+                            $cleaned_line = preg_replace('/^\s*\d+\*?\.?\s+/u', '', $line, 1);
+                            $line = $cleaned_line;
+                        }
                     }
                 }
             }
