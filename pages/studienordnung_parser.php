@@ -1575,20 +1575,53 @@ class SoiExtractor {
                     $has_footnote_marker = preg_match('/\*+/', $first_token);
                     $has_digit = preg_match('/\d/', $clean_token);
                     $is_short_code = mb_strlen($clean_token) <= 4 && !preg_match('/^[A-Z][a-z]+/', $clean_token);
+                    // Split-Continuation: wenn das erste Token keine Fußnote hat, aber das
+                    // NÄCHSTE Token mit Digit+Footnote beginnt (z.B. "2SP-B 1.1*"), dann bilden
+                    // beide zusammen den Code-Teil (z.B. "2SP-B1.1"). Wird im combined-Pfad unten geprüft.
+                    $split_token = '';
+                    if(!$has_footnote_marker) {
+                        $rest_after_first = ltrim(substr($nxt, mb_strlen($first_token)));
+                        $next_tok = strtok($rest_after_first, " \t");
+                        if($next_tok !== false
+                            && preg_match('/^(\d[\d.]*)\*+/u', $next_tok, $sm)) {
+                            $split_token = $clean_token . $sm[1];
+                            $clean_token_with_split = $split_token;
+                        } else {
+                            $clean_token_with_split = $clean_token;
+                        }
+                    } else {
+                        $clean_token_with_split = $clean_token;
+                    }
                     // Zusätzliche Heuristik: Wenn das zusammengesetzte Modul (current + token)
                     // ein gültiger Modulcode ist UND die Gesamtlänge plausibel ist, ist der Token
                     // ein Code-Teil. Das fängt Fälle wie "PhF-NT-" + "Griech" → "PhF-NT-Griech" ab.
-                    $combined = $current['modulnummer'] . $clean_token;
+                    $combined = $current['modulnummer'] . $clean_token_with_split;
                     $is_code_continuation = $this->isModulCode($combined)
-                        && mb_strlen($clean_token) <= 8
+                        && mb_strlen($clean_token_with_split) <= 8
                         && mb_strlen($combined) <= 20
-                        && !preg_match('/^[A-Z][a-z]{6,}/', $clean_token);
+                        && !preg_match('/^[A-Z][a-z]{6,}/', $clean_token_with_split);
                     if($first_token !== false
                         && preg_match('/^[A-Za-z0-9.\-*]+$/u', $first_token)
                         && preg_match('/[A-Za-z]/', $clean_token)
                         && ($has_footnote_marker || $has_digit || $is_short_code || $is_code_continuation)
-                        && mb_strlen($clean_token) < 25) {
-                        $rest_after = trim(substr($nxt, mb_strlen($first_token)));
+                        && mb_strlen($clean_token_with_split) < 25) {
+                        $rest_after = trim(substr($nxt, mb_strlen($first_token) + (strlen($first_token) > 0 ? mb_strlen($first_token) : 0) - mb_strlen($first_token)));
+                        // Nach dem ersten Token + evtl. Split-Token (z.B. "2SP-B" + " 1.1*") überspringen
+                        $rest_after = $rest_after;
+                        // Einfacher: alles nach dem ersten Token + einem etwaigen Split-Token.
+                        if($split_token !== '' && $split_token !== $clean_token) {
+                            // Split-Token vorhanden — Rest beginnt NACH dem zweiten Token.
+                            $rest_start = strpos($nxt, $first_token);
+                            if($rest_start !== false) {
+                                $after_first = substr($nxt, $rest_start + strlen($first_token));
+                                // Skip whitespace, dann das Split-Token selbst überspringen.
+                                $after_first = ltrim($after_first);
+                                $next_tok_full = strtok($after_first, " \t");
+                                if($next_tok_full !== false) {
+                                    $rest_after = trim(substr($after_first, strlen($next_tok_full)));
+                                }
+                            }
+                        }
                         // Wenn der Token wie ein vollständiger Modulnummer-Header aussieht,
                         // wird der unten stehende Modulnummer-Header-Pfad genommen.
                         // Wir prüfen: beginnt das erste Wort des Rests mit einem gültigen
@@ -1606,7 +1639,7 @@ class SoiExtractor {
                         // Beispiel: "LIT-1*" mit Rest → Continuation.
                         $looks_like_own_module_header = !$has_footnote_marker && $rest_after === '' && $this->isModulCode($clean_token);
                         if(!$looks_like_new_module && !$looks_like_own_module_header) {
-                            $current['modulnummer'] .= $clean_token;
+                            $current['modulnummer'] .= $clean_token_with_split;
                             if($rest_after !== '') $current_block_lines[] = $rest_after;
                             continue;
                         }
