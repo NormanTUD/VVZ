@@ -1419,19 +1419,29 @@ class SoiExtractor {
         // Hilfsfunktion: Extrahiere LP (einzelne Zahl am Ende einer Zeile).
         // LP ist die Zahl, die NICHT in einer SWS-Zelle (X/Y) und NICHT neben PL steht.
         $extract_lp = function($line) {
-            $candidates = array();
+            $candidates_real = array();
+            $candidates_isolated = array();
             foreach(preg_split('/\R/u', $line) as $line_i) {
-                // Vermeide SWS-Zellen und PL-Marker auf dieser Zeile.
+                // Vermeide SWS-Zellen und Fußnoten-Marker auf dieser Zeile.
                 $stripped = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b|\*+(?:\/\*+)*/', '', $line_i);
-                $stripped = preg_replace('/\b\d+\s*PL\*?/i', '', $stripped);
-                $stripped = trim($stripped);
-                if(preg_match('/\b(\d{1,3})\s*$/', $stripped, $m)) {
+                $stripped = preg_replace('/\b\d+\s*PL\*?\b/i', '', $stripped);
+                $stripped_pl_only = trim($stripped);
+                $stripped_full = trim($line_i);
+                // Eine "isolierte" LP-Zeile enthält NUR Whitespace + Zahl (Section-Footer wie "35" für
+                // "Ergänzungsbereich (35 Leistungspunkte)"). Eine echte Modul-LP-Zeile hat weiteren Inhalt.
+                $is_isolated = $stripped_full !== '' && preg_match('/^\s*\d{1,3}\s*$/', $line_i);
+                if(preg_match('/\b(\d{1,3})\s*$/', $stripped_pl_only, $m)) {
                     $val = (int)$m[1];
-                    if($val >= 1 && $val <= 200) $candidates[] = $val;
+                    if($val >= 1 && $val <= 200) {
+                        if($is_isolated) $candidates_isolated[] = $val;
+                        else $candidates_real[] = $val;
+                    }
                 }
             }
-            // Wenn mehrere LP-Werte gefunden wurden, nimm den letzten (typisch: am Zeilenende der Modul-Zeile).
-            return !empty($candidates) ? end($candidates) : null;
+            // Bevorzuge echte Modul-LPs (Zeilen mit weiterem Inhalt) vor isolierten Section-Footern.
+            if(!empty($candidates_real)) return end($candidates_real);
+            if(!empty($candidates_isolated)) return end($candidates_isolated);
+            return null;
         };
 
         // Hilfsfunktion: Ist die Zeile ein Modulnummer-Header?
