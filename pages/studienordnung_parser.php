@@ -1554,6 +1554,14 @@ class SoiExtractor {
                 $current_section = trim($m[1]);
                 continue;
             }
+            // "Module aus dem Bereich XYZ*" Section-Header (z.B. Politikwissenschaft, Soziologie).
+            if(preg_match('/^Module\s+aus\s+dem\s+Bereich\b/u', $trimmed)) {
+                $process_block();
+                $current_block_lines = [];
+                if($current) { $modules[] = $current; $current = null; }
+                $current_section = trim($trimmed, " \t\n\r\0\x0B*");
+                continue;
+            }
 
             // Tabellen-Header (Modul-Nr., Modulname, etc.) → ignorieren
             if(preg_match('/Modul-?Nr\.|Modulname|V\/S\/T\/AK\/P/i', $trimmed) && mb_strlen($trimmed) < 100) {
