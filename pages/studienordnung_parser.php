@@ -1627,9 +1627,26 @@ class SoiExtractor {
             // der Level-Indikator (z.B. "KathTh-BM 1"). Wir hängen die Ziffer an den Code an,
             // BEVOR wir den Fußnoten-Marker strippen.
             $cleaned_line = $line;
-            if($current && !preg_match('/\d/', $current['modulnummer']) && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', trim($line))) {
-                if(preg_match('/^\s*(\d+)\*?\.?\s+/u', $line, $lm)) {
-                    $current['modulnummer'] .= $lm[1];
+            if($current && !preg_match('/^(Qualifikationsziele|Inhalte|Lehr-|Voraussetzungen|Verwendbarkeit|Leistungspunkte|Häufigkeit|Arbeitsaufwand|Dauer)/u', trim($line))) {
+                // Trailing-dash Continuation: Code endet mit "-" → nächste Zeile enthält den
+                // fehlenden Code-Teil (z.B. "SLK-BA-S-3-" + "PB2* nisch" → "SLK-BA-S-3-PB2"
+                // oder "SLK-BA-S-3-" + "KLIN** Linguistik" → "SLK-BA-S-3-KLIN").
+                // Wir akzeptieren Buchstaben+Ziffern, optional mit einem oder mehreren Fußnoten-Markern.
+                if(substr($current['modulnummer'], -1) === '-') {
+                    if(preg_match('/^\s*([A-Za-z][A-Za-z0-9]{0,5})\*+\s+(.*)$/u', $line, $cm)) {
+                        $code_part = $cm[1];
+                        $rest_after = $cm[2];
+                        $current['modulnummer'] .= $code_part;
+                        $cleaned_line = $rest_after;
+                        $line = $rest_after;
+                    }
+                }
+                // No-digit Continuation: Code enthält KEINE Ziffer (z.B. "KathTh-BM") und die
+                // Zeile beginnt mit einer einzelnen Ziffer + Fußnoten-Marker (z.B. "1* dul:...").
+                elseif(!preg_match('/\d/', $current['modulnummer'])) {
+                    if(preg_match('/^\s*(\d+)\*?\.?\s+/u', $line, $lm)) {
+                        $current['modulnummer'] .= $lm[1];
+                    }
                 }
             }
             // Fußnoten-Marker am Zeilenanfang entfernen (z.B. "1*  dul: Einführung..." → "dul: Einführung...").
