@@ -924,3 +924,138 @@ if($has_pdf && $pdftotext !== '') {
 	}
 	is_equal("PDF: Alle erkannten Voraussetzungen verweisen auf existierende Module", $invalid_count, 0);
 }
+
+/* ============================ Trailing-Dash Continuation: reale Layouts ============================ */
+
+/* Regression: Anlage 2 mit footnote-marker auf der Code-Zeile (z.B. "SLK-BA-A-2V-S*") wurde
+ * nicht als Modul-Header erkannt — der is_modul_header-Check verlangte nur Whitespace nach
+ * dem Code, aber hier folgt ein "*". Die Folge war, dass die Code-Zeile als Block-Inhalt
+ * des VORMODULS gespeichert wurde (z.B. "Components SLK-BA-A-2V-S V" im Namen). */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modul-Nr.              Modulname
+SLK-BA-A-1-SPLC        Sprachpraxis – Language Components           0/0/0/0/2/0     0/0/0/0/4/0
+                                                                                       8
+                       Language Components                           2 PL            2 PL
+SLK-BA-A-2V-S*         Vertiefungsmodul – Sprachwissenschaft       0/2/0/0/0/0     0/2/0/0/0/0
+                                                                                       10
+                       Sprachwissenschaft                            1 PL            1 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	$codes = array_map(function($m) { return $m['modulnummer']; }, $mods);
+	is_equal("Footnote-on-code: 2 Module erkannt", count($mods), 2);
+	is_equal("Footnote-on-code: SLK-BA-A-1-SPLC vollständig", in_array('SLK-BA-A-1-SPLC', $codes), true);
+	is_equal("Footnote-on-code: SLK-BA-A-2V-S (ohne *)", in_array('SLK-BA-A-2V-S', $codes), true);
+	is_equal("Footnote-on-code: kein 'SLK-BA-A-2V-S*'",
+		in_array('SLK-BA-A-2V-S*', $codes), false);
+	// Der Name von SLK-BA-A-1-SPLC darf NICHT den Code des Folgemoduls enthalten.
+	$first = null;
+	foreach($mods as $m) if($m['modulnummer'] === 'SLK-BA-A-1-SPLC') $first = $m;
+	is_equal("Footnote-on-code: Name ohne 'SLK-BA-A-2V-S'",
+		$first !== null && strpos($first['name'], 'SLK-BA-A-2V-S') === false, true);
+}
+
+/* Regression: Anlage 2 mit "PhF-NT-" + "Griech" Continuation (6 Zeichen, Mixed-Case).
+ * Der Continuation-Check verlangte entweder Footnote-Marker ODER Digit ODER ≤ 4 Zeichen.
+ * "Griech" hat keine Footnote, kein Digit, ist 6 Zeichen, ist Mixed-Case → wurde abgelehnt.
+ * Lösung: zusätzliche Heuristik "is_code_continuation" (current+token ist gültiger Code,
+ * Token ≤ 8 Zeichen, combined ≤ 20 Zeichen, Token nicht ^[A-Z][a-z]{6,}). */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer            Modulname
+PhF-NT-                Neutestamentliches Griechisch                0/0/0/2/4    0/0/0/2/4
+                                                                                       10
+Griech                                                                            1 PL
+PhF-EvTh-BA-BL1        Biblische Literatur 1";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	$codes = array_map(function($m) { return $m['modulnummer']; }, $mods);
+	is_equal("Alpha-Continuation: 2 Module erkannt", count($mods), 2);
+	is_equal("Alpha-Continuation: PhF-NT-Griech vollständig", in_array('PhF-NT-Griech', $codes), true);
+	is_equal("Alpha-Continuation: kein abgeschnittener 'PhF-NT-'",
+		in_array('PhF-NT-', $codes), false);
+}
+
+/* Regression: Anlage 2 mit "SLK-BA-R-I-" + "2SP-B 1.1*" (Code-Split mit Space).
+ * Der Continuation-Check nahm nur das erste Token ("2SP-B") und übersah das " 1.1*".
+ * Lösung: zusätzliche Heuristik, die auch das nächste Token mitberücksichtigt wenn es
+ * eine Digit+Footnote-Folge ist (z.B. "1.1*"). */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer           Modulname
+SLK-BA-R-I-           Sprachpraxis B1.1                             1 PL
+2SP-B 1.1*            – Italienisch
+SLK-BA-R-F-           Aufbaumodul Französische Sprachwissenschaft  0/0/0/4
+                                                                                       6
+2A-S*                 wissenschaft";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	$codes = array_map(function($m) { return $m['modulnummer']; }, $mods);
+	is_equal("Split-Continuation: 2 Module erkannt", count($mods), 2);
+	// Erwartet: SLK-BA-R-I-2SP-B1.1 (Space wird entfernt).
+	is_equal("Split-Continuation: SLK-BA-R-I-2SP-B1.1 vollständig",
+		in_array('SLK-BA-R-I-2SP-B1.1', $codes) || in_array('SLK-BA-R-I-2SP-B1', $codes), true);
+}
+
+/* Regression: trailing-dash mit langem Code-Token, der selbst ein Modul-Header ist
+ * (z.B. "SLK-BA-G-1B-" gefolgt von "SLK-BA-G-2B-DAF" mit eigenem LP).
+ * Der Continuation-Check verwechselte das Folgemodul mit einem Continuation-Token,
+ * weil die combined-Länge ≤ 20 war UND alle anderen Heuristiken (Digit, etc.) zutrafen.
+ * Lösung: $looks_like_new_module-Check, der prüft, ob das erste Wort des Rests ein
+ * gültiger Modul-Code ist — dann ist die Zeile ein neuer Modul-Header. */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer           Modulname
+SLK-BA-G-1B-          Basismodul: Sprache und Kultur/Kommunikation   2/2/2/0/0/0
+                                                                                       6
+SPR-2*                und Praxis                                       1 PL
+SLK-BA-G-2B-          Basismodul: Sprache und Kultur/Deutsch als       2/2/2/0/0/0
+                                                                                       6
+DAF                   Fremdsprache                                     1 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	$codes = array_map(function($m) { return $m['modulnummer']; }, $mods);
+	is_equal("Own-Header-Detection: 2 Module erkannt", count($mods), 2);
+	is_equal("Own-Header-Detection: SLK-BA-G-1B-SPR-2 vollständig", in_array('SLK-BA-G-1B-SPR-2', $codes), true);
+	is_equal("Own-Header-Detection: SLK-BA-G-2B-DAF als eigenes Modul", in_array('SLK-BA-G-2B-DAF', $codes), true);
+}
+
+/* Regression: trailing-dash + LP-Zeile dazwischen ("        10") wurde fälschlich
+ * als Continuation-Token interpretiert. Lösung: isModulCode-Check im Token, der
+ * reine Ziffern ablehnt (Token muss mit Buchstaben beginnen). */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer           Modulname
+SLK-BA-S-3-           Sprachpraxis B2 – Russisch                    0/0/0/0/4/0      0/0/0/0/4/0
+                                                                                       10
+RB2*                  sisch                                            2 PL             1 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	is_equal("LP-not-continuation: 1 Modul erkannt", count($mods), 1);
+	is_equal("LP-not-continuation: SLK-BA-S-3-RB2 vollständig",
+		$mods[0]['modulnummer'], 'SLK-BA-S-3-RB2');
+}
+
+/* Regression: Anlage 2 mit "SLK-BA-R-F-" + "1B-K*         wissenschaft" (Name folgt).
+ * Der Continuation-Check verwarf das "1B-K*", weil der Rest "wissenschaft    2/0/0/0..."
+ * lang genug war und \d+\/\d+ enthielt → $looks_like_new_module = true.
+ * Lösung: $looks_like_new_module prüft jetzt nur, ob das ERSTE WORT des Rests ein
+ * gültiger Modul-Code ist (statt nur SWS-Daten im ganzen Rest). */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer           Modulname
+SLK-BA-R-F-           Basismodul Französische Kultur-                2/0/0/0/0      0/2/0/0
+                                                                                       6
+1B-K*                 wissenschaft                                    1 PL         1 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	is_equal("Rest-has-SWS: 1 Modul erkannt", count($mods), 1);
+	is_equal("Rest-has-SWS: SLK-BA-R-F-1B-K vollständig",
+		$mods[0]['modulnummer'], 'SLK-BA-R-F-1B-K');
+}
