@@ -569,61 +569,71 @@ class SoiExtractor {
         $i = 0;
         while($i < $n) {
             $line = $lines[$i];
-            $consumed_next_line = false;
+
             // (A) Mid-line hyphenation: hyphen is followed by 2+ whitespace
             // (column separator) — the column-2 content lives on the same line.
+            $consumed_via_a = false;
             if($i + 1 < $n
                && preg_match('/([a-zäöüß]+)-\s{2,}/u', $line, $hm)
                && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$i+1], $nm)) {
                 $word_fragment = $hm[1];
                 $continuation = $nm[1];
-                // Replace ONLY the "X-" with "XY" so the original column-separator
-                // whitespace after the hyphen is preserved.
                 $line = preg_replace(
                     '/' . preg_quote($word_fragment . '-', '/') . '/u',
                     $word_fragment . $continuation,
                     $line, 1
                 );
-                // Strip the leading word + whitespace from the next line. The
-                // remainder of the next line is kept; we emit it as a separate
-                // output row below.
                 $lines[$i+1] = preg_replace(
                     '/^\s*' . preg_quote($continuation, '/') . '/u',
                     '',
                     $lines[$i+1], 1
                 );
-                $consumed_next_line = true;
+                $consumed_via_a = true;
             }
             // (B) Trailing hyphenation: line ends with "X-".
             elseif($i + 1 < $n
                   && preg_match('/[a-zäöüß]-\s*$/u', $line)
                   && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$i+1], $nm)) {
                 $continuation = $nm[1];
-                // Strip the trailing hyphen + any trailing whitespace.
-                $line = preg_replace('/-\s*$/u', '', $line);
+                $line = preg_replace('/-\s*$/u', '', $line) . $continuation;
                 $lines[$i+1] = preg_replace(
                     '/^\s*' . preg_quote($continuation, '/') . '/u',
                     '',
                     $lines[$i+1], 1
                 );
-                $line = $line . $continuation;
-                $consumed_next_line = true;
+                $consumed_via_a = true;
             }
 
             $merged[] = $line;
 
-            // If we consumed the leading word of line $i+1, the remainder of
-            // that line still needs to appear in the output. Emit it directly
-            // (unless it became empty, in which case it is just skipped).
-            if($consumed_next_line) {
+            // If we consumed the leading word of $lines[$i+1], the remainder of
+            // that line is kept as a separate output row. That remainder may itself
+            // end with a hyphen ("Urchristen-" + "tums" → "Urchristentums"), so we
+            // keep absorbing further leading words until either the running remainder
+            // no longer ends with a hyphen or we run out of input lines.
+            $rest = null;
+            $next_idx = $i + 1;
+            if($consumed_via_a) {
                 $rest = $lines[$i+1];
+                $next_idx = $i + 2;
+                while($next_idx < $n
+                      && preg_match('/[a-zäöüß]-\s*$/u', $rest)
+                      && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$next_idx], $jm)) {
+                    $cont = $jm[1];
+                    $rest = preg_replace('/-\s*$/u', '', $rest) . $cont;
+                    $lines[$next_idx] = preg_replace(
+                        '/^\s*' . preg_quote($cont, '/') . '/u',
+                        '',
+                        $lines[$next_idx], 1
+                    );
+                    $next_idx++;
+                }
                 if(trim($rest) !== '') {
                     $merged[] = $rest;
                 }
-                $i += 2;
-            } else {
-                $i++;
             }
+
+            $i = $next_idx;
         }
         return $merged;
     }
