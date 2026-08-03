@@ -533,6 +533,7 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 					(9,2),
 					(1,55),
 					(1,56),
+					(1,61),
 					(1,43);");
 					initialized("role_to_page");
 			}
