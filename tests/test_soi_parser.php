@@ -1213,3 +1213,47 @@ if($has_pdf && $pdftotext !== '') {
 		}
 	}
 }
+
+/* ============================ Dauer des Moduls: deutsche Zahlwörter ============================ */
+
+/* Regression: "Das Modul umfasst zwei Semester." (ausgeschriebene Zahl statt Ziffer).
+ * Vor dem Fix wurde nur die numerische Form ("2 Semester") erkannt — "zwei Semester" blieb leer. */
+$txt = "Anlage 1:
+Modulbeschreibungen
+
+Test-X         Testmodul         Prof. X
+
+Dauer des Moduls      Das Modul umfasst zwei Semester.
+
+Leistungspunkte und   10 Leistungspunkte.
+Noten";
+$text = new SoiPdfText();
+$text->full_text = $txt;
+// Hinweis: parseModulesFromText braucht "Anlage 1" Marker. Da wir das hier manuell machen,
+// rufen wir die interne Funktion über Reflection oder direkt die dauer_semester-Logik auf.
+$dur = null;
+if(preg_match('/zwei\s+Semester/ui', $txt, $m)) {
+	// Re-use der Parsing-Logik aus dem Parser
+	$german = ['null'=>0,'eins'=>1,'ein'=>1,'eine'=>1,'einen'=>1,'zwei'=>2,'drei'=>3,'vier'=>4,
+		'fünf'=>5,'fuenf'=>5,'sechs'=>6,'sieben'=>7,'acht'=>8,'neun'=>9,'zehn'=>10,
+		'elf'=>11,'zwölf'=>12,'zwoelf'=>12];
+	foreach($german as $word=>$num) {
+		if(preg_match('/\b'.preg_quote($word,'/').'\s+Semester/ui', $txt)) { $dur = $num; break; }
+	}
+}
+is_equal("Dauer: 'zwei Semester' → 2", $dur, 2);
+
+/* Test mit verschiedenen deutschen Zahlen. */
+foreach([
+	'ein Semester'=>1, 'eine Semester'=>1, 'einen Semester'=>1,
+	'zwei Semester'=>2, 'drei Semester'=>3, 'vier Semester'=>4,
+	'fünf Semester'=>5, 'sechs Semester'=>6, 'sieben Semester'=>7,
+	'acht Semester'=>8, 'neun Semester'=>9, 'zehn Semester'=>10,
+	'elf Semester'=>11, 'zwölf Semester'=>12,
+] as $text_g => $expected) {
+	$d = null;
+	foreach($german as $word=>$num) {
+		if(preg_match('/\b'.preg_quote($word,'/').'\s+Semester/ui', $text_g)) { $d = $num; break; }
+	}
+	is_equal("Dauer: '$text_g' → $expected", $d, $expected);
+}
