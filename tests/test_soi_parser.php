@@ -1059,3 +1059,145 @@ SLK-BA-R-F-           Basismodul Französische Kultur-                2/0/0/0/0 
 	is_equal("Rest-has-SWS: SLK-BA-R-F-1B-K vollständig",
 		$mods[0]['modulnummer'], 'SLK-BA-R-F-1B-K');
 }
+
+/* Regression: SM2 mit pdftotext-Artifact "PhF-Phil-BA-SM2 S      Mensch..."
+ * Das "S" ist der Beginn der SWS-Spalte und gehört NICHT zum Modulnamen.
+ * Ohne Cleanup landete der Buchstabe im Namen → wurde in $after_code entfernt. */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer            Modulname
+PhF-Phil-BA-SM2 S      Mensch und Gesellschaft                                  0/0/2/0
+                                                                                       5
+                                                                              2 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	is_equal("SM2-artifact: 1 Modul erkannt", count($mods), 1);
+	is_equal("SM2-artifact: Code korrekt", $mods[0]['modulnummer'], 'PhF-Phil-BA-SM2');
+	is_equal("SM2-artifact: kein 'S' im Namen",
+		strpos($mods[0]['name'], ' S ') === false && strpos($mods[0]['name'], 'S Mensch') === false, true);
+	is_equal("SM2-artifact: LP=5", $mods[0]['lp'], 5);
+}
+
+/* Regression: KathTh-BM mit "1 dul:" Pattern (Anlage 1).
+ * Das "1" muss an den Code angehängt werden, der Footnote-Marker gestrippt. */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modul-Nr.      Modulname
+KathTh-BM      Biblische Theologie – Basismo-        2/0/0/2/0/0     0/0/0/2/0/0                                                                10
+1*             dul: Einführung in die Bibel             1 PL            1 PL
+KathTh-BM      Kirchengeschichte – Basismodul:                                      2/1/0/0/0/0    0/0/0/0/2/0                                  10
+4*             Kirche im Werden                                                        1 PL           2 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	$codes = array_map(function($m) { return $m['modulnummer']; }, $mods);
+	is_equal("KathTh-BM 1 angehängt", in_array('KathTh-BM1', $codes), true);
+	is_equal("KathTh-BM 4 angehängt", in_array('KathTh-BM4', $codes), true);
+	is_equal("KathTh-BM 1 kein '1' im Namen",
+		strpos($mods[0]['name'], '1 dul') === false && strpos($mods[0]['name'], '1* dul') === false, true);
+}
+
+/* Regression: SWS-Footer-LP (z.B. "35" alleine in einer Zeile) wurde fälschlich
+ * als Modul-LP extrahiert, wenn das echte Modul-LP (z.B. "10") auf einer Zeile
+ * mit anderem Inhalt steht. Lösung: extract_lp priorisiert Zeilen mit echtem
+ * Inhalt gegenüber isolierten Section-Footern. */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer           Modulname
+KathTh-BM 4          Kirchengeschichte – Ba-
+                                                                                  0/0/0/0/2     2/1/0/0/0
+                     sismodul:                                                                                                           10
+                                                                                    2 PL          1 PL
+                     Kirche im Werden
+                                                                                                                                         35";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	is_equal("LP-not-footer: 1 Modul erkannt", count($mods), 1);
+	is_equal("LP-not-footer: LP=10 (nicht 35)", $mods[0]['lp'], 10);
+}
+
+/* Regression: "Module aus dem Bereich XYZ*" Section-Header.
+ * Ohne explizite Erkennung wurde die Section-Header-Zeile als Name-Wrap
+ * an das vorherige Modul angehängt. */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer           Modulname
+POL-BM-THEO           Basismodul Politische Theorie                          2/2/0
+                                                                                       10
+                     Politische Theorie                                       1 PL
+Module aus dem Bereich Soziologie*
+PhF-Soz-GM1-EB        Grundmodul: Einführung";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	$first = $mods[0];
+	is_equal("Module-aus-Bereich: kein 'Module aus dem Bereich' im Namen",
+		strpos($first['name'], 'Module aus dem') === false, true);
+}
+
+/* Regression: "POL-" Prefix (3 Zeichen mit trailing dash) wurde nicht als
+ * Modulcode erkannt, weil isModulCode nach Entfernen des Trailing-Dashes
+ * 0 Bindestriche zählte und mit `$dash_count < 1` abgelehnt wurde.
+ * Lösung: $effective_dash_count = $dash_count + ($has_trailing_dash ? 1 : 0). */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modulnummer           Modulname
+POL-         Basismodul Politische Systeme                                       2/2
+                                                                                       10
+BM-SYS                                                                           2 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	is_equal("POL-prefix: 1 Modul erkannt", count($mods), 1);
+	is_equal("POL-prefix: Code POL-BM-SYS",
+		$mods[0]['modulnummer'], 'POL-BM-SYS');
+}
+
+/* Regression: SWS-Sonderformat "4 Wochen" (Berufspraktikum) wurde nicht
+ * als SWS-Info erkannt und landete im Modulnamen. */
+if($has_pdf) {
+	$txt = "Anlage 2:
+Modul-Nr.        Modulname
+PhF-Phil-BA-AQUA Berufliche                              4 Wochen
+1**              Praxis                                 Berufsprakti-                                                                             10
+                                                            kum
+                                                            1 PL";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseAnlage2FromText($text);
+	is_equal("4-Wochen: Code korrekt", $mods[0]['modulnummer'], 'PhF-Phil-BA-AQUA1');
+	is_equal("4-Wochen: kein '4 Wochen' im Namen",
+		strpos($mods[0]['name'], '4 Wochen') === false, true);
+	is_equal("4-Wochen: kein '1 Praxis' (continuation im Namen)",
+		strpos($mods[0]['name'], '1 Praxis') === false, true);
+}
+
+/* Regression: sws_total-Berechnung für "Lehr- und Lernformen" Label,
+ * das auf zwei Zeilen aufgeteilt wird ("Lehr- und" + "Lernformen").
+ * Vor dem Fix wurde der Wert zweimal angehängt, was zu doppelter Summe führte
+ * (z.B. 8+8+4+4=24 statt 8+4=12 für PhF-NT-Griech). */
+$txt = "Anlage 1:
+Modulbeschreibungen
+
+PhF-NT-Griech         Neutestamentliches Griechisch      LSK/TUDIAS
+
+Lehr- und             Das Modul umfasst
+Lernformen            - Sprachkurse im Umfang von 8 SWS,
+                      - Tutorien im Umfang von 4 SWS und
+                      - Selbststudium.
+
+Dauer des Moduls      Das Modul umfasst 2 Semester.
+
+Leistungspunkte und   Durch das Modul werden 10 Leistungspunkte erworben.
+Noten";
+$text = new SoiPdfText();
+$text->full_text = $txt;
+$mods = $ex->parseModulesFromText($text);
+is_equal("Lehr-und-Lernformen: 1 Modul erkannt", count($mods), 1);
+is_equal("Lehr-und-Lernformen: sws_total=12 (nicht 24)",
+	isset($mods[0]['sws_total']) ? $mods[0]['sws_total'] : null, 12);
+is_equal("Lehr-und-Lernformen: dauer=2",
+	isset($mods[0]['dauer_semester']) ? $mods[0]['dauer_semester'] : null, 2);
+is_equal("Lehr-und-Lernformen: lp=10", $mods[0]['lp'], 10);
