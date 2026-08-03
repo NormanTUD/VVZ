@@ -531,6 +531,131 @@ class SoiExtractor {
     /**
      * Layout-based Anlage 1 parser (improved version with better wrapping/line aggregation).
      */
+    /**
+     * Merge hyphenated line breaks inside an array of text lines.
+     *
+     * In pdftotext -layout output, words broken at a line end are emitted with a
+     * trailing hyphen (e.g. "Lern-\nformen"). Because the layout mode combines
+     * multiple columns into a single logical line, the hyphen can also appear
+     * mid-line, followed by the column-2 content (e.g. "Lern-      Das Modul …\n
+     * formen                   - einer Vorlesung"). This helper stitches the
+     * word back together so label detection (and other downstream regexes)
+     * can match the full word.
+     *
+     * Two cases are handled:
+     *  (A) Mid-line hyphenation:
+     *      Current line contains "X-  " (hyphen followed by 2+ spaces — column
+     *      separator) and the next line starts with a lowercase word fragment Y.
+     *      We replace "X-" with "XY" in the current line and strip "Y" from the
+     *      next line.
+     *  (B) Trailing hyphenation:
+     *      Current line ends with "X-" (possibly followed by trailing whitespace)
+     *      and the next line starts with a lowercase word fragment Y. We strip
+     *      the trailing hyphen from the current line and append Y.
+     *
+     * Important: when case (A) merges line N+1 into line N (by stripping its
+     * leading word), the remainder of line N+1 is still emitted as a separate
+     * output line — otherwise we would silently lose the rest of the content
+     * (e.g. "- einer Vorlesung (2 SWS)" after merging "Lern-" + "formen").
+     *
+     * Multiple consecutive hyphenations are handled in one pass.
+     *
+     * @param string[] $lines
+     * @return string[]
+     */
+    public function mergeHyphenatedLineBreaks(array $lines): array {
+        $merged = [];
+        $n = count($lines);
+        $i = 0;
+        while($i < $n) {
+            $line = $lines[$i];
+            $consumed_next_line = false;
+            // (A) Mid-line hyphenation: hyphen is followed by 2+ whitespace
+            // (column separator) — the column-2 content lives on the same line.
+            if($i + 1 < $n
+               && preg_match('/([a-zäöüß]+)-\s{2,}/u', $line, $hm)
+               && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$i+1], $nm)) {
+                $word_fragment = $hm[1];
+                $continuation = $nm[1];
+                // Replace ONLY the "X-" with "XY" so the original column-separator
+                // whitespace after the hyphen is preserved.
+                $line = preg_replace(
+                    '/' . preg_quote($word_fragment . '-', '/') . '/u',
+                    $word_fragment . $continuation,
+                    $line, 1
+                );
+                // Strip the leading word + whitespace from the next line. The
+                // remainder of the next line is kept; we emit it as a separate
+                // output row below.
+                $lines[$i+1] = preg_replace(
+                    '/^\s*' . preg_quote($continuation, '/') . '/u',
+                    '',
+                    $lines[$i+1], 1
+                );
+                $consumed_next_line = true;
+            }
+            // (B) Trailing hyphenation: line ends with "X-".
+            elseif($i + 1 < $n
+                  && preg_match('/[a-zäöüß]-\s*$/u', $line)
+                  && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$i+1], $nm)) {
+                $continuation = $nm[1];
+                // Strip the trailing hyphen + any trailing whitespace.
+                $line = preg_replace('/-\s*$/u', '', $line);
+                $lines[$i+1] = preg_replace(
+                    '/^\s*' . preg_quote($continuation, '/') . '/u',
+                    '',
+                    $lines[$i+1], 1
+                );
+                $line = $line . $continuation;
+                $consumed_next_line = true;
+            }
+
+            $merged[] = $line;
+
+            // If we consumed the leading word of line $i+1, the remainder of
+            // that line still needs to appear in the output. Emit it directly
+            // (unless it became empty, in which case it is just skipped).
+            if($consumed_next_line) {
+                $rest = $lines[$i+1];
+                if(trim($rest) !== '') {
+                    $merged[] = $rest;
+                }
+                $i += 2;
+            } else {
+                $i++;
+            }
+        }
+        return $merged;
+    }
+
+    /**
+     * Map label-fragment → full label. Used to suppress "label-break" false positives
+     * when collecting the value for a label that was itself split across lines.
+     *
+     * Example: "Voraussetzungen" is the first fragment of
+     * "Voraussetzungen für die Vergabe von Leistungspunkten". When we are collecting
+     * the value for "Voraussetzungen", we must not break at the next line that
+     * starts with another fragment of the same full label ("die Vergabe von",
+     * "Leistungspunkten", etc.).
+     */
+    public function getLabelFragmentMap(): array {
+        return [
+            // PT-section: 4-way split across columns
+            'Voraussetzungen'                    => 'Voraussetzungen für die Vergabe von Leistungspunkten',
+            'Voraussetzungen für'                => 'Voraussetzungen für die Vergabe von Leistungspunkten',
+            'die Vergabe von'                    => 'Voraussetzungen für die Vergabe von Leistungspunkten',
+            'Leistungspunkten'                   => 'Voraussetzungen für die Vergabe von Leistungspunkten',
+            // Lehr- und Lernformen: split as "Lehr- und" + "Lernformen"
+            'Lehr- und'                          => 'Lehr- und Lernformen',
+            'Lernformen'                         => 'Lehr- und Lernformen',
+            // Leistungspunkte und Noten: split as "Leistungspunkte und" + "Noten"
+            'Leistungspunkte und'                => 'Leistungspunkte und Noten',
+            'Leistungspunkte'                    => 'Leistungspunkte und Noten',
+            // Häufigkeit des Moduls: "Häufigkeit des" + "Angebots" (or similar)
+            'Häufigkeit des'                     => 'Häufigkeit des Moduls',
+        ];
+    }
+
     public function parseModulesFromText(SoiPdfText $text): array {
         $boundaries = $this->findAnlageBoundaries($text);
         $a1 = $boundaries['anlage1_start'];
@@ -539,6 +664,9 @@ class SoiExtractor {
         $block = $a2 !== false ? mb_substr($text->full_text, $a1, $a2 - $a1) : mb_substr($text->full_text, $a1);
 
         $lines = preg_split('/\r\n|\r|\n/', $block);
+        // Pre-process: merge hyphenated line breaks (e.g. "Lern-\nformen" → "Lernformen").
+        // Without this, labels like "Lehr- und Lernformen" become unrecognisable.
+        $lines = $this->mergeHyphenatedLineBreaks($lines);
         $modules = [];
         $current = null;
         $current_section = null;
@@ -824,11 +952,28 @@ class SoiExtractor {
             if(preg_match('/^('.$label_alt.')\s{2,}(.*)$/u', $trimmed, $m)) {
                 $label = $m[1];
                 $value = $m[2];
+                // Build the set of label-fragments that are part of the same full label
+                // as $label. When we see one of these on the next line, we keep collecting
+                // (instead of breaking) — otherwise we'd lose the rest of the content
+                // when a label is split across lines (e.g. "Voraussetzungen\nfür die Vergabe\n…).
+                $fragment_map = $this->getLabelFragmentMap();
+                $full_label = isset($fragment_map[$label]) ? $fragment_map[$label] : $label;
+                $same_label_fragments = [];
+                foreach($fragment_map as $frag => $full) {
+                    if($full === $full_label) $same_label_fragments[$frag] = true;
+                }
                 // Continue collecting wrapped value lines until we hit another known label or module code
                 while(isset($lines[$i+1])) {
                     $nxt = trim($lines[$i+1]);
                     if($nxt === '') { $i++; continue; }
-                    if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt)) break;
+                    // Label-Bruch: nicht abbrechen, wenn die nächste Zeile ein Fragment
+                    // des aktuellen Labels ist (z.B. "Leistungspunkten" nach "Voraussetzungen").
+                    $matched_label_frag = null;
+                    if(preg_match('/^('.$label_alt.')\s{2,}/u', $nxt, $lm)) {
+                        $matched_label_frag = $lm[1];
+                        if(!isset($same_label_fragments[$matched_label_frag])) break;
+                        // Fragment des aktuellen Labels → konsumieren, aber NICHT abbrechen.
+                    }
                     if(preg_match('/^([A-Z][A-Za-z0-9.\-]+(?:\s[A-Za-z0-9.\-]+)?)\s{2,}/u', $nxt, $cm)) {
                         $raw = $cm[1];
                         if(substr_count($raw, ' ') === 1 && preg_match('/^[A-Za-z0-9.\-]+\s[A-Za-z0-9.\-]+$/u', $raw)) {
@@ -856,14 +1001,24 @@ class SoiExtractor {
                     // Wert wird ggf. unten noch um Folgezeilen erweitert; prüfe auch $current['fields']['Lehr- und'].
                     $ll = $value;
                     if(isset($current['fields']['Lernformen'])) $ll .= ' '.$current['fields']['Lernformen'];
-                    if(preg_match_all('/(\d+(?:[.,]\d+)?)\s*SWS/u', $ll, $swsm)) {
+                    // SWS-Pattern: unterstützt jetzt auch "2 x 2 SWS" (= 4 SWS) und "2 * 2 SWS".
+                    // Variante 1: "<n> [x|*] <m> SWS" → n*m.
+                    // Variante 2: "<n> SWS" → n.
+                    if(preg_match_all('/(\d+(?:[.,]\d+)?)(?:\s*(?:x|\*)\s*(\d+(?:[.,]\d+)?))?\s*SWS/u', $ll, $swsm, PREG_SET_ORDER)) {
                         $sum = 0.0;
-                        foreach($swsm[1] as $v) { $sum += (float)str_replace(',', '.', $v); }
+                        foreach($swsm as $hit) {
+                            $base = (float)str_replace(',', '.', $hit[1]);
+                            if(isset($hit[2]) && $hit[2] !== '') {
+                                $base *= (float)str_replace(',', '.', $hit[2]);
+                            }
+                            $sum += $base;
+                        }
                         $current['sws_total'] = $sum;
                     }
                 }
                 if($label === 'Voraussetzungen für die Vergabe von Leistungspunkten'
                     || $label === 'Voraussetzungen für'
+                    || $label === 'Voraussetzungen'
                     || $label === 'die Vergabe von'
                     || $label === 'Leistungspunkten') {
                     $candidates = ['Klausurarbeit','Klausur','Mündliche Prüfung','mündliche Prüfung','Referat','Protokoll','Hausarbeit','Seminararbeit','Essay','Portfolio','Bericht','Vortrag','Thesenpapier','Bibliographie','Exposé','Rezension','Bachelorarbeit','Masterarbeit','Kolloquium'];
