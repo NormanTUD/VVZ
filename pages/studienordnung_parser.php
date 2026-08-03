@@ -615,7 +615,7 @@ class SoiExtractor {
             }
             // (B) Trailing hyphenation: line ends with "X-".
             elseif($i + 1 < $n
-                  && preg_match('/(?:[a-zäöüß]|-)-\s*$/u', $line)
+                  && preg_match('/[a-zäöüß]?-\s*$/u', $line)
                   && ($continuation = $this->pickHyphenContinuation($lines[$i+1], $stop_words)) !== null) {
                 $consumed_via_a = true;
                 $line = preg_replace('/-\s*$/u', '', $line) . $continuation;
@@ -626,32 +626,50 @@ class SoiExtractor {
                 );
             }
 
-            $merged[] = $line;
+                $merged[] = $line;
 
-            // If we consumed the leading word of $lines[$i+1], the remainder of
-            // that line is kept as a separate output row. That remainder may itself
-            // end with a hyphen ("Urchristen-" + "tums" → "Urchristentums"), so we
-            // keep absorbing further leading words until either the running remainder
-            // no longer ends with a hyphen or we run out of input lines.
-            $next_idx = $i + 1;
-            if($consumed_via_a) {
-                $rest = $lines[$i+1];
-                $next_idx = $i + 2;
-                while($next_idx < $n
-                      && preg_match('/(?:[a-zäöüß]|-)-\s*$/u', $rest)
-                      && ($cont = $this->pickHyphenContinuation($lines[$next_idx], $stop_words)) !== null) {
-                    $rest = preg_replace('/-\s*$/u', '', $rest) . $cont;
-                    $lines[$next_idx] = preg_replace(
-                        '/^\s*' . preg_quote($cont, '/') . '/u',
-                        '',
-                        $lines[$next_idx], 1
-                    );
-                    $next_idx++;
+                // If we consumed the leading word of $lines[$i+1], the remainder of
+                // that line is kept as a separate output row. That remainder may itself
+                // end with a hyphen ("Urchristen-" + "tums" → "Urchristentums"), so we
+                // keep absorbing further leading words until either the running remainder
+                // no longer ends with a hyphen or we run out of input lines.
+                //
+                // When the chained-merge loop runs, $rest absorbs continuations that
+                // belong to the SAME logical row as $line — we must therefore APPEND
+                // $rest to $line, not emit $rest as a separate row. The original
+                // emission of $line above is replaced by the combined line.
+                $next_idx = $i + 1;
+                if($consumed_via_a) {
+                    $rest = $lines[$i+1];
+                    $next_idx = $i + 2;
+                    $chained = false;
+                    while($next_idx < $n
+                          && preg_match('/[a-zäöüß]?-\s*$/u', $rest)
+                          && ($cont = $this->pickHyphenContinuation($lines[$next_idx], $stop_words)) !== null) {
+                        $rest = preg_replace('/-\s*$/u', '', $rest) . $cont;
+                        $lines[$next_idx] = preg_replace(
+                            '/^\s*' . preg_quote($cont, '/') . '/u',
+                            '',
+                            $lines[$next_idx], 1
+                        );
+                        $next_idx++;
+                        $chained = true;
+                    }
+                    if($chained) {
+                        // Replace the earlier emission of $line with $line + $rest
+                        // (no separator — the continuation was a broken word fragment).
+                        array_pop($merged);
+                        $combined = preg_replace('/\s+$/u', '', $line) . $rest;
+                        if(trim($combined) !== '') {
+                            $merged[] = $combined;
+                        }
+                    } elseif(trim($rest) !== '') {
+                        // No chained merge — $rest is the original remainder of line
+                        // N+1 (e.g. "− einer Vorlesung (2 SWS)" after stripping
+                        // "formen"). Emit it as a separate row.
+                        $merged[] = $rest;
+                    }
                 }
-                if(trim($rest) !== '') {
-                    $merged[] = $rest;
-                }
-            }
 
             $i = $next_idx;
         }
