@@ -479,7 +479,7 @@ class SoiExtractor {
      * Reason: in pdftotext -layout output the TOC entry for "Anlage 2: Studienablaufplan"
      * puts both phrases on the same logical line, separated by tabs. We must skip those.
      */
-    private function findActualSectionStart(string $text, string $label, array $expected_next_lines): int {
+    private function findActualSectionStart(string $text, string $label, array $expected_next_lines): int|false {
         $offset = 0;
         $best_pos = false;
         while(true) {
