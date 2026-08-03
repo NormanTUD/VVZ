@@ -1197,15 +1197,17 @@ if(function_exists('extract_sws_total')) {
 /* Test mit echter PDF-Datei (PhF-NT-Griech SWS=12). */
 if($has_pdf && $pdftotext !== '') {
 	$full_txt = shell_exec($pdftotext.' -layout '.escapeshellarg($pdf_path));
-	$text = new SoiPdfText();
-	$text->full_text = $full_txt;
-	$mods = $ex->parseModulesFromText($text);
-	foreach($mods as $m) {
-		if(isset($m['modulnummer']) && $m['modulnummer'] === 'PhF-NT-Griech') {
-			is_equal("PDF: PhF-NT-Griech sws_total=12", $m['sws_total'] ?? null, 12);
-			is_equal("PDF: PhF-NT-Griech lp=10", $m['lp'] ?? null, 10);
-			is_equal("PDF: PhF-NT-Griech dauer=2", $m['dauer_semester'] ?? null, 2);
-			break;
+	if(is_string($full_txt) && $full_txt !== '') {
+		$text = new SoiPdfText();
+		$text->full_text = $full_txt;
+		$mods = $ex->parseModulesFromText($text);
+		foreach($mods as $m) {
+			if(isset($m['modulnummer']) && $m['modulnummer'] === 'PhF-NT-Griech') {
+				is_equal("PDF: PhF-NT-Griech sws_total=12", $m['sws_total'] ?? null, 12);
+				is_equal("PDF: PhF-NT-Griech lp=10", $m['lp'] ?? null, 10);
+				is_equal("PDF: PhF-NT-Griech dauer=2", $m['dauer_semester'] ?? null, 2);
+				break;
+			}
 		}
 	}
 }
