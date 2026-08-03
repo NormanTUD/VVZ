@@ -965,7 +965,7 @@ SLK-BA-A-2V-S*         Vertiefungsmodul – Sprachwissenschaft       0/2/0/0/0/0
  * Token ≤ 8 Zeichen, combined ≤ 20 Zeichen, Token nicht ^[A-Z][a-z]{6,}). */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer            Modulname
+StudienablaufplanModulnummer            Modulname
 PhF-NT-                Neutestamentliches Griechisch                0/0/0/2/4    0/0/0/2/4
                                                                                        10
 Griech                                                                            1 PL
@@ -986,7 +986,7 @@ PhF-EvTh-BA-BL1        Biblische Literatur 1";
  * eine Digit+Footnote-Folge ist (z.B. "1.1*"). */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer           Modulname
+StudienablaufplanModulnummer           Modulname
 SLK-BA-R-I-           Sprachpraxis B1.1                             1 PL
 2SP-B 1.1*            – Italienisch
 SLK-BA-R-F-           Aufbaumodul Französische Sprachwissenschaft  0/0/0/4
@@ -1010,7 +1010,7 @@ SLK-BA-R-F-           Aufbaumodul Französische Sprachwissenschaft  0/0/0/4
  * gültiger Modul-Code ist — dann ist die Zeile ein neuer Modul-Header. */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer           Modulname
+StudienablaufplanModulnummer           Modulname
 SLK-BA-G-1B-          Basismodul: Sprache und Kultur/Kommunikation   2/2/2/0/0/0
                                                                                        6
 SPR-2*                und Praxis                                       1 PL
@@ -1031,7 +1031,7 @@ DAF                   Fremdsprache                                     1 PL";
  * reine Ziffern ablehnt (Token muss mit Buchstaben beginnen). */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer           Modulname
+StudienablaufplanModulnummer           Modulname
 SLK-BA-S-3-           Sprachpraxis B2 – Russisch                    0/0/0/0/4/0      0/0/0/0/4/0
                                                                                        10
 RB2*                  sisch                                            2 PL             1 PL";
@@ -1050,7 +1050,7 @@ RB2*                  sisch                                            2 PL     
  * gültiger Modul-Code ist (statt nur SWS-Daten im ganzen Rest). */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer           Modulname
+StudienablaufplanModulnummer           Modulname
 SLK-BA-R-F-           Basismodul Französische Kultur-                2/0/0/0/0      0/2/0/0
                                                                                        6
 1B-K*                 wissenschaft                                    1 PL         1 PL";
@@ -1067,7 +1067,7 @@ SLK-BA-R-F-           Basismodul Französische Kultur-                2/0/0/0/0 
  * Ohne Cleanup landete der Buchstabe im Namen → wurde in $after_code entfernt. */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer            Modulname
+StudienablaufplanModulnummer            Modulname
 PhF-Phil-BA-SM2 S      Mensch und Gesellschaft                                  0/0/2/0
                                                                                        5
                                                                               2 PL";
@@ -1085,7 +1085,7 @@ PhF-Phil-BA-SM2 S      Mensch und Gesellschaft                                  
  * Das "1" muss an den Code angehängt werden, der Footnote-Marker gestrippt. */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modul-Nr.      Modulname
+StudienablaufplanModul-Nr.      Modulname
 KathTh-BM      Biblische Theologie – Basismo-        2/0/0/2/0/0     0/0/0/2/0/0                                                                10
 1*             dul: Einführung in die Bibel             1 PL            1 PL
 KathTh-BM      Kirchengeschichte – Basismodul:                                      2/1/0/0/0/0    0/0/0/0/2/0                                  10
@@ -1106,7 +1106,7 @@ KathTh-BM      Kirchengeschichte – Basismodul:                                
  * Inhalt gegenüber isolierten Section-Footern. */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer           Modulname
+StudienablaufplanModulnummer           Modulname
 KathTh-BM 4          Kirchengeschichte – Ba-
                                                                                   0/0/0/0/2     2/1/0/0/0
                      sismodul:                                                                                                           10
@@ -1125,7 +1125,7 @@ KathTh-BM 4          Kirchengeschichte – Ba-
  * an das vorherige Modul angehängt. */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer           Modulname
+StudienablaufplanModulnummer           Modulname
 POL-BM-THEO           Basismodul Politische Theorie                          2/2/0
                                                                                        10
                      Politische Theorie                                       1 PL
@@ -1145,7 +1145,7 @@ PhF-Soz-GM1-EB        Grundmodul: Einführung";
  * Lösung: $effective_dash_count = $dash_count + ($has_trailing_dash ? 1 : 0). */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modulnummer           Modulname
+StudienablaufplanModulnummer           Modulname
 POL-         Basismodul Politische Systeme                                       2/2
                                                                                        10
 BM-SYS                                                                           2 PL";
@@ -1161,7 +1161,7 @@ BM-SYS                                                                          
  * als SWS-Info erkannt und landete im Modulnamen. */
 if($has_pdf) {
 	$txt = "Anlage 2:
-Modul-Nr.        Modulname
+StudienablaufplanModul-Nr.        Modulname
 PhF-Phil-BA-AQUA Berufliche                              4 Wochen
 1**              Praxis                                 Berufsprakti-                                                                             10
                                                             kum
