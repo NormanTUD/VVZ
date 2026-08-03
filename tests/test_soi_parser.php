@@ -933,6 +933,8 @@ if($has_pdf && $pdftotext !== '') {
  * des VORMODULS gespeichert wurde (z.B. "Components SLK-BA-A-2V-S V" im Namen). */
 if($has_pdf) {
 	$txt = "Anlage 2:
+Studienablaufplan
+
 Modul-Nr.              Modulname
 SLK-BA-A-1-SPLC        Sprachpraxis – Language Components           0/0/0/0/2/0     0/0/0/0/4/0
                                                                                        8
