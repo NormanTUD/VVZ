@@ -479,7 +479,7 @@ class SoiExtractor {
      * Reason: in pdftotext -layout output the TOC entry for "Anlage 2: Studienablaufplan"
      * puts both phrases on the same logical line, separated by tabs. We must skip those.
      */
-    private function findActualSectionStart(string $text, string $label, array $expected_next_lines): int|false {
+    private function findActualSectionStart(string $text, string $label, array $expected_next_lines): int {
         $offset = 0;
         $best_pos = false;
         while(true) {
@@ -850,41 +850,12 @@ class SoiExtractor {
                 if($label === 'Dauer des Moduls') {
                     if(preg_match('/(\d+)\s*Semester/u', $value, $dm)) {
                         $current['dauer_semester'] = (int)$dm[1];
-                    } else {
-                        // Fallback: deutsche Zahlwörter (z.B. "zwei Semester", "ein Semester").
-                        $german_numbers = [
-                            'null'=>0, 'eins'=>1, 'ein'=>1, 'eine'=>1, 'einen'=>1, 'einem'=>1, 'einer'=>1,
-                            'zwei'=>2, 'drei'=>3, 'vier'=>4, 'fünf'=>5, 'fuenf'=>5,
-                            'sechs'=>6, 'sieben'=>7, 'acht'=>8, 'neun'=>9, 'zehn'=>10,
-                            'elf'=>11, 'zwölf'=>12, 'zwoelf'=>12, 'dreizehn'=>13, 'vierzehn'=>14,
-                            'fünfzehn'=>15, 'fuenfzehn'=>15, 'sechzehn'=>16, 'siebzehn'=>17,
-                            'achtzehn'=>18, 'neunzehn'=>19, 'zwanzig'=>20,
-                            'einundzwanzig'=>21, 'zweiundzwanzig'=>22, 'dreiundzwanzig'=>23,
-                            'vierundzwanzig'=>24, 'fünfundzwanzig'=>25, 'fuenfundzwanzig'=>25,
-                            'dreißig'=>30, 'dreissig'=>30, 'vierzig'=>40, 'fünfzig'=>50, 'fuenfzig'=>50,
-                            'sechzig'=>60, 'siebzig'=>70, 'achtzig'=>80, 'neunzig'=>90, 'hundert'=>100,
-                        ];
-                        foreach($german_numbers as $word => $num) {
-                            if(preg_match('/\b'.preg_quote($word, '/').'\s+Semester/ui', $value, $dm)) {
-                                $current['dauer_semester'] = $num;
-                                break;
-                            }
-                        }
                     }
                 }
                 if($label === 'Lehr- und Lernformen' || $label === 'Lehr- und' || $label === 'Lernformen') {
-                    // Wenn das Label auf zwei Zeilen aufgeteilt wurde ("Lehr- und" + "Lernformen"),
-                    // werden die beiden Teilwerte separat in fields gespeichert. Wir vereinen sie hier
-                    // für die SWS-Berechnung, ABER nur wenn die Labels tatsächlich getrennt sind
-                    // (sonst hängen wir den Wert nicht doppelt an).
+                    // Wert wird ggf. unten noch um Folgezeilen erweitert; prüfe auch $current['fields']['Lehr- und'].
                     $ll = $value;
-                    if($label === 'Lehr- und' && isset($current['fields']['Lernformen'])
-                        && $current['fields']['Lernformen'] !== $value) {
-                        $ll .= ' '.$current['fields']['Lernformen'];
-                    } elseif($label === 'Lernformen' && isset($current['fields']['Lehr- und'])
-                        && $current['fields']['Lehr- und'] !== $value) {
-                        $ll = $current['fields']['Lehr- und'].' '.$value;
-                    }
+                    if(isset($current['fields']['Lernformen'])) $ll .= ' '.$current['fields']['Lernformen'];
                     if(preg_match_all('/(\d+(?:[.,]\d+)?)\s*SWS/u', $ll, $swsm)) {
                         $sum = 0.0;
                         foreach($swsm[1] as $v) { $sum += (float)str_replace(',', '.', $v); }
@@ -980,11 +951,11 @@ class SoiExtractor {
         // Continuation-Logik unten wieder zusammengefügt.
         $has_trailing_dash = (substr($s, -1) === '-');
         if($has_trailing_dash) $s = substr($s, 0, -1);
-        // Mindestens 1 Bindestrich nötig (entweder im Code selbst ODER als trailing dash).
-        // So werden kurze Codes wie "POL-" (trailing dash) und "PhF-BA-POL" (internes dash) erkannt.
+        // Mindestens 2 Bindestriche nötig, damit einzelne Wörter wie "Modul-Nr." oder
+        // "Bachelor-Arbeit" nicht fälschlich als Modulnummer erkannt werden.
+        // Ausnahme: trailing-dash-Continuation ("PHF-BA-POL-" → 3 dashes before trim → OK).
         $dash_count = substr_count($s, '-');
-        $effective_dash_count = $dash_count + ($has_trailing_dash ? 1 : 0);
-        if($effective_dash_count < 1) return false;
+        if($dash_count < 1) return false;
         // Most chars should be uppercase or digits
         $upper_count = 0;
         $lower_count = 0;
@@ -1001,8 +972,7 @@ class SoiExtractor {
         // nur dann ab, wenn der Code exakt einem deutschen Wort ähnelt (siehe unten).
         // Frühere Logik verlangte Ziffern oder Kleinbuchstaben — das hat diese legitimen
         // Codes fälschlich abgelehnt.
-        // Berücksichtige auch trailing-dash-Continuation als gültigen "dash".
-        if($effective_dash_count < 1) return false; // mind. 1 Bindestrich (echt oder trailing)
+        if($dash_count < 1) return false; // mind. 1 Bindestrich
         return true;
     }
 
@@ -1424,12 +1394,6 @@ class SoiExtractor {
                     }
                 }
             }
-            // Sonderformat: "N Wochen" / "N Semesterwochenstunden" (Berufspraktikum etc.).
-            if(preg_match_all('/\b(\d+)\s+(Wochen|Semesterwochenstunden?|SWS)\b/u', $line, $wm)) {
-                foreach($wm[1] as $weeks) {
-                    $out[] = [(string)$weeks, '0', '0', '0']; // Dummy-SWS-Zelle
-                }
-            }
             return $out;
         };
 
@@ -1455,29 +1419,19 @@ class SoiExtractor {
         // Hilfsfunktion: Extrahiere LP (einzelne Zahl am Ende einer Zeile).
         // LP ist die Zahl, die NICHT in einer SWS-Zelle (X/Y) und NICHT neben PL steht.
         $extract_lp = function($line) {
-            $candidates_real = array();
-            $candidates_isolated = array();
+            $candidates = array();
             foreach(preg_split('/\R/u', $line) as $line_i) {
-                // Vermeide SWS-Zellen und Fußnoten-Marker auf dieser Zeile.
+                // Vermeide SWS-Zellen und PL-Marker auf dieser Zeile.
                 $stripped = preg_replace('/\b\d+\/\d+(?:\/\d+)*\b|\*+(?:\/\*+)*/', '', $line_i);
-                $stripped = preg_replace('/\b\d+\s*PL\*?\b/i', '', $stripped);
-                $stripped_pl_only = trim($stripped);
-                $stripped_full = trim($line_i);
-                // Eine "isolierte" LP-Zeile enthält NUR Whitespace + Zahl (Section-Footer wie "35" für
-                // "Ergänzungsbereich (35 Leistungspunkte)"). Eine echte Modul-LP-Zeile hat weiteren Inhalt.
-                $is_isolated = $stripped_full !== '' && preg_match('/^\s*\d{1,3}\s*$/', $line_i);
-                if(preg_match('/\b(\d{1,3})\s*$/', $stripped_pl_only, $m)) {
+                $stripped = preg_replace('/\b\d+\s*PL\*?/i', '', $stripped);
+                $stripped = trim($stripped);
+                if(preg_match('/\b(\d{1,3})\s*$/', $stripped, $m)) {
                     $val = (int)$m[1];
-                    if($val >= 1 && $val <= 200) {
-                        if($is_isolated) $candidates_isolated[] = $val;
-                        else $candidates_real[] = $val;
-                    }
+                    if($val >= 1 && $val <= 200) $candidates[] = $val;
                 }
             }
-            // Bevorzuge echte Modul-LPs (Zeilen mit weiterem Inhalt) vor isolierten Section-Footern.
-            if(!empty($candidates_real)) return end($candidates_real);
-            if(!empty($candidates_isolated)) return end($candidates_isolated);
-            return null;
+            // Wenn mehrere LP-Werte gefunden wurden, nimm den letzten (typisch: am Zeilenende der Modul-Zeile).
+            return !empty($candidates) ? end($candidates) : null;
         };
 
         // Hilfsfunktion: Ist die Zeile ein Modulnummer-Header?
@@ -1562,8 +1516,6 @@ class SoiExtractor {
             $name_text = preg_replace('/\s+\d{1,3}\s*$/m', ' ', $name_text);
             // SWS-Bemerkungen wie "2 SWS", "1 SWS" entfernen.
             $name_text = preg_replace('/\b\d+\s*SWS\*?\b/i', ' ', $name_text);
-            // Sonderformate wie "4 Wochen" (Berufspraktikum) oder "2 Semesterwochenstunden" entfernen.
-            $name_text = preg_replace('/\b\d+\s+(Wochen|Semesterwochenstunden?)\b/ui', ' ', $name_text);
             $name_text = trim($name_text);
             // Multi-line → single-line (Space-getrennt).
             $name_text = preg_replace('/\s+/u', ' ', $name_text);
@@ -1589,14 +1541,6 @@ class SoiExtractor {
                 $current_block_lines = [];
                 if($current) { $modules[] = $current; $current = null; }
                 $current_section = trim($m[1]);
-                continue;
-            }
-            // "Module aus dem Bereich XYZ*" Section-Header (z.B. Politikwissenschaft, Soziologie).
-            if(preg_match('/^Module\s+aus\s+dem\s+Bereich\b/u', $trimmed)) {
-                $process_block();
-                $current_block_lines = [];
-                if($current) { $modules[] = $current; $current = null; }
-                $current_section = trim($trimmed, " \t\n\r\0\x0B*");
                 continue;
             }
 
@@ -1631,53 +1575,20 @@ class SoiExtractor {
                     $has_footnote_marker = preg_match('/\*+/', $first_token);
                     $has_digit = preg_match('/\d/', $clean_token);
                     $is_short_code = mb_strlen($clean_token) <= 4 && !preg_match('/^[A-Z][a-z]+/', $clean_token);
-                    // Split-Continuation: wenn das erste Token keine Fußnote hat, aber das
-                    // NÄCHSTE Token mit Digit+Footnote beginnt (z.B. "2SP-B 1.1*"), dann bilden
-                    // beide zusammen den Code-Teil (z.B. "2SP-B1.1"). Wird im combined-Pfad unten geprüft.
-                    $split_token = '';
-                    if(!$has_footnote_marker) {
-                        $rest_after_first = ltrim(substr($nxt, mb_strlen($first_token)));
-                        $next_tok = strtok($rest_after_first, " \t");
-                        if($next_tok !== false
-                            && preg_match('/^(\d[\d.]*)\*+/u', $next_tok, $sm)) {
-                            $split_token = $clean_token . $sm[1];
-                            $clean_token_with_split = $split_token;
-                        } else {
-                            $clean_token_with_split = $clean_token;
-                        }
-                    } else {
-                        $clean_token_with_split = $clean_token;
-                    }
                     // Zusätzliche Heuristik: Wenn das zusammengesetzte Modul (current + token)
                     // ein gültiger Modulcode ist UND die Gesamtlänge plausibel ist, ist der Token
                     // ein Code-Teil. Das fängt Fälle wie "PhF-NT-" + "Griech" → "PhF-NT-Griech" ab.
-                    $combined = $current['modulnummer'] . $clean_token_with_split;
+                    $combined = $current['modulnummer'] . $clean_token;
                     $is_code_continuation = $this->isModulCode($combined)
-                        && mb_strlen($clean_token_with_split) <= 8
+                        && mb_strlen($clean_token) <= 8
                         && mb_strlen($combined) <= 20
-                        && !preg_match('/^[A-Z][a-z]{6,}/', $clean_token_with_split);
+                        && !preg_match('/^[A-Z][a-z]{6,}/', $clean_token);
                     if($first_token !== false
                         && preg_match('/^[A-Za-z0-9.\-*]+$/u', $first_token)
                         && preg_match('/[A-Za-z]/', $clean_token)
                         && ($has_footnote_marker || $has_digit || $is_short_code || $is_code_continuation)
-                        && mb_strlen($clean_token_with_split) < 25) {
-                        $rest_after = trim(substr($nxt, mb_strlen($first_token) + (strlen($first_token) > 0 ? mb_strlen($first_token) : 0) - mb_strlen($first_token)));
-                        // Nach dem ersten Token + evtl. Split-Token (z.B. "2SP-B" + " 1.1*") überspringen
-                        $rest_after = $rest_after;
-                        // Einfacher: alles nach dem ersten Token + einem etwaigen Split-Token.
-                        if($split_token !== '' && $split_token !== $clean_token) {
-                            // Split-Token vorhanden — Rest beginnt NACH dem zweiten Token.
-                            $rest_start = strpos($nxt, $first_token);
-                            if($rest_start !== false) {
-                                $after_first = substr($nxt, $rest_start + strlen($first_token));
-                                // Skip whitespace, dann das Split-Token selbst überspringen.
-                                $after_first = ltrim($after_first);
-                                $next_tok_full = strtok($after_first, " \t");
-                                if($next_tok_full !== false) {
-                                    $rest_after = trim(substr($after_first, strlen($next_tok_full)));
-                                }
-                            }
-                        }
+                        && mb_strlen($clean_token) < 25) {
+                        $rest_after = trim(substr($nxt, mb_strlen($first_token)));
                         // Wenn der Token wie ein vollständiger Modulnummer-Header aussieht,
                         // wird der unten stehende Modulnummer-Header-Pfad genommen.
                         // Wir prüfen: beginnt das erste Wort des Rests mit einem gültigen
@@ -1695,7 +1606,7 @@ class SoiExtractor {
                         // Beispiel: "LIT-1*" mit Rest → Continuation.
                         $looks_like_own_module_header = !$has_footnote_marker && $rest_after === '' && $this->isModulCode($clean_token);
                         if(!$looks_like_new_module && !$looks_like_own_module_header) {
-                            $current['modulnummer'] .= $clean_token_with_split;
+                            $current['modulnummer'] .= $clean_token;
                             if($rest_after !== '') $current_block_lines[] = $rest_after;
                             continue;
                         }
@@ -1743,10 +1654,6 @@ class SoiExtractor {
                     }
                 }
                 $after_code = preg_replace('/^\s+/u', '', $after_code);
-                // pdftotext-Artifact: einzelner Großbuchstabe + mehrere Whitespace + Name
-                // (z.B. "PhF-Phil-BA-SM2 S Mensch und Gesellschaft" — "S" ist der Beginn
-                // der SWS-Spalte, der mit dem Modulnamen verschmolzen wurde).
-                $after_code = preg_replace('/^[A-Z]\s{2,}/u', '', $after_code);
                 if($after_code !== '') $current_block_lines[] = $after_code;
                 continue;
             }
@@ -1772,28 +1679,15 @@ class SoiExtractor {
                     }
                 }
                 // No-digit Continuation: Code enthält KEINE Ziffer (z.B. "KathTh-BM") und die
-                // Zeile beginnt mit einer einzelnen Ziffer, optional gefolgt von Fußnoten-Markern
-                // (z.B. "1 dul:...", "1* dul:...", "1** Praxis", "2***").
+                // Zeile beginnt mit einer einzelnen Ziffer + Fußnoten-Marker (z.B. "1* dul:...").
                 elseif(!preg_match('/\d/', $current['modulnummer'])) {
                     if(preg_match('/^\s*(\d+)\*?\.?\s+/u', $line, $lm)) {
-                        // Nur fortfahren, wenn danach KEINE SWS-Zelle und KEINE LP-ähnliche Zeile kommt
-                        // (wir wollen nicht versehentlich die "1 PL" Zeile als Code-Continuation
-                        // interpretieren — SWS/PL-Zeilen werden unten separat behandelt).
-                        $rest_check = ltrim(substr($line, strlen($lm[0])));
-                        $looks_like_pl_or_sws = preg_match('/^\d+\s*PL\b/i', $rest_check)
-                            || preg_match('/^\d+\/\d+/', $rest_check);
-                        if(!$looks_like_pl_or_sws) {
-                            $current['modulnummer'] .= $lm[1];
-                            // Auch $cleaned_line aktualisieren, damit der Fußnoten-Marker NICHT im Namen landet.
-                            $cleaned_line = preg_replace('/^\s*\d+\*?\.?\s+/u', '', $line, 1);
-                            $line = $cleaned_line;
-                        }
+                        $current['modulnummer'] .= $lm[1];
                     }
                 }
             }
             // Fußnoten-Marker am Zeilenanfang entfernen (z.B. "1*  dul: Einführung..." → "dul: Einführung...").
-            // Auch mehrfache Sterne (1**, 1***) und Punkte (1., 2.) werden hier entfernt.
-            $cleaned_line = preg_replace('/^\s*\d+\*+\.?\.?\s+/u', '', $cleaned_line, 1);
+            $cleaned_line = preg_replace('/^\s*\d+\*?\.?\s+/u', '', $cleaned_line, 1);
             $current_block_lines[] = $cleaned_line !== '' ? $cleaned_line : $line;
         }
         // Letzten Block verarbeiten.
