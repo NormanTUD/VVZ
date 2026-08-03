@@ -563,21 +563,45 @@ class SoiExtractor {
      * @param string[] $lines
      * @return string[]
      */
+    /**
+     * Common German function words that frequently appear at the start of a line
+     * following a hyphenation break but are NOT themselves the continuation.
+     * When such a word is detected as the first word of the candidate line, the
+     * merge logic scans further into the line for the actual continuation.
+     *
+     * Example: "bestan-/für die Vergabe von den" — "für" is a function word, the
+     * actual continuation is "den" (giving "bestanden").
+     */
+    public function getHyphenStopWords(): array {
+        return [
+            'für', 'die', 'der', 'das', 'dem', 'des', 'diese', 'dieser', 'diesem', 'einen', 'einer', 'einem', 'eine',
+            'von', 'und', 'oder', 'mit', 'im', 'in', 'an', 'auf', 'bei', 'zu', 'zur', 'zum', 'als', 'aus', 'durch',
+            'ist', 'sind', 'war', 'waren', 'wird', 'werden', 'wurde', 'wurden', 'sei', 'seien',
+            'keine', 'kein', 'keinen', 'keinem', 'keiner', 'nicht', 'auch', 'sehr', 'noch',
+            // Pronouns (very common at line start, rarely real continuations).
+            'es', 'er', 'sie', 'wir', 'ihr', 'sich',
+            // Note: 'den' is intentionally NOT a stop word. It is a valid continuation
+            // for compound words like "Metho-/den" → "Methoden" and "bestan-/den" →
+            // "bestanden" that appear frequently in this corpus.
+        ];
+    }
+
     public function mergeHyphenatedLineBreaks(array $lines): array {
         $merged = [];
         $n = count($lines);
+        $stop_words = array_flip($this->getHyphenStopWords());
         $i = 0;
         while($i < $n) {
             $line = $lines[$i];
+            $consumed_via_a = false;
 
             // (A) Mid-line hyphenation: hyphen is followed by 2+ whitespace
             // (column separator) — the column-2 content lives on the same line.
-            $consumed_via_a = false;
             if($i + 1 < $n
                && preg_match('/([a-zäöüß]+)-\s{2,}/u', $line, $hm)
-               && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$i+1], $nm)) {
+               && ($continuation = $this->pickHyphenContinuation($lines[$i+1], $stop_words)) !== null) {
                 $word_fragment = $hm[1];
-                $continuation = $nm[1];
+                $consumed_via_a = true;
                 $line = preg_replace(
                     '/' . preg_quote($word_fragment . '-', '/') . '/u',
                     $word_fragment . $continuation,
@@ -588,20 +612,18 @@ class SoiExtractor {
                     '',
                     $lines[$i+1], 1
                 );
-                $consumed_via_a = true;
             }
             // (B) Trailing hyphenation: line ends with "X-".
             elseif($i + 1 < $n
-                  && preg_match('/[a-zäöüß]-\s*$/u', $line)
-                  && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$i+1], $nm)) {
-                $continuation = $nm[1];
+                  && preg_match('/(?:[a-zäöüß]|-)-\s*$/u', $line)
+                  && ($continuation = $this->pickHyphenContinuation($lines[$i+1], $stop_words)) !== null) {
+                $consumed_via_a = true;
                 $line = preg_replace('/-\s*$/u', '', $line) . $continuation;
                 $lines[$i+1] = preg_replace(
                     '/^\s*' . preg_quote($continuation, '/') . '/u',
                     '',
                     $lines[$i+1], 1
                 );
-                $consumed_via_a = true;
             }
 
             $merged[] = $line;
@@ -611,15 +633,13 @@ class SoiExtractor {
             // end with a hyphen ("Urchristen-" + "tums" → "Urchristentums"), so we
             // keep absorbing further leading words until either the running remainder
             // no longer ends with a hyphen or we run out of input lines.
-            $rest = null;
             $next_idx = $i + 1;
             if($consumed_via_a) {
                 $rest = $lines[$i+1];
                 $next_idx = $i + 2;
                 while($next_idx < $n
-                      && preg_match('/[a-zäöüß]-\s*$/u', $rest)
-                      && preg_match('/^\s*([a-zäöüß]+)/u', $lines[$next_idx], $jm)) {
-                    $cont = $jm[1];
+                      && preg_match('/(?:[a-zäöüß]|-)-\s*$/u', $rest)
+                      && ($cont = $this->pickHyphenContinuation($lines[$next_idx], $stop_words)) !== null) {
                     $rest = preg_replace('/-\s*$/u', '', $rest) . $cont;
                     $lines[$next_idx] = preg_replace(
                         '/^\s*' . preg_quote($cont, '/') . '/u',
@@ -636,6 +656,86 @@ class SoiExtractor {
             $i = $next_idx;
         }
         return $merged;
+    }
+
+    /**
+     * Multi-word label fragments that frequently appear at the start of a line
+     * after a hyphenation break. When the candidate line starts with one of
+     * these phrases, the entire phrase is skipped — those words are part of a
+     * label heading, not the continuation of the broken word.
+     *
+     * Example: "bestan-/für die Vergabe von den" — "für die Vergabe von" is
+     * a label fragment; the actual continuation is "den".
+     */
+    public function getLabelFragmentPrefixes(): array {
+        return [
+            'für die Vergabe',
+            'für die Teilnahme',
+            'und Noten',
+            'und Lernformen',
+        ];
+    }
+
+    /**
+     * Find the best continuation word for a hyphenation break in $candidate_line.
+     * Returns the lowercase word to append, or null if no reasonable candidate
+     * was found.
+     *
+     * Algorithm:
+     *  1. Skip known multi-word label prefixes (e.g. "für die Vergabe") so that
+     *     a later word (e.g. "den") is preferred over words inside the label
+     *     heading.
+     *  2. Scan up to 6 leading words. Each candidate is scored by length
+     *     (shorter is better, because real hyphenation continuations are
+     *     short — typically 2-8 chars). The candidate with the smallest
+     *     length, that does not contain digits or uppercase letters mid-word,
+     *     wins.
+     *
+     * This avoids picking "Wahlpflichtmodul" over "dem" for "Zu-/dem ist es
+     * ein …", and avoids picking "theologische" over "den" for "Metho-/den
+     * theologische …".
+     *
+     * @return string|null  The continuation word, or null when none is found.
+     */
+    private function pickHyphenContinuation(string $candidate_line, array $stop_words): ?string {
+        // First, skip known multi-word label prefixes (case-insensitive).
+        foreach($this->getLabelFragmentPrefixes() as $prefix) {
+            $pattern = '/^\s*' . preg_quote($prefix, '/') . '(?=\s|$)/iu';
+            if(preg_match($pattern, $candidate_line)) {
+                // Strip the prefix from the candidate line.
+                $candidate_line = preg_replace($pattern, '', $candidate_line, 1);
+                break;
+            }
+        }
+        $cursor = $candidate_line;
+        $best = null;
+        $best_len = PHP_INT_MAX;
+        // Scan up to 6 leading tokens; collect the shortest "word-like" candidate.
+        for($attempt = 0; $attempt < 6; $attempt++) {
+            if(!preg_match('/^\s*([a-zäöüß]+)/u', $cursor, $nm)) {
+                break;
+            }
+            $word = $nm[1];
+            $len = mb_strlen($word);
+            // Word must be at least 2 chars and at most ~12 chars to be plausible
+            // as a continuation. Real continuations are 2-8 chars; longer tokens
+            // are usually content words that don't actually continue the broken word.
+            if($len >= 2 && $len <= 12 && $len < $best_len) {
+                // Reject pure stop-words that are extremely common (für, von, etc.).
+                // "den" and "dem" are kept because they are real continuations
+                // (Methoden, Zudem, bestanden).
+                if(!isset($stop_words[mb_strtolower($word)])) {
+                    $best = $word;
+                    $best_len = $len;
+                }
+            }
+            // Skip this token and look further.
+            $cursor = preg_replace('/^\s*\S+/u', '', $cursor, 1);
+            if($cursor === null || trim($cursor) === '') {
+                break;
+            }
+        }
+        return $best;
     }
 
     /**

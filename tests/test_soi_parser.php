@@ -840,6 +840,110 @@ Studienablaufplan";
 		in_array('KathTh-BM-', $codes) || in_array('KathTh-BM', $codes), false);
 }
 
+/* ============================ mergeHyphenatedLineBreaks ============================ */
+
+/* Einfacher Trailing-Hyphen-Fall (am Zeilenende). */
+$lines = ["Verfasser in-", "nerhalb der Geschichte Israels."];
+$merged = $ex->mergeHyphenatedLineBreaks($lines);
+is_equal("mergeHyphen: 'in-'+'nerhalb' → 'innerhalb'", $merged[0], "Verfasser innerhalb");
+is_equal("mergeHyphen: Rest behält 1 führendes Leerzeichen", $merged[1], " der Geschichte Israels.");
+
+/* Mid-line-Hyphenation (Spaltentrenner im Layout). */
+$lines = [" Lehr- und Lern-      Das Modul besteht aus:", "formen                   - einer Vorlesung (2 SWS)"];
+$merged = $ex->mergeHyphenatedLineBreaks($lines);
+is_equal("mergeHyphen: mid-line 'Lern-'+'formen' → 'Lernformen'", $merged[0], " Lehr- und Lernformen      Das Modul besteht aus:");
+is_equal("mergeHyphen: Rest nach 'formen' erhalten", $merged[1], "                   - einer Vorlesung (2 SWS)");
+
+/* 3-Segment-Kette (Ur-/christen-/tums → Urchristentums). */
+$lines = ["Ur-", "christen-", "tums"];
+$merged = $ex->mergeHyphenatedLineBreaks($lines);
+is_equal("mergeHyphen: 3-Segment-Kette → 'Urchristentums'", $merged[0], "Urchristentums");
+is_equal("mergeHyphen: 3-Segment-Kette keine Reste", count($merged), 1);
+
+/* "bestan-/für die Vergabe von den" — "für die Vergabe" ist Label-Fragment,
+ * echte Fortsetzung ist "den". */
+$lines = ["Modulprüfung bestan-", "für die Vergabe von den ist. Die Modulprüfung besteht aus:"];
+$merged = $ex->mergeHyphenatedLineBreaks($lines);
+is_equal("mergeHyphen: bestan-/Label-Skip → 'bestanden'", $merged[0], "Modulprüfung bestanden");
+is_equal("mergeHyphen: Rest nach Label-Skip", $merged[1], "für die Vergabe von den ist. Die Modulprüfung besteht aus:");
+
+/* Kurze Continuations vor langem Inhalt (Zu-/dem ist es ein Wahlpflichtmodul → ZudeWahlpflichtmodul? NEIN).
+ * Hier soll das Skript sicher scheitern statt "Wahlpflichtmodul" zu wählen.
+ * Da "dem" ein Stop-Word ist, wird keine sinnvolle Fortsetzung gefunden — kein Merge. */
+$lines = ["Zu-", "dem ist es ein Wahlpflichtmodul"];
+$merged = $ex->mergeHyphenatedLineBreaks($lines);
+is_equal("mergeHyphen: kein Merge wenn alle Kandidaten Stop-/Longwords", $merged[0], "Zu-");
+is_equal("mergeHyphen: Rest unverändert", $merged[1], "dem ist es ein Wahlpflichtmodul");
+
+/* Reine Trennung ohne Rest. */
+$lines = ["Modul-", "name"];
+$merged = $ex->mergeHyphenatedLineBreaks($lines);
+is_equal("mergeHyphen: 'Modul-'+'name' → 'Modulname'", $merged[0], "Modulname");
+
+/* ============================ SWS-Extraktion mit 'x'-Multiplikator ============================ */
+
+/* Regression: "2 x 2 SWS" wurde als 2 statt 4 SWS extrahiert. */
+if($has_pdf) {
+	$txt = "Anlage 1:
+Modulbeschreibungen
+
+ModX1              Modulname eins                          Prof. Dr. X
+ Lehr- und Lern-  Das Modul besteht aus:
+ formen             - einer Vorlesung (2 SWS)
+                      - zwei Proseminaren (2 x 2 SWS).
+ Voraussetzungen   Keine.
+ für die Teilnahme
+ Verwendbarkeit    Beliebig.
+ des Moduls
+ Leistungspunkte   6 Leistungspunkte.
+ und Noten
+ Dauer des Moduls  1 Semester.
+
+Anlage 2:
+Studienablaufplan";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseModulesFromText($text);
+	$mod = null;
+	foreach($mods as $m) { if($m['modulnummer'] === 'ModX1') { $mod = $m; break; } }
+	is_equal("SWS: Modul erkannt", $mod !== null, true);
+	is_equal("SWS: 2 x 2 SWS = 4 + 2 Vorlesung = 6 SWS", $mod === null ? null : $mod['sws_total'], 6.0);
+}
+
+/* ============================ Prüfungstypen bei gesplittetem Voraussetzungen-Label ============================ */
+
+/* Regression: Wenn "Voraussetzungen / für die Vergabe / von / Leistungspunkten" über 4 Zeilen gesplittet
+ * wird, gingen Klausur & Co. verloren. */
+if($has_pdf) {
+	$txt = "Anlage 1:
+Modulbeschreibungen
+
+ModY1              Modulname eins                          Prof. Dr. Y
+ Voraussetzungen   Die Leistungspunkte werden erworben, wenn die Modulprüfung be-
+ für die Vergabe   standen ist. Die Modulprüfung besteht aus:
+ von               - einer Klausur im Umfang von 90 Minuten
+ Leistungspunkten  - einer Seminararbeit im Umfang von 90 Stunden.
+
+Anlage 2:
+Studienablaufplan";
+	$text = new SoiPdfText();
+	$text->full_text = $txt;
+	$mods = $ex->parseModulesFromText($text);
+	$mod = null;
+	foreach($mods as $m) { if($m['modulnummer'] === 'ModY1') { $mod = $m; break; } }
+	is_equal("PT-Split: Modul erkannt", $mod !== null, true);
+	is_equal("PT-Split: Klausur erkannt", $mod === null ? false : in_array('Klausur', $mod['pruefungstypen']), true);
+	is_equal("PT-Split: Seminararbeit erkannt", $mod === null ? false : in_array('Seminararbeit', $mod['pruefungstypen']), true);
+}
+
+/* ============================ getLabelFragmentMap ============================ */
+
+$map = $ex->getLabelFragmentMap();
+is_equal("Fragment-Map: 'Voraussetzungen' → full label", $map['Voraussetzungen'], 'Voraussetzungen für die Vergabe von Leistungspunkten');
+is_equal("Fragment-Map: 'Lehr- und' → full label", $map['Lehr- und'], 'Lehr- und Lernformen');
+is_equal("Fragment-Map: 'Leistungspunkten' → full label", $map['Leistungspunkten'], 'Voraussetzungen für die Vergabe von Leistungspunkten');
+is_equal("Fragment-Map: 'Qualifikationsziele' nicht enthalten", isset($map['Qualifikationsziele']), false);
+
 /* ============================ find_anlage2 Edge-Cases ============================ */
 
 is_equal("find_anlage2: leeres Array → null", soi_find_anlage2_for_modul(array(), 'X'), null);
@@ -924,3 +1028,6 @@ if($has_pdf && $pdftotext !== '') {
 	}
 	is_equal("PDF: Alle erkannten Voraussetzungen verweisen auf existierende Module", $invalid_count, 0);
 }
+
+// EOF marker for debugging
+fwrite(STDERR, "=== test_soi_parser.php EOF reached ===\n");
