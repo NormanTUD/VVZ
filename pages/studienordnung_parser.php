@@ -853,9 +853,18 @@ class SoiExtractor {
                     }
                 }
                 if($label === 'Lehr- und Lernformen' || $label === 'Lehr- und' || $label === 'Lernformen') {
-                    // Wert wird ggf. unten noch um Folgezeilen erweitert; prüfe auch $current['fields']['Lehr- und'].
+                    // Wenn das Label auf zwei Zeilen aufgeteilt wurde ("Lehr- und" + "Lernformen"),
+                    // werden die beiden Teilwerte separat in fields gespeichert. Wir vereinen sie hier
+                    // für die SWS-Berechnung, ABER nur wenn die Labels tatsächlich getrennt sind
+                    // (sonst hängen wir den Wert nicht doppelt an).
                     $ll = $value;
-                    if(isset($current['fields']['Lernformen'])) $ll .= ' '.$current['fields']['Lernformen'];
+                    if($label === 'Lehr- und' && isset($current['fields']['Lernformen'])
+                        && $current['fields']['Lernformen'] !== $value) {
+                        $ll .= ' '.$current['fields']['Lernformen'];
+                    } elseif($label === 'Lernformen' && isset($current['fields']['Lehr- und'])
+                        && $current['fields']['Lehr- und'] !== $value) {
+                        $ll = $current['fields']['Lehr- und'].' '.$value;
+                    }
                     if(preg_match_all('/(\d+(?:[.,]\d+)?)\s*SWS/u', $ll, $swsm)) {
                         $sum = 0.0;
                         foreach($swsm[1] as $v) { $sum += (float)str_replace(',', '.', $v); }
