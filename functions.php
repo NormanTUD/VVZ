@@ -152,6 +152,15 @@ declare(ticks=1);
 
 	include('mysql.php');
 
+	if(!function_exists('rquery')) {
+		if(function_exists('dier')) {
+			dier("mysql.php konnte nicht geladen werden (rquery() ist nicht definiert). Bitte prüfen, ob mysql.php im gleichen Verzeichnis liegt und fehlerfrei lädt.");
+		} else {
+			http_response_code(500);
+			die("mysql.php konnte nicht geladen werden (rquery() ist nicht definiert).");
+		}
+	}
+
 	rquery("SET @@system_versioning_alter_history = 0;");
 	selftest_startpage();
 
