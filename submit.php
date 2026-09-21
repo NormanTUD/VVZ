@@ -3,6 +3,8 @@
 
 	if(count($GLOBALS["error"])) {
 		http_response_code(500);
+
+		print($GLOBALS["error"]);
 	}
 
 	foreach (array(
