@@ -563,7 +563,11 @@ function validate_autosubmit ($form) {
 			problems.join(' \u2022 ') +
 			'. Nicht ben\u00f6tigte Zeilen bitte mit dem X-Button entfernen. W\u00fcnsche f\u00fcr die Raumplanung k\u00f6nnen unabh\u00e4ngig davon oben eingetragen werden.';
 
-		if(einzelne_termine_warning_message !== problem_message) {
+		var $current_warning = $('#toast-container .toast-warning .toast-message');
+		if(einzelne_termine_warning_message !== null && $current_warning.length) {
+			$current_warning.text(problem_message);
+			einzelne_termine_warning_message = problem_message;
+		} else {
 			warning('Einzelne Termine unvollst\u00e4ndig', problem_message);
 			einzelne_termine_warning_message = problem_message;
 		}
