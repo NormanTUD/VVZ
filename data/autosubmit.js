@@ -15,10 +15,6 @@ function autosubmit_extract_feedback (html) {
 
 function autosubmit (identifier=".form_autosubmit, :input") {
 	$(identifier).each(function (index) {
-		if($(this).data('autosubmit_bound')) {
-			return;
-		}
-		$(this).data('autosubmit_bound', true);
 		if(!$(this).attr('noautosubmit')) {
 			$(this).change(function (index) {
 				var loc = window.location.pathname;
@@ -31,10 +27,6 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 				}
 
 				if(data) {
-					if(typeof window.validate_autosubmit === 'function' && window.validate_autosubmit($(this.form)) === false) {
-						return;
-					}
-
 					var $changedField = $(this);
 					var fieldName = $changedField.attr('name') || $changedField.attr('id') || 'Feld';
 
