@@ -56,6 +56,32 @@
 				stderrw("debug logs is no dir");
 			}
 
+			if(!empty($GLOBALS['submit_php'])) {
+				if($data instanceof \Throwable) {
+					$submit_message = get_class($data).": ".$data->getMessage()." in ".$data->getFile().":".$data->getLine();
+				} else {
+					ob_start();
+					print_r($data);
+					$submit_message = trim(ob_get_clean());
+				}
+
+				if(!is_array($GLOBALS['error'])) {
+					$GLOBALS['error'] = array();
+				}
+				if(!in_array($submit_message, $GLOBALS['error'], true)) {
+					$GLOBALS['error'][] = $submit_message;
+				}
+
+				http_response_code(500);
+
+				if(function_exists('show_output')) {
+					show_output('error', 'red', 1);
+				} else {
+					print "<span>".htmlentities($submit_message)."</span>\n";
+				}
+				exit(1);
+			}
+
 			#http_response_code(500);
 			if(might_be_query($data)) {
 				$sql = 1;
