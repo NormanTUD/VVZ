@@ -21,8 +21,8 @@ function autosubmit_handle_change (item) {
 	}
 
 	var loc = window.location.pathname;
-	var dir = window.location.protocol  + "//" + window.location.host + "/" + loc.substring(0, loc.lastIndexOf('/'));
-	var submitfile = dir + '/submit.php';
+	var base = loc.slice(0, loc.lastIndexOf('/') + 1);
+	var submitfile = window.location.protocol  + "//" + window.location.host + base + 'submit.php';
 
 	var $form = $changedField.closest('form');
 	var data = $form.length ? $form.serialize() : $changedField.serialize();
