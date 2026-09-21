@@ -5,6 +5,7 @@
 
 "use strict";
 var tour;
+var einzelne_termine_warning_message = null;
 function toggle_details (id) {
 	$("#details_" + id).toggle();
 }
@@ -557,15 +558,32 @@ function validate_autosubmit ($form) {
 	});
 
 	if(problems.length) {
-		warning(
-			'Einzelne Termine unvollst\u00e4ndig',
+		var problem_message =
 			'Ein einzelner Termin wird erst gespeichert, wenn in seiner Zeile Start, Ende, Geb\u00e4ude und Raum vollst\u00e4ndig ausgef\u00fcllt sind \u2013 unvollst\u00e4ndige Zeilen blockieren das automatische Speichern. Fehlend: ' +
 			problems.join(' \u2022 ') +
-			'. Nicht ben\u00f6tigte Zeilen bitte mit dem X-Button entfernen. W\u00fcnsche f\u00fcr die Raumplanung k\u00f6nnen unabh\u00e4ngig davon oben eingetragen werden.'
-		);
+			'. Nicht ben\u00f6tigte Zeilen bitte mit dem X-Button entfernen. W\u00fcnsche f\u00fcr die Raumplanung k\u00f6nnen unabh\u00e4ngig davon oben eingetragen werden.';
+
+		if(einzelne_termine_warning_message !== problem_message) {
+			warning('Einzelne Termine unvollst\u00e4ndig', problem_message);
+			einzelne_termine_warning_message = problem_message;
+		}
 		return false;
 	}
+
+	clear_autosubmit_warnings();
 	return true;
+}
+
+function clear_autosubmit_warnings () {
+	if(einzelne_termine_warning_message === null) {
+		return;
+	}
+	einzelne_termine_warning_message = null;
+	if(window.jQuery && window.toastr) {
+		$('#toast-container .toast-warning').fadeOut(150, function () {
+			$(this).remove();
+		});
+	}
 }
 
 $(document).on("focus", ".datetimepicker", function(){

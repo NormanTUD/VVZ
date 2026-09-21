@@ -15,6 +15,10 @@ function autosubmit_extract_feedback (html) {
 
 function autosubmit (identifier=".form_autosubmit, :input") {
 	$(identifier).each(function (index) {
+		if($(this).data('autosubmit_bound')) {
+			return;
+		}
+		$(this).data('autosubmit_bound', true);
 		if(!$(this).attr('noautosubmit')) {
 			$(this).change(function (index) {
 				var loc = window.location.pathname;
@@ -40,6 +44,9 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 						data: data,
 						success: function (response) {
 							var fb = autosubmit_extract_feedback(response);
+							if(typeof window.clear_autosubmit_warnings === 'function') {
+								window.clear_autosubmit_warnings();
+							}
 							success(fb.message || fb.title, fb.message ? fb.title : '');
 							if($(".auto_reload_stylesheets").length != 0) {
 								reloadStylesheets();
