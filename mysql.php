@@ -504,11 +504,20 @@
 		if($vvzdbpw) {
 			$GLOBALS["db_password"] = $vvzdbpw;
 
-			$GLOBALS['dbh'] = mysqli_connect('localhost', $GLOBALS['db_username'], $GLOBALS["db_password"]);
+			$connect_username = $GLOBALS['db_username'] ?? '';
+			if(!$connect_username) {
+				$connect_username = 'root';
+			}
+
+			try {
+				$GLOBALS['dbh'] = mysqli_connect('localhost', $connect_username, $GLOBALS["db_password"]);
+			} catch (\Throwable $e) {
+				dier("Kann nicht zur Datenbank verbinden! User: $connect_username - ".$e->getMessage());
+			}
 
 			// Check connection
-			if ($GLOBALS["dbh"]->connect_error) {
-				die("Connection failed: ".$GLOBALS["dbh"]->connect_error);
+			if(!$GLOBALS['dbh']) {
+				dier("Kann nicht zur Datenbank verbinden! (".mysqli_connect_error().")");
 			}
 
 
