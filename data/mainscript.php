@@ -489,8 +489,8 @@ function add_new_row_to_einzelne_termine () {
 
 function einzelne_termine_validation_definition () {
 	return {
-		'Start': 	{ 'link': 'input[name="einzelner_termin_start[]"]', 	'hint': 'Start fehlt \u2013 Format: JJJJ-MM-TT HH:MM:SS' },
-		'Ende': 	{ 'link': 'input[name="einzelner_termin_ende[]"]', 	'hint': 'Ende fehlt \u2013 Format: JJJJ-MM-TT HH:MM:SS' },
+		'Start': 	{ 'link': 'input[name="einzelner_termin_start[]"]', 	'hint': 'Start fehlt \u2013 Format: JJJJ-MM-TT HH:MM oder HH:MM:SS' },
+		'Ende': 	{ 'link': 'input[name="einzelner_termin_ende[]"]', 	'hint': 'Ende fehlt \u2013 Format: JJJJ-MM-TT HH:MM oder HH:MM:SS' },
 		'Geb\u00e4ude': { 'link': 'select[name="einzelner_termin_geb\u00e4ude[]"]', 'hint': 'Geb\u00e4ude fehlt \u2013 bitte ausw\u00e4hlen' },
 		'Raum': 	{ 'link': 'input[name="einzelner_termin_raum[]"]', 	'hint': 'Raum fehlt \u2013 z.B. Raumnummer' }
 	};
@@ -541,7 +541,7 @@ function validate_autosubmit ($form) {
 			var value = ($field.val() || '').toString().trim();
 			var ok = value !== '';
 			if(label === 'Start' || label === 'Ende') {
-				ok = ok && /^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(value);
+				ok = ok && /^\d{4}-\d\d-\d\d \d\d:\d\d(:\d\d)?$/.test(value);
 			}
 			if(ok) {
 				einzelne_termine_unmark($field);
