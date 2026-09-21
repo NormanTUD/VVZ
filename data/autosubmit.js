@@ -20,54 +20,79 @@ function autosubmit_handle_change (item) {
 		return;
 	}
 
-	var loc = window.location.pathname;
-	var base = loc.slice(0, loc.lastIndexOf('/') + 1);
-	var submitfile = window.location.protocol  + "//" + window.location.host + base + 'submit.php';
+	try {
+		var base = window.location.pathname.slice(0, window.location.pathname.lastIndexOf('/') + 1);
+		var submitfile = window.location.protocol  + "//" + window.location.host + base + 'submit.php';
 
-	var $form = $changedField.closest('form');
-	var data = $form.length ? $form.serialize() : $changedField.serialize();
-	if(!data) {
-		return;
-	}
+		var $form = $changedField.closest('form');
+		var data = $form.length ? $form.serialize() : $changedField.serialize();
+		if(!data) {
+			return;
+		}
 
-	// Guardrail: Speichern darf nie stillschweigend ausfallen. Wenn die Validierung ein
-	// Problem meldet, wird der POST blockiert und die betroffenen Felder sind rot markiert.
-	var blocked = false;
-	if(typeof window.validate_autosubmit === 'function') {
-		try {
-			if(window.validate_autosubmit($form.length ? $form : $changedField) === false) {
-				blocked = true;
+		// Guardrail: Eine fehlerhafte Validierung darf das Speichern nie dauerhaft verhindern.
+		var blocked = false;
+		if(typeof window.validate_autosubmit === 'function') {
+			try {
+				if(window.validate_autosubmit($form.length ? $form : $changedField) === false) {
+					blocked = true;
+				}
+			} catch(e) {
+				var log = window.log;
+				if(typeof log === 'function') {
+					log("autosubmit.js: validate_autosubmit Fehler: ", e);
+				}
 			}
-		} catch(e) {
-			log("autosubmit.js: validate_autosubmit Fehler: ", e);
+		}
+		if(blocked) {
+			return;
+		}
+
+		$.ajax({
+			url : submitfile,
+			type: "POST",
+			data: data,
+			success: function (response) {
+				try {
+					var fb = autosubmit_extract_feedback(response);
+					if(typeof window.success === 'function') {
+						window.success(fb.message || fb.title, fb.message ? fb.title : '');
+					}
+					if($(".auto_reload_stylesheets").length != 0 && typeof window.reloadStylesheets === 'function') {
+						reloadStylesheets();
+					}
+				} catch(e) {
+					var log2 = window.log;
+					if(typeof log2 === 'function') {
+						log2("autosubmit.js: success-Behandlung Fehler: ", e);
+					}
+				}
+			},
+			error: function (response, textStatus, errorThrown) {
+				var log3 = window.log;
+				if(typeof log3 === 'function') {
+					log3(response);
+				}
+				try {
+					if(typeof window.error === 'function') {
+						window.error("FEHLER", "Das automatische Speichern ist fehlgeschlagen. Bitte pr\u00fcfen Sie Ihre Eingaben.");
+					}
+				} catch(e) {}
+			}
+		});
+	} catch(e) {
+		var log4 = window.log;
+		if(typeof log4 === 'function') {
+			log4("autosubmit.js: Fehler beim Verarbeiten der Änderung: ", e);
 		}
 	}
-	if(blocked) {
-		return;
-	}
-
-	$.ajax({
-		url : submitfile,
-		type: "POST",
-		data: data,
-		success: function (response) {
-			var fb = autosubmit_extract_feedback(response);
-			success(fb.message || fb.title, fb.message ? fb.title : '');
-			if($(".auto_reload_stylesheets").length != 0) {
-				reloadStylesheets();
-			}
-		},
-		error: function (response, textStatus, errorThrown) {
-			log(response);
-			error("FEHLER", "Das automatische Speichern ist fehlgeschlagen. Bitte pr\u00fcfen Sie Ihre Eingaben.");
-		}
-	});
 }
 
 function autosubmit (identifier=".form_autosubmit, :input") {
-	// Guardrail: EIN einziger, delegierter Change-Handler auf document.
-	// Er greift für alle aktuellen UND dynamisch hinzugefügten Elemente automatisch,
-	// verhindert doppelte Bindings und ist robust gegen einzelne Fehler während des Bindens.
+	// Guardrail: EIN delegierter Change-Handler. Wird sofort beim Laden aktiv,
+	// NICHT erst bei DOM-ready — so kann ein Fehler in einem anderen ready-Handler
+	// das automatische Speichern nie verhindern. Erfasst auch nachträglich
+	// hinzugefügte Zeilen (neue Termine).
 	if(window.__autosubmit_delegated) {
 		return;
 	}
@@ -77,8 +102,7 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 		autosubmit_handle_change(this);
 	});
 
-	// Guardrail: Unvollständige Felder schon beim Tippen sichtbar rot markieren (ohne POST).
-	// So ist sofort klar, warum noch nicht automatisch gespeichert wird.
+	// Guardrail: Unvollständige Felder schon beim Tippen rot markieren (ohne POST).
 	if(typeof window.validate_autosubmit === 'function') {
 		$(document).on("input.autosubmit", identifier, function () {
 			var $form = $(this).closest('form');
@@ -87,8 +111,10 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 			}
 		});
 	}
-
 }
+
+// Sofort binden (nicht auf document.ready warten).
+autosubmit();
 
 $(document).ready(function(){
 	autosubmit();
@@ -98,7 +124,6 @@ $(document).ready(function(){
 	$(document).on('submit', 'form:not(.form_autosubmit)', function() {
 		var $form = $(this);
 		if($form.attr('noautosubmit') !== undefined) return;
-		// Nur Formulare, die echte Schreib-Aktionen sind (POST oder POST-Marker)
 		var method = ($form.attr('method') || '').toLowerCase();
 		if(method && method !== 'post') return;
 		if(window.toastr && typeof window.toastr.info === 'function') {
