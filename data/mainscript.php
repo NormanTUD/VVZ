@@ -5,7 +5,6 @@
 
 "use strict";
 var tour;
-var einzelne_termine_warning_message = null;
 function toggle_details (id) {
 	$("#details_" + id).toggle();
 }
