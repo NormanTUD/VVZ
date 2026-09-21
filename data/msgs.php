@@ -31,6 +31,7 @@ function success (title, msg) {
 	toastr.options.timeOut = 5000;
 	toastr.options.extendedTimeOut = 10000;
 	toastr.options.closeButton = true;
+	toastr.options.preventDuplicates = false;
 
 	toastr["success"](msg, title);
 }

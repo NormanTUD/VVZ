@@ -13,53 +13,80 @@ function autosubmit_extract_feedback (html) {
 	return { title: 'Gespeichert', message: cleaned || fallback || '' };
 }
 
-function autosubmit (identifier=".form_autosubmit, :input") {
-	$(identifier).each(function (index) {
-		if($(this).data('autosubmit_bound')) {
-			return;
+function autosubmit_handle_change (item) {
+	var $changedField = $(item);
+
+	if($changedField.attr('noautosubmit')) {
+		return;
+	}
+
+	var loc = window.location.pathname;
+	var dir = window.location.protocol  + "//" + window.location.host + "/" + loc.substring(0, loc.lastIndexOf('/'));
+	var submitfile = dir + '/submit.php';
+
+	var $form = $changedField.closest('form');
+	var data = $form.length ? $form.serialize() : $changedField.serialize();
+	if(!data) {
+		return;
+	}
+
+	// Guardrail: Speichern darf nie stillschweigend ausfallen. Wenn die Validierung ein
+	// Problem meldet, wird der POST blockiert und die betroffenen Felder sind rot markiert.
+	var blocked = false;
+	if(typeof window.validate_autosubmit === 'function') {
+		try {
+			if(window.validate_autosubmit($form.length ? $form : $changedField) === false) {
+				blocked = true;
+			}
+		} catch(e) {
+			log("autosubmit.js: validate_autosubmit Fehler: ", e);
 		}
-		$(this).data('autosubmit_bound', true);
-		if(!$(this).attr('noautosubmit')) {
-			$(this).change(function (index) {
-				var loc = window.location.pathname;
-				var dir = window.location.protocol  + "//" + window.location.host + "/" + loc.substring(0, loc.lastIndexOf('/'));
-				var submitfile = dir + '/submit.php';
+	}
+	if(blocked) {
+		return;
+	}
 
-				var data = $(this.form).serialize();
-				if(!data) {
-					data = $(this).serialize();
-				}
-
-				if(data) {
-					if(typeof window.validate_autosubmit === 'function' && window.validate_autosubmit($(this.form)) === false) {
-						return;
-					}
-
-					var $changedField = $(this);
-					var fieldName = $changedField.attr('name') || $changedField.attr('id') || 'Feld';
-
-					$.ajax({
-						url : submitfile,
-						type: "POST",
-						data: data,
-						success: function (response) {
-							var fb = autosubmit_extract_feedback(response);
-							success(fb.message || fb.title, fb.message ? fb.title : '');
-							if($(".auto_reload_stylesheets").length != 0) {
-								reloadStylesheets();
-							}
-						},
-						error: function (response, textStatus, errorThrown) {
-							log(response);
-							error("FEHLER", "Das automatische Speichern ist fehlgeschlagen. Bitte pr\u00fcfen Sie Ihre Eingaben.");
-						}
-					});
-				} else {
-					log("autosubmit.js: data was empty: ", this);
-				}
-			});
+	$.ajax({
+		url : submitfile,
+		type: "POST",
+		data: data,
+		success: function (response) {
+			var fb = autosubmit_extract_feedback(response);
+			success(fb.message || fb.title, fb.message ? fb.title : '');
+			if($(".auto_reload_stylesheets").length != 0) {
+				reloadStylesheets();
+			}
+		},
+		error: function (response, textStatus, errorThrown) {
+			log(response);
+			error("FEHLER", "Das automatische Speichern ist fehlgeschlagen. Bitte pr\u00fcfen Sie Ihre Eingaben.");
 		}
 	});
+}
+
+function autosubmit (identifier=".form_autosubmit, :input") {
+	// Guardrail: EIN einziger, delegierter Change-Handler auf document.
+	// Er greift für alle aktuellen UND dynamisch hinzugefügten Elemente automatisch,
+	// verhindert doppelte Bindings und ist robust gegen einzelne Fehler während des Bindens.
+	if(window.__autosubmit_delegated) {
+		return;
+	}
+	window.__autosubmit_delegated = true;
+
+	$(document).on("change.autosubmit", identifier, function () {
+		autosubmit_handle_change(this);
+	});
+
+	// Guardrail: Unvollständige Felder schon beim Tippen sichtbar rot markieren (ohne POST).
+	// So ist sofort klar, warum noch nicht automatisch gespeichert wird.
+	if(typeof window.validate_autosubmit === 'function') {
+		$(document).on("input.autosubmit", identifier, function () {
+			var $form = $(this).closest('form');
+			if($form.length) {
+				try { window.validate_autosubmit($form); } catch(e) {}
+			}
+		});
+	}
 
 }
 
