@@ -469,7 +469,6 @@ function start_tour () {
 function remove_tr (item) {
 	autosubmit();
 	$($(item).closest("tr")).remove();
-	mark_einzelne_termine_validation();
 }
 
 function add_new_row_to_einzelne_termine () {
@@ -486,17 +485,6 @@ function add_new_row_to_einzelne_termine () {
 	);
 
 	autosubmit();
-	mark_einzelne_termine_validation();
-}
-
-function mark_einzelne_termine_validation () {
-	try {
-		if(typeof validate_autosubmit === 'function') {
-			validate_autosubmit($('#einzelne_termine').closest('form'));
-		}
-	} catch(e) {
-		log("mark_einzelne_termine_validation Fehler: ", e);
-	}
 }
 
 function einzelne_termine_validation_definition () {
@@ -553,7 +541,7 @@ function validate_autosubmit ($form) {
 			var value = ($field.val() || '').toString().trim();
 			var ok = value !== '';
 			if(label === 'Start' || label === 'Ende') {
-				ok = ok && /^\d{4}-\d\d-\d\d\s+\d\d:\d\d(:\d\d)?$/.test(value);
+				ok = ok && /^\d{4}-\d\d-\d\d \d\d:\d\d(:\d\d)?$/.test(value);
 			}
 			if(ok) {
 				einzelne_termine_unmark($field);
