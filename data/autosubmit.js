@@ -27,6 +27,10 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 				}
 
 				if(data) {
+					if(typeof window.validate_autosubmit === 'function' && window.validate_autosubmit($(this.form)) === false) {
+						return;
+					}
+
 					var $changedField = $(this);
 					var fieldName = $changedField.attr('name') || $changedField.attr('id') || 'Feld';
 

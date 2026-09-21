@@ -725,6 +725,17 @@ a, a:visited, a:hover, a:active {
 	color: orange;
 }
 
+.einzelner_termin_invalid {
+	border: 2px solid #e0362c !important;
+	background-color: #ffe3d6 !important;
+	box-shadow: 0 0 0 2px rgba(224, 54, 44, 0.15);
+}
+
+.einzelner_termin_invalid::placeholder {
+	color: #b03028;
+	font-style: italic;
+}
+
 .green {
 	color: green;
 }

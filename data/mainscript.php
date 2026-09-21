@@ -487,6 +487,87 @@ function add_new_row_to_einzelne_termine () {
 	autosubmit();
 }
 
+function einzelne_termine_validation_definition () {
+	return {
+		'Start': 	{ 'link': 'input[name="einzelner_termin_start[]"]', 	'hint': 'Start fehlt \u2013 Format: JJJJ-MM-TT HH:MM:SS' },
+		'Ende': 	{ 'link': 'input[name="einzelner_termin_ende[]"]', 	'hint': 'Ende fehlt \u2013 Format: JJJJ-MM-TT HH:MM:SS' },
+		'Geb\u00e4ude': { 'link': 'select[name="einzelner_termin_geb\u00e4ude[]"]', 'hint': 'Geb\u00e4ude fehlt \u2013 bitte ausw\u00e4hlen' },
+		'Raum': 	{ 'link': 'input[name="einzelner_termin_raum[]"]', 	'hint': 'Raum fehlt \u2013 z.B. Raumnummer' }
+	};
+}
+
+function einzelne_termine_mark_invalid ($field, hint) {
+	if(!$field.length) return;
+	if(!$field.data('hidden-validation-placeholder')) {
+		$field.data('hidden-validation-placeholder', $field.attr('placeholder') || '');
+	}
+	$field.addClass('einzelner_termin_invalid');
+	if($field.is('input[type="text"], input:not([type])')) {
+		$field.attr('placeholder', hint);
+	}
+}
+
+function einzelne_termine_unmark ($field) {
+	if(!$field.length) return;
+	$field.removeClass('einzelner_termin_invalid');
+	var original = $field.data('hidden-validation-placeholder');
+	if(original !== undefined) {
+		if(original) {
+			$field.attr('placeholder', original);
+		} else {
+			$field.removeAttr('placeholder');
+		}
+		$field.removeData('hidden-validation-placeholder');
+	}
+}
+
+function validate_autosubmit ($form) {
+	var $table = ($form && $form.length) ? $form.find('#einzelne_termine') : $('#einzelne_termine');
+	if(!$table.length) return true;
+
+	var definition = einzelne_termine_validation_definition();
+	var problems = [];
+	var rowNumber = 0;
+
+	$table.find('tbody tr').each(function(){
+		var $row = $(this);
+		if(!$row.find('input[name], select[name]').length) return;
+
+		rowNumber++;
+		var missing = [];
+
+		$.each(definition, function(label, def){
+			var $field = $row.find(def.link);
+			var value = ($field.val() || '').toString().trim();
+			var ok = value !== '';
+			if(label === 'Start' || label === 'Ende') {
+				ok = ok && /^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(value);
+			}
+			if(ok) {
+				einzelne_termine_unmark($field);
+			} else {
+				einzelne_termine_mark_invalid($field, def.hint);
+				missing.push(label);
+			}
+		});
+
+		if(missing.length) {
+			problems.push('Zeile ' + rowNumber + ': ' + missing.join(', '));
+		}
+	});
+
+	if(problems.length) {
+		warning(
+			'Einzelne Termine unvollst\u00e4ndig',
+			'Ein einzelner Termin wird erst gespeichert, wenn in seiner Zeile Start, Ende, Geb\u00e4ude und Raum vollst\u00e4ndig ausgef\u00fcllt sind \u2013 unvollst\u00e4ndige Zeilen blockieren das automatische Speichern. Fehlend: ' +
+			problems.join(' \u2022 ') +
+			'. Nicht ben\u00f6tigte Zeilen bitte mit dem X-Button entfernen. W\u00fcnsche f\u00fcr die Raumplanung k\u00f6nnen unabh\u00e4ngig davon oben eingetragen werden.'
+		);
+		return false;
+	}
+	return true;
+}
+
 $(document).on("focus", ".datetimepicker", function(){
 	$(this).datetimepicker({
 		prevText: '&#x3c;zurück', prevStatus: '',

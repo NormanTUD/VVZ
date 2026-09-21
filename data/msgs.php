@@ -49,3 +49,17 @@ function error (title, msg) {
 	toastr.options.closeButton = false;
 	toastr["error"](msg, title);
 }
+
+
+function warning (title, msg) {
+	if(!title) {
+		title = msg;
+	}
+	if(!title) {
+		log("Empty msg and title");
+	}
+	toastr.options.timeOut = 8000;
+	toastr.options.extendedTimeOut = 16000;
+	toastr.options.closeButton = true;
+	toastr["warning"](msg, title);
+}
