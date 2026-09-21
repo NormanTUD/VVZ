@@ -44,9 +44,6 @@ function autosubmit (identifier=".form_autosubmit, :input") {
 						data: data,
 						success: function (response) {
 							var fb = autosubmit_extract_feedback(response);
-							if(typeof window.clear_autosubmit_warnings === 'function') {
-								window.clear_autosubmit_warnings();
-							}
 							success(fb.message || fb.title, fb.message ? fb.title : '');
 							if($(".auto_reload_stylesheets").length != 0) {
 								reloadStylesheets();
