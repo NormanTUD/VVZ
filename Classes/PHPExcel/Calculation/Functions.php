@@ -518,15 +518,14 @@ class PHPExcel_Calculation_Functions
     }
 
 
-    /**
-     * VERSION
-     *
-     * @return    string    Version information
-     */
-    public static function VERSION()
-    {
-        return 'PHPExcel ##VERSION##, ##DATE##';
-    }
+	/**
+	 * VERSION
+	 *
+	 * @return	string	Version information
+	 */
+	public static function VERSION() {
+		return 'PHPExcel 1.0.1, 2023-06-03';
+	}	//	function VERSION()
 
 
     /**

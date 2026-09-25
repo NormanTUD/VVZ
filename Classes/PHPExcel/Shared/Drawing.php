@@ -41,11 +41,8 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Value in pixels
      * @return     int            Value in EMU
      */
-    public static function pixelsToEMU($pValue)
+    public static function pixelsToEMU($pValue = 0)
     {
-	if(is_null($pValue)) {
-	    $pValue=0;
-	}
         return round($pValue * 9525);
     }
 
@@ -55,12 +52,8 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Value in EMU
      * @return     int            Value in pixels
      */
-    public static function EMUToPixels($pValue)
+    public static function EMUToPixels($pValue = 0)
     {
-	if(is_null($pValue)) {
-	    $pValue=0;
-	}
-
         if ($pValue != 0) {
             return round($pValue / 9525);
         } else {
@@ -77,11 +70,8 @@ class PHPExcel_Shared_Drawing
      * @param     PHPExcel_Style_Font $pDefaultFont    Default font of the workbook
      * @return     int            Value in cell dimension
      */
-    public static function pixelsToCellDimension($pValue, PHPExcel_Style_Font $pDefaultFont)
+    public static function pixelsToCellDimension(int $pValue, PHPExcel_Style_Font $pDefaultFont): int
     {
-	if(is_null($pValue)) {
-	    $pValue=0;
-	}
         // Font name and size
         $name = $pDefaultFont->getName();
         $size = $pDefaultFont->getSize();
@@ -95,7 +85,7 @@ class PHPExcel_Shared_Drawing
             $colWidth = $pValue * 11 * PHPExcel_Shared_Font::$defaultColumnWidths['Calibri'][11]['width'] / PHPExcel_Shared_Font::$defaultColumnWidths['Calibri'][11]['px'] / $size;
         }
 
-        return $colWidth;
+        return (int) $colWidth;
     }
 
     /**
@@ -105,11 +95,8 @@ class PHPExcel_Shared_Drawing
      * @param     PHPExcel_Style_Font $pDefaultFont    Default font of the workbook
      * @return     int        Value in pixels
      */
-    public static function cellDimensionToPixels($pValue, PHPExcel_Style_Font $pDefaultFont)
+    public static function cellDimensionToPixels(float $pValue, PHPExcel_Style_Font $pDefaultFont): int
     {
-	if(is_null($pValue)) {
-	    $pValue=0;
-	}
         // Font name and size
         $name = $pDefaultFont->getName();
         $size = $pDefaultFont->getSize();
@@ -161,11 +148,8 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Degrees
      * @return     int            Angle
      */
-    public static function degreesToAngle($pValue)
+    public static function degreesToAngle($pValue = 0)
     {
-	if(is_null($pValue)) {
-	    $pValue=0;
-	}
         return (int)round($pValue * 60000);
     }
 
@@ -175,11 +159,8 @@ class PHPExcel_Shared_Drawing
      * @param     int $pValue    Angle
      * @return     int            Degrees
      */
-    public static function angleToDegrees($pValue)
+    public static function angleToDegrees($pValue = 0)
     {
-	if(is_null($pValue)) {
-	    $pValue=0;
-	}
         if ($pValue != 0) {
             return round($pValue / 60000);
         } else {

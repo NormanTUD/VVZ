@@ -37,11 +37,8 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
      * @return  string            XML Output
      * @throws  PHPExcel_Writer_Exception
      */
-    public function writeChart(PHPExcel_Chart $pChart, $calculateCellValues)
+    public function writeChart(PHPExcel_Chart $pChart = null, $calculateCellValues = true)
     {
-	    if(is_null($calculateCellValues)) {
-		$calculateCellValues = true;
-	    }
         $this->calculateCellValues = $calculateCellValues;
 
         // Create XML writer
@@ -119,7 +116,7 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
      *
      * @throws  PHPExcel_Writer_Exception
      */
-    private function writeTitle(PHPExcel_Chart_Title $title, $objWriter)
+    private function writeTitle(PHPExcel_Chart_Title $title = null, $objWriter)
     {
         if (is_null($title)) {
             return;
@@ -164,7 +161,7 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
      *
      * @throws  PHPExcel_Writer_Exception
      */
-    private function writeLegend(PHPExcel_Chart_Legend $legend, $objWriter)
+    private function writeLegend(PHPExcel_Chart_Legend $legend = null, $objWriter)
     {
         if (is_null($legend)) {
             return;
@@ -219,7 +216,7 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
      *
      * @throws  PHPExcel_Writer_Exception
      */
-    private function writePlotArea(PHPExcel_Chart_PlotArea $plotArea, PHPExcel_Chart_Title $xAxisLabel, PHPExcel_Chart_Title $yAxisLabel, $objWriter, PHPExcel_Worksheet $pSheet, PHPExcel_Chart_Axis $xAxis, PHPExcel_Chart_Axis $yAxis, PHPExcel_Chart_GridLines $majorGridlines, PHPExcel_Chart_GridLines $minorGridlines)
+    private function writePlotArea(PHPExcel_Chart_PlotArea $plotArea, PHPExcel_Chart_Title $xAxisLabel = null, PHPExcel_Chart_Title $yAxisLabel = null, $objWriter, PHPExcel_Worksheet $pSheet, PHPExcel_Chart_Axis $xAxis, PHPExcel_Chart_Axis $yAxis, PHPExcel_Chart_GridLines $majorGridlines, PHPExcel_Chart_GridLines $minorGridlines)
     {
         if (is_null($plotArea)) {
             return;
@@ -1262,9 +1259,6 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
      */
     private function writePlotSeriesValues($plotSeriesValues, $objWriter, $groupType, $dataType, PHPExcel_Worksheet $pSheet)
     {
-	    if(is_null($dataType)) {
-		$dataType = "str";
-	    }
         if (is_null($plotSeriesValues)) {
             return;
         }
@@ -1402,7 +1396,7 @@ class PHPExcel_Writer_Excel2007_Chart extends PHPExcel_Writer_Excel2007_WriterPa
      *
      * @throws  PHPExcel_Writer_Exception
      */
-    private function writeLayout(PHPExcel_Chart_Layout $layout, $objWriter)
+    private function writeLayout(PHPExcel_Chart_Layout $layout = null, $objWriter)
     {
         $objWriter->startElement('c:layout');
 

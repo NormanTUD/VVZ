@@ -265,7 +265,7 @@ class PHPExcel_Cell
      *    @return    mixed
      *    @throws    PHPExcel_Exception
      */
-    public function getCalculatedValue($resetLog = true)
+    public function getCalculatedValue(bool $resetLog = true): mixed
     {
 //echo 'Cell '.$this->getCoordinate().' value is a '.$this->dataType.' with a value of '.$this->getValue().PHP_EOL;
         if ($this->dataType == PHPExcel_Cell_DataType::TYPE_FORMULA) {
@@ -299,7 +299,7 @@ class PHPExcel_Cell
             }
 //echo 'Returning calculated value of '.$result.' for cell '.$this->getCoordinate().PHP_EOL;
             return $result;
-        } elseif ($this->value instanceof PHPExcel_RichText) {
+        } else if ($this->value instanceof PHPExcel_RichText) {
 //        echo 'Cell value for '.$this->getCoordinate().' is rich text: Returning data value of '.$this->value.'<br />';
             return $this->value->getPlainText();
         }
@@ -830,7 +830,7 @@ class PHPExcel_Cell
      *    @param    int $pColumnIndex Column index (base 0 !!!)
      *    @return    string
      */
-    public static function stringFromColumnIndex($pColumnIndex = 0)
+    public static function stringFromColumnIndex(int $pColumnIndex = 0): string
     {
         //    Using a lookup cache adds a slight memory overhead, but boosts speed
         //    caching using a static within the method is faster than a class static,
@@ -842,11 +842,11 @@ class PHPExcel_Cell
             if ($pColumnIndex < 26) {
                 $_indexCache[$pColumnIndex] = chr(65 + $pColumnIndex);
             } elseif ($pColumnIndex < 702) {
-                $_indexCache[$pColumnIndex] = chr(64 + ($pColumnIndex / 26)) .
+                $_indexCache[$pColumnIndex] = chr(64 + floor($pColumnIndex / 26)) .
                                               chr(65 + $pColumnIndex % 26);
             } else {
-                $_indexCache[$pColumnIndex] = chr(64 + (($pColumnIndex - 26) / 676)) .
-                                              chr(65 + ((($pColumnIndex - 26) % 676) / 26)) .
+                $_indexCache[$pColumnIndex] = chr(64 + floor(($pColumnIndex - 26) / 676)) .
+                                              chr(65 + floor((($pColumnIndex - 26) % 676) / 26)) .
                                               chr(65 + $pColumnIndex % 26);
             }
         }

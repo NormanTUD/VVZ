@@ -154,7 +154,7 @@ class PHPExcel_Calculation
      * @var PHPExcel_CalcEngine_Logger
      *
      */
-    private $debugLog;
+    private PHPExcel_CalcEngine_Logger $_debugLog;
 
     /**
      * Flag to determine how formula errors should be handled
@@ -165,7 +165,7 @@ class PHPExcel_Calculation
      * @var boolean
      *
      */
-    public $suppressFormulaErrors = false;
+    public bool $suppressFormulaErrors = false;
 
     /**
      * Error message for any error that was raised/thrown by the calculation engine
@@ -174,7 +174,7 @@ class PHPExcel_Calculation
      * @var string
      *
      */
-    public $formulaError = null;
+    public string|null $formulaError = null;
 
     /**
      * An array of the nested cell references accessed by the calculation engine, used for the debug log
@@ -183,9 +183,9 @@ class PHPExcel_Calculation
      * @var array of string
      *
      */
-    private $cyclicReferenceStack;
+    private PHPExcel_CalcEngine_CyclicReferenceStack $cyclicReferenceStack;
 
-    private $cellStack = array();
+    private array $cellStack = array();
 
     /**
      * Current iteration counter for cyclic formulae
@@ -3346,7 +3346,7 @@ class PHPExcel_Calculation
 
                     //    If the last entry on the stack was a : operator, then we have a cell range reference
                     $testPrevOp = $stack->last(1);
-                    if ($testPrevOp['value'] == ':') {
+                    if (isset($testPrevOp['value']) && $testPrevOp['value'] == ':') {
                         //    If we have a worksheet reference, then we're playing with a 3D reference
                         if ($matches[2] == '') {
                             //    Otherwise, we 'inherit' the worksheet reference from the start cell reference
