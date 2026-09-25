@@ -2,6 +2,15 @@
 	if(file_exists('/etc/hardcore_debugging')) {
 		error_reporting(E_ALL);
 		set_error_handler(function ($severity, $message, $file, $line) {
+			# Deprecation-Warnungen (E_DEPRECATED) werden NICHT zu Exceptions
+			# hochgestuft. Seit PHP 8.1/8.2 erzeugt altes Vendor-Code (z.B. die
+			# 2015 archivierten PHPExcel-Klassen) massenhaft Deprecations bei der
+			# Klassen-Initialisierung, die sonst den gesamten Request zum Abbruch
+			# bringen ("During inheritance of Iterator: Uncaught ErrorException").
+			# Diese sind hier ungewolltes Rauschen und dürfen keinen Fatal Error auslösen.
+			if($severity === E_DEPRECATED || $severity === E_USER_DEPRECATED) {
+				return true;
+			}
 			throw new \ErrorException($message, $severity, $severity, $file, $line);
 		});
 
