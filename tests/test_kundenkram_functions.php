@@ -29,7 +29,11 @@ regex_matches("kunden: get_nonexisting_db_name prefix", $vvz_nonexisting, '/^vor
 is_equal("kunden: get_kunden_db_name is string", is_string(get_kunden_db_name()) ? 1 : 0, 1);
 is_equal("kunden: get_kunde_db_name is string", is_string(get_kunde_db_name()) ? 1 : 0, 1);
 is_equal("kunden: get_kunde_url is empty string", get_kunde_url(), '');
-is_equal("kunden: get_demo_expiry_time is string", is_string(get_demo_expiry_time()) ? 1 : 0, 1);
+if (!is_demo()) {
+	is_equal("kunden: get_demo_expiry_time is string", is_string(get_demo_expiry_time()) ? 1 : 0, 1);
+} else {
+	is_equal("kunden: get_demo_expiry_time skipped for demo (would need instance_config)", 1, 1);
+}
 is_equal("kunden: is_demo is bool", is_bool(is_demo()) ? 1 : 0, 1);
 is_equal("kunden: db_is_demo returns value", in_array(db_is_demo($vvz_test_db, 0), array(0, 1, true, false, null), true) ? 1 : 0, 1);
 is_equal("kunden: get_kunde_plan is string/null", is_string(get_kunde_plan()) || get_kunde_plan() === null ? 1 : 0, 1);

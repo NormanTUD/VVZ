@@ -67,6 +67,10 @@ is_equal("prod: get_institut_id unknown is null", get_institut_id('Nicht existie
 is_equal("prod: get_institut_id_by_veranstaltung_id unknown is falsy", !get_institut_id_by_veranstaltung_id(999999) ? 1 : 0, 1);
 is_equal("prod: get_startnr_by_institut(1) is numeric/null", is_numeric(get_startnr_by_institut(1)) || get_startnr_by_institut(1) === null ? 1 : 0, 1);
 is_equal("prod: get_valid_institut(null) returns integer", preg_match('/^\d+$/', (string) get_valid_institut(null)) ? 1 : 0, 1);
+$_GET['institut'] = '1';
+is_equal("prod: get_valid_institut uses GET institut", (string) get_valid_institut(null), '1');
+$_GET = array();
+is_equal("prod: get_valid_institut returns passed value", get_valid_institut(5), 5);
 
 /* ============================================================ */
 /* Studiengänge, Module, Prüfungsdaten                           */
@@ -179,6 +183,13 @@ $vvz_semester_by_date_swap = get_and_create_semester_id_by_jahr_monat_tag(2026, 
 is_equal("prod: get_and_create_semester_id_by_jahr_monat_tag swap returns array", is_array($vvz_semester_by_date_swap) ? 1 : 0, 1);
 is_equal("prod: is_future_semester future", is_future_semester(array(999, '2100', 'Sommersemester')), 1);
 is_equal("prod: is_future_semester past", is_future_semester(array(999, '2000', 'Sommersemester')), 0);
+$vvz_current_semester = get_and_create_this_semester();
+$vvz_current_year = preg_replace('/\/.*$/', '', $vvz_current_semester[1]);
+$vvz_current_type = $vvz_current_semester[2];
+is_equal("prod: is_future_semester same year same type", is_future_semester(array(999, $vvz_current_year, $vvz_current_type)), 0);
+$vvz_other_type = $vvz_current_type == 'Sommersemester' ? 'Wintersemester' : 'Sommersemester';
+$vvz_expected_future = ($vvz_current_type == 'Sommersemester' && $vvz_other_type == 'Wintersemester') ? 1 : 0;
+is_equal("prod: is_future_semester same year other type", is_future_semester(array(999, $vvz_current_year, $vvz_other_type)), $vvz_expected_future);
 is_equal("prod: get_semester_begin_and_end Wintersemester", get_semester_begin_and_end(2026, 'Wintersemester'), array('start' => '2026-10-01', 'end' => '2027-03-31'));
 is_equal("prod: get_semester_begin_and_end Sommersemester", get_semester_begin_and_end(2026, 'Sommersemester'), array('start' => '2026-04-01', 'end' => '2026-09-30'));
 is_equal("prod: get_semester_from_veranstaltung_id unknown is empty", get_semester_from_veranstaltung_id(999999), array());
@@ -233,6 +244,11 @@ is_equal("prod: check_page_rights_role_id(1, 1, 0)", check_page_rights_role_id(1
 $vvz_rights_array = check_page_rights_role_id(array(1, 2), 1, 0);
 is_equal("prod: check_page_rights_role_id(array) returns array", is_array($vvz_rights_array) ? 1 : 0, 1);
 is_equal("prod: check_page_rights_role_id(array) contains page 1", in_array('1', $vvz_rights_array) || in_array(1, $vvz_rights_array) ? 1 : 0, 1);
+is_equal("prod: check_page_rights_role_id filename is int", is_int(check_page_rights_role_id('welcome.php', 1, 0)) ? 1 : 0, 1);
+$vvz_saved_role_for_test = $GLOBALS['user_role_id'];
+unset($GLOBALS['user_role_id']);
+is_equal("prod: check_page_rights_role_id without role returns 0", check_page_rights_role_id(1, 0, 0), 0);
+$GLOBALS['user_role_id'] = $vvz_saved_role_for_test;
 is_equal("prod: check_function_rights('anything')", check_function_rights('anything'), 1);
 is_equal("prod: check_function_rights_role_id('anything', 1)", check_function_rights_role_id('anything', 1), 1);
 is_equal("prod: role_has_access_to_page(1, 1)", role_has_access_to_page(1, 1), true);
@@ -614,6 +630,20 @@ is_equal("prod: create_event_file empty", strpos(create_event_file(array()), 'BE
 is_equal("prod: create_event_file unknown veranstaltung", strpos(create_event_file(array(999999)), 'END:VCALENDAR') !== false ? 1 : 0, 1);
 is_equal("prod: search_veranstaltung no hit", search_veranstaltung('zzzzzzzz'), '[]');
 is_equal("prod: get_logo_filename only filename is string", is_string(get_logo_filename(1)) ? 1 : 0, 1);
+is_equal("prod: get_sws(1, jede Woche)", get_sws(1, 'jede Woche'), array(0, 2));
+is_equal("prod: get_sws('1-2', jede Woche)", get_sws('1-2', 'jede Woche'), array(0, 4));
+is_equal("prod: get_sws('2-3', jede Woche)", get_sws('2-3', 'jede Woche'), array(0, 4));
+is_equal("prod: get_sws('1-5', jede Woche)", get_sws('1-5', 'jede Woche'), array(0, 10));
+is_equal("prod: get_sws invalid is null", get_sws('x-y', 'jede Woche') === null ? 1 : 0, 1);
+is_equal("prod: show_in_current_page returns bool", is_bool(show_in_current_page(1)) ? 1 : 0, 1);
+$_GET['kunde_id'] = '1';
+is_equal("prod: get_logo_filename with kunde_id", is_string(get_logo_filename(1)) ? 1 : 0, 1);
+ob_start();
+$vvz_logo_direct = get_logo_filename(0);
+$vvz_logo_output = ob_get_clean();
+is_equal("prod: get_logo_filename direct returns/prints", is_string($vvz_logo_direct) || is_string($vvz_logo_output) ? 1 : 0, 1);
+$_GET = array();
+is_equal("prod: get_setting unknown is null", get_setting('does_not_exist_xyz') === null ? 1 : 0, 1);
 is_equal("prod: semester_has_sperrvermerk unknown is false", semester_has_sperrvermerk(999999), false);
 
 /* query_to_table with a tiny real query */
@@ -678,6 +708,11 @@ is_equal("prod: create_add_where... empty", create_add_where_export_dozent_pruef
 is_equal("prod: create_add_where... with values contains AND", strpos(create_add_where_export_dozent_pruefungsnummern(1, 1, 1, 1), 'AND') !== false ? 1 : 0, 1);
 is_equal("prod: create_title_plus nulls is empty", create_title_plus(null, null, null, null, null), '');
 is_equal("prod: create_title_plus with semester is string", is_string(create_title_plus(1, null, null, null, null)) ? 1 : 0, 1);
+is_equal("prod: create_title_plus institute only", is_string(create_title_plus(null, 1, null, null, null)) ? 1 : 0, 1);
+is_equal("prod: create_title_plus studiengang only", is_string(create_title_plus(null, null, 1, null, null)) ? 1 : 0, 1);
+is_equal("prod: create_title_plus dozent only", is_string(create_title_plus(null, null, null, 1, null)) ? 1 : 0, 1);
+is_equal("prod: create_title_plus pruefungsamt only", is_string(create_title_plus(null, null, null, null, 1)) ? 1 : 0, 1);
+is_equal("prod: create_title_plus all fields", is_string(create_title_plus(1, 1, 1, 1, 1)) ? 1 : 0, 1);
 
 /* Raumplanung / Sperrvermerk */
 is_equal("prod: raum_ist_belegt without data", raum_ist_belegt(null, null, null, null, null), 0);

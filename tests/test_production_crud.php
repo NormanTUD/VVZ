@@ -468,6 +468,17 @@ is_equal("crud: update_pruefung signals schema mismatch", $vvz_threw, 1);
 is_equal("crud: create_pruefungen_by_studiengang_array with data", count(create_pruefungen_by_studiengang_array($vvz_studiengang_id)) > 0 ? 1 : 0, 1);
 is_equal("crud: get_studiengang_modul_pruefungsnummer_array has data", count(get_studiengang_modul_pruefungsnummer_array()) > 0 ? 1 : 0, 1);
 is_equal("crud: get_anzahl_pl_pro_semester unknown is 0", (string) get_anzahl_pl_pro_semester('NOPE', get_current_semester_id()), '0');
+create_bereich($vvz_tag . '-MergeSource');
+create_bereich($vvz_tag . '-MergeTarget');
+$vvz_merge_source_id = get_single_row_from_query("select id from bereich where name = " . esc($vvz_tag . '-MergeSource'));
+$vvz_merge_target_id = get_single_row_from_query("select id from bereich where name = " . esc($vvz_tag . '-MergeTarget'));
+create_pruefungsnummer($vvz_modul_id, $vvz_tag . '-MergePN', $vvz_pruefungstyp_id, $vvz_merge_source_id, 'Merge', $vvz_zeitraum_id);
+$vvz_merge_pn_id = get_pruefungsnummer_id_by_pruefungsnummer($vvz_tag . '-MergePN');
+merge_data('bereich', array($vvz_merge_source_id), $vvz_merge_target_id);
+is_equal("crud: merge_data rewires referenced row", (string) get_single_row_from_query("select bereich_id from pruefungsnummer where id = " . (int) $vvz_merge_pn_id), (string) $vvz_merge_target_id);
+is_equal("crud: merge_data removes source row", get_single_row_from_query("select count(*) from bereich where id = " . (int) $vvz_merge_source_id), '0');
+delete_pruefungsnummer($vvz_merge_pn_id);
+
 $vvz_export_pn = export_pruefungsnummern_dozent(get_current_semester_id(), $vvz_dozent_id, null, null, null, 0, 1);
 is_equal("crud: export_pruefungsnummern_dozent with data", strpos($vvz_export_pn, '<table>') !== false ? 1 : 0, 1);
 is_equal("crud: export_pruefungsnummern_dozent returns string", is_string($vvz_export_pn) ? 1 : 0, 1);
