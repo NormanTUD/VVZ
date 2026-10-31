@@ -19,7 +19,7 @@ $vvz_test_db = $GLOBALS['dbname'];
 $vvz_tag = 'ZZT' . substr(md5((string) getmypid() . (string) mt_rand()), 0, 4);
 
 $vvz_saved_globals = array();
-foreach (array('logged_in_user_id', 'user_role_id', 'user_dozent_id', 'user_institut_id', 'memoize', 'toc', 'debug', 'get_gebaeude_name_cache', 'this_page_number', 'db_freshly_created', 'already_deleted_old_session_ids') as $vvz_global_name) {
+foreach (array('logged_in_user_id', 'user_role_id', 'user_dozent_id', 'user_institut_id', 'memoize', 'toc', 'debug', 'get_gebaeude_name_cache', 'this_page_number', 'db_freshly_created', 'already_deleted_old_session_ids', 'logged_in_data', 'pruefungen_already_chosen', 'pruefungen_already_done') as $vvz_global_name) {
 	$vvz_saved_globals[$vvz_global_name] = array_key_exists($vvz_global_name, $GLOBALS) ? $GLOBALS[$vvz_global_name] : null;
 }
 $vvz_saved_post = $_POST;
@@ -35,6 +35,10 @@ $GLOBALS['toc'] = array();
 $GLOBALS['get_gebaeude_name_cache'] = array();
 $GLOBALS['db_freshly_created'] = 0;
 $GLOBALS['already_deleted_old_session_ids'] = 0;
+$GLOBALS['this_page_number'] = 7;
+$GLOBALS['logged_in_data'] = array(1 => 'Test-User');
+$GLOBALS['pruefungen_already_chosen'] = array();
+$GLOBALS['pruefungen_already_done'] = array();
 $_POST = array();
 $_GET = array();
 $_COOKIE = array();
@@ -254,6 +258,18 @@ is_equal("crud: update_barrierefrei updates logged in user", (string) get_single
 update_barrierefrei(1);
 update_own_data('changed-password');
 is_equal("crud: update_own_data changes password", strlen((string) get_single_row_from_query("select password_sha256 from users where id = 1")) > 20 ? 1 : 0, 1);
+rquery("INSERT INTO `users` (`username`, `password_sha256`, `dozent_id`, `institut_id`, `salt`, `barrierefrei`) VALUES (" . esc($vvz_tag . 'SaltUser') . ", '', NULL, " . esc($vvz_institut_id) . ", '', '0')");
+$vvz_salt_user_id = get_user_id($vvz_tag . 'SaltUser');
+$vvz_generated_salt = get_and_create_salt($vvz_salt_user_id);
+is_equal("crud: get_and_create_salt generates for empty salt", strlen((string) get_single_row_from_query("select salt from users where id = " . (int) $vvz_salt_user_id)) > 0 ? 1 : 0, 1);
+delete_user($vvz_salt_user_id);
+
+$GLOBALS['logged_in_user_id'] = $vvz_user_id;
+$vvz_search_result = search_veranstaltung($vvz_tag);
+is_equal("crud: search_veranstaltung non-admin returns string", is_string($vvz_search_result) ? 1 : 0, 1);
+$GLOBALS['logged_in_user_id'] = 999999;
+is_equal("crud: search_veranstaltung non-admin without dozent returns empty list", search_veranstaltung($vvz_tag), '[]');
+$GLOBALS['logged_in_user_id'] = 1;
 
 /* ============================================================ */
 /* Seiten / Rollen-Zuordnung                                     */
@@ -294,6 +310,8 @@ is_equal("crud: print_subnavigation returns html string", is_string($vvz_print_s
 
 setze_semester(1);
 is_equal("crud: setze_semester sets default", (string) get_current_semester_id(), '1');
+get_and_create_next_n_semester_years(0);
+is_equal("crud: get_and_create_next_n_semester_years creates semesters", is_array(get_this_semester()) ? 1 : 0, 1);
 update_semester(1, '2099-01-01');
 is_equal("crud: update_semester stores date", get_single_row_from_query("select erste_veranstaltung_default from semester where id = 1"), '2099-01-01');
 $vvz_new_semester = get_and_create_semester_id_by_jahr_monat_tag(2099, 10, 10);
@@ -349,9 +367,68 @@ is_equal("crud: get_or_set_and_get_lv_nr_by_veranstaltung creates", $vvz_lv_nr !
 is_equal("crud: get_or_set_and_get_lv_nr_by_veranstaltung existing", (string) get_or_set_and_get_lv_nr_by_veranstaltung($vvz_veranstaltung_id), (string) $vvz_lv_nr);
 is_equal("crud: create_event_file with veranstaltung", strpos(create_event_file(array($vvz_veranstaltung_id)), 'BEGIN:VEVENT') !== false ? 1 : 0, 1);
 
+$vvz_stundenplan_veranstaltungen = array($vvz_veranstaltung_id);
+$vvz_stundenplan_extra = array(
+	array('Mo', '1', 'gerade Woche'),
+	array('Di', '1-2', 'keine Angabe'),
+	array('Mi', '2', 'ungerade Woche'),
+);
+foreach ($vvz_stundenplan_extra as $vvz_i => $vvz_extra) {
+	rquery('INSERT INTO `veranstaltung` (`veranstaltungstyp_id`, `name`, `dozent_id`, `institut_id`, `semester_id`, `gebaeude_id`, `raum_id`) VALUES (' . esc($vvz_veranstaltungstyp_id) . ', ' . esc($vvz_tag . '-Stundenplan' . $vvz_i) . ', ' . esc($vvz_dozent_id) . ', ' . esc($vvz_institut_id) . ', ' . esc(get_current_semester_id()) . ', ' . esc($vvz_gebaeude_id) . ', ' . ($vvz_i == 1 ? 'NULL' : esc($vvz_raum_id)) . ')');
+	$vvz_extra_id = mysqli_insert_id($GLOBALS['dbh']);
+	$vvz_stundenplan_veranstaltungen[] = $vvz_extra_id;
+	rquery('INSERT INTO `veranstaltung_metadaten` (`veranstaltung_id`, `wochentag`, `stunde`, `woche`, `erster_termin`) VALUES (' . esc($vvz_extra_id) . ', ' . esc($vvz_extra[0]) . ', ' . esc($vvz_extra[1]) . ', ' . esc($vvz_extra[2]) . ', "2099-04-01")');
+}
+$vvz_stundenplan = create_stundenplan($vvz_stundenplan_veranstaltungen, 1, 1, null, 0, null, null, get_current_semester_id());
+is_equal("crud: create_stundenplan returns array", is_array($vvz_stundenplan) ? 1 : 0, 1);
+is_equal("crud: create_stundenplan renders table", strpos($vvz_stundenplan[0], 'stundenplan') !== false ? 1 : 0, 1);
+is_equal("crud: create_stundenplan renders building list", strpos($vvz_stundenplan[0], 'Gebäude') !== false ? 1 : 0, 1);
+is_equal("crud: create_stundenplan detects collision", strpos($vvz_stundenplan[0], 'kollidiert') !== false ? 1 : 0, 1);
+is_equal("crud: create_stundenplan renders block seminar", strpos($vvz_stundenplan[0], 'Blockveranstaltung') !== false ? 1 : 0, 1);
+$vvz_stundenplan_empty = create_stundenplan(array(999999), 0, 0, null, 0, null, null, get_current_semester_id());
+is_equal("crud: create_stundenplan unknown veranstaltung", strpos($vvz_stundenplan_empty[0], 'scheinen nicht zu existieren') !== false ? 1 : 0, 1);
+
+ob_start();
+$vvz_raumplanung_result = raumplanung($vvz_institut_id, get_current_semester_id(), 1);
+$vvz_raumplanung_html = ob_get_clean();
+is_equal("crud: raumplanung with data returns int", is_int($vvz_raumplanung_result) ? 1 : 0, 1);
+is_equal("crud: raumplanung renders table", strpos($vvz_raumplanung_html, 'raumplanungtable') !== false ? 1 : 0, 1);
+is_equal("crud: raumplanung unknown institute returns int", is_int(raumplanung(999999, get_current_semester_id(), 1)) ? 1 : 0, 1);
+ob_start();
+$vvz_raumplanung_crazy = raumplanung_crazy($vvz_institut_id, get_current_semester_id(), 0);
+ob_end_clean();
+is_equal("crud: raumplanung_crazy returns PHPExcel", is_object($vvz_raumplanung_crazy) ? 1 : 0, 1);
+ob_start();
+$vvz_raumplanung_excel = raumplanung($vvz_institut_id, get_current_semester_id(), 0);
+ob_end_clean();
+is_equal("crud: raumplanung Excel branch returns PHPExcel", is_object($vvz_raumplanung_excel) ? 1 : 0, 1);
+
+rquery('INSERT INTO `einzelne_termine` (`veranstaltung_id`, `start`, `end`, `raum_id`) VALUES (' . esc($vvz_veranstaltung_id) . ', "2099-05-01 10:00:00", "2099-05-01 12:00:00", ' . esc($vvz_raum_id) . ')');
+$vvz_termine = get_einzelne_termine_by_veranstaltung_id($vvz_veranstaltung_id);
+is_equal("crud: get_einzelne_termine_by_veranstaltung_id", count($vvz_termine), 1);
+$vvz_nice_termine = nice_einzelne_veranstaltung_by_id($vvz_veranstaltung_id);
+is_equal("crud: nice_einzelne_veranstaltung_by_id", count($vvz_nice_termine), 1);
+is_equal("crud: nice_einzelne_veranstaltung_by_id date", $vvz_nice_termine[0]['start_datum'], '01.05.2099');
+$vvz_termine_liste = get_einzelne_termine_gebaeude_raum_liste($vvz_veranstaltung_id);
+is_equal("crud: get_einzelne_termine_gebaeude_raum_liste", count($vvz_termine_liste) == 1 && strpos(join(' ', $vvz_termine_liste), 'R2') !== false ? 1 : 0, 1);
+
 create_pruefungsnummer($vvz_modul_id, $vvz_tag . '-PN', $vvz_pruefungstyp_id, $vvz_bereich_id, $vvz_tag . ' Modulbezeichnung', $vvz_zeitraum_id);
 $vvz_pruefungsnummer_id = get_pruefungsnummer_id_by_pruefungsnummer($vvz_tag . '-PN');
 is_equal("crud: create_pruefungsnummer returns id", $vvz_pruefungsnummer_id !== null ? 1 : 0, 1);
+$vvz_pn_array = create_pruefungsnummern_array_by_modul_id($vvz_modul_id);
+is_equal("crud: create_pruefungsnummern_array_by_modul_id contains PN", isset($vvz_pn_array[$vvz_pruefungsnummer_id]) ? 1 : 0, 1);
+$vvz_all_pn = create_pruefungsnummern_array();
+is_equal("crud: create_pruefungsnummern_array contains PN", isset($vvz_all_pn[$vvz_pruefungsnummer_id]) ? 1 : 0, 1);
+$vvz_veranstaltungen_array = create_veranstaltungen_array($vvz_dozent_id, null, 5, get_current_semester_id(), $vvz_institut_id, 1);
+is_equal("crud: create_veranstaltungen_array contains veranstaltung", isset($vvz_veranstaltungen_array[$vvz_veranstaltung_id]) ? 1 : 0, 1);
+$vvz_veranstaltungen_array2 = create_veranstaltungen_array(array($vvz_dozent_id), $vvz_veranstaltung_id, 0, null, null, 0);
+is_equal("crud: create_veranstaltungen_array not_id excludes veranstaltung", isset($vvz_veranstaltungen_array2[$vvz_veranstaltung_id]) ? 0 : 1, 1);
+$vvz_modul_stg = create_modul_studiengang_array(0, $vvz_institut_id);
+is_equal("crud: create_modul_studiengang_array contains modul", isset($vvz_modul_stg[$vvz_modul_id]) ? 1 : 0, 1);
+$vvz_modul_stg_short = create_modul_studiengang_array(3, $vvz_institut_id);
+is_equal("crud: create_modul_studiengang_array shortens", isset($vvz_modul_stg_short[$vvz_modul_id]) ? 1 : 0, 1);
+$vvz_modules_array = create_module_array_by_studiengang_and_semester(array($vvz_studiengang_id), get_current_semester_id());
+is_equal("crud: create_module_array_by_studiengang_and_semester array branch", is_array($vvz_modules_array) ? 1 : 0, 1);
 is_equal("crud: get_pruefungsnummer_bereich", (string) get_pruefungsnummer_bereich_by_pruefungsnummer_id($vvz_tag . '-PN'), (string) $vvz_bereich_id);
 is_equal("crud: get_pruefungsnummer_modul", (string) get_pruefungsnummer_modul_by_pruefungsnummer_id($vvz_tag . '-PN'), (string) $vvz_modul_id);
 is_equal("crud: get_pruefungstyp_id_from_pruefungsnummer", (string) get_pruefungstyp_id_from_pruefungsnummer($vvz_tag . '-PN'), (string) $vvz_pruefungstyp_id);
@@ -361,6 +438,8 @@ insert_pruefungsnummern($vvz_modul_id, $vvz_tag . '-PN2', $vvz_pruefungstyp_id);
 is_equal("crud: insert_pruefungsnummern creates row", get_pruefungsnummer_id_by_pruefungsnummer($vvz_tag . '-PN2') !== null ? 1 : 0, 1);
 update_pruefungsnummer($vvz_pruefungsnummer_id, $vvz_modul_id, $vvz_tag . '-PNX', $vvz_pruefungstyp_id, $vvz_bereich_id, 'Neu', $vvz_zeitraum_id, 'on');
 is_equal("crud: update_pruefungsnummer sets disabled", (string) get_single_row_from_query("select disabled from pruefungsnummer where id = " . (int) $vvz_pruefungsnummer_id), '1');
+update_pruefungsnummer($vvz_pruefungsnummer_id, $vvz_modul_id, $vvz_tag . '-PNX', $vvz_pruefungstyp_id, $vvz_bereich_id, 'Neu', $vvz_zeitraum_id, 'off');
+is_equal("crud: update_pruefungsnummer re-enables", (string) get_single_row_from_query("select disabled from pruefungsnummer where id = " . (int) $vvz_pruefungsnummer_id), '0');
 is_equal("crud: get_pruefung_zeitraum", get_pruefung_zeitraum($vvz_pruefungsnummer_id), $vvz_tag . '-Zeitraum2');
 
 $vvz_threw = 0;
@@ -389,6 +468,23 @@ is_equal("crud: update_pruefung signals schema mismatch", $vvz_threw, 1);
 is_equal("crud: create_pruefungen_by_studiengang_array with data", count(create_pruefungen_by_studiengang_array($vvz_studiengang_id)) > 0 ? 1 : 0, 1);
 is_equal("crud: get_studiengang_modul_pruefungsnummer_array has data", count(get_studiengang_modul_pruefungsnummer_array()) > 0 ? 1 : 0, 1);
 is_equal("crud: get_anzahl_pl_pro_semester unknown is 0", (string) get_anzahl_pl_pro_semester('NOPE', get_current_semester_id()), '0');
+$vvz_export_pn = export_pruefungsnummern_dozent(get_current_semester_id(), $vvz_dozent_id, null, null, null, 0, 1);
+is_equal("crud: export_pruefungsnummern_dozent with data", strpos($vvz_export_pn, '<table>') !== false ? 1 : 0, 1);
+is_equal("crud: export_pruefungsnummern_dozent returns string", is_string($vvz_export_pn) ? 1 : 0, 1);
+$vvz_export_dozent = export_dozent_pruefungsnummern(get_current_semester_id(), $vvz_dozent_id, null, null, null, 1);
+is_equal("crud: export_dozent_pruefungsnummern with data", strpos($vvz_export_dozent, '<table>') !== false ? 1 : 0, 1);
+$vvz_export_crazy = export_crazy_ethik_export_format(null, get_current_semester_id(), $vvz_tag . '-PNX', 1);
+is_equal("crud: export_crazy_ethik_export_format with data", strpos($vvz_export_crazy, '<table>') !== false ? 1 : 0, 1);
+$vvz_export_crazy2 = export_crazy_ethik_export_format_2(null, get_current_semester_id(), $vvz_tag . '-PNX', 1);
+is_equal("crud: export_crazy_ethik_export_format_2 with data", strpos($vvz_export_crazy2, '<table>') !== false ? 1 : 0, 1);
+$vvz_excel_export_pn = export_pruefungsnummern_dozent(get_current_semester_id(), $vvz_dozent_id, null, null, null, 0, 0);
+is_equal("crud: export_pruefungsnummern_dozent Excel branch", is_object($vvz_excel_export_pn) ? 1 : 0, 1);
+$vvz_excel_export_dozent = export_dozent_pruefungsnummern(get_current_semester_id(), $vvz_dozent_id, null, null, null, 0);
+is_equal("crud: export_dozent_pruefungsnummern Excel branch", is_object($vvz_excel_export_dozent) ? 1 : 0, 1);
+$vvz_excel_crazy = export_crazy_ethik_export_format(null, get_current_semester_id(), $vvz_tag . '-PNX', 0);
+is_equal("crud: export_crazy_ethik_export_format Excel branch", is_object($vvz_excel_crazy) ? 1 : 0, 1);
+$vvz_excel_crazy2 = export_crazy_ethik_export_format_2(null, get_current_semester_id(), $vvz_tag . '-PNX', 0);
+is_equal("crud: export_crazy_ethik_export_format_2 Excel branch", is_object($vvz_excel_crazy2) ? 1 : 0, 1);
 
 /* The nachpruefung table is missing in the current schema. We document this
  * by asserting that the production function signals the schema mismatch. */
@@ -427,8 +523,12 @@ delete_pruefungsnummer($vvz_pn2_id);
 delete_modul($vvz_modul_id);
 is_equal("crud: delete_modul", get_single_row_from_query("select count(*) from modul where id = " . (int) $vvz_modul_id), '0');
 delete_modul($vvz_modul_id2);
-delete_veranstaltung($vvz_veranstaltung_id);
-is_equal("crud: delete_veranstaltung", get_single_row_from_query("select count(*) from veranstaltung where id = " . (int) $vvz_veranstaltung_id), '0');
+foreach ($vvz_stundenplan_veranstaltungen as $vvz_cleanup_veranstaltung_id) {
+	delete_veranstaltung($vvz_cleanup_veranstaltung_id);
+}
+is_equal("crud: delete_veranstaltung", get_single_row_from_query("select count(*) from veranstaltung where id IN (" . join(', ', array_map('intval', $vvz_stundenplan_veranstaltungen)) . ")"), '0');
+delete_veranstaltungstyp($vvz_veranstaltungstyp_id);
+is_equal("crud: delete_veranstaltungstyp", get_single_row_from_query("select count(*) from veranstaltungstyp where id = " . (int) $vvz_veranstaltungstyp_id), '0');
 delete_api($vvz_auth_code);
 is_equal("crud: delete_api", get_single_row_from_query("select count(*) from api_auth_codes where id = " . (int) $vvz_api_id), '0');
 delete_user($vvz_user_id);

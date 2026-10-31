@@ -503,6 +503,15 @@ is_equal("prod: SplitSQL returns true", $vvz_splitsql, true);
 is_equal("prod: SplitSQL sets slurped_sql_file", $GLOBALS['slurped_sql_file'], 1);
 @unlink($vvz_sql_file);
 is_equal("prod: SplitSQL missing file returns false", SplitSQL('/tmp/does-not-exist-vvz-' . getmypid() . '.sql'), false);
+$vvz_cmp_file = tempnam(sys_get_temp_dir(), 'vvz-cmp-');
+file_put_contents($vvz_cmp_file, "THIS LINE IS NOT IN THE DATABASE\n");
+$vvz_cmp = compare_db($vvz_cmp_file);
+is_equal("prod: compare_db returns diff string", is_string($vvz_cmp) ? 1 : 0, 1);
+@unlink($vvz_cmp_file);
+$vvz_cmp_empty = tempnam(sys_get_temp_dir(), 'vvz-cmp-empty-');
+$vvz_cmp_result = compare_db($vvz_cmp_empty);
+is_equal("prod: compare_db empty file returns null", $vvz_cmp_result === null ? 1 : 0, 1);
+@unlink($vvz_cmp_empty);
 
 $vvz_cache_file = sys_get_temp_dir() . '/vvz-get-cached-' . getmypid() . '.txt';
 file_put_contents($vvz_cache_file, 'cache-content');

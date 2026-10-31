@@ -107,6 +107,8 @@ update_modul_semester_data(1, 1, '5', '2', array(), $vvz_modul_id);
 is_equal("tx: update_modul_semester_data clears veranstaltungstyp counts", (string) get_single_row_from_query("select count(*) from modul_nach_semester_veranstaltungstypen_anzahl where modul_id = " . (int) $vvz_modul_id), '0');
 $vvz_veranstaltungstyp_anzahlen = create_array_veranstaltungstyp_anzahl_by_modul_id_semester($vvz_modul_id, 1);
 is_equal("tx: create_array_veranstaltungstyp_anzahl... returns array", is_array($vvz_veranstaltungstyp_anzahlen) ? 1 : 0, 1);
+$vvz_has_semester_data = studiengang_has_semester_modul_data(1);
+is_equal("tx: studiengang_has_semester_modul_data returns value", $vvz_has_semester_data === null || is_numeric($vvz_has_semester_data) || is_int($vvz_has_semester_data) ? 1 : 0, 1);
 $vvz_veranstaltungstypen = get_veranstaltungstypen_modul_semester($vvz_modul_id, 1);
 is_equal("tx: get_veranstaltungstypen_modul_semester returns array", is_array($vvz_veranstaltungstypen) ? 1 : 0, 1);
 $vvz_credit = get_credit_points_and_anzahl_pruefungsleistungen_by_modul_id_and_semester($vvz_modul_id, 1);
@@ -217,6 +219,42 @@ is_equal("tx: update_veranstaltung_metadata updates bezug", (string) get_single_
 is_equal("tx: update_veranstaltung_metadata updates pruefung", (string) get_single_row_from_query("select pruefungsnummer_id from pruefung where veranstaltung_id = " . (int) $vvz_meta_v_id), (string) $vvz_pn2);
 is_equal("tx: update_veranstaltung_metadata master niveau", (string) get_single_row_from_query("select master_niveau from veranstaltung where id = " . (int) $vvz_meta_v_id), '1');
 
+update_veranstaltung_metadata(
+	$vvz_meta_v_id,
+	'Mi',
+	'1',
+	'jede Woche',
+	'2099-01-04',
+	'10',
+	'Wunsch3',
+	'Hinweis3',
+	'https://example.org/opal3',
+	'2099-02-03',
+	1,
+	1,
+	array($vvz_pn1),
+	0,
+	array(1),
+	null,
+	array(array(
+		'einzelner_termin_start' => '2099-05-01 10:00',
+		'einzelner_termin_ende' => '2099-05-01 12:00',
+		'einzelner_termin_gebaeude' => 1,
+		'einzelner_termin_raum' => '101',
+	)),
+	array(1),
+	0,
+	null,
+	array(1)
+);
+is_equal("tx: update_veranstaltung_metadata einzelne termine", (string) get_single_row_from_query("select count(*) from einzelne_termine where veranstaltung_id = " . (int) $vvz_meta_v_id), '1');
+is_equal("tx: update_veranstaltung_metadata raumwunsch", (string) get_single_row_from_query("select raumwunsch_id from veranstaltung where id = " . (int) $vvz_meta_v_id), '1');
+is_equal("tx: update_veranstaltung_metadata gebaeudewunsch", (string) get_single_row_from_query("select gebaeudewunsch_id from veranstaltung where id = " . (int) $vvz_meta_v_id), '1');
+$vvz_meta_ter = get_einzelne_termine_by_veranstaltung_id($vvz_meta_v_id);
+is_equal("tx: get_einzelne_termine_by_veranstaltung_id after metadata", count($vvz_meta_ter), 1);
+is_equal("tx: get_einzelne_termine_gebaeude_raum_liste after metadata", is_array(get_einzelne_termine_gebaeude_raum_liste($vvz_meta_v_id)) ? 1 : 0, 1);
+is_equal("tx: nice_einzelne_veranstaltung_by_id after metadata", count(nice_einzelne_veranstaltung_by_id($vvz_meta_v_id)), 1);
+
 /* ============================================================ */
 /* create_veranstaltung (uses update_veranstaltung_metadata)     */
 /* ============================================================ */
@@ -248,6 +286,9 @@ ob_start();
 $vvz_sperrvermerk_empty = sperrvermerk_table(array(array($vvz_semester_id)), '', 0);
 ob_end_clean();
 is_equal("tx: sperrvermerk_table without lock returns 0", $vvz_sperrvermerk_empty, 0);
+
+delete_demo();
+is_equal("tx: delete_demo runs without error", 1, 1);
 
 /* ============================================================ */
 /* Cleanup                                                       */
