@@ -1133,7 +1133,9 @@ foreach ($pure_test_files as $file) {
 print "\n--- Pure tests summary ---\n";
 print "Number of started tests: " . $GLOBALS['started_tests'] . "\n";
 if(isset($GLOBALS['failed_tests']) && $GLOBALS['failed_tests'] > 0) {
-	print "Note: " . $GLOBALS['failed_tests'] . " failure(s) occurred (these may be expected side-effects of testing the testing framework itself)\n";
+	print red_text("Failed tests: " . $GLOBALS['failed_tests']) . "\n";
+	print "Pure tests completed with failures.\n";
+	exit(1);
 }
 print "Pure tests completed.\n";
 exit(0);

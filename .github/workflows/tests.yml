@@ -134,6 +134,126 @@ jobs:
           echo "=========================================="
           php tests/run_pure_tests.php
 
+  # Dedicated coverage job. It runs the full DB suite and the pure suite
+  # with Xdebug coverage enabled, merges the raw data and posts a coverage
+  # table to the workflow run summary (GITHUB_STEP_SUMMARY). The HTML
+  # report is uploaded as an artifact.
+  coverage:
+    name: Coverage (PHP 8.4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      XDEBUG_MODE: coverage
+      VVZ_COVERAGE_DIR: ${{ runner.temp }}/vvz-coverage
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: rootpw
+          MARIADB_ROOT_HOST: '%'
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=30
+          --health-start-period=30s
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4 with Xdebug
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mysqli, mbstring, bcmath, pdo_mysql
+          coverage: xdebug
+
+      - name: Wait for MariaDB to be reachable
+        run: |
+          for i in $(seq 1 60); do
+            if php -r '
+              $dbh = @mysqli_connect("127.0.0.1", "root", "rootpw", "", 3306);
+              if(!$dbh) { exit(1); }
+              $r = @mysqli_query($dbh, "SELECT 1");
+              exit($r ? 0 : 1);
+            ' 2>/dev/null; then
+              echo "MariaDB is up"
+              exit 0
+            fi
+            echo "Waiting for MariaDB... ($i)"
+            sleep 2
+          done
+          echo "::error::MariaDB did not become reachable in time"
+          exit 1
+
+      - name: Seed /etc/vvzdbpw with the DB password
+        run: |
+          echo -n "rootpw" | sudo tee /etc/vvzdbpw > /dev/null
+          sudo chmod 600 /etc/vvzdbpw
+
+      - name: Create startpage database
+        run: |
+          php -r '
+            $dbh = mysqli_connect("127.0.0.1", "root", "rootpw", "", 3306);
+            if(!$dbh) { fwrite(STDERR, "Cannot connect to MariaDB\n"); exit(1); }
+            mysqli_query($dbh, "CREATE DATABASE IF NOT EXISTS startpage");
+            echo "startpage DB is ready\n";
+          '
+
+      - name: Run DB tests with coverage
+        run: |
+          set +e
+          mkdir -p "$VVZ_COVERAGE_DIR"
+          php -d auto_prepend_file=tests/coverage/bootstrap.php testsuite.php
+          status=$?
+          echo "$status" > "$RUNNER_TEMP/testsuite.exit"
+          echo "testsuite.php exit code: $status"
+          exit 0
+
+      - name: Run pure tests with coverage
+        run: |
+          set +e
+          php -d auto_prepend_file=tests/coverage/bootstrap.php tests/run_pure_tests.php
+          status=$?
+          echo "$status" > "$RUNNER_TEMP/pure.exit"
+          echo "run_pure_tests.php exit code: $status"
+          exit 0
+
+      - name: Generate coverage report
+        if: always()
+        run: |
+          php tests/coverage/report.php \
+            --dir="$VVZ_COVERAGE_DIR" \
+            --summary="$RUNNER_TEMP/coverage-summary.md" \
+            --html="$RUNNER_TEMP/coverage-report/index.html" \
+            --json="$RUNNER_TEMP/coverage-report/coverage.json"
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ${{ runner.temp }}/coverage-report
+          if-no-files-found: warn
+
+      - name: Fail when a test suite failed
+        if: always()
+        run: |
+          set -e
+          testsuite_status=$(cat "$RUNNER_TEMP/testsuite.exit" 2>/dev/null || echo 1)
+          pure_status=$(cat "$RUNNER_TEMP/pure.exit" 2>/dev/null || echo 1)
+          echo "testsuite.php: $testsuite_status"
+          echo "run_pure_tests.php: $pure_status"
+          if [ "$testsuite_status" != "0" ] || [ "$pure_status" != "0" ]; then
+            echo "::error::At least one test suite failed"
+            exit 1
+          fi
+
   # Separate job that runs once per workflow run (after all matrix
   # combinations succeed) and pushes a tag like `ci-run-1234567890`
   # pointing at the tested commit. The runner ID is unique across all
@@ -143,7 +263,7 @@ jobs:
   # access to the base repo's tags.
   tag-success:
     name: Tag successful run
-    needs: test
+    needs: [test, coverage]
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     permissions:
