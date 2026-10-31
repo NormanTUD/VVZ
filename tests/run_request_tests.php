@@ -126,7 +126,8 @@ if (getenv('VVZ_REQUEST_DEBUG') === '1') {
 
 $variants = array(
 	'baseline', 'login_post', 'sdsg', 'pages_direct', 'pages_die', 'auto_login',
-	'updates', 'pages', 'roles', 'users', 'rights', 'creates', 'deletes',
+	'updates', 'pages', 'roles', 'users', 'rights', 'creates',
+	'veranstaltung_update', 'veranstaltung_meta', 'customize', 'creates2', 'delete_confirm', 'deletes',
 );
 $failures = 0;
 foreach ($variants as $variant) {

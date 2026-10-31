@@ -141,6 +141,75 @@ switch ($variant) {
 			'language' => array(1), 'praesenztyp' => array(1),
 		);
 		break;
+	case 'veranstaltung_update':
+		$_POST = array(
+			'id' => 1, 'update_veranstaltung' => 1,
+			'name' => 'ReqVeranstaltungNeu', 'dozent' => 1, 'veranstaltungstyp' => 1,
+			'institut' => 1, 'semester' => 1, 'master_niveau' => 1,
+			'fester_bbb_raum' => 0, 'speichern_metainfos' => 1,
+		);
+		break;
+	case 'veranstaltung_meta':
+		$_POST = array(
+			'id' => 1, 'update_einzelne_veranstaltung' => 1,
+			'tag' => 'Mo', 'stunde' => '1', 'woche' => 'jede Woche',
+			'erster_termin' => '2099-01-01', 'anzahl_hoerer' => 10,
+			'wunsch' => 'w', 'hinweis' => 'h', 'opal_link' => 'https://example.org',
+			'abgabe_pruefungsleistungen' => '2099-02-01',
+			'gebaeudewunsch' => 1, 'raumwunsch' => 'R1', 'master_niveau' => 1,
+			'language' => array(1), 'praesenztyp' => array(1),
+			'pruefungsnummer' => array(1), 'fester_bbb_raum' => 0,
+			'videolink' => '', 'bezug' => array(1),
+		);
+		break;
+	case 'customize':
+		$_POST = array('id' => 1, 'customize_value' => 1, 'value' => 'ReqCSS');
+		break;
+	case 'creates2':
+		$_POST = array(
+			'dozent_wizard' => 1, 'first_name' => 'Req', 'last_name' => 'Wizard',
+			'password' => 'pw', 'titel_id' => 1, 'institut' => 1, 'barrierefrei' => 1,
+			'reset_sperrvermerk_semester_id_1' => 1,
+			'sperrvermerk_semester_id_1' => 1,
+			'delete_semester_start_ids' => 1, 'semester_id' => 1,
+			'new_faculty_name' => 'ReqFakultaet', 'new_start_nr' => 1,
+			'create_gebaeude' => 1, 'new_gebaeude_name' => 'ReqGeb', 'new_abkuerzung' => 'RG3',
+			'create_language' => 1, 'new_name' => 'ReqSprache', 'new_abkuerzung' => 'rs',
+			'new_dozent_first_name' => 'Req', 'new_dozent_last_name' => 'Doz3',
+			'new_pruefungstyp_name' => 'ReqPT2',
+			'institut_id' => 1, 'new_studiengang' => 'ReqStudiengang2',
+			'studienordnung' => 'x', 'bereich' => 1,
+			'studiengang_id' => 1, 'new_module' => 'ReqModul2',
+			'beschreibung' => 'b', 'abkuerzung' => 'RM2',
+			'new_veranstaltungstyp_name' => 'ReqVT2', 'new_veranstaltungstyp_abkuerzung' => 'RVT2',
+			'neue_pruefung' => 1,
+			'create_faq' => 1, 'frage' => 'ReqFAQ', 'antwort' => 'ReqAntwort', 'wie_oft_gestellt' => 1,
+			'import_bereiche_from_csv' => 1, 'csv' => "bereich_name\nReqCSV\n",
+			'import_gebaeude_from_csv' => 1, 'csv' => "gebaeude_name,gebaeude_abkuerzung\nReqCSVG,RCG\n",
+			'update_setting' => 1, 'name' => 'x11_debugging_mode', 'value' => '0', 'description' => 'x',
+		);
+		break;
+	case 'delete_confirm':
+		$_POST = array(
+			'id' => 1, 'delete' => 1,
+			'update_language' => 1, 'update_pruefungsamt' => 1,
+			'update_pruefung_zeitraum' => 1, 'update_titel' => 1,
+			'faculty_name' => 'x', 'update_veranstaltung' => 1,
+			'studiengang' => 'x', 'institut_id' => 1,
+			'gebaeude_id' => 1, 'raum_name' => 'x',
+			'gebaeude_name' => 'x', 'abkuerzung' => 'x',
+			'updatepage' => 1, 'dozent_first_name' => 'x', 'dozent_last_name' => 'x',
+			'studiengang_id' => 1, 'module' => 'x',
+			'veranstaltungstyp_name' => 'x', 'veranstaltungstyp_abkuerzung' => 'x',
+			'pruefungstyp_id' => 1, 'veranstaltung_id' => 1, 'pruefungsnummer' => 'x',
+			'neue_rolle' => 'x', 'page' => array(1),
+			'faq_update' => 1, 'datum' => '2099-01-01', 'raum' => 1, 'stunde' => '1', 'pruefung' => 1,
+			'update_nachpruefung' => 1, 'update_pruefungsnummer' => 1, 'pruefungstyp' => 1,
+			'name' => 'x', 'password' => 'x', 'role' => 1,
+			'update_bereich' => 1, 'update_fach' => 1,
+			'update_veranstaltungstyp' => 1, 'create_institut' => 1,
+		);
+		break;
 	case 'deletes':
 		$_POST = array(
 			'delete' => 1, 'delete_for_sure' => 1, 'id' => 1,

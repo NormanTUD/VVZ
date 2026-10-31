@@ -98,6 +98,24 @@ if ($variant === 'rich') {
 	);
 }
 
+if (strpos($variant, 'param:') === 0) {
+	$key = substr($variant, strlen('param:'));
+	$value = '1';
+	if ($key === 'unreplied') {
+		$value = '0';
+	} else if ($key === 'table') {
+		$value = 'language';
+	} else if ($key === 'studiengang') {
+		$value = '1';
+	} else if ($key === 'semester') {
+		$value = (string) get_current_semester_id();
+	} else if ($key === 'institut' || $key === 'dozent' || $key === 'pruefungsamt' || $key === 'bereich' || $key === 'raum' || $key === 'modul' || $key === 'id' || $key === 'dozent_id') {
+		$value = '1';
+	}
+	$_GET[$key] = $value;
+	$_POST[$key] = $value;
+}
+
 if (strpos($variant, 'table:') === 0) {
 	$_GET['table'] = substr($variant, strlen('table:'));
 }
@@ -181,6 +199,15 @@ $_SERVER['SERVER_NAME'] = 'localhost';
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 $_SERVER['REQUEST_METHOD'] = 'GET';
 
+if ($page_file === 'useragents.php') {
+	rquery('CREATE TEMPORARY TABLE IF NOT EXISTS `ua_overview` (`browser_name` varchar(100), `browser_version` varchar(50), `os_name` varchar(100), `os_version` varchar(50), `c` int, `year` int, `month` int, `day` int)');
+	rquery('INSERT INTO `ua_overview` (`browser_name`, `browser_version`, `os_name`, `os_version`, `c`, `year`, `month`, `day`) VALUES ("Firefox", "120", "Linux", "6", 5, 2026, 10, 31)');
+}
+if ($page_file === 'api.php') {
+	rquery('INSERT IGNORE INTO `api_auth_codes` (`id`, `auth_code`, `email`, `ansprechpartner`, `grund`, `user_id`) VALUES (1, "reqtestcode", "req@example.org", "Req", "ReqGrund", 1)');
+	rquery('INSERT IGNORE INTO `api_log` (`auth_code_id`, `time`, `parameter`, `ip`, `api_error_code_id`) VALUES (1, now(), "req=1", "127.0.0.1", NULL)');
+	$_GET['id'] = 'reqtestcode';
+}
 if ($page_file === 'neuerdozent.php') {
 	rquery('INSERT IGNORE INTO `institut` (`name`, `start_nr`) VALUES ("ReqTest-Institut-2", 2)');
 }

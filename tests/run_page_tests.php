@@ -27,6 +27,12 @@ print "Running " . count($files) . " page smoke tests\n";
 foreach ($files as $file) {
 	$relative = substr($file, strlen($root) + 1);
 	$variants = array('default', 'rich');
+	$source = file_get_contents($file);
+	if ($source !== false && preg_match_all('/get_(?:get|post)\s*\(\s*[\'"]([a-zA-Z0-9_]+)[\'"]/', $source, $matches)) {
+		foreach (array_unique($matches[1]) as $key) {
+			$variants[] = 'param:' . $key;
+		}
+	}
 	if (basename($file) === 'studienordnung_import.php') {
 		$variants = array('default', 'rich', 'stage:detail', 'stage:download', 'stage:analyze', 'stage:debug_text', 'stage:cross_validate', 'stage:preview', 'stage:commit', 'stage:commit_v2', 'stage:upload');
 	}
