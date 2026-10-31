@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        php: ['8.1', '8.2', '8.3', '8.4']
+        php: ['latest']
 
     services:
       mariadb:
@@ -151,12 +151,19 @@ jobs:
           echo "=========================================="
           php tests/run_pure_tests.php
 
+      - name: Run subpage smoke tests
+        run: |
+          echo "=========================================="
+          echo "  Subpage smoke tests"
+          echo "=========================================="
+          php tests/run_page_tests.php
+
   # Dedicated coverage job. It runs the full DB suite and the pure suite
   # with Xdebug coverage enabled, merges the raw data and posts a coverage
   # table to the workflow run summary (GITHUB_STEP_SUMMARY). The HTML
   # report is uploaded as an artifact.
   coverage:
-    name: Coverage (PHP 8.4)
+    name: Coverage (latest PHP)
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -183,10 +190,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP 8.4 with Xdebug
+      - name: Setup latest PHP with Xdebug
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: 'latest'
           extensions: mysqli, mbstring, bcmath, pdo_mysql
           coverage: xdebug
 
@@ -258,6 +265,15 @@ jobs:
           echo "run_pure_tests.php exit code: $status"
           exit 0
 
+      - name: Run subpage tests with coverage
+        run: |
+          set +e
+          php tests/run_page_tests.php
+          status=$?
+          echo "$status" > "$RUNNER_TEMP/pages.exit"
+          echo "run_page_tests.php exit code: $status"
+          exit 0
+
       - name: Generate coverage report
         if: always()
         run: |
@@ -281,9 +297,11 @@ jobs:
           set -e
           testsuite_status=$(cat "$RUNNER_TEMP/testsuite.exit" 2>/dev/null || echo 1)
           pure_status=$(cat "$RUNNER_TEMP/pure.exit" 2>/dev/null || echo 1)
+          pages_status=$(cat "$RUNNER_TEMP/pages.exit" 2>/dev/null || echo 1)
           echo "testsuite.php: $testsuite_status"
           echo "run_pure_tests.php: $pure_status"
-          if [ "$testsuite_status" != "0" ] || [ "$pure_status" != "0" ]; then
+          echo "run_page_tests.php: $pages_status"
+          if [ "$testsuite_status" != "0" ] || [ "$pure_status" != "0" ] || [ "$pages_status" != "0" ]; then
             echo "::error::At least one test suite failed"
             exit 1
           fi
