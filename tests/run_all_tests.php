@@ -34,6 +34,8 @@ $test_files = array(
 	"test_more_functions.php",
 	"test_icon_helpers.php",
 	"test_extra_coverage.php",
+	"test_production_lookups.php",
+	"test_production_crud.php",
 );
 
 foreach ($test_files as $file) {
