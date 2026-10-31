@@ -119,6 +119,23 @@ jobs:
             echo "startpage DB is ready\n";
           '
 
+      - name: Seed default data from initialdatensatz.php
+        run: |
+          php -d xdebug.mode=off -r '
+            $GLOBALS["no_selftest"] = 1;
+            $GLOBALS["no_selftest_force"] = 1;
+            require "functions.php";
+            require "tests/setup_db.php";
+
+            $dbname = $GLOBALS["dbname"];
+            rquery("UPDATE vvz_global.kundendaten SET plan_id = 1 WHERE dbname = " . esc($dbname));
+            $GLOBALS["logged_in_user_id"] = 1;
+            $GLOBALS["user_role_id"] = 1;
+
+            include "initialdatensatz.php";
+            echo "Seeded initialdatensatz for $dbname\n";
+          '
+
       - name: Run testsuite
         run: |
           set -e
@@ -145,7 +162,7 @@ jobs:
 
     env:
       XDEBUG_MODE: coverage
-      VVZ_COVERAGE_DIR: ${{ runner.temp }}/vvz-coverage
+      VVZ_COVERAGE_DIR: ${{ github.workspace }}/vvz-coverage-data
 
     services:
       mariadb:
@@ -203,6 +220,23 @@ jobs:
             if(!$dbh) { fwrite(STDERR, "Cannot connect to MariaDB\n"); exit(1); }
             mysqli_query($dbh, "CREATE DATABASE IF NOT EXISTS startpage");
             echo "startpage DB is ready\n";
+          '
+
+      - name: Seed default data from initialdatensatz.php
+        run: |
+          php -d xdebug.mode=off -r '
+            $GLOBALS["no_selftest"] = 1;
+            $GLOBALS["no_selftest_force"] = 1;
+            require "functions.php";
+            require "tests/setup_db.php";
+
+            $dbname = $GLOBALS["dbname"];
+            rquery("UPDATE vvz_global.kundendaten SET plan_id = 1 WHERE dbname = " . esc($dbname));
+            $GLOBALS["logged_in_user_id"] = 1;
+            $GLOBALS["user_role_id"] = 1;
+
+            include "initialdatensatz.php";
+            echo "Seeded initialdatensatz for $dbname\n";
           '
 
       - name: Run DB tests with coverage

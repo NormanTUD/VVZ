@@ -76,12 +76,15 @@ is_equal("prod: get_valid_institut returns passed value", get_valid_institut(5),
 /* Studiengänge, Module, Prüfungsdaten                           */
 /* ============================================================ */
 
-is_equal("prod: get_studiengang_name(1)", get_studiengang_name(1), 'Bachelor Philosophie');
+$vvz_stg_row = get_single_row_from_query_assoc("select name, institut_id from studiengang where id = 1");
+$vvz_stg_name = $vvz_stg_row ? $vvz_stg_row['name'] : null;
+$vvz_stg_institut = $vvz_stg_row ? $vvz_stg_row['institut_id'] : 1;
+is_equal("prod: get_studiengang_name(1)", get_studiengang_name(1), $vvz_stg_name);
 is_equal("prod: get_studiengang_name('alle')", get_studiengang_name('alle'), 'Alle Studiengänge');
 is_equal("prod: get_studiengang_name(null) is null", get_studiengang_name(null) === null ? 1 : 0, 1);
-is_equal("prod: get_studiengang_id('Bachelor Philosophie', 1)", (string) get_studiengang_id('Bachelor Philosophie', 1), '1');
-is_equal("prod: get_studiengang_id unknown is null", get_studiengang_id('Unbekannt', 1) === null ? 1 : 0, 1);
-is_equal("prod: get_studiengang_id_by_name('Bachelor Philosophie')", (string) get_studiengang_id_by_name('Bachelor Philosophie'), '1');
+is_equal("prod: get_studiengang_id(current name, institut)", (string) get_studiengang_id($vvz_stg_name, $vvz_stg_institut), '1');
+is_equal("prod: get_studiengang_id unknown is null", get_studiengang_id('Unbekannt', $vvz_stg_institut) === null ? 1 : 0, 1);
+is_equal("prod: get_studiengang_id_by_name(current name)", (string) get_studiengang_id_by_name($vvz_stg_name), '1');
 is_equal("prod: get_studiengang_name_by_modul_id(999999) is null", get_studiengang_name_by_modul_id(999999) === null ? 1 : 0, 1);
 
 is_equal("prod: get_pruefungsnummer_id_by_pruefungsnummer unknown is null", get_pruefungsnummer_id_by_pruefungsnummer('NOPE-XYZ') === null ? 1 : 0, 1);

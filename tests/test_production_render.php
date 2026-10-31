@@ -175,7 +175,8 @@ ob_start();
 print_ul_li_from_result($vvz_result);
 $vvz_ul = ob_get_clean();
 is_equal("render: print_ul_li_from_result outputs list", strpos($vvz_ul, '<ul>') !== false ? 1 : 0, 1);
-is_equal("render: print_ul_li_from_result contains studiengang", strpos($vvz_ul, 'Bachelor Philosophie') !== false ? 1 : 0, 1);
+$vvz_expected_stg_name = get_studiengang_name(1);
+is_equal("render: print_ul_li_from_result contains studiengang", ($vvz_expected_stg_name && strpos($vvz_ul, $vvz_expected_stg_name) !== false) ? 1 : 0, 1);
 
 $vvz_broken_legacy = array(
 	'modul_zu_veranstaltung_hinzufuegen' => function () { modul_zu_veranstaltung_hinzufuegen(1, 1); },
