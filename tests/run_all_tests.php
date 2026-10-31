@@ -36,6 +36,7 @@ $test_files = array(
 	"test_extra_coverage.php",
 	"test_production_lookups.php",
 	"test_production_crud.php",
+	"test_production_transactions.php",
 );
 
 foreach ($test_files as $file) {
