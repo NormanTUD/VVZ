@@ -158,6 +158,13 @@ jobs:
           echo "=========================================="
           php tests/run_page_tests.php
 
+      - name: Run request dispatcher tests
+        run: |
+          echo "=========================================="
+          echo "  Request dispatcher tests"
+          echo "=========================================="
+          php tests/run_request_tests.php
+
   # Dedicated coverage job. It runs the full DB suite and the pure suite
   # with Xdebug coverage enabled, merges the raw data and posts a coverage
   # table to the workflow run summary (GITHUB_STEP_SUMMARY). The HTML
@@ -274,6 +281,15 @@ jobs:
           echo "run_page_tests.php exit code: $status"
           exit 0
 
+      - name: Run request dispatcher tests with coverage
+        run: |
+          set +e
+          php tests/run_request_tests.php
+          status=$?
+          echo "$status" > "$RUNNER_TEMP/requests.exit"
+          echo "run_request_tests.php exit code: $status"
+          exit 0
+
       - name: Generate coverage report
         if: always()
         run: |
@@ -298,10 +314,12 @@ jobs:
           testsuite_status=$(cat "$RUNNER_TEMP/testsuite.exit" 2>/dev/null || echo 1)
           pure_status=$(cat "$RUNNER_TEMP/pure.exit" 2>/dev/null || echo 1)
           pages_status=$(cat "$RUNNER_TEMP/pages.exit" 2>/dev/null || echo 1)
+          requests_status=$(cat "$RUNNER_TEMP/requests.exit" 2>/dev/null || echo 1)
           echo "testsuite.php: $testsuite_status"
           echo "run_pure_tests.php: $pure_status"
           echo "run_page_tests.php: $pages_status"
-          if [ "$testsuite_status" != "0" ] || [ "$pure_status" != "0" ] || [ "$pages_status" != "0" ]; then
+          echo "run_request_tests.php: $requests_status"
+          if [ "$testsuite_status" != "0" ] || [ "$pure_status" != "0" ] || [ "$pages_status" != "0" ] || [ "$requests_status" != "0" ]; then
             echo "::error::At least one test suite failed"
             exit 1
           fi
