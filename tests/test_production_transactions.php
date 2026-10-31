@@ -286,6 +286,7 @@ ob_start();
 $vvz_sperrvermerk_empty = sperrvermerk_table(array(array($vvz_semester_id)), '', 0);
 ob_end_clean();
 is_equal("tx: sperrvermerk_table without lock returns 0", $vvz_sperrvermerk_empty, 0);
+rquery('DELETE FROM `sperrvermerk` WHERE `semester_id` = ' . (int) $vvz_semester_id);
 
 delete_demo();
 is_equal("tx: delete_demo runs without error", 1, 1);
