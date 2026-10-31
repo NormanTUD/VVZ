@@ -28,7 +28,10 @@ foreach ($files as $file) {
 	$relative = substr($file, strlen($root) + 1);
 	$variants = array('default', 'rich');
 	if (basename($file) === 'studienordnung_import.php') {
-		$variants = array('default', 'rich', 'stage:detail', 'stage:download', 'stage:analyze', 'stage:debug_text', 'stage:cross_validate', 'stage:preview', 'stage:commit', 'stage:commit_v2');
+		$variants = array('default', 'rich', 'stage:detail', 'stage:download', 'stage:analyze', 'stage:debug_text', 'stage:cross_validate', 'stage:preview', 'stage:commit', 'stage:commit_v2', 'stage:upload');
+	}
+	if (basename($file) === 'merges.php') {
+		$variants[] = 'table:language';
 	}
 	foreach ($variants as $variant) {
 		$command = 'timeout ' . $timeout_seconds . ' ' . escapeshellarg(PHP_BINARY)

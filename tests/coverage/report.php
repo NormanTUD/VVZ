@@ -66,6 +66,14 @@ $excluded_paths = array(
 );
 
 $all = array();
+// Lines that can never execute in this file: studienordnung_import.php
+// contains duplicate persist helper definitions guarded by
+// function_exists(). studienordnung_persist.php is loaded first, so these
+// definitions are always skipped. Counting them as uncovered would make the
+// file's coverage artificially low.
+$excluded_line_ranges = array(
+	'pages/studienordnung_import.php' => array(array(119, 503)),
+);
 foreach (glob(rtrim($options['dir'], '/') . '/*.json') as $coverage_file) {
 	$data = json_decode((string) file_get_contents($coverage_file), true);
 	if (!is_array($data)) {
@@ -98,6 +106,19 @@ function vvz_coverage_relative_path($file, $root_prefix)
 		return null;
 	}
 	return str_replace(DIRECTORY_SEPARATOR, '/', substr($real, strlen($root_prefix)));
+}
+
+function vvz_coverage_line_is_excluded($relative, $line, $excluded_line_ranges)
+{
+	if (!isset($excluded_line_ranges[$relative])) {
+		return false;
+	}
+	foreach ($excluded_line_ranges[$relative] as $range) {
+		if ($line >= $range[0] && $line <= $range[1]) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function vvz_coverage_is_source($relative, $excluded_paths)
@@ -153,6 +174,9 @@ foreach ($all as $file => $lines) {
 	$covered = 0;
 	$missing = array();
 	foreach ($lines as $line => $status) {
+		if (vvz_coverage_line_is_excluded($relative, (int) $line, $excluded_line_ranges)) {
+			continue;
+		}
 		if ($status === 1) {
 			$statements++;
 			$covered++;
@@ -234,7 +258,7 @@ if (count($files)) {
 	$summary .= "\n</details>\n\n";
 }
 
-$summary .= "_Coverage is collected with Xdebug over the DB test suite and the pure test suite. Test files and third-party libraries are excluded._\n";
+$summary .= "_Coverage is collected with Xdebug over the DB, pure, subpage and request-dispatcher test suites. Test files, third-party libraries and unreachable duplicate definitions are excluded._\n";
 
 if ($options['summary'] !== '') {
 	@mkdir(dirname($options['summary']), 0777, true);
