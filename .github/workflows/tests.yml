@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        php: ['latest']
+        php: ['8.5']
 
     services:
       mariadb:
@@ -175,7 +175,7 @@ jobs:
   # table to the workflow run summary (GITHUB_STEP_SUMMARY). The HTML
   # report is uploaded as an artifact.
   coverage:
-    name: Coverage (latest PHP)
+    name: Coverage (PHP 8.5)
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -202,10 +202,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup latest PHP with Xdebug
+      - name: Setup PHP 8.5 with Xdebug
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 'latest'
+          php-version: '8.5'
           extensions: mysqli, mbstring, bcmath, pdo_mysql
           coverage: xdebug
 
