@@ -39,6 +39,7 @@ $test_files = array(
 	"test_production_crud.php",
 	"test_production_transactions.php",
 	"test_kundenkram_functions.php",
+	"test_functions_extra.php",
 );
 
 foreach ($test_files as $file) {

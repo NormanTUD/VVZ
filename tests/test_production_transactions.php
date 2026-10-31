@@ -57,8 +57,18 @@ update_right_to_page(array($vvz_right_id => array(1 => 1)));
 is_equal("tx: update_right_to_page inserts mapping", (string) get_single_row_from_query("select count(*) from function_right_to_page where function_right_id = " . (int) $vvz_right_id . " and page_id = 1"), '1');
 rollback();
 
+create_role($vvz_tag . '-RechteRolle2', 'Testrolle2');
+$vvz_role_id2 = get_role_id($vvz_tag . '-RechteRolle2');
+update_right_to_user_role(array($vvz_right_id => array($vvz_role_id => 1, $vvz_role_id2 => 1)));
+is_equal("tx: update_right_to_user_role multiple roles", (string) get_single_row_from_query("select count(*) from function_right_to_user_role where function_right_id = " . (int) $vvz_right_id), '2');
+rollback();
+update_right_to_page(array($vvz_right_id => array(1 => 1, 2 => 1)));
+is_equal("tx: update_right_to_page multiple pages", (string) get_single_row_from_query("select count(*) from function_right_to_page where function_right_id = " . (int) $vvz_right_id), '2');
+rollback();
+
 rquery('DELETE FROM `function_right` WHERE `id` = ' . (int) $vvz_right_id);
 rquery('DELETE FROM `role` WHERE `id` = ' . (int) $vvz_role_id);
+rquery('DELETE FROM `role` WHERE `id` = ' . (int) $vvz_role_id2);
 
 /* ============================================================ */
 /* Superdozent                                                   */
@@ -105,6 +115,10 @@ update_modul_semester_data(1, 1, 'keine-zahl', '2', array(), $vvz_modul_id);
 is_equal("tx: update_modul_semester_data rejects invalid credit points", (string) get_single_row_from_query("select credit_points from modul_nach_semester_metadata where modul_id = " . (int) $vvz_modul_id . " and semester = 1"), '5');
 update_modul_semester_data(1, 1, '5', '2', array(), $vvz_modul_id);
 is_equal("tx: update_modul_semester_data clears veranstaltungstyp counts", (string) get_single_row_from_query("select count(*) from modul_nach_semester_veranstaltungstypen_anzahl where modul_id = " . (int) $vvz_modul_id), '0');
+update_modul_semester_data(1, 1, '5', 'keine-zahl', array(), $vvz_modul_id);
+is_equal("tx: update_modul_semester_data rejects invalid pruefungsleistung", (string) get_single_row_from_query("select anzahl_pruefungsleistungen from modul_nach_semester_metadata where modul_id = " . (int) $vvz_modul_id . " and semester = 1"), '2');
+update_modul_semester_data(1, 1, '5', '2', array(1 => 'keine-zahl'), $vvz_modul_id);
+is_equal("tx: update_modul_semester_data rejects invalid veranstaltungstyp count", (string) get_single_row_from_query("select count(*) from modul_nach_semester_veranstaltungstypen_anzahl where modul_id = " . (int) $vvz_modul_id), '0');
 $vvz_veranstaltungstyp_anzahlen = create_array_veranstaltungstyp_anzahl_by_modul_id_semester($vvz_modul_id, 1);
 is_equal("tx: create_array_veranstaltungstyp_anzahl... returns array", is_array($vvz_veranstaltungstyp_anzahlen) ? 1 : 0, 1);
 $vvz_has_semester_data = studiengang_has_semester_modul_data(1);
@@ -254,6 +268,33 @@ $vvz_meta_ter = get_einzelne_termine_by_veranstaltung_id($vvz_meta_v_id);
 is_equal("tx: get_einzelne_termine_by_veranstaltung_id after metadata", count($vvz_meta_ter), 1);
 is_equal("tx: get_einzelne_termine_gebaeude_raum_liste after metadata", is_array(get_einzelne_termine_gebaeude_raum_liste($vvz_meta_v_id)) ? 1 : 0, 1);
 is_equal("tx: nice_einzelne_veranstaltung_by_id after metadata", count(nice_einzelne_veranstaltung_by_id($vvz_meta_v_id)), 1);
+
+update_veranstaltung_metadata(
+	$vvz_meta_v_id,
+	'Do',
+	'2',
+	'ungerade Woche',
+	'2099-01-05',
+	'8',
+	'Wunsch4',
+	'Hinweis4',
+	'https://example.org/opal4',
+	'2099-02-04',
+	null,
+	1,
+	array(),
+	0,
+	array(),
+	null,
+	array(),
+	array(),
+	0,
+	null,
+	array()
+);
+is_equal("tx: update_veranstaltung_metadata gebaeude-only wish", (string) get_single_row_from_query("select gebaeudewunsch_id from veranstaltung where id = " . (int) $vvz_meta_v_id), '1');
+is_equal("tx: update_veranstaltung_metadata clears raumwunsch", get_single_row_from_query("select raumwunsch_id from veranstaltung where id = " . (int) $vvz_meta_v_id), null);
+is_equal("tx: update_veranstaltung_metadata keeps language for empty array", (string) get_single_row_from_query("select count(*) from veranstaltung_to_language where veranstaltung_id = " . (int) $vvz_meta_v_id), '1');
 
 /* ============================================================ */
 /* create_veranstaltung (uses update_veranstaltung_metadata)     */
