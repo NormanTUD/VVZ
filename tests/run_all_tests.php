@@ -40,6 +40,7 @@ $test_files = array(
 	"test_production_transactions.php",
 	"test_kundenkram_functions.php",
 	"test_functions_extra.php",
+	"test_studienordnung_import_helpers.php",
 );
 
 foreach ($test_files as $file) {

@@ -123,18 +123,26 @@ if (strpos($variant, 'table:') === 0) {
 if (strpos($variant, 'stage:') === 0) {
 	$stage = substr($variant, strlen('stage:'));
 	$_GET['stage'] = $stage;
-	if ($stage === 'upload') {
+	if ($stage === 'upload' || $stage === 'upload_preview' || $stage === 'upload_empty' || $stage === 'upload_invalid') {
 		$fixture = __DIR__ . '/fixtures/12_06soBA1228.08.2023.pdf';
 		if (!is_file($fixture)) {
 			$fixture = __DIR__ . '/fixtures/03_06soBA128.08.2023.pdf';
 		}
 		$_GET['ajax'] = '1';
-		$_FILES['pdf'] = array('error' => UPLOAD_ERR_OK, 'tmp_name' => $fixture, 'name' => 'reqtest.pdf');
+		if ($stage === 'upload_empty') {
+			$_FILES = array();
+		} else if ($stage === 'upload_invalid') {
+			$invalid = tempnam(sys_get_temp_dir(), 'vvz-invalid-pdf-');
+			file_put_contents($invalid, 'not a pdf');
+			$_FILES['pdf'] = array('error' => UPLOAD_ERR_OK, 'tmp_name' => $invalid, 'name' => 'invalid.txt');
+		} else {
+			$_FILES['pdf'] = array('error' => UPLOAD_ERR_OK, 'tmp_name' => $fixture, 'name' => 'reqtest.pdf');
+		}
 		$_POST['soi_extract_method'] = 'auto';
 		$_POST['soi_institut'] = 1;
 		$_POST['soi_studiengang_mode'] = 'new';
 		$_POST['new_studiengang_name'] = 'ReqSoiStudiengang';
-		$_POST['auto_commit'] = 1;
+		$_POST['auto_commit'] = ($stage === 'upload_preview' ? 0 : 1);
 		$_POST['create_pruefungsnummern'] = 1;
 	}
 	if (in_array($stage, array('detail', 'download', 'analyze', 'debug_text', 'cross_validate', 'preview', 'commit', 'commit_v2'), true)) {

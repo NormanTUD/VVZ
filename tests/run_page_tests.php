@@ -34,7 +34,7 @@ foreach ($files as $file) {
 		}
 	}
 	if (basename($file) === 'studienordnung_import.php') {
-		$variants = array('default', 'rich', 'stage:detail', 'stage:download', 'stage:analyze', 'stage:debug_text', 'stage:cross_validate', 'stage:preview', 'stage:commit', 'stage:commit_v2', 'stage:upload');
+		$variants = array('default', 'rich', 'stage:detail', 'stage:download', 'stage:analyze', 'stage:debug_text', 'stage:cross_validate', 'stage:preview', 'stage:commit', 'stage:commit_v2', 'stage:upload', 'stage:upload_preview', 'stage:upload_empty', 'stage:upload_invalid');
 	}
 	if (basename($file) === 'merges.php') {
 		$variants[] = 'table:language';

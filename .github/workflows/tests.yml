@@ -253,7 +253,7 @@ jobs:
 
       - name: Seed default data from initialdatensatz.php
         run: |
-          php -d xdebug.mode=off -r '
+          php -d auto_prepend_file=tests/coverage/bootstrap.php -r '
             $GLOBALS["no_selftest"] = 1;
             $GLOBALS["no_selftest_force"] = 1;
             require "functions.php";

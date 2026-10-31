@@ -40,6 +40,7 @@ $root_prefix = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
 $excluded_paths = array(
 	'tests/',
+	'scripts/SqlFormatter.php',
 	'testing.php',
 	'testsuite.php',
 	'Classes/',

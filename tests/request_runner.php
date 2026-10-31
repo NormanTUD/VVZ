@@ -37,6 +37,24 @@ $session_id = 'reqtest-session';
 $cookie_name = md5($clone_db) . '_session_id';
 $_COOKIE[$cookie_name] = $session_id;
 
+if (strpos($variant, 'auto:') === 0 || strpos($variant, 'auto_no_id:') === 0) {
+	$no_id = strpos($variant, 'auto_no_id:') === 0;
+	$key = substr($variant, strlen($no_id ? 'auto_no_id:' : 'auto:'));
+	if (!$no_id) {
+		$_POST['id'] = 1;
+	}
+	$array_keys = array('language', 'praesenztyp', 'bezug', 'page', 'modules', 'checked_studiengaenge', 'editable_users', 'merge_from');
+	if (in_array($key, $array_keys, true)) {
+		$_POST[$key] = array(1);
+	} else if (in_array($key, array('institut', 'dozent', 'role', 'titel_id', 'bereich', 'pruefungstyp', 'zeitraum', 'modul', 'studiengang_id', 'veranstaltung_id', 'pruefungstyp_id', 'gebaeude_id', 'raum', 'raumwunsch', 'gebaeudewunsch', 'semester_id', 'id'), true)) {
+		$_POST[$key] = 1;
+	} else if (in_array($key, array('delete', 'delete_for_sure', 'newpage', 'updatepage', 'new_user', 'dozent_wizard', 'create_gebaeude', 'create_language', 'create_faq', 'create_bereich', 'create_fach', 'create_titel', 'create_pruefung_zeitraum', 'create_pruefungsamt', 'new_function_right', 'neue_pruefungsnummer', 'update_text', 'update_hinweis', 'update_setting', 'reset_setting', 'import_bereiche_from_csv', 'import_gebaeude_from_csv', 'delete_logo', 'delete_semester_start_ids', 'setze_semester', 'merge_data', 'api_new', 'api_change'), true)) {
+		$_POST[$key] = 1;
+	} else {
+		$_POST[$key] = 'Req';
+	}
+}
+
 switch ($variant) {
 	case 'login_post':
 		$_COOKIE = array();

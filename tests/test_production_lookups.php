@@ -109,35 +109,43 @@ is_equal("prod: get_semester_string(1) contains type", strpos(get_semester_strin
 /* Gebäude, Räume, Veranstaltungstypen                           */
 /* ============================================================ */
 
-is_equal("prod: get_gebaeude_name(1)", get_gebaeude_name(1), 'Absolutismus-Bau');
+$vvz_building_1 = get_single_row_from_query_assoc("select name, abkuerzung from gebaeude where id = 1");
+$vvz_building_1_name = $vvz_building_1 ? $vvz_building_1['name'] : null;
+$vvz_building_1_abk = $vvz_building_1 ? $vvz_building_1['abkuerzung'] : null;
+$vvz_room_1 = get_single_row_from_query_assoc("select r.id, r.raumnummer, g.abkuerzung from raum r left join gebaeude g on g.id = r.gebaeude_id order by r.id limit 1");
+$vvz_room_1_id = $vvz_room_1 ? (int) $vvz_room_1['id'] : 1;
+$vvz_room_1_nummer = $vvz_room_1 ? $vvz_room_1['raumnummer'] : null;
+$vvz_room_1_abk = $vvz_room_1 ? $vvz_room_1['abkuerzung'] : null;
+
+is_equal("prod: get_gebaeude_name(1)", get_gebaeude_name(1), $vvz_building_1_name);
 is_equal("prod: get_gebaeude_name(null) is null", get_gebaeude_name(null) === null ? 1 : 0, 1);
-is_equal("prod: get_gebaeude_id('Absolutismus-Bau')", (string) get_gebaeude_id('Absolutismus-Bau'), '1');
-is_equal("prod: get_gebaeude_id_by_abkuerzung('ABS')", (string) get_gebaeude_id_by_abkuerzung('ABS'), '1');
+is_equal("prod: get_gebaeude_id(current name)", (string) get_gebaeude_id($vvz_building_1_name), '1');
+is_equal("prod: get_gebaeude_id_by_abkuerzung(current abbreviation)", (string) get_gebaeude_id_by_abkuerzung($vvz_building_1_abk), (string) get_single_row_from_query("select id from gebaeude where abkuerzung = " . esc($vvz_building_1_abk) . " limit 1"));
 is_equal("prod: get_gebaeude_id_by_abkuerzung unknown is null", get_gebaeude_id_by_abkuerzung('ZZZ') === null ? 1 : 0, 1);
-is_equal("prod: get_gebaeude_abkuerzung(1)", get_gebaeude_abkuerzung(1), 'ABS');
+is_equal("prod: get_gebaeude_abkuerzung(1)", get_gebaeude_abkuerzung(1), $vvz_building_1_abk);
 is_equal("prod: get_gebaeude_abkuerzung(null) is null", get_gebaeude_abkuerzung(null) === null ? 1 : 0, 1);
 regex_matches("prod: get_gebaeude_abkuerzung(1, 1) contains navigator link", (string) get_gebaeude_abkuerzung(1, 1), '/navigator\.tu-dresden\.de/');
-is_equal("prod: get_gebaeude_name_abkuerzung(1)", get_gebaeude_name_abkuerzung(1), array('ABS', 'Absolutismus-Bau'));
+is_equal("prod: get_gebaeude_name_abkuerzung(1)", get_gebaeude_name_abkuerzung(1), array($vvz_building_1_abk, $vvz_building_1_name));
 is_equal("prod: get_gebaeude_name_abkuerzung(null) is null", get_gebaeude_name_abkuerzung(null) === null ? 1 : 0, 1);
 $vvz_geo = get_gebaeude_geo_coords_by_id(1);
 is_equal("prod: get_gebaeude_geo_coords_by_id returns array", is_array($vvz_geo) ? 1 : 0, 1);
 
-is_equal("prod: get_raum_name_by_id(1)", get_raum_name_by_id(1), '101');
+is_equal("prod: get_raum_name_by_id(current room)", get_raum_name_by_id($vvz_room_1_id), $vvz_room_1_nummer);
 is_equal("prod: get_raum_name_by_id(null) is null", get_raum_name_by_id(null) === null ? 1 : 0, 1);
 is_equal("prod: get_raum_name_by_id unknown is null", get_raum_name_by_id(999999) === null ? 1 : 0, 1);
-regex_matches("prod: get_raum_gebaeude_by_id(1) contains ABS", (string) get_raum_gebaeude_by_id(1), '/ABS/');
-regex_matches("prod: get_raum_gebaeude_by_id(1) contains 101", (string) get_raum_gebaeude_by_id(1), '/101/');
+regex_matches("prod: get_raum_gebaeude_by_id(current) contains abbreviation", (string) get_raum_gebaeude_by_id($vvz_room_1_id), '/' . preg_quote((string) $vvz_room_1_abk, '/') . '/');
+regex_matches("prod: get_raum_gebaeude_by_id(current) contains room number", (string) get_raum_gebaeude_by_id($vvz_room_1_id), '/' . preg_quote((string) $vvz_room_1_nummer, '/') . '/');
 is_equal("prod: get_raum_gebaeude_by_id(null) is null", get_raum_gebaeude_by_id(null) === null ? 1 : 0, 1);
-regex_matches("prod: get_raum_gebaeude(1) contains ABS", (string) get_raum_gebaeude(1), '/ABS/');
+regex_matches("prod: get_raum_gebaeude(current) contains abbreviation", (string) get_raum_gebaeude($vvz_room_1_id), '/' . preg_quote((string) $vvz_room_1_abk, '/') . '/');
 is_equal("prod: get_raum_gebaeude(null) is null", get_raum_gebaeude(null) === null ? 1 : 0, 1);
 $vvz_raum_gebaeude = get_raum_gebaeude_array();
 is_equal("prod: get_raum_gebaeude_array returns array", is_array($vvz_raum_gebaeude) ? 1 : 0, 1);
-is_equal("prod: get_raum_gebaeude_array contains room 1", array_key_exists(1, $vvz_raum_gebaeude) ? 1 : 0, 1);
+is_equal("prod: get_raum_gebaeude_array contains current room", array_key_exists($vvz_room_1_id, $vvz_raum_gebaeude) ? 1 : 0, 1);
 $vvz_room_names = create_raum_name_id_array();
-is_equal("prod: create_raum_name_id_array contains room 1", isset($vvz_room_names[1]) ? 1 : 0, 1);
-is_equal("prod: create_raum_name_id_array room 1 = 101", $vvz_room_names[1], '101');
+is_equal("prod: create_raum_name_id_array contains current room", isset($vvz_room_names[$vvz_room_1_id]) ? 1 : 0, 1);
+is_equal("prod: create_raum_name_id_array current room number", $vvz_room_names[$vvz_room_1_id], $vvz_room_1_nummer);
 
-is_equal("prod: get_gebaeude_abkuerzung_name_by_raum_id(1)", get_gebaeude_abkuerzung_name_by_raum_id(1), array('ABS', 'Absolutismus-Bau'));
+is_equal("prod: get_gebaeude_abkuerzung_name_by_raum_id(current)", get_gebaeude_abkuerzung_name_by_raum_id($vvz_room_1_id), array($vvz_room_1_abk, get_gebaeude_name(get_gebaeude_id_by_abkuerzung($vvz_room_1_abk))));
 is_equal("prod: get_gebaeude_abkuerzung_name_by_raum_id(null) is null", get_gebaeude_abkuerzung_name_by_raum_id(null) === null ? 1 : 0, 1);
 
 is_equal("prod: get_veranstaltungstyp_name(1)", get_veranstaltungstyp_name(1), 'Vorlesung');

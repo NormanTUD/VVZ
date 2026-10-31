@@ -127,8 +127,31 @@ if (getenv('VVZ_REQUEST_DEBUG') === '1') {
 $variants = array(
 	'baseline', 'login_post', 'sdsg', 'pages_direct', 'pages_die', 'auto_login',
 	'updates', 'pages', 'roles', 'users', 'rights', 'creates',
-	'veranstaltung_update', 'veranstaltung_meta', 'customize', 'creates2', 'delete_confirm', 'deletes',
+	'veranstaltung_update', 'veranstaltung_meta', 'customize', 'creates2', 'delete_confirm',
 );
+$functions_source = file_get_contents(dirname(__DIR__) . '/functions.php');
+$dispatch_start = strpos($functions_source, '/* Parameter verarbeiten */');
+$dispatch_end = strpos($functions_source, 'function htmle', $dispatch_start ?: 0);
+if ($dispatch_start !== false && $dispatch_end !== false) {
+	$dispatch_source = substr($functions_source, $dispatch_start, $dispatch_end - $dispatch_start);
+	preg_match_all('/get_post\(\s*[\'"]([a-zA-Z0-9_]+)[\'"]/', $dispatch_source, $matches);
+	foreach (array_unique($matches[1]) as $key) {
+		$variants[] = 'auto:' . $key;
+		$variants[] = 'auto_no_id:' . $key;
+	}
+	preg_match_all('/get_post_multiple_check\(\s*array\(([^)]*)\)/', $dispatch_source, $multi_matches);
+	foreach ($multi_matches[1] as $list) {
+		preg_match_all('/[\'"]([a-zA-Z0-9_]+)[\'"]/', $list, $keys);
+		foreach ($keys[1] as $key) {
+			$variants[] = 'auto:' . $key;
+			$variants[] = 'auto_no_id:' . $key;
+		}
+	}
+	$variants = array_values(array_unique($variants));
+}
+// Run destructive scenarios last so they cannot remove the login session
+// needed by the auto-generated dispatcher scenarios.
+$variants[] = 'deletes';
 $failures = 0;
 foreach ($variants as $variant) {
 	$command = 'timeout 90 ' . escapeshellarg(PHP_BINARY)
