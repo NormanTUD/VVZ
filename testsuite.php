@@ -118,6 +118,15 @@
 	 * by the existing testing framework.
 	 */
 
+	/*
+	 * The test bootstrap (tests/setup_db.php) creates and seeds the database
+	 * itself. Disable the production auto-install path in mysql.php so that
+	 * a fresh CI database does not make the request exit early after
+	 * selftest() with a "you will be redirected" message.
+	 */
+	$GLOBALS['no_selftest'] = 1;
+	$GLOBALS['no_selftest_force'] = 1;
+
 	include_once("testing.php");
 
 	/*
