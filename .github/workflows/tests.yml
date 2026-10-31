@@ -82,6 +82,11 @@ jobs:
       # Use PHP's mysqli instead of the mysql CLI client - the mysql
       # binary isn't installed by default on ubuntu-latest, and PHP
       # is already set up and knows about mysqli.
+      - name: Install PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+
       - name: Wait for MariaDB to be reachable
         run: |
           for i in $(seq 1 60); do
@@ -208,6 +213,11 @@ jobs:
           php-version: '8.5'
           extensions: mysqli, mbstring, bcmath, pdo_mysql
           coverage: xdebug
+
+      - name: Install PDF tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
 
       - name: Wait for MariaDB to be reachable
         run: |
