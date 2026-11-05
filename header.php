@@ -1,6 +1,8 @@
 <?php
 	include_once("functions.php");
 
+	$is_admin_page = preg_match('/admin/', basename($_SERVER['SCRIPT_NAME'] ?? ''));
+
 	if(isset($GLOBALS["reload_page"]) && $GLOBALS['reload_page']) {
 		header("Refresh:0");
 	}
@@ -27,6 +29,12 @@
 		<!-- Hey, wenn du die Daten dieser Seite brauchst, dann guck doch einfach in die API! Dann brauchst du hier nicht versuchen, HTML mit Regexen zu parsen... -->
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link nonce="<?php print nonce(); ?>" rel="icon" href="favicon.ico" type="image/x-icon" />
+		<link rel="manifest" href="manifest.webmanifest" />
+		<meta name="theme-color" content="#006092" />
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<link rel="apple-touch-icon" href="pwa-icon-192.png" />
 
 <?php
 		#<meta http-equiv="X-WebKit-CSP" content="<?php print $GLOBALS['csp_string']; ? >">
@@ -134,8 +142,9 @@
 
 		css("custom.php");
 		css("toastr.min.css");
+		css("pwa.css");
 
-		js(array("color-hash.js"));
+		js(array("color-hash.js", "pwa.js"));
 ?>
 		<style>
 			.password_change_warning {
@@ -1205,7 +1214,7 @@ html.dark-mode .bg_225599_ddaa66 {
 }
 		</style>
 	</head>
-<body>
+<body data-vvz-admin="<?php print $is_admin_page ? '1' : '0'; ?>">
 
 <!-- Dark Mode Toggle — subtle, top-right, non-intrusive -->
 <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dunkelmodus umschalten" title="Hell/Dunkel umschalten">

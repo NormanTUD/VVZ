@@ -1,0 +1,83 @@
+/* PWA / Offline-Unterstützung */
+
+#vvz-offline-banner {
+	position: sticky;
+	top: 0;
+	z-index: 99998;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	padding: 10px 120px 10px 14px;
+	background: #fff3cd;
+	border-bottom: 2px solid #e0a800;
+	color: #664d03;
+	font-size: 14px;
+	line-height: 1.45;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+#vvz-offline-banner[hidden] {
+	display: none !important;
+}
+
+#vvz-offline-banner strong {
+	font-size: 15px;
+	white-space: nowrap;
+}
+
+#vvz-offline-banner .vvz-offline-banner-text {
+	flex: 1 1 380px;
+	min-width: 0;
+}
+
+#vvz-offline-banner button {
+	flex: 0 0 auto;
+	padding: 6px 12px;
+	background: #664d03;
+	color: #fff;
+	border: 0;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#vvz-offline-banner button:hover {
+	background: #4e3a02;
+}
+
+#vvz-offline-banner button:disabled {
+	opacity: 0.65;
+	cursor: wait;
+}
+
+html.vvz-is-offline .vvz-offline-lockable {
+	opacity: 0.55;
+}
+
+html.dark-mode #vvz-offline-banner,
+body.dark-mode #vvz-offline-banner {
+	background: #5c4a1e;
+	border-bottom-color: #c9a52e;
+	color: #f5d5a5;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+html.dark-mode #vvz-offline-banner button,
+body.dark-mode #vvz-offline-banner button {
+	background: #f5d5a5;
+	color: #3a2d08;
+}
+
+html.dark-mode #vvz-offline-banner button:hover,
+body.dark-mode #vvz-offline-banner button:hover {
+	background: #ffe9bf;
+}
+
+@media (max-width: 700px) {
+	#vvz-offline-banner {
+		padding-right: 14px;
+		padding-top: 76px;
+	}
+}

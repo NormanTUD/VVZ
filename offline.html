@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#006092">
+	<title>Offline – Vorlesungsverzeichnis</title>
+	<style>
+		:root {
+			color-scheme: light dark;
+			--bg: #eef3f8;
+			--card: #ffffff;
+			--text: #1f2933;
+			--muted: #5c6b7a;
+			--accent: #006092;
+			--accent-strong: #004b73;
+			--warning-bg: #fff3cd;
+			--warning-border: #e0a800;
+			--warning-text: #664d03;
+			--shadow: 0 18px 50px rgba(15, 43, 66, 0.18);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #101827;
+				--card: #16213e;
+				--text: #e6edf5;
+				--muted: #a8b3c2;
+				--accent: #7eb8ff;
+				--accent-strong: #a9d1ff;
+				--warning-bg: #5c4a1e;
+				--warning-border: #c9a52e;
+				--warning-text: #f5d5a5;
+				--shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+			}
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			min-height: 100%;
+		}
+
+		body {
+			margin: 0;
+			padding: 24px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background:
+				radial-gradient(circle at 15% 10%, rgba(0, 96, 146, 0.14), transparent 40%),
+				radial-gradient(circle at 90% 90%, rgba(0, 96, 146, 0.10), transparent 45%),
+				var(--bg);
+			color: var(--text);
+			font-family: Arial, Helvetica, sans-serif;
+			line-height: 1.55;
+		}
+
+		.offline-card {
+			width: 100%;
+			max-width: 640px;
+			padding: 34px 34px 28px;
+			background: var(--card);
+			border-radius: 14px;
+			border: 1px solid rgba(128, 145, 165, 0.28);
+			box-shadow: var(--shadow);
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-bottom: 24px;
+			color: var(--muted);
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+
+		.brand-mark {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 42px;
+			height: 42px;
+			border-radius: 10px;
+			background: var(--accent);
+			color: #fff;
+			font-size: 14px;
+			letter-spacing: 0;
+		}
+
+		.status {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			margin-bottom: 14px;
+			padding: 5px 11px;
+			border-radius: 999px;
+			background: rgba(224, 168, 0, 0.14);
+			color: var(--warning-text);
+			font-size: 12px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+		}
+
+		.status-dot {
+			width: 9px;
+			height: 9px;
+			border-radius: 50%;
+			background: var(--warning-border);
+		}
+
+		body.is-online .status {
+			background: rgba(46, 160, 67, 0.15);
+			color: #1a7f37;
+		}
+
+		body.is-online .status-dot {
+			background: #2ea043;
+		}
+
+		h1 {
+			margin: 0 0 10px;
+			font-size: clamp(26px, 5vw, 36px);
+			line-height: 1.15;
+		}
+
+		p {
+			margin: 0 0 14px;
+			color: var(--muted);
+			font-size: 15px;
+		}
+
+		.admin-warning {
+			margin: 20px 0;
+			padding: 14px 16px;
+			border-left: 4px solid var(--warning-border);
+			border-radius: 6px;
+			background: var(--warning-bg);
+			color: var(--warning-text);
+			font-size: 14px;
+		}
+
+		.admin-warning strong {
+			display: block;
+			margin-bottom: 4px;
+			font-size: 15px;
+		}
+
+		.admin-warning[hidden] {
+			display: none;
+		}
+
+		.actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 24px;
+		}
+
+		button,
+		.button-link {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: 10px 16px;
+			border: 0;
+			border-radius: 7px;
+			background: var(--accent);
+			color: #fff;
+			font: inherit;
+			font-size: 14px;
+			font-weight: 700;
+			text-decoration: none;
+			cursor: pointer;
+		}
+
+		button:hover,
+		.button-link:hover {
+			background: var(--accent-strong);
+		}
+
+		.button-link.secondary {
+			background: transparent;
+			color: var(--accent);
+			border: 1px solid currentColor;
+		}
+
+		.button-link.secondary:hover {
+			background: rgba(0, 96, 146, 0.08);
+			color: var(--accent-strong);
+		}
+
+		.hint {
+			margin-top: 22px;
+			padding-top: 16px;
+			border-top: 1px solid rgba(128, 145, 165, 0.25);
+			color: var(--muted);
+			font-size: 12px;
+		}
+
+		@media (max-width: 480px) {
+			body {
+				padding: 14px;
+			}
+
+			.offline-card {
+				padding: 26px 20px 22px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="offline-card">
+		<div class="brand">
+			<span class="brand-mark">VVZ</span>
+			<span>Vorlesungsverzeichnis</span>
+		</div>
+
+		<div class="status">
+			<span class="status-dot"></span>
+			<span id="offline-status-text">Offline</span>
+		</div>
+
+		<h1 id="offline-headline">Sie sind offline</h1>
+		<p id="offline-description">
+			Das Vorlesungsverzeichnis kann gerade keine Verbindung zum Server aufbauen.
+			Bereits besuchte Seiten und die zuletzt geladenen Inhalte bleiben offline verfügbar.
+		</p>
+
+		<div class="admin-warning" id="admin-warning" hidden>
+			<strong>Administrationsbereich</strong>
+			Sie bleiben angemeldet. Im Offline-Modus sind jedoch keine Live-Änderungen möglich:
+			Bearbeiten, Speichern und Löschen funktioniert erst wieder, sobald die Verbindung
+			zum Server besteht. Ihre Sitzung wird dabei nicht beendet.
+		</div>
+
+		<div class="actions">
+			<button type="button" id="offline-retry">Erneut versuchen</button>
+			<a class="button-link secondary" id="offline-back" href="./">Zurück</a>
+		</div>
+
+		<p class="hint">
+			Tipp: Sobald die Verbindung wiederhergestellt ist, können Sie diese Seite neu laden.
+			Eine erneute Anmeldung ist nicht erforderlich.
+		</p>
+	</main>
+
+	<script>
+		(function () {
+			'use strict';
+
+			var fromAdmin = false;
+			try {
+				fromAdmin = sessionStorage.getItem('vvz-offline-from-admin') === '1';
+			} catch (e) {
+				/* ignore */
+			}
+			if (!fromAdmin) {
+				fromAdmin = /(^|\/)(admin(\.php)?|pages)(\/|$)/.test(window.location.pathname);
+			}
+
+			var statusText = document.getElementById('offline-status-text');
+			var headline = document.getElementById('offline-headline');
+			var description = document.getElementById('offline-description');
+			var adminWarning = document.getElementById('admin-warning');
+			var retry = document.getElementById('offline-retry');
+			var back = document.getElementById('offline-back');
+
+			if (fromAdmin) {
+				adminWarning.hidden = false;
+				description.textContent = 'Die Administrationsseite ist offline nicht erreichbar. ' +
+					'Ihre Anmeldung bleibt bestehen, aber Änderungen können erst nach Wiederherstellung ' +
+					'der Verbindung live gespeichert werden.';
+			}
+
+			if (window.history && window.history.length > 1) {
+				back.addEventListener('click', function (event) {
+					event.preventDefault();
+					window.history.back();
+				});
+			}
+
+			function updateConnectionState() {
+				if (navigator.onLine) {
+					document.body.classList.add('is-online');
+					statusText.textContent = 'Verbindung wiederhergestellt';
+					headline.textContent = 'Sie sind wieder online';
+					if (!fromAdmin) {
+						description.textContent = 'Die Verbindung zum Server ist wiederhergestellt. ' +
+							'Sie können die Seite jetzt neu laden und normal weiterarbeiten.';
+					}
+				} else {
+					document.body.classList.remove('is-online');
+					statusText.textContent = 'Offline';
+					headline.textContent = 'Sie sind offline';
+				}
+			}
+
+			retry.addEventListener('click', function () {
+				retry.disabled = true;
+				retry.textContent = 'Prüfe Verbindung …';
+
+				if (navigator.onLine) {
+					window.location.reload();
+					return;
+				}
+
+				fetch('sw.js?ping=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
+					.then(function (response) {
+						if (response && response.ok) {
+							window.location.reload();
+						} else {
+							throw new Error('offline');
+						}
+					})
+					.catch(function () {
+						retry.disabled = false;
+						retry.textContent = 'Weiterhin offline';
+						updateConnectionState();
+					});
+			});
+
+			window.addEventListener('online', updateConnectionState);
+			window.addEventListener('offline', updateConnectionState);
+			updateConnectionState();
+		})();
+	</script>
+</body>
+</html>

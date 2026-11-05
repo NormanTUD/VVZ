@@ -2,6 +2,10 @@ Options +FollowSymLinks -MultiViews
 RewriteEngine On
 AddDefaultCharset UTF-8
 
+<IfModule mod_mime.c>
+        AddType application/manifest+json .webmanifest
+</IfModule>
+
 <Files "reset.php">
         Order Allow,Deny
         Deny from all
@@ -18,6 +22,12 @@ AddDefaultCharset UTF-8
         # 301 Redirects für alte v/-Pfade (relativ zum aktuellen Ordner)
         RewriteRule ^v/startseite(\.php)?$ %{ENV:BASE} [R=301,L]
         RewriteRule ^v/$ %{ENV:BASE} [R=301,L]
+
+        # PWA-Dateien im Kundenpfad (z.B. /v/uni/sw.js) auf die Root-Dateien abbilden
+        RewriteRule ^v/[a-z0-9_-]+/sw\.js$ %{ENV:BASE}sw.js [L]
+        RewriteRule ^v/[a-z0-9_-]+/manifest\.webmanifest$ %{ENV:BASE}manifest.webmanifest [L]
+        RewriteRule ^v/[a-z0-9_-]+/offline\.html$ %{ENV:BASE}offline.html [L]
+        RewriteRule ^v/[a-z0-9_-]+/offline/?$ %{ENV:BASE}offline.html [L]
 
         # Trailing-v Entpackung
         RewriteRule ^v/(.*)/(.*)/(.*)/(.*)/(.*)$ %{ENV:BASE}$2/$3/$4/$5 [NE,E=SFURI:$1]
@@ -36,6 +46,7 @@ AddDefaultCharset UTF-8
         RewriteRule ^kontakt$ kontakt.php [L]
         RewriteRule ^startseite$ startseite.php [L]
         RewriteRule ^logo\.png$ logo.php [L]
+        RewriteRule ^offline/?$ offline.html [L]
 
         # Dynamischer Auto-Append für .php
         RewriteRule ^([a-zA-Z0-9_]+)$ $1.php [L]
@@ -44,3 +55,11 @@ AddDefaultCharset UTF-8
         RedirectMatch 404 /\.git
         RedirectMatch 404 /install\.sh
 </IfModule>
+
+# Der Service Worker muss zeitnah aktualisiert werden können.
+<Files "sw.js">
+        <IfModule mod_headers.c>
+                Header set Cache-Control "no-cache, no-store, must-revalidate"
+                Header set Service-Worker-Allowed "/"
+        </IfModule>
+</Files>
