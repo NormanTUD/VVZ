@@ -696,6 +696,17 @@
 				border-color: #444 !important;
 			}
 
+			html.dark-mode .accordion-title:focus,
+			html.dark-mode .accordion-title:hover {
+				background-color: #2a2a4a !important;
+				color: #fff !important;
+			}
+
+			html.dark-mode .accordion-title,
+			html.dark-mode .accordion-item .accordion-title {
+				border-color: #2a2a4a !important;
+			}
+
 			html.dark-mode .tabs {
 				background: #16213e !important;
 				border-color: #444 !important;
