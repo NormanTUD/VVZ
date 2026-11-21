@@ -1669,6 +1669,13 @@
 					</a>
 				</div>
 			</div>
+			<div class="row">
+				<div class="<?php print $width_determining_class; ?> medium-centered columns">
+				<a href="pruefungsnummer_info">
+						<div id="pruefungsnummer_info_anzeigen" class="callout text-center"><?php print $GLOBALS['linkicon']; ?><h4>Prüfungsnummer nachschlagen</h4></div>
+					</a>
+				</div>
+			</div>
 <?php
 		} else {
 			if(get_kunde_plan() == "Demo") {

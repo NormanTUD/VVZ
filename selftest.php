@@ -399,6 +399,16 @@ ALTER TABLE '.$row[0].' ADD COLUMN ts TIMESTAMP(6) GENERATED ALWAYS AS ROW START
 				}
 			}
 
+			if(table_exists($GLOBALS['dbname'], 'page')) {
+				$pni_parent = get_single_row_from_query("SELECT id FROM `page` WHERE id = 27 LIMIT 1");
+				$pni_parent_sql = $pni_parent ? '27' : 'NULL';
+				rquery("INSERT IGNORE INTO `page` (name, file, show_in_navigation, parent, show_in_startpage) VALUES ('Prüfungsnummer-Info', '../pruefungsnummer_info.php', '1', ".$pni_parent_sql.", 1)");
+				$page_id_pni = get_single_row_from_query("SELECT id FROM `page` WHERE `file` = '../pruefungsnummer_info.php' LIMIT 1");
+				if($page_id_pni) {
+					rquery("INSERT IGNORE INTO `role_to_page` (role_id, page_id) VALUES (1, ".esc($page_id_pni).")");
+				}
+			}
+
 			if(!table_exists_and_has_entries("role_to_page") && !already_initialized("role_to_page")) {
 				# removed: (1,32),
 				rquery("insert ignore INTO `role_to_page` (role_id, page_id) VALUES (1,1),
