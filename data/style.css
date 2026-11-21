@@ -1566,27 +1566,6 @@ html.dark-mode .pni_pn_chip_historical small {
 	outline-offset: -4px;
 }
 
-.startseite_globalsearch {
-	margin: 14px auto 10px auto;
-	max-width: 520px;
-}
-
-.startseite_globalsearch input[type="search"] {
-	width: 100%;
-	box-sizing: border-box;
-	padding: 10px 12px;
-	font-size: 15px;
-	border: 1px solid #b8c4cc;
-	border-radius: 5px;
-	background: #fff;
-}
-
-.startseite_globalsearch input[type="search"]:focus {
-	border-color: #006092;
-	box-shadow: 0 0 0 3px rgba(0, 96, 146, 0.18);
-	outline: none;
-}
-
 .filter_toolbar {
 	line-height: 1.8;
 }
@@ -1675,12 +1654,6 @@ html.dark-mode .pni_pn_chip_historical small {
 	color: #fff !important;
 }
 
-html.dark-mode .startseite_globalsearch input[type="search"] {
-	background: #1e1e3a;
-	border-color: #555;
-	color: #e0e0e0;
-}
-
 html.dark-mode .filter_summary {
 	color: #d8d8e8;
 }
@@ -1707,10 +1680,6 @@ html.dark-mode .skip-link {
 }
 
 @media (max-width: 700px) {
-	.startseite_globalsearch {
-		margin: 10px 8px;
-	}
-
 	#filter table,
 	#filter tbody,
 	#filter tr,

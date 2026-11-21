@@ -36,19 +36,4 @@
 		'startseite?studiengang=5'
 	);
 
-	is_equal(
-		'usability: public search url defaults to all study programmes',
-		vvz_startseite_search_url(array('vltitel' => 'A & B', 'semester' => '3', 'institut' => '2')),
-		'startseite?studiengang=alle&vltitel=A+%26+B&semester=3&institut=2'
-	);
-	is_equal(
-		'usability: public search url can override study programme and drops null values',
-		vvz_startseite_search_url(array('studiengang' => '7', 'institut' => null)),
-		'startseite?studiengang=7'
-	);
-	regex_matches(
-		'usability: public search url keeps study programme context',
-		vvz_startseite_search_url(array('dozent' => '12')),
-		'/studiengang=alle/'
-	);
 ?>

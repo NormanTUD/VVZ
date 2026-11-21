@@ -4,7 +4,6 @@
 	}
 
 	require_once(dirname(__DIR__).'/usability_helpers.php');
-	require_once(dirname(__DIR__).'/search_functions.php');
 	include_once(dirname(__DIR__).'/startseite_functions.php');
 
 	$saved_globals = array();

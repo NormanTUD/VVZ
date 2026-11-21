@@ -90,15 +90,4 @@
 		}
 	}
 
-	if(!function_exists('vvz_startseite_search_url')) {
-		function vvz_startseite_search_url ($params) {
-			$url_params = array_merge(array('studiengang' => 'alle'), $params);
-			foreach($url_params as $key => $value) {
-				if(!vvz_value_is_set($value)) {
-					unset($url_params[$key]);
-				}
-			}
-			return 'startseite?'.http_build_query($url_params);
-		}
-	}
 ?>
