@@ -41,6 +41,7 @@ $test_files = array(
 	"test_kundenkram_functions.php",
 	"test_functions_extra.php",
 	"test_studienordnung_import_helpers.php",
+	"test_usability_features.php",
 );
 
 foreach ($test_files as $file) {

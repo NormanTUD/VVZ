@@ -1227,6 +1227,9 @@ html.dark-mode .bg_225599_ddaa66 {
 	</head>
 <body data-vvz-admin="<?php print $is_admin_page ? '1' : '0'; ?>">
 
+<?php $skip_target = ($is_admin_page || basename($_SERVER['SCRIPT_NAME'] ?? '') === 'api.php') ? '#main' : '#mainindex'; ?>
+<a class="skip-link" href="<?php print $skip_target; ?>">Zum Inhalt springen</a>
+
 <!-- Dark Mode Toggle — subtle, top-right, non-intrusive -->
 <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Dunkelmodus umschalten" title="Hell/Dunkel umschalten">
 	<span class="toggle-icon sun">☀️</span>

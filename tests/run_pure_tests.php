@@ -1123,6 +1123,7 @@ $pure_test_files = array(
 	"test_emojis.php",
 	"test_discordian_date.php",
 	"test_soi_parser.php",
+	"test_usability_helpers.php",
 );
 
 foreach ($pure_test_files as $file) {

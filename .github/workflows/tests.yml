@@ -168,6 +168,13 @@ jobs:
           echo "=========================================="
           php tests/run_page_tests.php
 
+      - name: Run usability feature tests
+        run: |
+          echo "=========================================="
+          echo "  Usability feature tests"
+          echo "=========================================="
+          php tests/run_usability_tests.php
+
       - name: Run request dispatcher tests
         run: |
           echo "=========================================="

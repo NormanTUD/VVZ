@@ -1,5 +1,6 @@
 <?php
 	include_once("config.php");
+	require_once(__DIR__.'/usability_helpers.php');
 
 
 
@@ -102,7 +103,7 @@
 
 	function show_filter_veranstaltungstypen () {
 ?>
-		<select name="veranstaltungstyp_id">
+		<select id="filter_veranstaltungstyp" name="veranstaltungstyp_id">
 			<option value="">Alle</option>
 <?php
 			$query = 'SELECT `id`, concat(`abkuerzung`, " (", `name`, ")") FROM `veranstaltungstyp` WHERE `id` IN (SELECT `veranstaltungstyp_id` FROM `veranstaltung` WHERE `institut_id` = '.esc($GLOBALS['this_institut']).')';
@@ -127,7 +128,7 @@
 
 	function show_filter_pruefungstyp () {
 ?>
-		<select name="pruefungstyp">
+		<select id="filter_pruefungstyp" name="pruefungstyp">
 			<option value="">Alle</option>
 <?php
 			$query = 'select pt.id, pt.name from pruefung p join pruefungsnummer pn on p.pruefungsnummer_id = pn.id join pruefungstyp pt on pt.id = pn.pruefungstyp_id where veranstaltung_id in (select id from veranstaltung where institut_id = '.esc($GLOBALS['this_institut']).') group by pt.id order by pt.name';
@@ -145,7 +146,7 @@
 
 	function show_filter_modul () {
 ?>
-		<select name="modul">
+		<select id="filter_modul" name="modul">
 			<option value="">Alle</option>
 <?php
 			$query = 'SELECT `m`.`id`, if(m.abkuerzung is null, `m`.`name`, concat(m.name, " (", m.abkuerzung, ")")) as shown_name, s.name as studiengang_name FROM `modul` m join studiengang s on s.id = m.studiengang_id WHERE m.`name` IS NOT NULL AND m.`name` != ""';
@@ -180,7 +181,7 @@
 
 	function show_filter_studiengang () {
 ?>
-		<select name="studiengang">
+		<select id="filter_studiengang" name="studiengang">
 			<option value="alle">Alle</option>
 <?php
 			$query = 'SELECT `s`.`id`, `s`.`name` FROM `studiengang` `s`';
@@ -199,7 +200,7 @@
 
 	function show_filter_semester () {
 ?>
-		<select name="semester">
+		<select id="filter_semester" name="semester">
 <?php
 			$query = 'select id, concat(typ, " ", jahr) from semester where id in (select semester_id from veranstaltung) order by jahr asc, typ asc';
 			$result = rquery($query);
@@ -222,7 +223,7 @@
 
 	function show_filter_wochentag () {
 ?>
-		<select name="wochentag">
+		<select id="filter_wochentag" name="wochentag">
 			<option value="">Alle</option>
 <?php
 			foreach (create_wochentag_array() as $wochentag) {
@@ -237,7 +238,7 @@
 
 	function show_filter_stunde () {
 ?>
-		<select name="stunde">
+		<select id="filter_stunde" name="stunde">
 		<option value="">Alle</option>
 <?php
 			$stundenquery = 'SELECT `stunde` FROM `veranstaltung_metadaten` `vm` JOIN `veranstaltung` `v` ON `v`.`id` = `vm`.`veranstaltung_id` WHERE `v`.`institut_id` = '.esc($GLOBALS['this_institut']).' GROUP BY `stunde`';
@@ -258,7 +259,7 @@
 
 	function show_filter_dozent () {
 ?>
-		<select name="dozent">
+		<select id="filter_dozent" name="dozent">
 			<option value="">Alle</option>
 <?php
 			$query = 'SELECT `id`, concat(`first_name`, " ", `last_name`) FROM `dozent` WHERE `id` IN (SELECT `dozent_id` FROM `veranstaltung` WHERE `institut_id` = '.esc($GLOBALS['this_institut']).')';
@@ -276,7 +277,7 @@
 
 	function show_filter_gebaeude () {
 ?>
-		<select name="gebaeude">
+		<select id="filter_gebaeude" name="gebaeude">
 			<option value="">Alle</option>
 <?php
 			$query = 'SELECT `id`, `abkuerzung`, `name` FROM `gebaeude` WHERE `id` IN (SELECT `gebaeude_id` FROM `veranstaltung`) ORDER BY `abkuerzung`';
@@ -293,12 +294,13 @@
 	}
 
 	function show_filter () {
+		$filter_active = vvz_filter_is_active($_GET);
 ?>
-		<form id="filter">
+		<form id="filter" method="get" action="startseite" class="<?php print $filter_active ? 'filter_open' : ''; ?>">
 			<table>
 				<tr>
 					<td>
-						Semester:
+						<label for="filter_semester">Semester:</label>
 					</td>
 					<td>
 						<?php show_filter_semester($GLOBALS['this_semester']); ?>
@@ -306,10 +308,10 @@
 				</tr>
 				<tr>
 					<td>
-						Vorlesungsname enthält im Titel:
+						<label for="filter_vltitel">Vorlesungsname enthält im Titel:</label>
 					</td>
 					<td>
-						<input label="Vorlesungsname enthält im Titel" type="text" name="vltitel" value="<?php print htmlentities(get_get('vltitel') ?? ""); ?>" />
+						<input id="filter_vltitel" type="text" name="vltitel" value="<?php print htmlentities(get_get('vltitel') ?? ""); ?>" />
 					</td>
 				</tr>
 <?php
@@ -317,20 +319,26 @@
 ?>
 					<tr>
 						<td>
-							Modul:
+							<label for="filter_modul">Modul:</label>
 						</td>
 						<td>
 							<?php show_filter_modul(); ?>
 						</td>
 					</tr>
 <?php
+				} else {
+					foreach(get_get('modul') as $this_modul_id) {
+?>
+						<input type="hidden" name="modul[]" value="<?php print htmlentities($this_modul_id); ?>" />
+<?php
+					}
 				}
 
 				if(get_get('studiengang') == 'alle') {
 ?>
 					<tr>
 						<td>
-							Studiengang:
+							<label for="filter_studiengang">Studiengang:</label>
 						</td>
 						<td>
 							<?php show_filter_studiengang(); ?>
@@ -339,19 +347,37 @@
 <?php
 				} else {
 ?>
-					<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang')); ?>" />
+					<input type="hidden" name="studiengang" value="<?php print htmlentities(get_get('studiengang') ?? ""); ?>" />
+<?php
+				}
+
+				if(get_get('institut')) {
+?>
+					<input type="hidden" name="institut" value="<?php print htmlentities(get_get('institut')); ?>" />
+<?php
+				}
+
+				if(get_get('bereich')) {
+?>
+					<input type="hidden" name="bereich" value="<?php print htmlentities(get_get('bereich')); ?>" />
+<?php
+				}
+
+				if(get_get('pruefungsnummer_id')) {
+?>
+					<input type="hidden" name="pruefungsnummer_id" value="<?php print htmlentities(get_get('pruefungsnummer_id')); ?>" />
 <?php
 				}
 ?>
 				<tr>
-					<td>Veranstaltungstypen:</td>
+					<td><label for="filter_veranstaltungstyp">Veranstaltungstypen:</label></td>
 					<td>
 						<?php show_filter_veranstaltungstypen($GLOBALS['this_institut']); ?>
 					</td>
 				</tr>
 				<tr>
 					<td>
-						Wochentag:
+						<label for="filter_wochentag">Wochentag:</label>
 					</td>
 					<td>
 						<?php show_filter_wochentag(); ?>
@@ -359,7 +385,7 @@
 				</tr>
 				<tr>
 					<td>
-						Stunde:
+						<label for="filter_stunde">Stunde:</label>
 					</td>
 					<td>
 						<?php show_filter_stunde($GLOBALS['this_institut']); ?>
@@ -367,7 +393,7 @@
 				</tr>
 				<tr>
 					<td>
-						Lehrkraft:
+						<label for="filter_dozent">Lehrkraft:</label>
 					</td>
 					<td>
 						<?php show_filter_dozent($GLOBALS['this_institut']); ?>
@@ -375,7 +401,7 @@
 				</tr>
 				<tr>
 					<td>
-						Gebäude:
+						<label for="filter_gebaeude">Gebäude:</label>
 					</td>
 					<td>
 						<?php show_filter_gebaeude(); ?>
@@ -383,23 +409,102 @@
 				</tr>
 				<tr>
 					<td>
-						Prüfungstyp:
+						<label for="filter_pruefungstyp">Prüfungstyp:</label>
 					</td>
 					<td>
 						<?php show_filter_pruefungstyp($GLOBALS['this_institut']); ?>
 					</td>
 				</tr>
 				<tr>
-					<td>eLearning-Seite vorhanden?</td>
-					<td><input label="eLearning-Seite vorhanden?" type="checkbox" value="1" name="opal_zwingend" <?php print htmlentities(get_get('opal_zwingend') ?? "") ? 'checked="CHECKED"' : '' ?> /></td>
+					<td><label for="filter_opal">eLearning-Seite vorhanden?</label></td>
+					<td><input id="filter_opal" type="checkbox" value="1" name="opal_zwingend" <?php print htmlentities(get_get('opal_zwingend') ?? "") ? 'checked="CHECKED"' : '' ?> /></td>
 				</tr>
 				<tr>
 					<td></td>
-					<td><input type="submit" value="Filtern" /></td>
+					<td class="filter_actions">
+						<input type="submit" value="Filtern" />
+						<?php if($filter_active) { ?>
+							<a class="filter_reset_link" href="<?php print htmlentities(vvz_filter_reset_url($_GET)); ?>">Filter zurücksetzen</a>
+						<?php } ?>
+					</td>
 				</tr>
 			</table>
 
 		</form>
+<?php
+		show_active_filter_summary();
+	}
+
+	function show_active_filter_summary () {
+		$active_keys = vvz_filter_active_keys($_GET);
+
+		if(!count($active_keys)) {
+			return;
+		}
+?>
+		<div class="filter_summary" role="status" aria-live="polite">
+			<span class="filter_summary_label">Aktive Filter:</span>
+<?php
+			foreach($active_keys as $key) {
+				$filter_values = get_get($key);
+				if(!is_array($filter_values)) {
+					$filter_values = array($filter_values);
+				}
+				foreach($filter_values as $filter_value) {
+					if(!vvz_value_is_set($filter_value)) {
+						continue;
+					}
+					$label = '';
+					switch($key) {
+						case 'vltitel':
+							$label = 'Titel: '.$filter_value;
+							break;
+						case 'modul':
+							$label = 'Modul: '.(get_modul_name($filter_value) ?: $filter_value);
+							break;
+						case 'veranstaltungstyp_id':
+							$label = 'Veranstaltungstyp: '.(get_veranstaltungstyp_name($filter_value) ?: $filter_value);
+							break;
+						case 'wochentag':
+							$label = 'Wochentag: '.$filter_value;
+							break;
+						case 'stunde':
+							$label = 'Stunde: '.$filter_value;
+							break;
+						case 'dozent':
+							$label = 'Lehrkraft: '.(get_dozent_name($filter_value) ?: $filter_value);
+							break;
+						case 'gebaeude':
+							$gebaeude = get_gebaeude_name_abkuerzung($filter_value);
+							$label = 'Gebäude: '.($gebaeude ? $gebaeude[0] : $filter_value);
+							break;
+						case 'pruefungstyp':
+							$label = 'Prüfungstyp: '.(get_pruefungstyp_name($filter_value) ?: $filter_value);
+							break;
+						case 'opal_zwingend':
+							$label = 'eLearning-Seite vorhanden';
+							break;
+						case 'pruefungsnummer_id':
+							$label = 'Prüfungsnummer: '.$filter_value;
+							break;
+						case 'fakultaet':
+							$label = 'Fakultät: '.$filter_value;
+							break;
+						default:
+							$label = $key.': '.$filter_value;
+							break;
+					}
+?>
+			<span class="filter_chip">
+				<?php print htmlentities($label); ?>
+				<a href="<?php print htmlentities(vvz_filter_remove_url($_GET, $key)); ?>" aria-label="<?php print htmlentities($label); ?> entfernen">&times;</a>
+			</span>
+<?php
+				}
+			}
+?>
+			<a class="filter_reset_link" href="<?php print htmlentities(vvz_filter_reset_url($_GET)); ?>">Alle zurücksetzen</a>
+		</div>
 <?php
 	}
 
@@ -1093,10 +1198,12 @@
 	}
 
 	function show_veranstaltungsuebersicht_header () {
+		$filter_active = vvz_filter_is_active($_GET);
+		$filter_count = vvz_filter_active_count($_GET);
 ?>
-		<div class="font20px">
-			<a id="filter_toggle"><?php print_search_icon(); ?>&nbsp;Filter</a> &mdash;
-			<a id="toggle_all_details"><?php print_double_arrow_down_icon(); ?>&nbsp;Details anzeigen/ausblenden</a>
+		<div class="font20px filter_toolbar">
+			<a id="filter_toggle" href="#filter" role="button" aria-controls="filter" aria-expanded="<?php print $filter_active ? 'true' : 'false'; ?>"><?php print_search_icon(); ?>&nbsp;Filter<?php if($filter_count) { print ' ('.$filter_count.')'; } ?></a> &mdash;
+			<a id="toggle_all_details" role="button" tabindex="0" aria-pressed="false"><?php print_double_arrow_down_icon(); ?>&nbsp;Details anzeigen/ausblenden</a>
 <?php
 			stundenplanerstellung_link();
 			studienordnung_link();
@@ -1639,14 +1746,43 @@
 <?php
 				show_link_alle_pruefungen_for_studiengang($GLOBALS['this_institut'], $GLOBALS['this_semester']);
 			} else {
-?>
-				<i class="red_text">Mit den gegebenen Suchkriterien konnten keine Veranstaltungen gefunden werden.</i>
-<?php
+				show_no_veranstaltungen_gefunden();
 			}
 
 			//js("toc.js");
 ?>
 		</form>
+<?php
+	}
+
+	function show_no_veranstaltungen_gefunden () {
+		$filter_active = vvz_filter_is_active($_GET);
+		$reset_url = vvz_filter_reset_url($_GET);
+		$all_url = vvz_startseite_url(array_merge($_GET, array('studiengang' => 'alle')), false);
+?>
+		<div class="empty_state" role="status">
+			<p class="red_text">Mit den gegebenen Suchkriterien konnten keine Veranstaltungen gefunden werden.</p>
+			<div class="empty_state_actions">
+<?php
+				if($filter_active) {
+?>
+					<a class="button_like" href="<?php print htmlentities($reset_url); ?>">Filter zurücksetzen</a>
+<?php
+				}
+				if(get_get('vltitel')) {
+?>
+					<a class="button_like" href="<?php print htmlentities(vvz_filter_remove_url($_GET, 'vltitel')); ?>">Suche &bdquo;<?php print htmlentities(get_get('vltitel')); ?>&ldquo; entfernen</a>
+<?php
+				}
+				if(get_get('studiengang') && get_get('studiengang') != 'alle') {
+?>
+					<a class="button_like" href="<?php print htmlentities(vvz_startseite_url(array_merge($_GET, array('studiengang' => 'alle')), true)); ?>">In allen Studiengängen suchen</a>
+<?php
+				}
+?>
+				<a class="button_like" href="<?php print htmlentities($all_url); ?>">Alle Veranstaltungen dieses Semesters anzeigen</a>
+			</div>
+		</div>
 <?php
 	}
 
@@ -1731,6 +1867,15 @@
 
 	}
 
+	function show_global_search_input () {
+?>
+		<div class="startseite_globalsearch">
+			<label class="visually_hidden" for="globalsearch">Suche im Vorlesungsverzeichnis</label>
+			<input type="search" id="globalsearch" name="search" noautosubmit="1" data-search-scope="public" placeholder="Veranstaltung, Lehrkraft, Prüfungsnummer …" autocomplete="off" />
+		</div>
+<?php
+	}
+
 	function show_header_startseite () {
 ?>
 		<header class="header_margin_bottom">
@@ -1757,6 +1902,8 @@
 					?></h3>
 					<p class="text-center"><?php print table_exists($GLOBALS["dbname"], "studiengang") ? htmlentities(get_studiengang_name(get_get('studiengang') ?? "") ?? "") : ""; ?></p>
 <?php
+					show_global_search_input();
+
 					show_institute_selector();
 
 					show_semester_selector();

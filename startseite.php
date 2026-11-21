@@ -412,11 +412,16 @@
 							if(document.activeElement == $("body")[0]) {
 								var keycode =  e.keyCode;
 								if(keycode >= 97 && keycode <= 122) {
-									if($("#filter").css("display") == "none") {
-										$("#filter").show();
+									var $globalsearch = $("#globalsearch");
+									if($globalsearch.length) {
+										$globalsearch.val($globalsearch.val() + String.fromCharCode(e.keyCode)).trigger("input").focus();
+									} else {
+										if($("#filter").css("display") == "none") {
+											$("#filter").show();
+										}
+										$("[name=vltitel]").val($("[name=vltitel]").val() + String.fromCharCode(e.keyCode));
+										$("[name=vltitel]").focus();
 									}
-									$("[name=vltitel]").val($("[name=vltitel]").val() + String.fromCharCode(e.keyCode));
-									$("[name=vltitel]").focus();
 								}
 							}
 						};

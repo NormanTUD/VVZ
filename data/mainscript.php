@@ -259,11 +259,16 @@ function save_geplante_pruefungsleistungen () {
 }
 
 function toggle_filter () {
-	$('#filter').toggle();
+	var $filter = $('#filter');
+	$filter.toggle();
+	$('#filter_toggle').attr('aria-expanded', $filter.is(':visible') ? 'true' : 'false');
 }
 
 function toggle_all_details () {
 	$("[id^='details_']").toggle();
+	var $toggle = $('#toggle_all_details');
+	var pressed = $toggle.attr('aria-pressed') === 'true';
+	$toggle.attr('aria-pressed', pressed ? 'false' : 'true');
 }
 
 function create_tinyurl () {
@@ -309,12 +314,46 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#filter_toggle').bind('click', function() {
+	$('#filter_toggle').bind('click', function(e) {
+		if(e) {
+			e.preventDefault();
+		}
 		toggle_filter();
 	});
 
-	$('#toggle_all_details').bind('click', function() {
+	$('#toggle_all_details').bind('click', function(e) {
+		if(e) {
+			e.preventDefault();
+		}
 		toggle_all_details();
+	});
+
+	$('#filter_toggle, #toggle_all_details').on('keydown', function(e) {
+		if(e.keyCode === 13 || e.keyCode === 32) {
+			e.preventDefault();
+			$(this).trigger('click');
+		}
+	});
+
+	$('#filter_toggle').attr('aria-expanded', $('#filter').is(':visible') ? 'true' : 'false');
+
+	$(document).on('keydown', function(e) {
+		if(e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) {
+			return;
+		}
+		var active = document.activeElement;
+		var tag = active && active.tagName ? active.tagName.toLowerCase() : '';
+		if(tag === 'input' || tag === 'textarea' || tag === 'select' || (active && active.isContentEditable)) {
+			return;
+		}
+		var $globalsearch = $('#globalsearch');
+		if($globalsearch.length) {
+			e.preventDefault();
+			$globalsearch.trigger('focus');
+			if($globalsearch[0].select) {
+				$globalsearch[0].select();
+			}
+		}
 	});
 
 	$('#neinliebernicht').bind('click', function() {
@@ -642,13 +681,16 @@ $(document).ready(function() {
 		"Gebäude":            { color: "#5d4037", icon: "🏢" }
 	};
 
+	var globalSearchScope = $globalsearch.attr('data-search-scope') || 'admin';
+
 	$globalsearch.autocomplete({
 		source: function( request, response ) {
 			$.ajax( {
 				url: "search.php",
 				dataType: "json",
 				data: {
-					term: request.term
+					term: request.term,
+					scope: globalSearchScope
 				},
 				success: function( data ) {
 					if(!data || data.error) {
