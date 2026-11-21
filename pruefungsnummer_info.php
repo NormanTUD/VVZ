@@ -743,29 +743,197 @@
 			return pni_regex_from_trie_node($root);
 		}
 
-		function pni_module_numbers ($module_id) {
-			$numbers = array();
-			$rows = pni_fetch_all('SELECT `pruefungsnummer` FROM `pruefungsnummer` WHERE `modul_id` = '.esc($module_id));
+		function pni_has_system_versioning ($table) {
+			static $cache = array();
+			if(array_key_exists($table, $cache)) {
+				return $cache[$table];
+			}
+
+			$cache[$table] = false;
+			if(!pni_table_exists($table)) {
+				return false;
+			}
+
+			try {
+				$row = get_single_row_from_query_assoc('SHOW CREATE TABLE `'.$table.'`');
+				$create = '';
+				if(is_array($row)) {
+					if(isset($row['Create Table'])) {
+						$create = $row['Create Table'];
+					} else {
+						foreach($row as $value) {
+							if(is_string($value) && strpos($value, 'CREATE') === 0) {
+								$create = $value;
+								break;
+							}
+						}
+					}
+				}
+				$cache[$table] = stripos($create, 'SYSTEM VERSIONING') !== false;
+			} catch (\Throwable $e) {
+				$cache[$table] = false;
+			}
+
+			return $cache[$table];
+		}
+
+		function pni_fetch_all_system_time ($table, $where) {
+			if(!pni_table_exists($table)) {
+				return array();
+			}
+
+			if(pni_has_system_versioning($table)) {
+				try {
+					return pni_fetch_all('SELECT * FROM `'.$table.'` FOR SYSTEM_TIME ALL WHERE '.$where);
+				} catch (\Throwable $e) {
+				}
+			}
+
+			try {
+				return pni_fetch_all('SELECT * FROM `'.$table.'` WHERE '.$where);
+			} catch (\Throwable $e) {
+				return array();
+			}
+		}
+
+		function pni_module_number_map ($module_ids) {
+			if(!is_array($module_ids)) {
+				$module_ids = array($module_ids);
+			}
+
+			$ids = array();
+			foreach($module_ids as $id) {
+				if(preg_match('/^\d+$/', (string)$id)) {
+					$ids[(int)$id] = (int)$id;
+				}
+			}
+
+			if(!count($ids)) {
+				return array();
+			}
+
+			$id_sql = implode(',', $ids);
+			$map = array_fill_keys($ids, array());
+			$pn_ids = array();
+			$pn_to_module = array();
+
+			$rows = pni_fetch_all_system_time('pruefungsnummer', '`modul_id` IN ('.$id_sql.')');
 			foreach($rows as $row) {
+				$modul_id = (int)$row['modul_id'];
+				$pn_id = (int)$row['id'];
 				$number = trim((string)$row['pruefungsnummer']);
-				if(preg_match('/^\d+$/', $number)) {
-					$numbers[$number] = $number;
+				if($pn_id > 0) {
+					$pn_ids[$pn_id] = $pn_id;
+					$pn_to_module[$pn_id] = $modul_id;
+				}
+				if(isset($map[$modul_id]) && preg_match('/^\d+$/', $number)) {
+					$map[$modul_id][$number] = $number;
 				}
 			}
 
 			if(pni_table_exists('pruefungsnummer_import')) {
-				$rows = pni_fetch_all('SELECT `generated_nr` FROM `pruefungsnummer_import` WHERE `modul_id` = '.esc($module_id));
+				$import_where = '`modul_id` IN ('.$id_sql.')';
+				if(count($pn_ids)) {
+					$import_where .= ' OR `pruefungsnummer_id` IN ('.implode(',', $pn_ids).')';
+				}
+				$rows = pni_fetch_all_system_time('pruefungsnummer_import', $import_where);
 				foreach($rows as $row) {
+					$modul_id = (int)$row['modul_id'];
+					$pn_id = (int)$row['pruefungsnummer_id'];
 					$number = trim((string)$row['generated_nr']);
-					if(preg_match('/^\d+$/', $number)) {
-						$numbers[$number] = $number;
+					$target_module = isset($map[$modul_id]) ? $modul_id : (isset($pn_to_module[$pn_id]) ? $pn_to_module[$pn_id] : null);
+					if($target_module !== null && isset($map[$target_module]) && preg_match('/^\d+$/', $number)) {
+						$map[$target_module][$number] = $number;
 					}
 				}
 			}
 
+			foreach($map as $modul_id => $numbers) {
+				$numbers = array_values($numbers);
+				sort($numbers, SORT_STRING);
+				$map[$modul_id] = $numbers;
+			}
+
+			return $map;
+		}
+
+		function pni_module_numbers ($module_ids) {
+			$map = pni_module_number_map($module_ids);
+			$numbers = array();
+			foreach($map as $module_numbers) {
+				foreach($module_numbers as $number) {
+					$numbers[$number] = $number;
+				}
+			}
 			$numbers = array_values($numbers);
 			sort($numbers, SORT_STRING);
 			return $numbers;
+		}
+
+		function pni_module_search_terms ($module_ids) {
+			if(!is_array($module_ids)) {
+				$module_ids = array($module_ids);
+			}
+
+			$ids = array();
+			foreach($module_ids as $id) {
+				if(preg_match('/^\d+$/', (string)$id)) {
+					$ids[(int)$id] = (int)$id;
+				}
+			}
+
+			if(!count($ids)) {
+				return array();
+			}
+
+			$id_sql = implode(',', $ids);
+			$terms = array();
+
+			$rows = pni_fetch_all_system_time('modul', '`id` IN ('.$id_sql.')');
+			foreach($rows as $row) {
+				if(!empty($row['name'])) {
+					$terms[] = $row['name'];
+				}
+				if(!empty($row['abkuerzung'])) {
+					$terms[] = $row['abkuerzung'];
+				}
+			}
+
+			if(pni_table_exists('pruefungsnummer')) {
+				$rows = pni_fetch_all_system_time('pruefungsnummer', '`modul_id` IN ('.$id_sql.')');
+				foreach($rows as $row) {
+					if(!empty($row['modulbezeichnung'])) {
+						$terms[] = $row['modulbezeichnung'];
+					}
+				}
+			}
+
+			$expanded_terms = array();
+			foreach($terms as $term) {
+				foreach(preg_split('/\s*[,;]\s*/', (string)$term) as $part) {
+					$expanded_terms[] = $part;
+				}
+			}
+
+			$clean = array();
+			foreach($expanded_terms as $term) {
+				$term = trim((string)$term);
+				if($term === '' || preg_match('/^\d+$/', $term) || strlen($term) < 4) {
+					continue;
+				}
+				$key = strtolower($term);
+				if(!isset($clean[$key])) {
+					$clean[$key] = $term;
+				}
+			}
+
+			$clean = array_values($clean);
+			sort($clean, SORT_NATURAL | SORT_FLAG_CASE);
+			return $clean;
+		}
+
+		function pni_shell_quote ($value) {
+			return "'".str_replace("'", "'\\''", $value)."'";
 		}
 
 		function pni_command_block ($id, $label, $command) {
@@ -778,7 +946,55 @@
 			return $html;
 		}
 
-		function pni_render_module_result ($module) {
+		function pni_render_combined_command ($numbers, $module_count, $terms = array()) {
+			$number_regex = pni_compact_number_regex($numbers);
+			$term_patterns = array();
+			foreach($terms as $term) {
+				$term_patterns[] = preg_quote($term, '/');
+			}
+
+			$parts = array();
+			if($number_regex) {
+				$parts[] = '(?<!\d)'.$number_regex.'(?!\d)';
+			}
+			if(count($term_patterns)) {
+				$parts[] = '(?i:'.implode('|', $term_patterns).')';
+			}
+
+			if(!count($parts)) {
+				print '<div class="callout warning"><b>Für die gefundenen Module sind keine Prüfungsnummern oder Modulnamen hinterlegt.</b></div>';
+				return;
+			}
+
+			$pattern = count($parts) === 1 ? $parts[0] : '(?:'.implode('|', $parts).')';
+			$ack = 'ack -l --type-add=tex:ext:tex -t tex '.pni_shell_quote($pattern).' .';
+			$pdfgrep = 'pdfgrep -r -l -P '.pni_shell_quote($pattern).' .';
+
+			$meta = count($numbers).' Prüfungsnummern';
+			if(count($terms)) {
+				$meta .= ' + '.count($terms).' Modulnamen/Abkürzungen';
+			}
+			$meta .= ' aus '.$module_count.' Modulen &middot; inklusive historischer Semester, Jahrgänge und Studiengänge';
+
+			print '<div class="pni_module_card pni_combined_card">';
+			print '<div class="pni_module_header">';
+			print '<div>';
+			print '<h2>Ein Befehl für alle Treffer</h2>';
+			print '<div class="pni_module_meta">'.$meta.'</div>';
+			print '</div>';
+			print '<div class="pni_module_count">'.strlen($pattern).' Zeichen Regex</div>';
+			print '</div>';
+			print '<p class="pni_command_hint">Der Befehl findet Dateien über Prüfungsnummern, Modulnamen, Abkürzungen und historische Bezeichnungen &mdash; auch dann, wenn in einer Arbeit gar keine Prüfungsnummer steht.</p>';
+			print pni_command_block('pni_ack_all', 'Alle .tex-Dateien finden (ack)', $ack);
+			print pni_command_block('pni_pdfgrep_all', 'Alle PDFs durchsuchen (pdfgrep)', $pdfgrep);
+			print '</div>';
+		}
+
+		function pni_render_module_result ($module, $numbers = null) {
+			if($numbers === null) {
+				$numbers = pni_module_numbers(array($module['id']));
+			}
+
 			$pns = pni_fetch_all('
 				SELECT
 					`pn`.`id`,
@@ -790,9 +1006,6 @@
 				WHERE `pn`.`modul_id` = '.esc($module['id']).'
 				ORDER BY `pn`.`pruefungsnummer`, `pn`.`id`
 			');
-
-			$numbers = pni_module_numbers($module['id']);
-			$regex = pni_compact_number_regex($numbers);
 
 			print '<div class="pni_module_card">';
 			print '<div class="pni_module_header">';
@@ -809,6 +1022,9 @@
 				$meta[] = pni_escape($module['institut_name']);
 			}
 			$meta[] = 'Modul-ID '.pni_escape($module['id']);
+			if(!empty($module['historical'])) {
+				$meta[] = '<span class="pni_historical_badge">historische Modulversion</span>';
+			}
 			print '<div class="pni_module_meta">'.implode(' &middot; ', $meta).'</div>';
 			print '</div>';
 			print '<div class="pni_module_count">'.count($numbers).' Prüfungsnummern</div>';
@@ -818,25 +1034,41 @@
 				print '<p>'.pni_escape($module['beschreibung']).'</p>';
 			}
 
+			$current_numbers = array();
+			$historical_numbers = array();
+			foreach($numbers as $number) {
+				$historical_numbers[$number] = $number;
+			}
+
 			if(count($pns)) {
-				print '<div class="pni_pn_chips">';
+				ob_start();
 				foreach($pns as $pn) {
 					$label = pni_escape($pn['pruefungsnummer']);
+					$current_numbers[(string)$pn['pruefungsnummer']] = 1;
 					if($pn['pruefungstyp']) {
 						$label .= ' <small>'.pni_escape($pn['pruefungstyp']).'</small>';
 					}
 					print '<a class="pni_pn_chip" href="'.htmlentities(pni_url(array('id' => $pn['id'])), ENT_QUOTES, 'UTF-8').'">'.$label.'</a>';
 				}
-				print '</div>';
+				$pn_chips = ob_get_clean();
+			} else {
+				$pn_chips = '';
 			}
 
-			if($regex) {
-				$pattern = '(?<!\d)'.$regex.'(?!\d)';
-				$ack = "ack -l --type-add=tex:ext:tex -t tex '".$pattern."' .";
-				$pdfgrep = "pdfgrep -r -l -P '".$pattern."' .";
-				print '<p class="pni_command_hint">Fertig zum Einfügen in die Shell &mdash; die Regex deckt alle '.count($numbers).' gefundenen Prüfungsnummern ab ('.strlen($pattern).' Zeichen).</p>';
-				print pni_command_block('pni_ack_'.$module['id'], 'Alle .tex-Dateien finden (ack)', $ack);
-				print pni_command_block('pni_pdfgrep_'.$module['id'], 'Alle PDFs durchsuchen (pdfgrep)', $pdfgrep);
+			$historical_only = array();
+			foreach($historical_numbers as $number) {
+				if(!isset($current_numbers[$number])) {
+					$historical_only[] = $number;
+				}
+			}
+
+			if($pn_chips || count($historical_only)) {
+				print '<div class="pni_pn_chips">';
+				print $pn_chips;
+				foreach($historical_only as $number) {
+					print '<span class="pni_pn_chip pni_pn_chip_historical" title="Nur in der Historie vorhanden">'.pni_escape($number).' <small>Historie</small></span>';
+				}
+				print '</div>';
 			} else {
 				print '<p><i>Für dieses Modul sind keine numerischen Prüfungsnummern hinterlegt.</i></p>';
 			}
@@ -940,6 +1172,7 @@
 	}
 
 	$pni_modul_rows = array();
+	$pni_module_ids = array();
 	if($pni_modul_input !== null) {
 		$pni_modul_like = '%'.addcslashes($pni_modul_input, '%_\\').'%';
 		$pni_modul_rows = pni_fetch_all('
@@ -950,8 +1183,7 @@
 				`m`.`beschreibung`,
 				`m`.`studiengang_id`,
 				`s`.`name` AS `studiengang_name`,
-				`i`.`name` AS `institut_name`,
-				(SELECT count(*) FROM `pruefungsnummer` `pn` WHERE `pn`.`modul_id` = `m`.`id`) AS `pn_count`
+				`i`.`name` AS `institut_name`
 			FROM `modul` `m`
 			LEFT JOIN `studiengang` `s` ON `s`.`id` = `m`.`studiengang_id`
 			LEFT JOIN `institut` `i` ON `i`.`id` = `s`.`institut_id`
@@ -959,8 +1191,54 @@
 				OR `m`.`abkuerzung` LIKE '.esc($pni_modul_like).'
 				OR `m`.`beschreibung` LIKE '.esc($pni_modul_like).'
 			ORDER BY `m`.`name`, `s`.`name`
-			LIMIT 60
 		');
+
+		$pni_current_module_ids = array();
+		foreach($pni_modul_rows as $row) {
+			$pni_current_module_ids[(int)$row['id']] = 1;
+			$pni_module_ids[(int)$row['id']] = (int)$row['id'];
+		}
+
+		if(pni_has_system_versioning('modul')) {
+			try {
+				$pni_historical_modules = pni_fetch_all('
+					SELECT DISTINCT
+						`id`, `name`, `abkuerzung`, `beschreibung`, `studiengang_id`
+					FROM `modul` FOR SYSTEM_TIME ALL
+					WHERE `name` LIKE '.esc($pni_modul_like).'
+						OR `abkuerzung` LIKE '.esc($pni_modul_like).'
+						OR `beschreibung` LIKE '.esc($pni_modul_like).'
+					ORDER BY `id`
+				');
+			} catch (\Throwable $e) {
+				$pni_historical_modules = array();
+			}
+
+			$pni_historical_seen = array();
+			foreach($pni_historical_modules as $row) {
+				$id = (int)$row['id'];
+				if($id <= 0) {
+					continue;
+				}
+				$pni_module_ids[$id] = $id;
+
+				if(isset($pni_current_module_ids[$id]) || isset($pni_historical_seen[$id])) {
+					continue;
+				}
+				$pni_historical_seen[$id] = 1;
+
+				$studiengang = get_single_row_from_query_assoc('
+					SELECT `s`.`name` AS `studiengang_name`, `i`.`name` AS `institut_name`
+					FROM `studiengang` `s`
+					LEFT JOIN `institut` `i` ON `i`.`id` = `s`.`institut_id`
+					WHERE `s`.`id` = '.esc($row['studiengang_id']).'
+				');
+				$row['studiengang_name'] = is_array($studiengang) ? $studiengang['studiengang_name'] : null;
+				$row['institut_name'] = is_array($studiengang) ? $studiengang['institut_name'] : null;
+				$row['historical'] = 1;
+				$pni_modul_rows[] = $row;
+			}
+		}
 	}
 
 	if(!$GLOBALS['pni_embedded']) {
@@ -999,7 +1277,7 @@
 					<input type="submit" value="Modul suchen" />
 				</div>
 			</form>
-			<p>Erzeugt einen kopierfertigen ack-/pdfgrep-Befehl mit allen Prüfungsnummern des Moduls.</p>
+			<p>Erzeugt einen einzigen kopierfertigen ack-/pdfgrep-Befehl mit allen Prüfungsnummern, Modulnamen, Abkürzungen und historischen Bezeichnungen aller Treffer.</p>
 		</div>
 	</div>
 <?php
@@ -1048,9 +1326,24 @@
 
 	if($pni_modul_input !== null) {
 		if(count($pni_modul_rows)) {
+			$pni_number_map = pni_module_number_map(array_values($pni_module_ids));
+			$pni_all_numbers = array();
+			foreach($pni_number_map as $module_numbers) {
+				foreach($module_numbers as $number) {
+					$pni_all_numbers[$number] = $number;
+				}
+			}
+			$pni_all_numbers = array_values($pni_all_numbers);
+			sort($pni_all_numbers, SORT_STRING);
+			$pni_search_terms = pni_module_search_terms(array_values($pni_module_ids));
+
 			print '<h2 class="pni_result_heading">Module zu &raquo;'.pni_escape($pni_modul_input).'&laquo;</h2>';
+			pni_render_combined_command($pni_all_numbers, count($pni_modul_rows), $pni_search_terms);
+
 			foreach($pni_modul_rows as $pni_modul_row) {
-				pni_render_module_result($pni_modul_row);
+				$module_id = (int)$pni_modul_row['id'];
+				$module_numbers = isset($pni_number_map[$module_id]) ? $pni_number_map[$module_id] : array();
+				pni_render_module_result($pni_modul_row, $module_numbers);
 			}
 		} else {
 			print '<div class="callout warning"><b>Kein Modul zu &raquo;'.pni_escape($pni_modul_input).'&laquo; gefunden.</b></div>';

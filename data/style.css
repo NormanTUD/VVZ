@@ -1475,3 +1475,57 @@ html.dark-mode .pni_pn_chip:hover {
 html.dark-mode .pni_pn_chip small {
 	color: #8bb5cf;
 }
+
+.pni_combined_card {
+	border-color: #9fd0e8;
+	background:
+		linear-gradient(135deg, rgba(0, 96, 146, 0.07), rgba(36, 199, 192, 0.08)),
+		#fff;
+}
+
+.pni_historical_badge {
+	display: inline-block;
+	padding: 2px 7px;
+	border: 1px solid #e0b36a;
+	border-radius: 999px;
+	background: #fff4dd;
+	color: #8a5a00;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+html.dark-mode .pni_combined_card {
+	border-color: #2f6d90;
+	background:
+		linear-gradient(135deg, rgba(0, 96, 146, 0.24), rgba(36, 199, 192, 0.1)),
+		#16213e;
+}
+
+html.dark-mode .pni_historical_badge {
+	border-color: #8a6e2e;
+	background: #4d3a14;
+	color: #ffd98a;
+}
+
+.pni_pn_chip_historical {
+	border-style: dashed;
+	border-color: #d6b36f;
+	background: #fff8e8;
+	color: #7d5a16 !important;
+}
+
+.pni_pn_chip_historical small {
+	color: #9a7424;
+}
+
+html.dark-mode .pni_pn_chip_historical {
+	border-color: #8a6e2e;
+	background: #3b2e13;
+	color: #ffd98a !important;
+}
+
+html.dark-mode .pni_pn_chip_historical small {
+	color: #e8bf67;
+}
