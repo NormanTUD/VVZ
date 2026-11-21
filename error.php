@@ -1,29 +1,16 @@
 <?php
-	if($GLOBALS['error_page_shown']) {
+	if(!empty($GLOBALS['error_page_shown'])) {
 		exit();
-	} else {
-		$GLOBALS["error_page_shown"] = 1;
 	}
-	$php_start = microtime(true);
-	include_once("config.php");
-	$page_title = "Vorlesungsverzeichnis ".$GLOBALS['university_name'];
+	$GLOBALS['error_page_shown'] = 1;
 
-	$filename = 'startseite';
-	include_once("header.php");
-?>
-	<div id="mainindex">
-		<a href="startseite" border="0"><?php print_uni_logo(); ?> </a>
-		<h2>Fehler</h2>
-<?php
-		$status_code = array_key_exists("REDIRECT_STATUS", $_SERVER) ? $_SERVER['REDIRECT_STATUS'] : null;
-		if($status_code) {
-?>
-			Es ist ein Fehler aufgetreten. Der Status-Code lautet <?php print htmlentities($status_code); ?>.
-<?php
-		} else {
-?>
-			Es ist ein Fehler aufgetreten. <?php if(isset($GLOBALS['messageerror'])) { print $GLOBALS['messageerror']; } ?>
-<?php
-		}
-	include("footer.php");
+	require_once(__DIR__.'/error_page.php');
+	render_vvz_error_page(
+		500,
+		'Da ist unser Server kurz ausgerutscht.',
+		'Bei der Verarbeitung ist ein interner Fehler aufgetreten. Bitte versuchen Sie es gleich noch einmal.',
+		'Bleibt der Fehler bestehen, informieren Sie bitte die Administration des Vorlesungsverzeichnisses.',
+		false
+	);
+	exit();
 ?>

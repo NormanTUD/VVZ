@@ -674,6 +674,175 @@
 			pni_section('Import-Historie', pni_render_importe($pn), false);
 			pni_section('Weitere Prüfungsnummern im selben Modul', pni_render_geschwister($pn), false);
 		}
+
+		function pni_regex_from_trie_node ($node) {
+			$parts = array();
+			$groups = array();
+
+			foreach($node['children'] as $char => $child) {
+				$suffix = pni_regex_from_trie_node($child);
+				$groups[$suffix][] = $char;
+			}
+
+			foreach($groups as $suffix => $chars) {
+				sort($chars, SORT_STRING);
+				$prefix = count($chars) === 1 ? $chars[0] : '['.implode('', $chars).']';
+				$parts[] = $prefix.$suffix;
+			}
+
+			if($node['end']) {
+				if(count($parts) === 0) {
+					return '';
+				}
+				if(count($parts) === 1) {
+					return '(?:'.$parts[0].')?';
+				}
+				return '(?:'.implode('|', $parts).')?';
+			}
+
+			if(count($parts) === 0) {
+				return '';
+			}
+			if(count($parts) === 1) {
+				return $parts[0];
+			}
+			return '(?:'.implode('|', $parts).')';
+		}
+
+		function pni_compact_number_regex ($numbers) {
+			$clean = array();
+			foreach($numbers as $number) {
+				$number = trim((string)$number);
+				if(preg_match('/^\d+$/', $number)) {
+					$clean[$number] = $number;
+				}
+			}
+
+			if(!count($clean)) {
+				return null;
+			}
+
+			$clean = array_values($clean);
+			sort($clean, SORT_STRING);
+
+			$root = array('end' => false, 'children' => array());
+			foreach($clean as $number) {
+				$node = &$root;
+				$length = strlen($number);
+				for($i = 0; $i < $length; $i++) {
+					$char = $number[$i];
+					if(!isset($node['children'][$char])) {
+						$node['children'][$char] = array('end' => false, 'children' => array());
+					}
+					$node = &$node['children'][$char];
+				}
+				$node['end'] = true;
+				unset($node);
+			}
+
+			return pni_regex_from_trie_node($root);
+		}
+
+		function pni_module_numbers ($module_id) {
+			$numbers = array();
+			$rows = pni_fetch_all('SELECT `pruefungsnummer` FROM `pruefungsnummer` WHERE `modul_id` = '.esc($module_id));
+			foreach($rows as $row) {
+				$number = trim((string)$row['pruefungsnummer']);
+				if(preg_match('/^\d+$/', $number)) {
+					$numbers[$number] = $number;
+				}
+			}
+
+			if(pni_table_exists('pruefungsnummer_import')) {
+				$rows = pni_fetch_all('SELECT `generated_nr` FROM `pruefungsnummer_import` WHERE `modul_id` = '.esc($module_id));
+				foreach($rows as $row) {
+					$number = trim((string)$row['generated_nr']);
+					if(preg_match('/^\d+$/', $number)) {
+						$numbers[$number] = $number;
+					}
+				}
+			}
+
+			$numbers = array_values($numbers);
+			sort($numbers, SORT_STRING);
+			return $numbers;
+		}
+
+		function pni_command_block ($id, $label, $command) {
+			$id = preg_replace('/[^a-zA-Z0-9_]/', '_', $id);
+			$html = '<div class="pni_command">';
+			$html .= '<label for="'.$id.'"><b>'.pni_escape($label).'</b></label>';
+			$html .= '<textarea id="'.$id.'" class="pni_command_text" readonly rows="2" onclick="this.select();">'.htmlentities($command, ENT_QUOTES, 'UTF-8').'</textarea>';
+			$html .= '<button type="button" class="button pni_copy_button" data-copy-target="'.$id.'">Kopieren</button>';
+			$html .= '</div>';
+			return $html;
+		}
+
+		function pni_render_module_result ($module) {
+			$pns = pni_fetch_all('
+				SELECT
+					`pn`.`id`,
+					`pn`.`pruefungsnummer`,
+					`pn`.`disabled`,
+					`pt`.`name` AS `pruefungstyp`
+				FROM `pruefungsnummer` `pn`
+				LEFT JOIN `pruefungstyp` `pt` ON `pt`.`id` = `pn`.`pruefungstyp_id`
+				WHERE `pn`.`modul_id` = '.esc($module['id']).'
+				ORDER BY `pn`.`pruefungsnummer`, `pn`.`id`
+			');
+
+			$numbers = pni_module_numbers($module['id']);
+			$regex = pni_compact_number_regex($numbers);
+
+			print '<div class="pni_module_card">';
+			print '<div class="pni_module_header">';
+			print '<div>';
+			print '<h2>'.pni_escape($module['name']).'</h2>';
+			$meta = array();
+			if($module['abkuerzung']) {
+				$meta[] = pni_escape($module['abkuerzung']);
+			}
+			if($module['studiengang_name']) {
+				$meta[] = pni_escape($module['studiengang_name']);
+			}
+			if($module['institut_name']) {
+				$meta[] = pni_escape($module['institut_name']);
+			}
+			$meta[] = 'Modul-ID '.pni_escape($module['id']);
+			print '<div class="pni_module_meta">'.implode(' &middot; ', $meta).'</div>';
+			print '</div>';
+			print '<div class="pni_module_count">'.count($numbers).' Prüfungsnummern</div>';
+			print '</div>';
+
+			if($module['beschreibung']) {
+				print '<p>'.pni_escape($module['beschreibung']).'</p>';
+			}
+
+			if(count($pns)) {
+				print '<div class="pni_pn_chips">';
+				foreach($pns as $pn) {
+					$label = pni_escape($pn['pruefungsnummer']);
+					if($pn['pruefungstyp']) {
+						$label .= ' <small>'.pni_escape($pn['pruefungstyp']).'</small>';
+					}
+					print '<a class="pni_pn_chip" href="'.htmlentities(pni_url(array('id' => $pn['id'])), ENT_QUOTES, 'UTF-8').'">'.$label.'</a>';
+				}
+				print '</div>';
+			}
+
+			if($regex) {
+				$pattern = '(?<!\d)'.$regex.'(?!\d)';
+				$ack = "ack -l --type-add=tex:ext:tex -t tex '".$pattern."' .";
+				$pdfgrep = "pdfgrep -r -l -P '".$pattern."' .";
+				print '<p class="pni_command_hint">Fertig zum Einfügen in die Shell &mdash; die Regex deckt alle '.count($numbers).' gefundenen Prüfungsnummern ab ('.strlen($pattern).' Zeichen).</p>';
+				print pni_command_block('pni_ack_'.$module['id'], 'Alle .tex-Dateien finden (ack)', $ack);
+				print pni_command_block('pni_pdfgrep_'.$module['id'], 'Alle PDFs durchsuchen (pdfgrep)', $pdfgrep);
+			} else {
+				print '<p><i>Für dieses Modul sind keine numerischen Prüfungsnummern hinterlegt.</i></p>';
+			}
+
+			print '</div>';
+		}
 	}
 
 	$pni_input = null;
@@ -761,6 +930,39 @@
 		}
 	}
 
+	$pni_modul_input = null;
+	$pni_modul_value = get_get('modul');
+	if(is_scalar($pni_modul_value)) {
+		$pni_modul_value = trim((string)$pni_modul_value);
+		if($pni_modul_value !== '') {
+			$pni_modul_input = $pni_modul_value;
+		}
+	}
+
+	$pni_modul_rows = array();
+	if($pni_modul_input !== null) {
+		$pni_modul_like = '%'.addcslashes($pni_modul_input, '%_\\').'%';
+		$pni_modul_rows = pni_fetch_all('
+			SELECT
+				`m`.`id`,
+				`m`.`name`,
+				`m`.`abkuerzung`,
+				`m`.`beschreibung`,
+				`m`.`studiengang_id`,
+				`s`.`name` AS `studiengang_name`,
+				`i`.`name` AS `institut_name`,
+				(SELECT count(*) FROM `pruefungsnummer` `pn` WHERE `pn`.`modul_id` = `m`.`id`) AS `pn_count`
+			FROM `modul` `m`
+			LEFT JOIN `studiengang` `s` ON `s`.`id` = `m`.`studiengang_id`
+			LEFT JOIN `institut` `i` ON `i`.`id` = `s`.`institut_id`
+			WHERE `m`.`name` LIKE '.esc($pni_modul_like).'
+				OR `m`.`abkuerzung` LIKE '.esc($pni_modul_like).'
+				OR `m`.`beschreibung` LIKE '.esc($pni_modul_like).'
+			ORDER BY `m`.`name`, `s`.`name`
+			LIMIT 60
+		');
+	}
+
 	if(!$GLOBALS['pni_embedded']) {
 		$page_title = 'Vorlesungsverzeichnis '.$GLOBALS['university_name'].' | Prüfungsnummer-Info';
 		$filename = 'startseite';
@@ -776,15 +978,33 @@
 		}
 	?>
 	<h1>Prüfungsnummer-Info</h1>
-	<form method="get" action="<?php print htmlentities($GLOBALS['pni_base'], ENT_QUOTES, 'UTF-8'); ?>">
-		<label for="pni_input"><b>Prüfungsnummer</b></label>
-		<input id="pni_input" type="text" name="pn" value="<?php print htmlentities($pni_input ?? '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="z.B. 214260" autofocus />
-		<input type="submit" value="Nachschlagen" />
-	</form>
-	<p>Geben Sie eine Prüfungsnummer ein, um alle dazu gespeicherten Informationen anzuzeigen.</p>
+	<div class="pni_search_grid">
+		<div class="pni_search_card">
+			<h2>Prüfungsnummer nachschlagen</h2>
+			<form method="get" action="<?php print htmlentities($GLOBALS['pni_base'], ENT_QUOTES, 'UTF-8'); ?>">
+				<label for="pni_input"><b>Prüfungsnummer</b></label>
+				<div class="pni_search_row">
+					<input id="pni_input" type="text" name="pn" value="<?php print htmlentities($pni_input ?? '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="z.B. 214260" autofocus />
+					<input type="submit" value="Nachschlagen" />
+				</div>
+			</form>
+			<p>Zeigt alle gespeicherten Informationen zu einer Prüfungsnummer an.</p>
+		</div>
+		<div class="pni_search_card">
+			<h2>Modul suchen</h2>
+			<form method="get" action="<?php print htmlentities($GLOBALS['pni_base'], ENT_QUOTES, 'UTF-8'); ?>">
+				<label for="pni_modul_input"><b>Modulname oder Abkürzung</b></label>
+				<div class="pni_search_row">
+					<input id="pni_modul_input" type="text" name="modul" value="<?php print htmlentities($pni_modul_input ?? '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="z.B. Praktische Philosophie" />
+					<input type="submit" value="Modul suchen" />
+				</div>
+			</form>
+			<p>Erzeugt einen kopierfertigen ack-/pdfgrep-Befehl mit allen Prüfungsnummern des Moduls.</p>
+		</div>
+	</div>
 <?php
-	if($pni_input === null && !$pni_id) {
-		print '<p><i>Noch keine Prüfungsnummer eingegeben.</i></p>';
+	if($pni_input === null && !$pni_id && $pni_modul_input === null) {
+		print '<p><i>Noch keine Prüfungsnummer und kein Modul eingegeben.</i></p>';
 	} else if($pni_id && !$pni_exact_found) {
 		print '<div class="callout warning"><b>Kein Datensatz mit dieser ID gefunden.</b></div>';
 	} else if($pni_input !== null && !$pni_exact_found) {
@@ -825,9 +1045,45 @@
 			print '<div class="height_20px"></div>';
 		}
 	}
+
+	if($pni_modul_input !== null) {
+		if(count($pni_modul_rows)) {
+			print '<h2 class="pni_result_heading">Module zu &raquo;'.pni_escape($pni_modul_input).'&laquo;</h2>';
+			foreach($pni_modul_rows as $pni_modul_row) {
+				pni_render_module_result($pni_modul_row);
+			}
+		} else {
+			print '<div class="callout warning"><b>Kein Modul zu &raquo;'.pni_escape($pni_modul_input).'&laquo; gefunden.</b></div>';
+		}
+	}
 ?>
 </div>
 <?php
+	if($pni_modul_input !== null && count($pni_modul_rows)) {
+?>
+<script nonce="<?php print nonce(); ?>">
+	document.querySelectorAll('.pni_copy_button').forEach(function(button) {
+		button.addEventListener('click', function() {
+			var field = document.getElementById(button.getAttribute('data-copy-target'));
+			if(!field) {
+				return;
+			}
+			field.focus();
+			field.select();
+			var text = field.value;
+			if(navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(text).then(function() {
+					button.textContent = 'Kopiert!';
+					setTimeout(function() { button.textContent = 'Kopieren'; }, 1500);
+				});
+			} else {
+				document.execCommand('copy');
+			}
+		});
+	});
+</script>
+<?php
+	}
 	if(!$GLOBALS['pni_embedded']) {
 		include(__DIR__.'/footer.php');
 	}
