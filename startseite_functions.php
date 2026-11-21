@@ -1867,15 +1867,6 @@
 
 	}
 
-	function show_global_search_input () {
-?>
-		<div class="startseite_globalsearch">
-			<label class="visually_hidden" for="globalsearch">Suche im Vorlesungsverzeichnis</label>
-			<input type="search" id="globalsearch" name="search" noautosubmit="1" data-search-scope="public" placeholder="Veranstaltung, Lehrkraft, Prüfungsnummer …" autocomplete="off" />
-		</div>
-<?php
-	}
-
 	function show_header_startseite () {
 ?>
 		<header class="header_margin_bottom">
@@ -1902,8 +1893,6 @@
 					?></h3>
 					<p class="text-center"><?php print table_exists($GLOBALS["dbname"], "studiengang") ? htmlentities(get_studiengang_name(get_get('studiengang') ?? "") ?? "") : ""; ?></p>
 <?php
-					show_global_search_input();
-
 					show_institute_selector();
 
 					show_semester_selector();

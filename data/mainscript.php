@@ -337,25 +337,6 @@ $(document).ready(function() {
 
 	$('#filter_toggle').attr('aria-expanded', $('#filter').is(':visible') ? 'true' : 'false');
 
-	$(document).on('keydown', function(e) {
-		if(e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) {
-			return;
-		}
-		var active = document.activeElement;
-		var tag = active && active.tagName ? active.tagName.toLowerCase() : '';
-		if(tag === 'input' || tag === 'textarea' || tag === 'select' || (active && active.isContentEditable)) {
-			return;
-		}
-		var $globalsearch = $('#globalsearch');
-		if($globalsearch.length) {
-			e.preventDefault();
-			$globalsearch.trigger('focus');
-			if($globalsearch[0].select) {
-				$globalsearch[0].select();
-			}
-		}
-	});
-
 	$('#neinliebernicht').bind('click', function() {
 		return_to_last_back();
 	});
@@ -681,16 +662,13 @@ $(document).ready(function() {
 		"Gebäude":            { color: "#5d4037", icon: "🏢" }
 	};
 
-	var globalSearchScope = $globalsearch.attr('data-search-scope') || 'admin';
-
 	$globalsearch.autocomplete({
 		source: function( request, response ) {
 			$.ajax( {
 				url: "search.php",
 				dataType: "json",
 				data: {
-					term: request.term,
-					scope: globalSearchScope
+					term: request.term
 				},
 				success: function( data ) {
 					if(!data || data.error) {
